@@ -28,22 +28,7 @@ if 'centralJet_' not in btag_name:
     btag_name = 'centralJet_' + btag_name
 jet_btag = branches[btag_name]
 
-# vis_b1_p4 = vector.zip({'pt': branches['genb1_vis_pt'],\
-#                         'eta': branches['genb1_vis_eta'],\
-#                         'phi': branches['genb1_vis_phi'],\
-#                         'mass': branches['genb1_vis_mass']})
-
-# vis_b2_p4 = vector.zip({'pt': branches['genb2_vis_pt'],\
-#                         'eta': branches['genb2_vis_eta'],\
-#                         'phi': branches['genb2_vis_phi'],\
-#                         'mass': branches['genb2_vis_mass']})
-
 has_at_least_2_reco_bjets = (ak.count_nonzero(jet_hadrFlav == 5, axis=1) >= 2)
-
-# jets_in_accep = ((vis_b1_p4.pt > 20) & (np.abs(vis_b1_p4.eta) < 2.5))\
-#               & ((vis_b2_p4.pt > 20) & (np.abs(vis_b2_p4.eta) < 2.5)) & has_at_least_2_b_reco_jets
-
-jets_in_accep = has_at_least_2_reco_bjets
 
 reco_lep1_type = branches['lep1_type']
 reco_lep2_type = branches['lep2_type']
@@ -68,22 +53,16 @@ lep1_correct = (reco_lep1_mu & gen_lep1_mu) | (reco_lep1_ele & gen_lep1_ele)
 lep2_correct = (reco_lep2_mu & gen_lep2_mu) | (reco_lep2_ele & gen_lep2_ele)
 both_lep_correct = lep1_correct & lep2_correct
 
-presel = jets_in_accep & both_lep_correct
+presel = has_at_least_2_reco_bjets & both_lep_correct
 
-jet_hadrFlav = jet_hadrFlav[presel]
 jet_btag = jet_btag[presel]
 jet_trueBjetTag = jet_trueBjetTag[presel]
 
 sort_by_btag = ak.argsort(jet_btag)[::, ::-1]
 jet_btag = jet_btag[sort_by_btag]
-jet_hadrFlav = jet_hadrFlav[sort_by_btag]
 jet_trueBjetTag = jet_trueBjetTag[sort_by_btag]
 
-# f1 = jet_hadrFlav[:, 0]
-# f2 = jet_hadrFlav[:, 1]
-# both_are_b_jets = (f1 == 5) & (f2 == 5)
 both_are_b_jets = (jet_trueBjetTag[:, 0]) & (jet_trueBjetTag[:, 1])
-
 purity = ak.count_nonzero(both_are_b_jets)/ak.count(both_are_b_jets)
 
 print(f"Sorted by: {args.sort_by}")
