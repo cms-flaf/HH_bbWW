@@ -15,11 +15,6 @@ file = uproot.open(args.file_name)
 tree = file['Events']
 branches = tree.arrays()
 
-jet_p4 = vector.zip({'pt': branches['centralJet_pt'],\
-                     'eta': branches['centralJet_eta'],\
-                     'phi': branches['centralJet_phi'],\
-                     'mass': branches['centralJet_mass']})
-
 jet_hadrFlav = branches['centralJet_hadronFlavour']
 jet_trueBjetTag = branches['centralJet_TrueBjetTag']
 
