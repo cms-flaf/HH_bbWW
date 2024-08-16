@@ -5,27 +5,28 @@ import uproot
 
 from Common.JetNet_utils import MXLossFunc, H_WW_MXLossFunc
 
+
 class JetNet():
-    def __init__(self, features, labels):
+    def __init__(self, features, labels, cfg):
         self.features = features
         self.labels = labels
 
         # training parameters
-        self.lr = 0.001
-        self.n_epochs = 50
-        self.batch_size = 256
-        self.verbosity = 1
-        self.valid_split = 0.33
+        self.lr = cfg['learning_rate']
+        self.n_epochs = cfg['n_epochs']
+        self.batch_size = cfg['batch_size']
+        self.verbosity = cfg['verbosity']
+        self.valid_split = cfg['valid_split']
+        self.name = cfg['name']
+        self.topology = cfg['topology']
 
         self.model = None
 
 
     def ConfigureModel(self, dataset_shape):
-        self.model = tf.keras.Sequential([tf.keras.layers.Dense(164, activation='relu'),
-                                          tf.keras.layers.Dense(82, activation='relu'),
-                                          tf.keras.layers.Dense(41, activation='relu'),
-                                          tf.keras.layers.Dense(20, activation='relu'),
-                                          tf.keras.layers.Dense(3)])
+        self.model = tf.keras.Sequential([tf.keras.layers.Dense(layer_size, activation='relu') for layer_size in self.topology])
+        self.model.add(tf.keras.layers.Dense(3))
+
         self.model.compile(loss=MXLossFunc, optimizer=tf.keras.optimizers.Adam(self.lr))
         self.model.build(dataset_shape)
 
@@ -49,7 +50,7 @@ class JetNet():
 
 
     def SaveModel(self, path):
-        self.model.save(f"{path}JetNet_v2.keras")
+        self.model.save(f"{path}{self.name}.keras")
 
     
     def LoadModel(self, model_name):
