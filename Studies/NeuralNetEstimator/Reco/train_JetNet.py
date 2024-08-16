@@ -1,6 +1,7 @@
-from JetNet import JetNet
-from Common.JetNetData import JetNetData
-from Common.JetNet_utils import PlotLoss, PlotPrediction
+from common.JetNet import JetNet
+from common.JetNetData import JetNetData
+from common.JetNet_utils import PlotLoss, PlotPrediction
+import yaml
 
 
 def main():
@@ -10,17 +11,20 @@ def main():
 
     input_files = ["JetNetTrain_reco.root"]
 
-    data = JetNetData(features, labels)
-    data.ReadFiles(input_files)
-    
-    data.Shuffle()
-    data.TrainTestSplit()        
+    with open("config.yaml", 'r') as stream:
+        cfg = yaml.safe_load(stream)
 
-    net = JetNet(features, labels)
-    net.ConfigureModel(data.train_features.shape)
-    history = net.Fit(data.train_features, data.train_labels)
-    net.SaveModel("./models/")
-    PlotLoss(history)
+        data = JetNetData(features, labels)
+        data.ReadFiles(input_files)
+        
+        data.Shuffle()
+        data.TrainTestSplit()        
+
+        net = JetNet(features, labels, cfg)
+        net.ConfigureModel(data.train_features.shape)
+        history = net.Fit(data.train_features, data.train_labels)
+        net.SaveModel("./models/")
+        PlotLoss(history)
 
     
 if __name__ == '__main__':
