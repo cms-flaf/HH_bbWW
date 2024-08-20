@@ -4,20 +4,27 @@ import numpy as np
 import psutil
 
 storage_folder = "/eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/"
-
-samples = []
-
 batch_dict = {
-    'signal': 1000,
-    'TT': 4000,
+    'signal': 100,
+    'TT': 400,
 
-    'batch_size': 0
+    'batch_size': 0,
 }
-
-
 for key in batch_dict.keys():
     if key == 'batch_size': continue
     batch_dict['batch_size'] += batch_dict[key]
+
+out_filename = f"traintest_2022_batchsize{batch_dict['batch_size']}.root"
+
+
+
+
+
+
+samples = []
+
+
+
 
 
 process_dict = {
@@ -116,7 +123,6 @@ print(f"Creating {nBatches} batches, according to distribution")
 print(process_dict)
 print(f"And total batch size is {batch_dict['batch_size']}")
 
-out_filename = "traintest.root"
 #Create the root file with all values set to 0, then we will fill by input next
 with uproot.recreate(out_filename) as file:
     for nBatch in range(nBatches):
@@ -134,6 +140,23 @@ with uproot.recreate(out_filename) as file:
 print(samples)
 
 
+
+def iterate_uproot(fnames, batch_size):
+    nBatches = 20
+    for iter in uproot.iterate(fnames, step_size=nBatches*batch_size):
+        p = 0
+        while p < nBatches*batch_size:
+            if p+batch_size > len(iter):
+                print("Bad new bears, end of file")
+                break
+            else:
+                out_array = iter[p:p+batch_size]
+                p+= batch_size
+                yield out_array
+
+
+
+nBatchesPerChunk = 500
 for process in process_dict.keys():
     for subprocess in process_dict[process].keys():
         if subprocess == 'total': continue
@@ -141,28 +164,34 @@ for process in process_dict.keys():
         tmp_file = uproot.recreate('tmp.root')
 
 
-        process_arrays = uproot.iterate(f"{os.path.join(storage_folder, subprocess)}/*.root:Events", step_size=process_dict[process][subprocess]['batch_size'])
-        write_arrays = uproot.iterate(f"{out_filename}:Events", step_size=batch_dict['batch_size'])
 
-        a = [[process_array, write_array] for process_array in process_arrays for write_array in write_arrays]
-        print("Created the arrays. Memory usage in MB is ", psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20))
+        process_iter = iterate_uproot(f"{os.path.join(storage_folder, subprocess)}/*.root:Events", process_dict[process][subprocess]['batch_size'])
+        output_iter = iterate_uproot(f"{out_filename}:Events", nBatchesPerChunk*batch_dict['batch_size'])
+
+        chunk_counter = 0
+        for output_array in output_iter:
+            new_write_array = np.array(output_array)
+            nBatchesThisChunk = len(new_write_array['lep1_pt'])//batch_dict['batch_size']
+            if len(new_write_array['lep1_pt'])%batch_dict['batch_size'] != 0: print("UH OH")
+            if nBatchesThisChunk == 0: continue
+            print("Looping output array. Memory usage in MB is ", psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20))
+            print(f"For subprocess {subprocess} we are on batch chunk number {chunk_counter} and this chunk has {nBatchesThisChunk} batches")
+            chunk_counter += 1
 
 
-        for nBatch in range(nBatches):
-            index_start = process_dict[process][subprocess]['batch_start']
-            index_end = index_start+process_dict[process][subprocess]['batch_size']
-            print(f"For subprocess {subprocess} we are starting at {index_start} on batch number {nBatch}")
+            for nBatch in range(nBatchesThisChunk):
+                process_array = next(process_iter)
+                index_start = process_dict[process][subprocess]['batch_start'] + (batch_dict['batch_size']*nBatch)
+                index_end = index_start+process_dict[process][subprocess]['batch_size']
 
+                #print(np.asarray(process_array['lep1_pt']))
+                #print(len(np.asarray(process_array['lep1_pt'])))
 
-            process_array = a[nBatch][0]
-            write_array = a[nBatch][1]
+                new_write_array['lep1_pt'][index_start:index_end] = np.asarray(process_array['lep1_pt'])
+                new_write_array['lep1_eta'][index_start:index_end] = np.asarray(process_array['lep1_eta'])
+                new_write_array['lep1_phi'][index_start:index_end] = np.asarray(process_array['lep1_phi'])
+                new_write_array['lep1_mass'][index_start:index_end] = np.asarray(process_array['lep1_mass'])
 
-            new_write_array = np.array(write_array)
-
-            new_write_array['lep1_pt'][index_start:index_end] = np.asarray(process_array['lep1_pt'])
-            new_write_array['lep1_eta'][index_start:index_end] = np.asarray(process_array['lep1_eta'])
-            new_write_array['lep1_phi'][index_start:index_end] = np.asarray(process_array['lep1_phi'])
-            new_write_array['lep1_mass'][index_start:index_end] = np.asarray(process_array['lep1_mass'])
 
             new_write_dict = {
                 'lep1_pt': new_write_array['lep1_pt'],
@@ -177,16 +206,8 @@ for process in process_dict.keys():
                 tmp_file['Events'].extend(new_write_dict)
 
 
+
         out_file.close()
         tmp_file.close()
         os.system(f"rm {out_filename}")
         os.system(f"mv tmp.root {out_filename}")
-
-
-
-
-
-
-
-
-
