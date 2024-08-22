@@ -1,6 +1,8 @@
 import argparse
+import csv
+import pandas as pd
 from PurityChecker import PurityChecker
-from ReportUtils import SaveToFile
+from ReportUtils import SaveToFile, MakeCmpPlot
 
 
 prefix = "/eos/user/a/abolshov/Analysis/FLAF/anaTuples/hme_v1/Run3_2022"
@@ -27,9 +29,21 @@ def main():
 
         for res in resonances:
             for channel_id, channel_name in channels.items():
-                purity = [pc.ComputePurity(p, channel_name) for p in paths if channel_id in p and res in p]
-                masspoint = [float(p.split('-')[-1].split('/')[0]) for p in paths if channel_id in p and res in p]
-                SaveToFile(f"out_{channel_name}_{res}_{tagger_name.split('-')[-1]}.txt", masspoint, purity)
+                data = [pc.ComputePurity(p, channel_name) for p in paths if channel_id in p and res in p]
+                output_name = f"out_{channel_name}_{res}_{tagger_name.split('-')[-1]}.csv"
+                SaveToFile(output_name, data)
+
+
+        for res in resonances:
+            for ch in channels:
+                deepflav = pd.read_csv(f"out_{ch}_{res}_btagDeepFlavB.csv")
+                pnet = pd.read_csv(f"out_{ch}_{res}_btagPNetB.csv")
+                MakeCmpPlot(pnet, 
+                            deepflav, 
+                            "btagPNetB", 
+                            "btagDeepFlavB", 
+                            f"Purity in {res} {ch.upper()} samples",
+                            f"{res}_{ch}_cmp.png")
 
 
 if __name__ == '__main__':
