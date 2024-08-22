@@ -2,6 +2,7 @@ import uproot
 import numpy as np
 import vector
 import awkward as ak
+from statsmodels.stats.proportion import proportion_confint
 
 
 class PurityChecker:
@@ -55,6 +56,11 @@ class PurityChecker:
         jet_trueBjetTag = jet_trueBjetTag[sort_by_btag]
 
         both_are_b_jets = (jet_trueBjetTag[:, 0]) & (jet_trueBjetTag[:, 1])
-        purity = ak.count_nonzero(both_are_b_jets)/ak.count(both_are_b_jets)
+        success_trials = ak.count_nonzero(both_are_b_jets)
+        total_trials = ak.count(both_are_b_jets)
+        purity = success_trials/total_trials
+        low, high = proportion_confint(success_trials, total_trials, alpha=0.32, method='beta')
 
-        return purity
+        masspoint = branches['X_mass'][0]
+
+        return masspoint, purity, low, high

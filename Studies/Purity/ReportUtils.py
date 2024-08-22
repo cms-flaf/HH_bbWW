@@ -1,36 +1,31 @@
-import seaborn as sns
+import csv
+import pandas as pd
 import matplotlib.pyplot as plt
 
-def MakePlot(masspoint, purity, output_name, title):
-    plt.grid()
-    plot = sns.lineplot(x=masspoint, y=purity, marker='s', linestyle='')
-    plot.set_title(title)
-    plot.set(xlabel='m(X), [GeV]', ylabel='Purity')
 
-    fig = plot.get_figure()
-    fig.savefig(output_name)
-    plt.close()
+def MakeCmpPlot(df1, df2, label1, label2, title, name):
+    plt.errorbar(df1['mX'], df1['purity'], 
+                 yerr=[df1['purity'] - df1['low'], df1['high'] - df1['purity']], 
+                 fmt='o', capsize=5, capthick=2, elinewidth=2, label=label1)
 
-
-# data: list of pairs (masspoint, purity) for all taggers in fixed channel and resonance type
-# markers: dactionary mapping tagger to marker type
-def MakeCmpPlot(data, output_name, title, taggers, markers):
-    plt.grid()
+    plt.errorbar(df2['mX'], df2['purity'], 
+                 yerr=[df2['purity'] - df2['low'], df2['high'] - df2['purity']], 
+                 fmt='s', capsize=5, capthick=2, elinewidth=2, label=label2)
     
-    for i, t in enumerate(data):
-        masspoint, purity = t
-        tagger = taggers[i]
-        plot = sns.lineplot(x=masspoint, y=purity, marker=markers[tagger], label=tagger, linestyle='', legend=False)
-        plot.set_title(title)
-        plot.set(xlabel='m(X), [GeV]', ylabel='Purity')
-
+    plt.title(title)
+    plt.xlabel("m(X)")
+    plt.ylabel("Purity")
+    plt.legend()
+    plt.grid(True)
+    plt.xscale('log')
     plt.legend(loc='upper right')
-    fig = plot.get_figure()
-    fig.savefig(output_name)
+    plt.savefig(name, format='png')
     plt.close()
 
 
-def SaveToFile(output_name, masspoint, purity):
-    with open(output_name, 'w') as file:
-        lines = [f"{masspoint[i]} {purity[i]}\n" for i in range(len(masspoint))]
-        file.write("".join(lines))
+def SaveToFile(output_name, data):
+    with open(output_name, 'w') as out:
+        csv_out = csv.writer(out)
+        csv_out.writerow(["mX", "purity", "low", "high"])
+        for row in data:
+            csv_out.writerow(row)
