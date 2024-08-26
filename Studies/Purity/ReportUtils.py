@@ -19,7 +19,7 @@ def MakeCmpPlot(df1, df2, label1, label2, title, name):
     plt.grid(True)
     plt.xscale('log')
     plt.legend(loc='upper right')
-    plt.savefig(name, format='png')
+    plt.savefig(name, format='pdf', bbox_inches='tight')
     plt.close()
 
 

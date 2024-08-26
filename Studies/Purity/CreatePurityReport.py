@@ -5,22 +5,24 @@ from PurityChecker import PurityChecker
 from ReportUtils import SaveToFile, MakeCmpPlot
 
 
-prefix = "/eos/user/a/abolshov/Analysis/FLAF/anaTuples/hme_v1/Run3_2022"
-nano = "nano_0.root"
-
 resonances = ["Graviton", "Radion"]
 channels = {"2B2L2Nu":"dl", "2B2JLNu":"sl"}
 
 
 def main():
     parser = argparse.ArgumentParser(prog='check_all', description='Checks purity of the given sample')
-    parser.add_argument('file_name', type=str, help="File with list of input files")
+    parser.add_argument('path', type=str, help="Path to the folder with samples")
+    parser.add_argument('inputs', type=str, help="File with list of samples to process")
+    parser.add_argument('file_name', type=str, help="Name of the .root file")
     parser.add_argument('sort_by', type=str, help="Name of the branch used to sort and select jets")
 
     args = parser.parse_args()
 
-    cfg_name = args.file_name
+    prefix = args.path
+    cfg_name = args.inputs
+    nano = args/file_name
     tagger_name = args.sort_by
+
 
     with open(cfg_name, 'r') as cfg:
         paths = [f"{prefix}/{line[:-1]}/{nano}" for line in cfg.readlines()]
@@ -43,7 +45,7 @@ def main():
                             "btagPNetB", 
                             "btagDeepFlavB", 
                             f"Purity in {res} {ch.upper()} samples",
-                            f"{res}_{ch}_cmp.png")
+                            f"{res}_{ch}_cmp.pdf")
 
 
 if __name__ == '__main__':
