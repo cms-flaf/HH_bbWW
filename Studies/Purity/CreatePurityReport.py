@@ -13,14 +13,14 @@ def main():
     parser = argparse.ArgumentParser(prog='check_all', description='Checks purity of the given sample')
     parser.add_argument('path', type=str, help="Path to the folder with samples")
     parser.add_argument('inputs', type=str, help="File with list of samples to process")
-    parser.add_argument('file_name', type=str, help="Name of the .root file")
+    parser.add_argument('file_name', type=str, default="nano_0.root", help="Name of the .root file")
     parser.add_argument('sort_by', type=str, help="Name of the branch used to sort and select jets")
 
     args = parser.parse_args()
 
     prefix = args.path
     cfg_name = args.inputs
-    nano = args/file_name
+    nano = args.file_name
     tagger_name = args.sort_by
 
 
