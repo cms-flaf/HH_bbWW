@@ -2,7 +2,8 @@ import os
 import uproot
 import numpy as np
 import psutil
-
+from datetime import datetime
+import yaml
 
 def variable_dict(batch_size, process_subdict, process_iter, output_array):
     vardict = {}
@@ -39,6 +40,9 @@ def init_empty_vardict(batch_size):
     }
     return empty_dict
 
+
+
+
 def iterate_uproot(fnames, batch_size, nBatchesPerChunk):
     for iter in uproot.iterate(fnames, step_size=nBatchesPerChunk*batch_size):
         p = 0
@@ -55,6 +59,8 @@ def iterate_uproot(fnames, batch_size, nBatchesPerChunk):
                 yield out_array
 
 
+
+
 def create_traintest(storage_folder, output_file_pattern, batch_dict):
     if 'batch_size' not in batch_dict.keys():
         batch_dict['batch_size'] = 0
@@ -64,8 +70,7 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict):
         batch_dict['batch_size'] += batch_dict[key]
         process_dict[key] = {}
 
-    #out_filename = f"traintest_2022_batchsize{batch_dict['batch_size']}.root"
-    out_filename = output_file_pattern.format(batch_dict['batch_size'])+".root"
+    out_filename = output_file_pattern.format(batch_dict['batch_size'])+f"_{datetime.today().strftime('%Y-%m-%d')}.root"
 
     samples = []
 
@@ -168,7 +173,7 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict):
 
     print(samples)
 
-    nBatchesPerChunk = int(nBatches/2)
+    nBatchesPerChunk = int(nBatches/2) #This still is changed by hand, should be optimized for RAM usage
     for process in process_dict.keys():
         for subprocess in process_dict[process].keys():
             if subprocess == 'total': continue
@@ -204,14 +209,17 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
+    parser.add_argument('--config', required=True, type=str, help="Config YAML")
 
-    storage_folder = "/eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/"
-    batch_dict = {
-        'signal': 100,
-        'TT': 400,
-    }
-    process_names = ['GluGlutoRadion', 'TT', 'DY']
-    output_file_pattern = "traintest_2022_batchsize{}"
-    
+    args = parser.parse_args()
+
+    with open(args.config, 'r') as file:
+        config_dict = yaml.safe_load(file)
+    print(config_dict)
+    storage_folder = config_dict['storage_folder']
+    batch_dict = config_dict['batch_dict']
+    process_names = config_dict['process_names']
+    output_file_pattern = config_dict['output_file_pattern']
+
 
     create_traintest(storage_folder, output_file_pattern, batch_dict)
