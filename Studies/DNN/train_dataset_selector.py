@@ -206,6 +206,141 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict):
 
 
 
+
+
+
+
+def create_traintest2(storage_folder, output_file_pattern, batch_dict, process_class_and_names):
+    if 'batch_size' not in batch_dict.keys():
+        batch_dict['batch_size'] = 0
+    process_dict = {}
+    for key in batch_dict.keys():
+        if key == 'batch_size': continue
+        batch_dict['batch_size'] += batch_dict[key]
+        process_dict[key] = {}
+
+    out_filename = output_file_pattern.format(batch_dict['batch_size'])+f"_{datetime.today().strftime('%Y-%m-%d')}.root"
+
+    samples = []
+
+
+    for process_class in process_class_and_names.keys():
+        for process_index, process_name in enumerate(process_class_and_names[process_class]):
+            process_dict[process_class][process_name] = {
+                'total': 0,
+                'nBatches': 0,
+                'batch_size': 0,
+                'batch_start': 0,
+            }
+            process_directory = os.path.join(storage_folder, process_class_and_names[process_class][process_index])
+            samples.append(process_directory)
+            for nano_file in os.listdir(process_directory):
+                with uproot.open(os.path.join(process_directory, nano_file)+":Events") as h:
+                    process_dict[process_class][process_name]['total'] += h.num_entries
+
+
+    for process in process_dict.keys():
+        process_dict[process]['total'] = 0
+        for subprocess in process_dict[process].keys():
+            if subprocess == 'total': continue
+            process_dict[process]['total'] += process_dict[process][subprocess]['total']
+
+        batch_size_sum = 0
+        for subprocess in process_dict[process].keys():
+            if subprocess == 'total': continue
+            process_dict[process][subprocess]['batch_size'] = max(int(process_dict[process][subprocess]['total']/process_dict[process]['total'] * batch_dict[process]), 1) #Hard require at least 1 per batch
+            process_dict[process][subprocess]['nBatches'] = int(process_dict[process][subprocess]['total']/process_dict[process][subprocess]['batch_size']) #Requirement is due to divide here, but maybe we want some batches to not have certain low-rate backgrounds?
+            batch_size_sum += process_dict[process][subprocess]['batch_size']
+
+
+        print(f"Process {process} has batch size sum {batch_size_sum}")
+        while batch_size_sum != batch_dict[process]:
+            print(f"Warning this is bad batch size, size={batch_size_sum} where goal is {batch_dict[process]}")
+
+            max_batches_subprocess = ""
+            max_batches_val = 0
+            for subprocess in process_dict[process].keys():
+                if subprocess == 'total': continue
+                if process_dict[process][subprocess]['nBatches'] > max_batches_val:
+                    max_batches_val = process_dict[process][subprocess]['nBatches']
+                    max_batches_subprocess = subprocess
+
+            print(f"Trying to fix, incrementing {max_batches_subprocess} batch size {process_dict[process][max_batches_subprocess]['batch_size']} by 1")
+            process_dict[process][max_batches_subprocess]['batch_size'] += 1
+            print(f"nBatches went from {process_dict[process][max_batches_subprocess]['nBatches']}")
+            process_dict[process][max_batches_subprocess]['nBatches'] = int(process_dict[process][max_batches_subprocess]['total']/process_dict[process][max_batches_subprocess]['batch_size'])
+            print(f"To {process_dict[process][max_batches_subprocess]['nBatches']}")
+            batch_size_sum += 1
+
+    current_index = 0
+    for process in process_dict.keys():
+        for subprocess in process_dict[process].keys():
+            if subprocess == 'total': continue
+            process_dict[process][subprocess]['batch_start'] = current_index
+            current_index += process_dict[process][subprocess]['batch_size']
+
+
+
+    nBatches = 1e100
+    for process in process_dict.keys():
+        for subprocess in process_dict[process].keys():
+            if subprocess == 'total': continue
+            if process_dict[process][subprocess]['nBatches'] < nBatches:
+                nBatches = process_dict[process][subprocess]['nBatches']
+
+
+
+
+    print(f"Creating {nBatches} batches, according to distribution")
+    print(process_dict)
+    print(f"And total batch size is {batch_dict['batch_size']}")
+
+    #Create the root file with all values set to 0, then we will fill by input next
+    with uproot.recreate(out_filename) as file:
+        for nBatch in range(nBatches):
+            empty_dict = init_empty_vardict(batch_dict['batch_size'])
+            if 'Events' not in '\t'.join(file.keys()):
+                file['Events'] = empty_dict
+            else:
+                file['Events'].extend(empty_dict)
+
+    print(samples)
+
+    nBatchesPerChunk = int(nBatches/2) #This still is changed by hand, should be optimized for RAM usage
+    for process in process_dict.keys():
+        for subprocess in process_dict[process].keys():
+            if subprocess == 'total': continue
+            out_file = uproot.open(out_filename)
+            tmp_file = uproot.recreate('tmp.root')
+
+
+
+            process_iter = iterate_uproot(f"{os.path.join(storage_folder, subprocess)}/*.root:Events", process_dict[process][subprocess]['batch_size'], nBatchesPerChunk)
+            output_iter = iterate_uproot(f"{out_filename}:Events", batch_dict['batch_size'], nBatchesPerChunk)
+
+            chunk_counter = 0
+            print(f"Looping output array {subprocess}. Memory usage in MB is ", psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20))
+            for output_array in output_iter:
+                new_write_dict = variable_dict(batch_dict['batch_size'], process_dict[process][subprocess], process_iter, output_array)
+
+                if 'Events' not in '\t'.join(tmp_file.keys()):
+                    tmp_file['Events'] = new_write_dict
+                else:
+                    tmp_file['Events'].extend(new_write_dict)
+
+            out_file.close()
+            tmp_file.close()
+            os.system(f"rm {out_filename}")
+            os.system(f"mv tmp.root {out_filename}")
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
@@ -215,11 +350,16 @@ if __name__ == '__main__':
 
     with open(args.config, 'r') as file:
         config_dict = yaml.safe_load(file)
-    print(config_dict)
+    #print(config_dict)
     storage_folder = config_dict['storage_folder']
     batch_dict = config_dict['batch_dict']
     process_names = config_dict['process_names']
     output_file_pattern = config_dict['output_file_pattern']
+    process_class_and_names = config_dict['process_class_and_names']
+    print(process_class_and_names)
 
+    output_folder = f"DNN_dataset_{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}"
+    os.makedirs(output_folder, exist_ok=True)
 
-    create_traintest(storage_folder, output_file_pattern, batch_dict)
+    #create_traintest(storage_folder, output_file_pattern, batch_dict)
+    create_traintest2(storage_folder, os.path.join(output_folder, output_file_pattern), batch_dict, process_class_and_names)
