@@ -2,28 +2,38 @@ from common.JetNet import JetNet
 from common.JetNetData import JetNetData
 from common.JetNet_utils import PlotLoss, PlotPrediction
 import yaml
+import argparse
 
 
 def main():
-    jet_obs = ['px', 'py', 'pz', 'E', 'btagPNetB', 'PNetRegPtRawCorr', 'PNetRegPtRawCorrNeutrino', 'PNetRegPtRawRes']
-    features = [f'centralJet{i}_{var}' for i in range(10) for var in jet_obs]
-    labels = ['H_VV_px', 'H_VV_py', 'H_VV_pz', 'H_VV_E', 'X_mass']
+    parser = argparse.ArgumentParser(prog='train_net', description='Trains Neural Net Estimator')
+    parser.add_argument('config_file', type=str, help="File with neural net configuration")
+    parser.add_argument('files', type=str, help="File with list of input files separated by newline character")
+    parser.add_argument('model_path', type=str, help="Path where to save trained model")
 
-    input_files = ["JetNetTrain_reco.root"]
+    args = parser.parse_args()
+    config = args.config_file
+    path_to_model = args.model_path
+    train_files = []
+    with open(arg.files, 'r') as file:
+        train_files = [line[:-1] for line in file.readlines()]
 
-    with open("config.yaml", 'r') as stream:
+    if not train_files:
+        raise RuntimeError(f"file {arg.files} contained empty list of input files")
+
+    with open(config, 'r') as stream:
         cfg = yaml.safe_load(stream)
 
         data = JetNetData(features, labels)
-        data.ReadFiles(input_files)
+        data.ReadFiles(train_files)
         
         data.Shuffle()
         data.TrainTestSplit()        
 
-        net = JetNet(features, labels, cfg)
+        net = JetNet(cfg)
         net.ConfigureModel(data.train_features.shape)
         history = net.Fit(data.train_features, data.train_labels)
-        net.SaveModel("./models/")
+        net.SaveModel(path_to_model)
         PlotLoss(history)
 
     
