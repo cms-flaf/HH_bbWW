@@ -71,22 +71,33 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict, process_cl
 
     out_filename = output_file_pattern.format(batch_dict['batch_size'])+f"_{datetime.today().strftime('%Y-%m-%d')}.root"
 
-    samples = []
 
 
     for process_class in process_class_and_names.keys():
-        for process_index, process_name in enumerate(process_class_and_names[process_class]):
+        class_value = process_class_and_names[process_class]['class_value']
+        process_names = process_class_and_names[process_class]['process_names'].keys()
+        for process_name in process_names:
+            #mass_value = process_class_and_names[process_class]['process_names'][process_name]['mass_value']
+            #print(f"Class/Mass {class_value}/{mass_value}")
             process_dict[process_class][process_name] = {
                 'total': 0,
                 'nBatches': 0,
                 'batch_size': 0,
                 'batch_start': 0,
+                'class_value': class_value,
+                #'mass_value': mass_value,
+                'all_extensions': []
             }
-            process_directory = os.path.join(storage_folder, process_class_and_names[process_class][process_index])
-            samples.append(process_directory)
-            for nano_file in os.listdir(process_directory):
-                with uproot.open(os.path.join(process_directory, nano_file)+":Events") as h:
-                    process_dict[process_class][process_name]['total'] += h.num_entries
+            #Check for the extension files
+            process_dict[process_class][process_name]['all_extensions'].append(process_name)
+            if (process_class_and_names[process_class]['process_names'][process_name]) != None:
+                for ext_name in (process_class_and_names[process_class]['process_names'][process_name]):
+                    process_dict[process_class][process_name]['all_extensions'].append(ext_name)
+            for ext_name in process_dict[process_class][process_name]['all_extensions']:
+                process_directory = os.path.join(storage_folder, ext_name)
+                for nano_file in os.listdir(process_directory):
+                    with uproot.open(os.path.join(process_directory, nano_file)+":Events") as h:
+                        process_dict[process_class][process_name]['total'] += h.num_entries
 
 
     for process in process_dict.keys():
@@ -122,6 +133,7 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict, process_cl
             print(f"To {process_dict[process][max_batches_subprocess]['nBatches']}")
             batch_size_sum += 1
 
+
     current_index = 0
     for process in process_dict.keys():
         for subprocess in process_dict[process].keys():
@@ -154,18 +166,20 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict, process_cl
             else:
                 file['Events'].extend(empty_dict)
 
-    print(samples)
 
     nBatchesPerChunk = int(nBatches/2) #This still is changed by hand, should be optimized for RAM usage
     for process in process_dict.keys():
         for subprocess in process_dict[process].keys():
             if subprocess == 'total': continue
+
             out_file = uproot.open(out_filename)
             tmp_file = uproot.recreate('tmp.root')
 
 
+            process_filelist = process_dict[process][subprocess]['all_extensions']
+            formatted_filelist = [ f"{os.path.join(storage_folder, x)}/*.root:Events" for x in process_filelist ]
 
-            process_iter = iterate_uproot(f"{os.path.join(storage_folder, subprocess)}/*.root:Events", process_dict[process][subprocess]['batch_size'], nBatchesPerChunk)
+            process_iter = iterate_uproot(formatted_filelist, process_dict[process][subprocess]['batch_size'], nBatchesPerChunk)
             output_iter = iterate_uproot(f"{out_filename}:Events", batch_dict['batch_size'], nBatchesPerChunk)
 
             chunk_counter = 0
