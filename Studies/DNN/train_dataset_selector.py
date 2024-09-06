@@ -5,38 +5,69 @@ import psutil
 from datetime import datetime
 import yaml
 
-def variable_dict(batch_size, process_subdict, process_iter, output_array):
+def variable_dict(batch_size, process_subdict, process_iter, output_array, mass_values):
     vardict = {}
     write_array = np.array(output_array)
     nBatchesThisChunk = len(write_array['lep1_pt'])//batch_size
     if len(write_array['lep1_pt'])%batch_size != 0: print("UH OH")
     if nBatchesThisChunk == 0: return vardict
 
+    class_value = process_subdict['class_value']
+    mass_value = process_subdict['mass_value']
+
     for nBatch in range(nBatchesThisChunk):
         process_array = next(process_iter)
         index_start = process_subdict['batch_start'] + (batch_size*nBatch)
         index_end = index_start+process_subdict['batch_size']
 
-        write_array['lep1_pt'][index_start:index_end] = np.asarray(process_array['lep1_pt'])
-        write_array['lep1_eta'][index_start:index_end] = np.asarray(process_array['lep1_eta'])
-        write_array['lep1_phi'][index_start:index_end] = np.asarray(process_array['lep1_phi'])
-        write_array['lep1_mass'][index_start:index_end] = np.asarray(process_array['lep1_mass'])
+        write_array['class_value'][index_start:index_end] = np.full(index_end-index_start, class_value)
+        if mass_value <= 0:
+            write_array['mass_value'][index_start:index_end] = np.random.choice(mass_values, size=index_end-index_start).astype(float)
+        else:
+            write_array['mass_value'][index_start:index_end] = np.full(index_end-index_start, mass_value)
+
+
+        write_array['lep1_pt'][index_start:index_end] =     np.asarray(process_array['lep1_pt'])
+        write_array['lep1_eta'][index_start:index_end] =    np.asarray(process_array['lep1_eta'])
+        write_array['lep1_phi'][index_start:index_end] =    np.asarray(process_array['lep1_phi'])
+        write_array['lep1_mass'][index_start:index_end] =   np.asarray(process_array['lep1_mass'])
+
+        write_array['lep2_pt'][index_start:index_end] =     np.asarray(process_array['lep2_pt'])
+        write_array['lep2_eta'][index_start:index_end] =    np.asarray(process_array['lep2_eta'])
+        write_array['lep2_phi'][index_start:index_end] =    np.asarray(process_array['lep2_phi'])
+        write_array['lep2_mass'][index_start:index_end] =   np.asarray(process_array['lep2_mass'])
 
     vardict = {
-        'lep1_pt': write_array['lep1_pt'],
-        'lep1_eta': write_array['lep1_eta'],
-        'lep1_phi': write_array['lep1_phi'],
-        'lep1_mass': write_array['lep1_mass'],
+        'class_value':  write_array['class_value'],
+        'mass_value':   write_array['mass_value'],
+
+        'lep1_pt':      write_array['lep1_pt'],
+        'lep1_eta':     write_array['lep1_eta'],
+        'lep1_phi':     write_array['lep1_phi'],
+        'lep1_mass':    write_array['lep1_mass'],
+
+        'lep2_pt':      write_array['lep2_pt'],
+        'lep2_eta':     write_array['lep2_eta'],
+        'lep2_phi':     write_array['lep2_phi'],
+        'lep2_mass':    write_array['lep2_mass'],
     }
     return vardict
 
 
 def init_empty_vardict(batch_size):
     empty_dict = {
-        'lep1_pt': np.zeros(batch_size),
-        'lep1_eta': np.zeros(batch_size),
-        'lep1_phi': np.zeros(batch_size),
-        'lep1_mass': np.zeros(batch_size),
+        'class_value':  np.zeros(batch_size),
+        'mass_value':   np.zeros(batch_size),
+
+        'lep1_pt':      np.zeros(batch_size),
+        'lep1_eta':     np.zeros(batch_size),
+        'lep1_phi':     np.zeros(batch_size),
+        'lep1_mass':    np.zeros(batch_size),
+
+        'lep2_pt':      np.zeros(batch_size),
+        'lep2_eta':     np.zeros(batch_size),
+        'lep2_phi':     np.zeros(batch_size),
+        'lep2_mass':    np.zeros(batch_size),
     }
     return empty_dict
 
@@ -60,7 +91,7 @@ def iterate_uproot(fnames, batch_size, nBatchesPerChunk):
 
 
 
-def create_traintest(storage_folder, output_file_pattern, batch_dict, process_class_and_names):
+def create_traintest(storage_folder, output_file_pattern, batch_dict, mass_values, process_class_and_names):
     if 'batch_size' not in batch_dict.keys():
         batch_dict['batch_size'] = 0
     process_dict = {}
@@ -77,15 +108,16 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict, process_cl
         class_value = process_class_and_names[process_class]['class_value']
         process_names = process_class_and_names[process_class]['process_names'].keys()
         for process_name in process_names:
-            #mass_value = process_class_and_names[process_class]['process_names'][process_name]['mass_value']
-            #print(f"Class/Mass {class_value}/{mass_value}")
+            mass_value = -1.0
+            if 'mass_string' in process_class_and_names[process_class].keys():
+                mass_value = float(eval(f"'{process_name}'{process_class_and_names[process_class]['mass_string']}"))
             process_dict[process_class][process_name] = {
                 'total': 0,
                 'nBatches': 0,
                 'batch_size': 0,
                 'batch_start': 0,
                 'class_value': class_value,
-                #'mass_value': mass_value,
+                'mass_value': mass_value,
                 'all_extensions': []
             }
             #Check for the extension files
@@ -185,7 +217,7 @@ def create_traintest(storage_folder, output_file_pattern, batch_dict, process_cl
             chunk_counter = 0
             print(f"Looping output array {subprocess}. Memory usage in MB is ", psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20))
             for output_array in output_iter:
-                new_write_dict = variable_dict(batch_dict['batch_size'], process_dict[process][subprocess], process_iter, output_array)
+                new_write_dict = variable_dict(batch_dict['batch_size'], process_dict[process][subprocess], process_iter, output_array, mass_values)
 
                 if 'Events' not in '\t'.join(tmp_file.keys()):
                     tmp_file['Events'] = new_write_dict
@@ -217,6 +249,7 @@ if __name__ == '__main__':
     storage_folder = config_dict['storage_folder']
     batch_dict = config_dict['batch_dict']
     output_file_pattern = config_dict['output_file_pattern']
+    mass_values = config_dict['mass_values']
     process_class_and_names = config_dict['process_class_and_names']
     print(process_class_and_names)
 
@@ -224,4 +257,4 @@ if __name__ == '__main__':
     os.makedirs(output_folder, exist_ok=True)
     os.system(f"cp {args.config} {output_folder}/.")
 
-    create_traintest(storage_folder, os.path.join(output_folder, output_file_pattern), batch_dict, process_class_and_names)
+    create_traintest(storage_folder, os.path.join(output_folder, output_file_pattern), batch_dict, mass_values, process_class_and_names)
