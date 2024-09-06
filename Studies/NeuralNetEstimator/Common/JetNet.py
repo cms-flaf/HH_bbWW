@@ -7,9 +7,12 @@ from Common.JetNet_utils import MXLossFunc, H_WW_MXLossFunc
 
 
 class JetNet():
-    def __init__(self, features, labels, cfg):
-        self.features = features
-        self.labels = labels
+    def __init__(self, cfg):
+        jet_obs = cfg['jet_observables']
+        n_jets = cfg['n_jets']
+
+        self.features = [f"centralJet{i}_{obs}" for i in range(n_jets) for obs in jet_obs]
+        self.labels = cfg['labels']
 
         # training parameters
         self.lr = cfg['learning_rate']
@@ -54,10 +57,6 @@ class JetNet():
 
     
     def LoadModel(self, model_name):
-        # to load with compilation custom_objects needs to be passed
-        # couldn't make it work
-        # if model is loaded only for prediction, compilation is not needed
         self.model = tf.keras.models.load_model(model_name, compile=False)
-        # self.model = tf.keras.models.load_model(model_name, custom_objects={'loss' : MXLossFunc(target, output)})
         print(f"Loaded model {model_name}")
         print(self.model.summary())
