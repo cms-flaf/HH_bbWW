@@ -4,42 +4,20 @@ import numpy as np
 
 
 @tf.function
-def MXLossFunc(target, output):
-    H_WW_px = target[:, 0]
-    H_WW_py = target[:, 1]
-    H_WW_pz = target[:, 2]
-    H_WW_E = target[:, 3]    
-        
-    X_mass = target[:, 4]
-    
-    H_bb_px = output[:, 0]
-    H_bb_py = output[:, 1]
-    H_bb_pz = output[:, 2]
+def GetMXPred(out_px, out_py, out_pz, target_px, target_py, target_pz, target_E, target_mass):
     H_mass = 125.0
-    H_bb_E_sqr = H_mass*H_mass + H_bb_px*H_bb_px + H_bb_py*H_bb_py + H_bb_pz*H_bb_pz
-    H_bb_E = tf.sqrt(H_bb_E_sqr)
+    out_E_sqr = H_mass*H_mass + out_px*out_px + out_py*out_py + out_pz*out_pz
+    out_E = tf.sqrt(out_E_sqr)
     
-    X_mass_pred = tf.sqrt((H_bb_E + H_WW_E)**2 - (H_bb_px + H_WW_px)**2 - (H_bb_py + H_WW_py)**2 - (H_bb_pz + H_WW_pz)**2)
-    return (X_mass_pred - X_mass)**2
+    pred_mass = tf.sqrt((out_E + target_E)**2 - (out_px + target_px)**2 - (out_y + target_py)**2 - (out_pz + target_pz)**2)
+    return pred_mass
 
 
 @tf.function
-def H_WW_MXLossFunc(target, output):
-    H_bb_px = target[:, 0]
-    H_bb_py = target[:, 1]
-    H_bb_pz = target[:, 2]
-    H_bb_E = target[:, 3]    
-        
+def MXLossFunc(target, output):
     X_mass = target[:, 4]
-    
-    H_WW_px = output[:, 0]
-    H_WW_py = output[:, 1]
-    H_WW_pz = output[:, 2]
-    H_mass = 125.0
-    H_WW_E_sqr = H_mass*H_mass + H_WW_px*H_WW_px + H_WW_py*H_WW_py + H_WW_pz*H_WW_pz
-    H_WW_E = tf.sqrt(H_WW_E_sqr)
-    
-    X_mass_pred = tf.sqrt((H_bb_E + H_WW_E)**2 - (H_bb_px + H_WW_px)**2 - (H_bb_py + H_WW_py)**2 - (H_bb_pz + H_WW_pz)**2)
+    X_mass_pred = GetMXPred(output[:, 0], output[:, 1], output[:, 2], 
+                            target[:, 0], target[:, 1], target[:, 2], target[:, 3], target[:, 4])
     return (X_mass_pred - X_mass)**2
 
 
@@ -50,7 +28,7 @@ def PlotLoss(history):
     plt.ylabel('Error')
     plt.legend()
     plt.grid(True)
-    plt.savefig('loss.png')
+    plt.savefig('loss.pdf', bbox_inches='tight')
     plt.clf()
 
 
@@ -99,7 +77,7 @@ def PlotPrediction(pred_labels, test_labels):
     plt.figtext(0.75, 0.8, f"peak: {peak:.2f}")
     plt.figtext(0.75, 0.75, f"width: {width:.2f}")
     plt.grid(True)
-    plt.savefig('JetNet_prediction.png', bbox_inches='tight')
+    plt.savefig('JetNet_prediction.pdf', bbox_inches='tight')
     plt.clf()
 
     return X_mass_pred
