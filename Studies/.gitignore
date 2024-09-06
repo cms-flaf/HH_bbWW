@@ -1,3 +1,2 @@
-Studies/NeuralNetEstimator/Common/__init__.py
-Studies/NeuralNetEstimator/Reco/__init__.py
-Studies/Purity/__pycache__/
+__init__.py
+/Purity/__pycache__/
