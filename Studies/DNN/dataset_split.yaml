@@ -3,42 +3,42 @@ batch_dict:
   GluGlutoRadion: 100
 output_file_pattern: traintest_2022_batchsize{}
 storage_folder: /eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/
+mass_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
 process_class_and_names:
   GluGlutoRadion:
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-250
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-260
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-270
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-270
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-300
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-350
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-450
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-550
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-600
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-650
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-700
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1000
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1200
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1400
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1600
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1800
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2000
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2500
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-3000
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-4000
-  - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-5000
+    class_value: 0
+    process_names:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-250:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-260:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-270:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-280:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-300:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-350:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-450:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-550:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-600:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-650:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-700:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1000:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1200:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1400:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1600:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1800:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2000:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2500:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-3000:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-4000:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-5000:
   TT:
-  - TT
-  - TT_ext1
-  - TTto2L2Nu
-  - TTto2L2Nu_ext1
-  - TTto4Q
-  - TTto4Q_ext1
-  - TTtoLNu2Q
-  - TTtoLNu2Q_ext1
-  - TTWH
-  - TTWW
-  - TTZH
-  - TTZToQQ
-  - TTZZ
+    class_value: 1
+    process_names: #If there is an extension, just add more to the list
+      TT:
+      - TT_ext1
+      TTto2L2Nu:
+      - TTto2L2Nu_ext1
+      TTto4Q:
+      - TTto4Q_ext1
+      TTtoLNu2Q:
+      - TTtoLNu2Q_ext1
   
