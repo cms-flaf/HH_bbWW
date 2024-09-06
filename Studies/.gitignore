@@ -1,2 +1,3 @@
-__init__.py
-/Purity/__pycache__/
+Studies/NeuralNetEstimator/Common/__init__.py
+Studies/NeuralNetEstimator/Reco/__init__.py
+Studies/Purity/__pycache__/
