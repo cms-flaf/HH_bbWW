@@ -2,10 +2,6 @@ batch_dict:
   TT: 400
   GluGlutoRadion: 100
 output_file_pattern: traintest_2022_batchsize{}
-process_names:
-- GluGlutoRadion
-- TT
-- DY
 storage_folder: /eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/
 process_class_and_names:
   GluGlutoRadion:
