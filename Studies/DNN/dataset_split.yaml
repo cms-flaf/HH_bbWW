@@ -7,6 +7,7 @@ mass_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
 process_class_and_names:
   GluGlutoRadion:
     class_value: 0
+    mass_string: .split('-')[-1]
     process_names:
       GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-250:
       GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-260:
