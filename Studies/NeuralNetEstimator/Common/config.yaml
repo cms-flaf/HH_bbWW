@@ -11,6 +11,7 @@ topology:
 - 8
 valid_split: 0.2
 verbosity: 1
+tree_name: 'Events'
 jet_observables:
 - 'px'
 - 'py'
@@ -27,3 +28,5 @@ labels:
 - 'H_VV_pz'
 - 'H_VV_E'
 - 'X_mass'
+extra_data:
+- 'event'

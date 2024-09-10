@@ -1,5 +1,5 @@
 from common.JetNet import JetNet
-from common.JetNetData import JetNetData
+from common.DataWrapper import DataWrapper
 from common.JetNet_utils import PlotLoss, PlotPrediction
 import yaml
 import argparse
@@ -24,7 +24,7 @@ def main():
     with open(config, 'r') as stream:
         cfg = yaml.safe_load(stream)
 
-        data = JetNetData(features, labels)
+        data = DataWrapper(cfg)
         data.ReadFiles(train_files)
         
         data.Shuffle()

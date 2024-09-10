@@ -1,5 +1,5 @@
 from Common.JetNet import JetNet
-from Common.JetNetData import JetNetData
+from Common.DataWrapper import DataWrapper
 from Common.JetNet_utils import PlotPrediction
 import yaml 
 import argparse
@@ -24,7 +24,7 @@ def main():
     with open(config, 'r') as stream:
         cfg = yaml.safe_load(stream)
 
-        data = JetNetData(features, labels)
+        data = JetNetData(cfg)
         data.ReadFiles(test_files)
 
         net = JetNet(cfg)
