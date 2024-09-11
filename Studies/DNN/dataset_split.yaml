@@ -1,39 +1,25 @@
 batch_dict:
   TT: 400
   GluGlutoRadion: 100
-output_file_pattern: traintest_2022_batchsize{}
+
 storage_folder: /eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/
-mass_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
-process_class_and_names:
+
+selection_branches: ['lep1_type', 'lep2_type', 'weight_MC_Lumi_pu']
+
+selection_cut: (tree['lep1_type'] >= 0) & (tree['lep2_type'] >= 0)
+
+signal:
   GluGlutoRadion:
     class_value: 0
-    mass_string: .split('-')[-1]
-    process_names:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-250:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-260:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-270:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-280:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-300:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-350:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-450:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-550:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-600:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-650:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-700:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1000:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1200:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1400:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1600:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-1800:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2000:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-2500:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-3000:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-4000:
-      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-5000:
+    spin: 0
+    mass_points: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
+    dataset_name_format:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-{}
+
+background:
   TT:
     class_value: 1
-    process_names: #If there is an extension, just add more to the list
+    background_datasets: #If there is an extension, just add more to the list
       TT:
       - TT_ext1
       TTto2L2Nu:
