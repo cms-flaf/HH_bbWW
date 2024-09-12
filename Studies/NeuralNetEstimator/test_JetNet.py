@@ -24,14 +24,14 @@ def main():
     with open(config, 'r') as stream:
         cfg = yaml.safe_load(stream)
 
-        data = JetNetData(cfg)
-        data.ReadFiles(test_files)
+        dw = DataWrapper(cfg)
+        dw.ReadFiles(test_files)
 
         net = JetNet(cfg)
         net.LoadModel(path_to_model)
 
-        pred = net.Predict(data.data[features])
-        mass = PlotPrediction(pred, data.data)
+        pred_df = net.Predict(dw.test_features)
+        PlotPrediction(dw.test_labels, pred_df)
     
     
 if __name__ == '__main__':
