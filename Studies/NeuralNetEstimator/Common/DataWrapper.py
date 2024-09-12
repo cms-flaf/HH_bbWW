@@ -27,7 +27,7 @@ class DataWrapper():
         branches = tree.arrays()
 
         d1 = {name: np.array(branches[name]) for name in self.extra_data}
-        d1["X_mass"] = np.array(branches['X_mass'], dtype=float)
+        d1["X_mass"] = np.array(branches['X_mass'], dtype=int)
 
         centralJet_p4 = vector.zip({'pt': branches['centralJet_pt'], 
                                     'eta': branches['centralJet_eta'], 
@@ -80,17 +80,18 @@ class DataWrapper():
         train_df = self.SelectEvents(0, 2)
         test_df = self.SelectEvents(1, 2)
 
+        self.test_labels = test_df[self.labels] # contain px, py, pz, E of H->VV and true X_mass
         test_df = test_df.drop(self.labels, axis=1)
         
-        self.train_events = train_df['event']
+        self.train_events = train_df['event'] 
         self.test_events = test_df['event']
 
         test_df = test_df.drop(['event'], axis=1)
         train_df = train_df.drop(['event'], axis=1)
        
-        self.train_features = train_df[self.features]
-        self.test_features = test_df[self.features]
-        self.train_labels = train_df[self.labels]
+        self.train_features = train_df[self.features] # contain all possible centralJet variables for all central jets (for train)
+        self.test_features = test_df[self.features] # contain all possible centralJet variables for all central jets (for test)
+        self.train_labels = train_df[self.labels] # contain X_mass and all variables of H->VV
 
 
     def SelectEvents(self, value, modulo):
