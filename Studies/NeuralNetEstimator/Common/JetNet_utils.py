@@ -37,23 +37,29 @@ def PlotPrediction(label_df, predicted_df):
     # label_df contains p4 of H->WW
     # predicted_df contains p4 of H->bb 
 
+    masspoints = label_df['X_mass'].unique()
+    X_mass_true = np.array(label_df['X_mass'])
     X_mass_pred = np.sqrt((label_df['H_VV_E'] + predicted_df['H_bb_E'])**2 -
                           (label_df['H_VV_px'] + predicted_df['H_bb_px'])**2 -
                           (label_df['H_VV_py'] + predicted_df['H_bb_py'])**2 -
                           (label_df['H_VV_pz'] + predicted_df['H_bb_pz'])**2)
+    mass_df = pd.DataFrame({"X_mass_true": X_mass_true, "X_mass_pred": X_mass_pred})
 
-    width = PredWidth(X_mass_pred)
-    peak = PredPeak(X_mass_pred)
+    for mp in masspoints:
+        df = mass_df[mass_df['X_mass_true'] == mp]
 
-    plt.hist(X_mass_pred, bins=100)
-    plt.title('JetNet prediction')
-    plt.xlabel('X mass [GeV]')
-    plt.ylabel('Count')
-    plt.figtext(0.75, 0.8, f"peak: {peak:.2f}")
-    plt.figtext(0.75, 0.75, f"width: {width:.2f}")
-    plt.grid(True)
-    plt.savefig('JetNet_prediction.pdf', bbox_inches='tight')
-    plt.clf()
+        width = PredWidth(df['X_mass_pred'])
+        peak = PredPeak(df['X_mass_pred'])
+
+        plt.hist(df['X_mass_pred'], bins=100)
+        plt.title('JetNet prediction')
+        plt.xlabel('X mass [GeV]')
+        plt.ylabel('Count')
+        plt.figtext(0.75, 0.8, f"peak: {peak:.2f}")
+        plt.figtext(0.75, 0.75, f"width: {width:.2f}")
+        plt.grid(True)
+        plt.savefig(f"X_mass_pred_{mp}_GeV.pdf", bbox_inches='tight')
+        plt.clf()
 
 
 def PredWidth(pred_mass):
