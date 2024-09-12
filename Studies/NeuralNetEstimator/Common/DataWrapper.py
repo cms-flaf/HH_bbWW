@@ -4,15 +4,16 @@ import awkward as ak
 import uproot
 import vector
 from sklearn.utils import shuffle
+from DataWrapper_utils import *
 
 
 class DataWrapper():
     def __init__(self, cfg):
-        jet_obs = cfg['jet_observables']
         self.n_jets = cfg['n_jets']
+        self.jet_obs = cfg['jet_observables']
 
         self.tree_name = cfg['tree_name']
-        self.features = [f"centralJet{i}_{obs}" for i in range(self.n_jets) for obs in jet_obs]
+        self.features = [f"centralJet{i}_{obs}" for i in range(self.n_jets) for obs in self.jet_obs]
         self.labels = cfg['labels']
         self.extra_data = cfg['extra_data']
 
@@ -33,26 +34,30 @@ class DataWrapper():
                                     'phi': branches['centralJet_phi'], 
                                     'mass': branches['centralJet_mass']})
 
+        PxPyPzE = ['px', 'py', 'pz', 'E']
+        func_map = {'px': Px, 'py': Py, 'pz': Pz, 'E': E}
+
         d2 = {}
         for i in range(self.n_jets):
-            d2[f"centralJet{i}_px"] = ak.to_numpy(ak.fill_none(ak.pad_none(centralJet_p4.px[:, :self.n_jets], self.n_jets), 0.0))[:, i]
-            d2[f"centralJet{i}_py"] = ak.to_numpy(ak.fill_none(ak.pad_none(centralJet_p4.py[:, :self.n_jets], self.n_jets), 0.0))[:, i]
-            d2[f"centralJet{i}_pz"] = ak.to_numpy(ak.fill_none(ak.pad_none(centralJet_p4.pz[:, :self.n_jets], self.n_jets), 0.0))[:, i]
-            d2[f"centralJet{i}_E"] = ak.to_numpy(ak.fill_none(ak.pad_none(centralJet_p4.E[:, :self.n_jets], self.n_jets), 0.0))[:, i]
-            d2[f"centralJet{i}_btagPNetB"] = ak.to_numpy(ak.fill_none(ak.pad_none(branches['centralJet_btagPNetB'][:, :self.n_jets], self.n_jets), 0.0))[:, i] 
-            d2[f"centralJet{i}_PNetRegPtRawCorr"] = ak.to_numpy(ak.fill_none(ak.pad_none(branches['centralJet_PNetRegPtRawCorr'][:, :self.n_jets], self.n_jets), 0.0))[:, i]
-            d2[f"centralJet{i}_PNetRegPtRawCorrNeutrino"] = ak.to_numpy(ak.fill_none(ak.pad_none(branches['centralJet_PNetRegPtRawCorrNeutrino'][:, :self.n_jets], self.n_jets), 0.0))[:, i]  
-            d2[f"centralJet{i}_PNetRegPtRawRes"] = ak.to_numpy(ak.fill_none(ak.pad_none(branches['centralJet_PNetRegPtRawRes'][:, :self.n_jets], self.n_jets), 0.0))[:, i] 
+            for var in self.jet_obs:
+                if var in PxPyPzE:
+                    func = func_map[var]
+                    var_awkward_array = func(centralJet_p4)
+                else:
+                    branch_name = f"centralJet_{var}"
+                    var_awkward_array = branches[branch_name]
+                d2[f"centralJet{i}_{var}"] = GetNumPyArray(var_awkward_array, self.n_jets, i)
 
         HVV_p4 = vector.zip({'pt': branches['genHVV_pt'],
                             'eta': branches['genHVV_eta'],
                             'phi': branches['genHVV_phi'],
                             'mass': branches['genHVV_mass']})
 
-        d2["H_VV_px"] = ak.to_numpy(HVV_p4.px)
-        d2["H_VV_py"] = ak.to_numpy(HVV_p4.py)
-        d2["H_VV_pz"] = ak.to_numpy(HVV_p4.pz)
-        d2["H_VV_E"] = ak.to_numpy(HVV_p4.E)
+        for var in PxPyPzE:
+            branch_name = f"H_VV_{var}"
+            func = func_map[var]
+            var_awkward_array = func(HVV_p4)
+            d2[branch_name] = ak.to_numpy(var_awkward_array)
 
         data_dict = d1 | d2
 
