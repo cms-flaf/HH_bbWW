@@ -2,6 +2,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 import uproot
+import pandas as pd
 
 from Common.JetNet_utils import MXLossFunc, H_WW_MXLossFunc
 
@@ -49,7 +50,11 @@ class JetNet():
     def Predict(self, test_features):
         if not np.all(test_features.columns == self.features):
             raise RuntimeError(f"Features pased for prediction do not match expected features: passed {test_features.columns}, while expected {self.features}")
-        return self.model.predict(test_features)
+        # returns predicted variables: px, py, pz of H->bb
+        pred_p3 = self.model.predict(test_features)
+        pred_en = np.sqrt(125.0**2 + np.sum(np.square(pred_p3), axis=1))
+        pred_df = pd.DataFrame({"H_bb_px": pred_p3[:, 0], "H_bb_py": pred_p3[0:, 1], "H_bb_pz": pred_p3[:, 2]}, "H_bb_E": pred_en)
+        return pred_df
 
 
     def SaveModel(self, path):
