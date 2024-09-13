@@ -4,9 +4,12 @@ batch_dict:
 
 storage_folder: /eos/user/d/daebi/ANA_FOLDER/anaTuples/dev/Run3_2022/
 
-selection_branches: ['lep1_type', 'lep2_type', 'weight_MC_Lumi_pu']
+selection_branches: ['lep1_type', 'lep2_type', 'weight_MC_Lumi_pu', 'event']
 
 selection_cut: (tree['lep1_type'] >= 0) & (tree['lep2_type'] >= 0)
+
+parity_func: (tree['event']%{nParity} == {parity_scan})
+nParity: 4
 
 signal:
   GluGlutoRadion:
@@ -15,6 +18,8 @@ signal:
     mass_points: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
     dataset_name_format:
       GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-{}
+    combined_name:
+      GluGlutoRadiontoHHto2B2Vto2B2L2Nu_Combined
 
 background:
   TT:
