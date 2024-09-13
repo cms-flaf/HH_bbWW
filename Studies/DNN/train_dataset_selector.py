@@ -189,7 +189,8 @@ def create_dict(config_dict, output_folder):
                     'class_value': class_value,
                     'spin': 0,
                     'mass': -1,
-                    'all_extensions': []
+                    'all_extensions': [],
+                    'storage_folder': os.path.join(os.getcwd(), output_folder)
                 }
                     
                 process_dict[signal_name][dataset_name]['all_extensions'] = [dataset_name]
@@ -216,7 +217,8 @@ def create_dict(config_dict, output_folder):
                     'class_value': class_value,
                     'spin': 0,
                     'mass': mass_point,
-                    'all_extensions': []
+                    'all_extensions': [],
+                    'storage_folder': storage_folder,
                 }
 
                 extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
@@ -249,7 +251,8 @@ def create_dict(config_dict, output_folder):
                     'batch_size': 0,
                     'batch_start': 0,
                     'class_value': class_value,
-                    'all_extensions': []   
+                    'all_extensions': [],
+                    'storage_folder': storage_folder 
                 }
 
                 extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
@@ -266,14 +269,54 @@ def create_dict(config_dict, output_folder):
                             process_dict[background_name][dataset_name]['weight_cut'] += eval(eval_string)
 
 
+
+
+
+
+
+        #Add totals to start the spin/mass dist and remove the individual signal files
+        signal_names = config_dict['signal'].keys()
         for process in process_dict:
             process_dict[process]['total'] = 0
             process_dict[process]['weight'] = 0
+            use_combined = False
+            if process in signal_names:
+                use_combined = config_dict['signal'][process]['use_combined']
             for subprocess in process_dict[process].keys():
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                if use_combined:
+                    if subprocess == config_dict['signal'][process]['combined_name']: continue
                 process_dict[process]['total'] += process_dict[process][subprocess]['total_cut']
                 process_dict[process]['weight'] += process_dict[process][subprocess]['weight_cut']
 
+
+        #Calculate the random spin/mass distribution for backgrounds to be assigned during parametric DNN
+        spin_mass_dist = {}
+
+        total_signal = 0
+        for signal_name in config_dict['signal']:
+            total_signal += process_dict[signal_name]['total']
+        for signal_name in config_dict['signal']:
+            keys_to_remove = [] #Keys we want to remove if the combined option is being used
+            use_combined = config_dict['signal'][signal_name]['use_combined']
+            for subprocess in process_dict[signal_name]:
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                if use_combined:
+                    if subprocess == config_dict['signal'][signal_name]['combined_name']: continue
+                subprocess_dict = process_dict[signal_name][subprocess]
+                if f"{subprocess_dict['spin']}" not in spin_mass_dist.keys():
+                    spin_mass_dist[f"{subprocess_dict['spin']}"] = {}
+                spin_mass_dist[f"{subprocess_dict['spin']}"][f"{subprocess_dict['mass']}"] = subprocess_dict['total_cut']/total_signal
+                if use_combined:
+                    keys_to_remove.append(subprocess)
+            #Remove unneeded keys since we will use combined anyway
+            for key in keys_to_remove:
+                del process_dict[signal_name][key]
+
+
+
+
+        for process in process_dict:
             batch_size_sum = 0
             for subprocess in process_dict[process]:
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
@@ -335,31 +378,6 @@ def create_dict(config_dict, output_folder):
         machine_yaml['meta_data']['selection_branches'] = selection_branches
         machine_yaml['meta_data']['selection_cut'] = total_cut
 
-
-        spin_mass_dist = {}
-
-        total_signal = 0
-        for signal_name in config_dict['signal']:
-            total_signal += process_dict[signal_name]['total']
-        for signal_name in config_dict['signal']:
-            keys_to_remove = [] #Keys we want to remove if the combined option is being used
-            use_combined = config_dict['signal'][signal_name]['use_combined']
-            for subprocess in process_dict[signal_name]:
-                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-                if use_combined:
-                    if subprocess == config_dict['signal'][signal_name]['combined_name']: continue
-                subprocess_dict = process_dict[signal_name][subprocess]
-                if f"{subprocess_dict['spin']}" not in spin_mass_dist.keys():
-                    spin_mass_dist[f"{subprocess_dict['spin']}"] = {}
-                spin_mass_dist[f"{subprocess_dict['spin']}"][f"{subprocess_dict['mass']}"] = subprocess_dict['total_cut']/total_signal
-                if use_combined:
-                    keys_to_remove.append(subprocess)
-            #Remove unneeded keys since we will use combined anyway
-            for key in keys_to_remove:
-                del process_dict[signal_name][key]
-
-
-
         machine_yaml['meta_data']['spin_mass_dist'] = spin_mass_dist #Dict of spin/mass distribution values for random choice parametric
 
 
@@ -368,8 +386,9 @@ def create_dict(config_dict, output_folder):
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue                
                 print("Using subprocess ", subprocess)
                 subprocess_dict = process_dict[process][subprocess]
+                datasets_full_pathway = [ os.path.join(subprocess_dict['storage_folder'], fn) for fn in subprocess_dict['all_extensions'] ]
                 tmp_process_dict = {
-                    'datasets': subprocess_dict['all_extensions'],
+                    'datasets': datasets_full_pathway,
                     'class_value': subprocess_dict['class_value'],
                     'batch_start': subprocess_dict['batch_start'],
                     'batch_size': subprocess_dict['batch_size'],
