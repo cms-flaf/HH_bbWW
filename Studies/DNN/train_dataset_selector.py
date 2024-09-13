@@ -98,49 +98,50 @@ def iterate_uproot(fnames, batch_size, nBatchesPerChunk, selection_branches, sel
 
 def create_signal_files(config_dict, output_folder):
     storage_folder = config_dict['storage_folder']
-    selection_cut = config_dict['selection_cut']
 
     for signal_name in config_dict['signal']:
         signal_dict = config_dict['signal'][signal_name]
         mass_points = signal_dict['mass_points']
         dataset_name_format = signal_dict['dataset_name_format']
+        use_combined = signal_dict['use_combined']
 
-        combined_name = signal_dict['combined_name']
+        if use_combined:
+            combined_name = signal_dict['combined_name']
 
-        out_file = uproot.recreate(f"{os.path.join(output_folder, combined_name)}.root")
+            out_file = uproot.recreate(f"{os.path.join(output_folder, combined_name)}.root")
 
-        new_array = {}
-        nEvents = 0
+            new_array = {}
+            nEvents = 0
 
-        print(f"Starting to merge signal {signal_name} files")
+            print(f"Starting to merge signal {signal_name} files")
 
-        for mass_point in tqdm(mass_points):
-            dataset_name = dataset_name_format.format(mass_point)
-            extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
+            for mass_point in tqdm(mass_points):
+                dataset_name = dataset_name_format.format(mass_point)
+                extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
 
-            for ext_name in ([dataset_name] + extension_list):
-                process_dir = os.path.join(storage_folder, ext_name)
-                for nano_file in os.listdir(process_dir):
-                    with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
-                        tree = h.arrays()
-                        nEvents += h.num_entries
+                for ext_name in ([dataset_name] + extension_list):
+                    process_dir = os.path.join(storage_folder, ext_name)
+                    for nano_file in os.listdir(process_dir):
+                        with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
+                            tree = h.arrays()
+                            nEvents += h.num_entries
 
-                        keys = tree.fields
-                        for key in keys:
-                            if key not in new_array.keys():
-                                new_array[key] = tree[key]
-                            else:
-                                new_array[key] = ak.concatenate([new_array[key], tree[key]])
+                            keys = tree.fields
+                            for key in keys:
+                                if key not in new_array.keys():
+                                    new_array[key] = tree[key]
+                                else:
+                                    new_array[key] = ak.concatenate([new_array[key], tree[key]])
 
 
-        #Shuffle the signal data
-        index = np.arange(nEvents)
-        np.random.shuffle(index)
-        for key in new_array.keys():
-            new_array[key] = new_array[key][index]
+            #Shuffle the signal data
+            index = np.arange(nEvents)
+            np.random.shuffle(index)
+            for key in new_array.keys():
+                new_array[key] = new_array[key][index]
 
-        out_file['Events'] = new_array
-        out_file.close()
+            out_file['Events'] = new_array
+            out_file.close()
 
 
 
@@ -170,12 +171,12 @@ def create_dict(config_dict, output_folder):
             class_value = signal_dict['class_value']
             mass_points = signal_dict['mass_points']
             dataset_name_format = signal_dict['dataset_name_format']
+            use_combined = signal_dict['use_combined']
 
 
             #If a combined file exists, lets use that
-            if f"{signal_dict['combined_name']}.root" in os.listdir(output_folder):
-                print("Yeah we found it!!!")
-
+            #if f"{signal_dict['combined_name']}.root" in os.listdir(output_folder):
+            if use_combined:
                 dataset_name = signal_dict['combined_name']
 
                 process_dict[signal_name][dataset_name] = {
@@ -341,32 +342,30 @@ def create_dict(config_dict, output_folder):
         for signal_name in config_dict['signal']:
             total_signal += process_dict[signal_name]['total']
         for signal_name in config_dict['signal']:
+            keys_to_remove = [] #Keys we want to remove if the combined option is being used
+            use_combined = config_dict['signal'][signal_name]['use_combined']
             for subprocess in process_dict[signal_name]:
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                if use_combined:
+                    if subprocess == config_dict['signal'][signal_name]['combined_name']: continue
                 subprocess_dict = process_dict[signal_name][subprocess]
                 if f"{subprocess_dict['spin']}" not in spin_mass_dist.keys():
                     spin_mass_dist[f"{subprocess_dict['spin']}"] = {}
                 spin_mass_dist[f"{subprocess_dict['spin']}"][f"{subprocess_dict['mass']}"] = subprocess_dict['total_cut']/total_signal
+                if use_combined:
+                    keys_to_remove.append(subprocess)
+            #Remove unneeded keys since we will use combined anyway
+            for key in keys_to_remove:
+                del process_dict[signal_name][key]
 
 
 
         machine_yaml['meta_data']['spin_mass_dist'] = spin_mass_dist #Dict of spin/mass distribution values for random choice parametric
 
 
-
-
-
         for process in process_dict:
-            combined_list = [ fn for fn in process_dict[process].keys() if "Combined" in fn]
             for subprocess in process_dict[process]:
-                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-                print("Starting sub ", subprocess)
-                #If this is signal and we have the combined filename, lets use that one instead
-                print(process_dict[process].keys())
-                if (len(combined_list) >= 1) and subprocess not in combined_list:
-                    print("At the combined subprocess, only use this one since it exists!")
-                    continue
-                
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue                
                 print("Using subprocess ", subprocess)
                 subprocess_dict = process_dict[process][subprocess]
                 tmp_process_dict = {
