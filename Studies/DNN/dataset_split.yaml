@@ -20,6 +20,8 @@ signal:
       GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-{}
     combined_name:
       GluGlutoRadiontoHHto2B2Vto2B2L2Nu_Combined
+    use_combined:
+      True
 
 background:
   TT:
