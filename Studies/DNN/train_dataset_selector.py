@@ -4,6 +4,8 @@ import numpy as np
 import psutil
 from datetime import datetime
 import yaml
+import awkward as ak
+from tqdm import tqdm
 
 def variable_dict(batch_size, process_subdict, process_iter, output_array, mass_values):
     vardict = {}
@@ -94,6 +96,53 @@ def iterate_uproot(fnames, batch_size, nBatchesPerChunk, selection_branches, sel
                 yield out_array
 
 
+def create_signal_files(config_dict, output_folder):
+    storage_folder = config_dict['storage_folder']
+    selection_cut = config_dict['selection_cut']
+
+    for signal_name in config_dict['signal']:
+        signal_dict = config_dict['signal'][signal_name]
+        mass_points = signal_dict['mass_points']
+        dataset_name_format = signal_dict['dataset_name_format']
+
+        combined_name = signal_dict['combined_name']
+
+        out_file = uproot.recreate(f"{os.path.join(output_folder, combined_name)}.root")
+
+        new_array = {}
+        nEvents = 0
+
+        print(f"Starting to merge signal {signal_name} files")
+
+        for mass_point in tqdm(mass_points):
+            dataset_name = dataset_name_format.format(mass_point)
+            extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
+
+            for ext_name in ([dataset_name] + extension_list):
+                process_dir = os.path.join(storage_folder, ext_name)
+                for nano_file in os.listdir(process_dir):
+                    with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
+                        tree = h.arrays()
+                        nEvents += h.num_entries
+
+                        keys = tree.fields
+                        for key in keys:
+                            if key not in new_array.keys():
+                                new_array[key] = tree[key]
+                            else:
+                                new_array[key] = ak.concatenate([new_array[key], tree[key]])
+
+
+        #Shuffle the signal data
+        index = np.arange(nEvents)
+        np.random.shuffle(index)
+        for key in new_array.keys():
+            new_array[key] = new_array[key][index]
+
+        out_file['Events'] = new_array
+        out_file.close()
+
+
 
 def create_dict(config_dict, output_folder):
     batch_dict = config_dict['batch_dict']
@@ -109,180 +158,229 @@ def create_dict(config_dict, output_folder):
         batch_dict['batch_size'] += batch_dict[key]
         process_dict[key] = {}
 
-    out_yaml = "batch_config.yaml"
+    for nParity in range(config_dict['nParity']):
+        nParity_Cut = config_dict['parity_func'].format(nParity = config_dict['nParity'], parity_scan = nParity)
+        total_cut = f"{selection_cut} & {nParity_Cut}"
 
-    for signal_name in config_dict['signal']:
-        signal_dict = config_dict['signal'][signal_name]
-        class_value = signal_dict['class_value']
-        mass_points = signal_dict['mass_points']
-        dataset_name_format = signal_dict['dataset_name_format']
+        out_yaml = f"batch_config_parity{nParity}.yaml"
 
-        for mass_point in mass_points:
-            dataset_name = dataset_name_format.format(mass_point)
-
-            process_dict[signal_name][dataset_name] = {
-                'total': 0,
-                'total_cut': 0,
-                'weight_cut': 0,
-                'nBatches': 0,
-                'batch_size': 0,
-                'batch_start': 0,
-                'class_value': class_value,
-                'spin': 0,
-                'mass': mass_point,
-                'all_extensions': []
-            }
-
-            extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext")]
-            process_dict[signal_name][dataset_name]['all_extensions'] = [dataset_name] + extension_list
-
-            for ext_name in process_dict[signal_name][dataset_name]['all_extensions']:
-                process_dir = os.path.join(storage_folder, ext_name)
-                for nano_file in os.listdir(process_dir):
-                    with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
-                        tree = h.arrays(selection_branches)
-                        process_dict[signal_name][dataset_name]['total'] += int(h.num_entries)
-                        process_dict[signal_name][dataset_name]['total_cut'] += int(np.sum(eval(selection_cut)))
-                        eval_string = f"float(np.sum(tree[{selection_cut}].weight_MC_Lumi_pu))"
-                        process_dict[signal_name][dataset_name]['weight_cut'] += eval(eval_string)
+        print("Looping over signals in config")
+        for signal_name in tqdm(config_dict['signal']):
+            signal_dict = config_dict['signal'][signal_name]
+            class_value = signal_dict['class_value']
+            mass_points = signal_dict['mass_points']
+            dataset_name_format = signal_dict['dataset_name_format']
 
 
+            #If a combined file exists, lets use that
+            if f"{signal_dict['combined_name']}.root" in os.listdir(output_folder):
+                print("Yeah we found it!!!")
 
-    for background_name in config_dict['background']:
-        background_dict = config_dict['background'][background_name]
-        class_value = background_dict['class_value']
-        dataset_names = background_dict['background_datasets']
+                dataset_name = signal_dict['combined_name']
 
-        for dataset_name in dataset_names:
-            process_dict[background_name][dataset_name] = {
-                'total': 0,
-                'total_cut': 0,
-                'weight_cut': 0,
-                'nBatches': 0,
-                'batch_size': 0,
-                'batch_start': 0,
-                'class_value': class_value,
-                'all_extensions': []   
-            }
+                process_dict[signal_name][dataset_name] = {
+                    'total': 0,
+                    'total_cut': 0,
+                    'weight_cut': 0,
+                    'nBatches': 0,
+                    'batch_size': 0,
+                    'batch_start': 0,
+                    'class_value': class_value,
+                    'spin': 0,
+                    'mass': -1,
+                    'all_extensions': []
+                }
+                    
+                process_dict[signal_name][dataset_name]['all_extensions'] = [dataset_name]
 
-            extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext")]
-            process_dict[background_name][dataset_name]['all_extensions'] = [dataset_name] + extension_list
-
-            for ext_name in process_dict[background_name][dataset_name]['all_extensions']:
-                process_dir = os.path.join(storage_folder, ext_name)
-                for nano_file in os.listdir(process_dir):
-                    with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
-                        tree = h.arrays(selection_branches)
-                        process_dict[background_name][dataset_name]['total'] += int(h.num_entries)
-                        process_dict[background_name][dataset_name]['total_cut'] += int(np.sum(eval(selection_cut)))
-                        eval_string = f"float(np.sum(tree[{selection_cut}].weight_MC_Lumi_pu))"
-                        process_dict[background_name][dataset_name]['weight_cut'] += eval(eval_string)
+                with uproot.open(f"{os.path.join(output_folder, dataset_name)}.root:Events") as h:
+                    tree = h.arrays(selection_branches)
+                    process_dict[signal_name][dataset_name]['total'] += int(h.num_entries)
+                    process_dict[signal_name][dataset_name]['total_cut'] += int(np.sum(eval(total_cut)))
+                    eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                    process_dict[signal_name][dataset_name]['weight_cut'] += eval(eval_string)
 
 
-    for process in process_dict:
-        process_dict[process]['total'] = 0
-        process_dict[process]['weight'] = 0
-        for subprocess in process_dict[process].keys():
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            process_dict[process]['total'] += process_dict[process][subprocess]['total_cut']
-            process_dict[process]['weight'] += process_dict[process][subprocess]['weight_cut']
 
-        batch_size_sum = 0
-        for subprocess in process_dict[process]:
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            process_dict[process][subprocess]['batch_size'] = int(batch_dict[process] * process_dict[process][subprocess]['weight_cut'] / process_dict[process]['weight'])
-            nBatches = 0
-            if process_dict[process][subprocess]['batch_size'] != 0:
-                nBatches = int(process_dict[process][subprocess]['total_cut']/process_dict[process][subprocess]['batch_size'])
-            process_dict[process][subprocess]['nBatches'] = nBatches
-            batch_size_sum += process_dict[process][subprocess]['batch_size']
+            for mass_point in mass_points:
+                dataset_name = dataset_name_format.format(mass_point)
 
-        print(f"Process {process} has batch size sum {batch_size_sum}")
-        while batch_size_sum != batch_dict[process]:
-            print(f"Warning this is bad batch size, size={batch_size_sum} where goal is {batch_dict[process]}")
-            max_batches_subprocess = ""
-            max_batches_val = 0
+                process_dict[signal_name][dataset_name] = {
+                    'total': 0,
+                    'total_cut': 0,
+                    'weight_cut': 0,
+                    'nBatches': 0,
+                    'batch_size': 0,
+                    'batch_start': 0,
+                    'class_value': class_value,
+                    'spin': 0,
+                    'mass': mass_point,
+                    'all_extensions': []
+                }
+
+                extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
+                process_dict[signal_name][dataset_name]['all_extensions'] = [dataset_name] + extension_list
+
+                for ext_name in process_dict[signal_name][dataset_name]['all_extensions']:
+                    process_dir = os.path.join(storage_folder, ext_name)
+                    for nano_file in os.listdir(process_dir):
+                        with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
+                            tree = h.arrays(selection_branches)
+                            process_dict[signal_name][dataset_name]['total'] += int(h.num_entries)
+                            process_dict[signal_name][dataset_name]['total_cut'] += int(np.sum(eval(total_cut)))
+                            eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                            process_dict[signal_name][dataset_name]['weight_cut'] += eval(eval_string)
+
+
+
+        print("Looping over backgrounds in config")
+        for background_name in tqdm(config_dict['background']):
+            background_dict = config_dict['background'][background_name]
+            class_value = background_dict['class_value']
+            dataset_names = background_dict['background_datasets']
+
+            for dataset_name in dataset_names:
+                process_dict[background_name][dataset_name] = {
+                    'total': 0,
+                    'total_cut': 0,
+                    'weight_cut': 0,
+                    'nBatches': 0,
+                    'batch_size': 0,
+                    'batch_start': 0,
+                    'class_value': class_value,
+                    'all_extensions': []   
+                }
+
+                extension_list = [ fn for fn in os.listdir(storage_folder) if fn.startswith(f"{dataset_name}_ext") ]
+                process_dict[background_name][dataset_name]['all_extensions'] = [dataset_name] + extension_list
+
+                for ext_name in process_dict[background_name][dataset_name]['all_extensions']:
+                    process_dir = os.path.join(storage_folder, ext_name)
+                    for nano_file in os.listdir(process_dir):
+                        with uproot.open(f"{os.path.join(process_dir, nano_file)}:Events") as h:
+                            tree = h.arrays(selection_branches)
+                            process_dict[background_name][dataset_name]['total'] += int(h.num_entries)
+                            process_dict[background_name][dataset_name]['total_cut'] += int(np.sum(eval(total_cut)))
+                            eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                            process_dict[background_name][dataset_name]['weight_cut'] += eval(eval_string)
+
+
+        for process in process_dict:
+            process_dict[process]['total'] = 0
+            process_dict[process]['weight'] = 0
             for subprocess in process_dict[process].keys():
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-                if process_dict[process][subprocess]['nBatches'] > max_batches_val:
-                    max_batches_val = process_dict[process][subprocess]['nBatches']
-                    max_batches_subprocess = subprocess
+                process_dict[process]['total'] += process_dict[process][subprocess]['total_cut']
+                process_dict[process]['weight'] += process_dict[process][subprocess]['weight_cut']
 
-            print(f"Trying to fix, incrementing {max_batches_subprocess} batch size {process_dict[process][max_batches_subprocess]['batch_size']} by 1")
-            process_dict[process][max_batches_subprocess]['batch_size'] += 1
-            print(f"nBatches went from {process_dict[process][max_batches_subprocess]['nBatches']}")
-            process_dict[process][max_batches_subprocess]['nBatches'] = int(process_dict[process][max_batches_subprocess]['total']/process_dict[process][max_batches_subprocess]['batch_size'])
-            print(f"To {process_dict[process][max_batches_subprocess]['nBatches']}")
-            batch_size_sum += 1
+            batch_size_sum = 0
+            for subprocess in process_dict[process]:
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                process_dict[process][subprocess]['batch_size'] = int(batch_dict[process] * process_dict[process][subprocess]['weight_cut'] / process_dict[process]['weight'])
+                nBatches = 0
+                if process_dict[process][subprocess]['batch_size'] != 0:
+                    nBatches = int(process_dict[process][subprocess]['total_cut']/process_dict[process][subprocess]['batch_size'])
+                process_dict[process][subprocess]['nBatches'] = nBatches
+                batch_size_sum += process_dict[process][subprocess]['batch_size']
 
-    current_index = 0
-    for process in process_dict.keys():
-        for subprocess in process_dict[process].keys():
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            process_dict[process][subprocess]['batch_start'] = current_index
-            current_index += process_dict[process][subprocess]['batch_size']
+            print(f"Process {process} has batch size sum {batch_size_sum}")
+            while batch_size_sum != batch_dict[process]:
+                print(f"Warning this is bad batch size, size={batch_size_sum} where goal is {batch_dict[process]}")
+                max_batches_subprocess = ""
+                max_batches_val = 0
+                for subprocess in process_dict[process].keys():
+                    if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                    if process_dict[process][subprocess]['nBatches'] > max_batches_val:
+                        max_batches_val = process_dict[process][subprocess]['nBatches']
+                        max_batches_subprocess = subprocess
 
+                print(f"Trying to fix, incrementing {max_batches_subprocess} batch size {process_dict[process][max_batches_subprocess]['batch_size']} by 1")
+                process_dict[process][max_batches_subprocess]['batch_size'] += 1
+                print(f"nBatches went from {process_dict[process][max_batches_subprocess]['nBatches']}")
+                process_dict[process][max_batches_subprocess]['nBatches'] = int(process_dict[process][max_batches_subprocess]['total']/process_dict[process][max_batches_subprocess]['batch_size'])
+                print(f"To {process_dict[process][max_batches_subprocess]['nBatches']}")
+                batch_size_sum += 1
 
-    nBatches = 1e100
-    for process in process_dict.keys():
-        for subprocess in process_dict[process].keys():
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            if process_dict[process][subprocess]['nBatches'] < nBatches and (process_dict[process][subprocess]['nBatches'] != 0):
-                nBatches = process_dict[process][subprocess]['nBatches']
-
-
-
-
-    print(f"Creating {nBatches} batches, according to distribution. ")
-    print(process_dict)
-    print(f"And total batch size is {batch_dict['batch_size']}")
-
-
-    machine_yaml = {
-        'meta_data': {},
-        'processes': [],
-    }
-
-    machine_yaml['meta_data']['storage_folder'] = storage_folder
-    machine_yaml['meta_data']['batch_dict'] = batch_dict
-    machine_yaml['meta_data']['selection_branches'] = selection_branches
-    machine_yaml['meta_data']['selection_cut'] = selection_cut
+        current_index = 0
+        for process in process_dict.keys():
+            for subprocess in process_dict[process].keys():
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                process_dict[process][subprocess]['batch_start'] = current_index
+                current_index += process_dict[process][subprocess]['batch_size']
 
 
-    spin_mass_dist = {}
-
-    total_signal = 0
-    for signal_name in config_dict['signal']:
-        total_signal += process_dict[signal_name]['total']
-    for signal_name in config_dict['signal']:
-        for subprocess in process_dict[signal_name]:
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            subprocess_dict = process_dict[signal_name][subprocess]
-            if f"{subprocess_dict['spin']}" not in spin_mass_dist.keys():
-                spin_mass_dist[f"{subprocess_dict['spin']}"] = {}
-            spin_mass_dist[f"{subprocess_dict['spin']}"][f"{subprocess_dict['mass']}"] = subprocess_dict['total_cut']/total_signal
+        nBatches = 1e100
+        for process in process_dict.keys():
+            for subprocess in process_dict[process].keys():
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                if process_dict[process][subprocess]['nBatches'] < nBatches and (process_dict[process][subprocess]['nBatches'] != 0):
+                    nBatches = process_dict[process][subprocess]['nBatches']
 
 
 
-    machine_yaml['meta_data']['spin_mass_dist'] = spin_mass_dist #Dict of spin/mass distribution values for random choice parametric
+
+        print(f"Creating {nBatches} batches, according to distribution. ")
+        print(process_dict)
+        print(f"And total batch size is {batch_dict['batch_size']}")
 
 
-    for process in process_dict:
-        for subprocess in process_dict[process]:
-            if subprocess.startswith('total') or subprocess.startswith('weight'): continue
-            subprocess_dict = process_dict[process][subprocess]
-            tmp_process_dict = {
-                'datasets': subprocess_dict['all_extensions'],
-                'class_value': subprocess_dict['class_value'],
-                'batch_start': subprocess_dict['batch_start'],
-                'batch_size': subprocess_dict['batch_size'],
-                'nBatches': subprocess_dict['nBatches'],
-            }
-            machine_yaml['processes'].append(tmp_process_dict)
+        machine_yaml = {
+            'meta_data': {},
+            'processes': [],
+        }
+
+        machine_yaml['meta_data']['storage_folder'] = storage_folder
+        machine_yaml['meta_data']['batch_dict'] = batch_dict
+        machine_yaml['meta_data']['selection_branches'] = selection_branches
+        machine_yaml['meta_data']['selection_cut'] = total_cut
 
 
-    with open(os.path.join(output_folder, out_yaml), 'w') as outfile:
-        yaml.dump(machine_yaml, outfile)
+        spin_mass_dist = {}
+
+        total_signal = 0
+        for signal_name in config_dict['signal']:
+            total_signal += process_dict[signal_name]['total']
+        for signal_name in config_dict['signal']:
+            for subprocess in process_dict[signal_name]:
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                subprocess_dict = process_dict[signal_name][subprocess]
+                if f"{subprocess_dict['spin']}" not in spin_mass_dist.keys():
+                    spin_mass_dist[f"{subprocess_dict['spin']}"] = {}
+                spin_mass_dist[f"{subprocess_dict['spin']}"][f"{subprocess_dict['mass']}"] = subprocess_dict['total_cut']/total_signal
+
+
+
+        machine_yaml['meta_data']['spin_mass_dist'] = spin_mass_dist #Dict of spin/mass distribution values for random choice parametric
+
+
+
+
+
+        for process in process_dict:
+            combined_list = [ fn for fn in process_dict[process].keys() if "Combined" in fn]
+            for subprocess in process_dict[process]:
+                if subprocess.startswith('total') or subprocess.startswith('weight'): continue
+                print("Starting sub ", subprocess)
+                #If this is signal and we have the combined filename, lets use that one instead
+                print(process_dict[process].keys())
+                if (len(combined_list) >= 1) and subprocess not in combined_list:
+                    print("At the combined subprocess, only use this one since it exists!")
+                    continue
+                
+                print("Using subprocess ", subprocess)
+                subprocess_dict = process_dict[process][subprocess]
+                tmp_process_dict = {
+                    'datasets': subprocess_dict['all_extensions'],
+                    'class_value': subprocess_dict['class_value'],
+                    'batch_start': subprocess_dict['batch_start'],
+                    'batch_size': subprocess_dict['batch_size'],
+                    'nBatches': subprocess_dict['nBatches'],
+                }
+                machine_yaml['processes'].append(tmp_process_dict)
+
+
+        with open(os.path.join(output_folder, out_yaml), 'w') as outfile:
+            yaml.dump(machine_yaml, outfile)
 
 
 
@@ -301,5 +399,6 @@ if __name__ == '__main__':
     os.makedirs(output_folder, exist_ok=True)
     os.system(f"cp {args.config} {output_folder}/.")
 
+    create_signal_files(config_dict, output_folder)
     create_dict(config_dict, output_folder)
     #create_file(out_file)
