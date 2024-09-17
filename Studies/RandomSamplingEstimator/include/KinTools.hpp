@@ -5,14 +5,16 @@
 
 #include "TLorentzVector.h"
 
-using RVecD = ROOT::VecOps::RVec<double>;
-using RVecS = ROOT::VecOps::RVec<size_t>;
-using RVecLV = ROOT::VecOps::RVec<TLorentzVector>;
+#include "Definitions.hpp"
 
-RVecS CreateIndices(size_t sz)
+RVecS CreateIndices(size_t sz, size_t start = 0)
 {
+    if (start != 0)
+    {
+        sz -= start;
+    }
     RVecS indices(sz);
-    std::iota(indices.begin(), indices.end(), 0);
+    std::iota(indices.begin(), indices.end(), start);
     return indices;
 }
 
