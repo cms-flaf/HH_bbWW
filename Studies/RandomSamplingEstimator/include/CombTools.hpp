@@ -58,7 +58,7 @@ std::pair<int, int> ChooseBestPair(RVecLV const& jets, Func func)
 
 struct Onshell
 {
-    inline bool operator()(TLorentzVector const& p1, TLorentzVector const& p2) const 
+    inline double operator()(TLorentzVector const& p1, TLorentzVector const& p2) const 
     {
         return std::abs(80.0 - (p1 + p2).M());
     }
@@ -66,7 +66,7 @@ struct Onshell
 
 struct Offshell
 {
-    inline bool operator()(TLorentzVector const& p1, TLorentzVector const& p2) const 
+    inline double operator()(TLorentzVector const& p1, TLorentzVector const& p2) const 
     {
         return std::abs(40.0 - (p1 + p2).M());
     }
