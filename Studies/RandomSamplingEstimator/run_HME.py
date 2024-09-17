@@ -12,9 +12,12 @@ def main():
     ROOT.gROOT.SetBatch(True)
     ROOT.EnableImplicitMT(8)
     ROOT.gROOT.ProcessLine('#include "include/EstimatorTools.hpp"')
-    ROOT.gROOT.ProcessLine('#include "include/MiscTools.hpp"')
+    ROOT.gROOT.ProcessLine('#include "include/KinTools.hpp"')
+    ROOT.gROOT.ProcessLine('#include "include/CombTools.hpp"')
+    ROOT.gROOT.ProcessLine('#include "include/Definitions.hpp"')
 
     df = ROOT.RDataFrame("Events", input_file)
+
     df = df.Filter("ncentralJet > 4", "At least 4 jets for resolved topology and SL channel")
     df = df.Filter("(genb1_vis_pt > 0.0) && (genb2_vis_pt > 0.0) && (genV2prod1_vis_pt > 0.0) && (genV2prod2_vis_pt > 0.0)", "All quarks have gen match")
     
@@ -27,6 +30,35 @@ def main():
     df = df.Define("lq2_p4", "CreateP4(genV2prod2_pt, genV2prod2_eta, genV2prod2_phi, genV2prod2_mass)")
     df = df.Define("light_quarks_dR", "lq1_p4.DeltaR(lq2_p4)")
     df = df.Filter("light_quarks_dR > 0.4", "Resolved light quarks")
+
+    df = df.Define("reco_lep_p4", "CreateP4(lep1_pt, lep1_eta, lep1_phi, lep1_mass)")
+    df = df.Define("reco_met_p4", "CreateP4(PuppiMET_pt, 0.0, PuppiMET_phi, 0.0)")
+
+    df = df.Define("reco_bj1_p4", "GetLeadBJetP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass)")
+    df = df.Define("reco_bj2_p4", "GetSublBJetP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass)")
+
+    df = df.Define("light_jet_indices", "CreateIndices(ncentralJet, 2)")
+    df = df.Define("light_jets", "CreateP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass, light_jet_indices)")
+    df = df.Define("best_onshell_pair", "ChooseBestPair(light_jets, Onshell())")
+    df = df.Define("best_offshell_pair", "ChooseBestPair(light_jets, Offshell())")
+
+    df = df.Define("input_onshell", """  RVecLV res;
+                                         res.push_back(reco_bj1_p4);
+                                         res.push_back(reco_bj2_p4);
+                                         res.push_back(light_jets[best_onshell_pair.first]);
+                                         res.push_back(light_jets[best_onshell_pair.second]);
+                                         res.push_back(reco_lep_p4);
+                                         res.push_back(reco_met_p4);
+                                         return res;""")
+
+    df = df.Define("input_offshell", """ RVecLV res;
+                                         res.push_back(reco_bj1_p4);
+                                         res.push_back(reco_bj2_p4);
+                                         res.push_back(light_jets[best_offshell_pair.first]);
+                                         res.push_back(light_jets[best_offshell_pair.second]);
+                                         res.push_back(reco_lep_p4);
+                                         res.push_back(reco_met_p4);
+                                         return res;""")
 
     print(f"dataset contains {df.Count().GetValue()} events")
 
