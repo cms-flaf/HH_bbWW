@@ -6,9 +6,13 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(prog='train_net', description='Runs Random Sampling Heavy Mass Estimator')
     parser.add_argument('file', type=str, help="Input file")
+    parser.add_argument('mod', type=int, help="Value module which event shoulbe selected")
+    parser.add_argument('val', type=int, help="Value for event selection")
 
     args = parser.parse_args()
     input_file = args.file
+    mod = args.mod
+    val = args.val
 
     ROOT.gROOT.SetBatch(True)
     ROOT.EnableImplicitMT(8)
@@ -23,6 +27,8 @@ def main():
     ROOT.gInterpreter.Declare("""TRandom3 rg; rg.SetSeed(42);""")
 
     df = ROOT.RDataFrame("Events", input_file)
+    
+    df = df.Filter(f"event % {mod} == {val}", "Evaluation selection")
 
     df = df.Filter("ncentralJet > 4", "At least 4 jets for resolved topology and SL channel")
     df = df.Filter("(genb1_vis_pt > 0.0) && (genb2_vis_pt > 0.0) && (genV2prod1_vis_pt > 0.0) && (genV2prod2_vis_pt > 0.0)", "All quarks have gen match")
