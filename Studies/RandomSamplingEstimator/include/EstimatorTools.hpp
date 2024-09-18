@@ -12,7 +12,7 @@
 #include "Definitions.hpp"
 #include "RealQuadEqn.hpp"
 
-inline constexpr int N_ITER = 1000;
+inline constexpr int N_ITER = 100;
 inline constexpr double TOL = 10e-9;
 
 inline constexpr double HIGGS_MASS = 125.03;
@@ -23,14 +23,14 @@ inline constexpr int N_BINS = 1500;
 
 enum PhysObj { bj1, bj2, wj1, wj2, lep, met };
 
-OptionalPair JetRescFact(TLorentzVector& j1, TLorentzVector& j2, std::unique_ptr<TH1F>& pdf, double mass)
+OptionalPair JetRescFact(TLorentzVector& j1, TLorentzVector& j2, std::unique_ptr<TH1F>& pdf, double mass, TRandom3& rg)
 {
     if (j1.Pt() <= j2.Pt()) 
     {
         std::swap(j1, j2);
     }
 
-    double c1 = pdf->GetRandom();
+    double c1 = pdf->GetRandom(&rg);
 
     double x1 = j2.M2();
     double x2 = 2*c1*(j1*j2);
@@ -89,7 +89,7 @@ OptionalPair EstimateMass(RVecLV const& particles, std::unique_ptr<TH1F>& pdf, T
     TLorentzVector l = particles[PhysObj::lep];
     TLorentzVector met = particles[PhysObj::met];
 
-    rg.SetSeed(0);
+    rg.SetSeed(42);
     double mh = rg.Gaus(HIGGS_MASS, HIGGS_WIDTH);
 
     double W_dijet_mass = (j1 + j2).M();
@@ -100,7 +100,7 @@ OptionalPair EstimateMass(RVecLV const& particles, std::unique_ptr<TH1F>& pdf, T
     for (int i = 0; i < N_ITER; ++i)
     {
         double eta = rg.Uniform(-6, 6);
-        OptionalPair b_jet_resc = JetRescFact(b1, b2, pdf, mh);
+        OptionalPair b_jet_resc = JetRescFact(b1, b2, pdf, mh, rg);
         if (b_jet_resc)
         {
             assert(b1.Pt() >= b2.Pt());
