@@ -58,7 +58,9 @@ class JetNet():
 
 
     def SaveModel(self, path):
-        self.model.save(f"{path}{self.name}.keras")
+        if path[-1] == '/':
+            self.model.save(f"{path}{self.name}.keras")
+        self.model.save(f"{path}/{self.name}.keras")
 
     
     def LoadModel(self, model_name):

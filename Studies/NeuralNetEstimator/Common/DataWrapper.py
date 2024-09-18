@@ -17,6 +17,10 @@ class DataWrapper():
         self.labels = cfg['labels']
         self.extra_data = cfg['extra_data']
 
+        self.modulo = cfg['modulo']
+        self.train_val = cfg['train_val']
+        self.test_val = cfg['test_val']
+
         # pd.DataFrame containing full dataset
         self.data = pd.DataFrame(columns=[*self.features, *self.labels, *self.extra_data])
 
@@ -77,8 +81,8 @@ class DataWrapper():
 
     def TrainTestSplit(self):
         self.Shuffle()
-        train_df = self.SelectEvents(0, 2)
-        test_df = self.SelectEvents(1, 2)
+        train_df = self.SelectEvents(self.train_val, self.modulo)
+        test_df = self.SelectEvents(self.test_val, self.modulo)
 
         self.test_labels = test_df[self.labels] # contain px, py, pz, E of H->VV and true X_mass
         test_df = test_df.drop(self.labels, axis=1)

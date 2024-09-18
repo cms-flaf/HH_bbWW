@@ -30,3 +30,6 @@ labels:
 - 'X_mass'
 extra_data:
 - 'event'
+modulo: 2
+train_val: 0
+test_val: 1
