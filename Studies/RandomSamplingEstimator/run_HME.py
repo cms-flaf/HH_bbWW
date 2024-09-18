@@ -16,6 +16,9 @@ def main():
     ROOT.gROOT.ProcessLine('#include "include/CombTools.hpp"')
     ROOT.gROOT.ProcessLine('#include "include/Definitions.hpp"')
 
+    ROOT.gInterpreter.Declare("""auto file_pdf = std::make_unique<TFile>("pdf.root", "READ");""")
+    ROOT.gInterpreter.Declare("""auto pdf = std::unique_ptr<TH1F>(static_cast<TH1F*>(file_pdf->Get("pdf")));""")
+
     df = ROOT.RDataFrame("Events", input_file)
 
     df = df.Filter("ncentralJet > 4", "At least 4 jets for resolved topology and SL channel")
@@ -60,8 +63,13 @@ def main():
                                          res.push_back(reco_met_p4);
                                          return res;""")
 
-    print(f"dataset contains {df.Count().GetValue()} events")
+    # df = df.Define("test", "Test(input_onshell)")
+    df = df.Define("test", "UseHist(pdf)")
+    test = df.AsNumpy(["test"])
+    print(test["test"])
 
+    print(f"dataset contains {df.Count().GetValue()} events")
+    
 
 if __name__ == '__main__':
     main()
