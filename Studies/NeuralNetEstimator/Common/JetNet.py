@@ -4,7 +4,7 @@ import numpy as np
 import uproot
 import pandas as pd
 
-from Common.JetNet_utils import MXLossFunc, H_WW_MXLossFunc
+from Common.JetNet_utils import MXLossFunc
 
 
 class JetNet():
@@ -53,7 +53,7 @@ class JetNet():
         # returns predicted variables: px, py, pz of H->bb
         pred_p3 = self.model.predict(test_features)
         pred_en = np.sqrt(125.0**2 + np.sum(np.square(pred_p3), axis=1))
-        pred_df = pd.DataFrame({"H_bb_px": pred_p3[:, 0], "H_bb_py": pred_p3[0:, 1], "H_bb_pz": pred_p3[:, 2]}, "H_bb_E": pred_en)
+        pred_df = pd.DataFrame({"H_bb_px": pred_p3[:, 0], "H_bb_py": pred_p3[0:, 1], "H_bb_pz": pred_p3[:, 2], "H_bb_E": pred_en})
         return pred_df
 
 
