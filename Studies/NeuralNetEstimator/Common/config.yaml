@@ -1,0 +1,35 @@
+batch_size: 128
+learning_rate: 0.0001
+n_epochs: 50
+name: nn_estimator_v1
+topology:
+- 256
+- 128
+- 64
+- 32
+- 16
+- 8
+valid_split: 0.2
+verbosity: 1
+tree_name: 'Events'
+jet_observables:
+- 'px'
+- 'py'
+- 'pz' 
+- 'E'
+- 'btagPNetB' 
+- 'PNetRegPtRawCorr'
+- 'PNetRegPtRawCorrNeutrino' 
+- 'PNetRegPtRawRes'
+n_jets: 10
+labels:
+- 'H_VV_px' 
+- 'H_VV_py'
+- 'H_VV_pz'
+- 'H_VV_E'
+- 'X_mass'
+extra_data:
+- 'event'
+modulo: 2
+train_val: 0
+test_val: 1
