@@ -4,7 +4,7 @@ import awkward as ak
 import uproot
 import vector
 from sklearn.utils import shuffle
-from DataWrapper_utils import *
+from Common.DataWrapper_utils import *
 
 
 class DataWrapper():
@@ -31,7 +31,7 @@ class DataWrapper():
         branches = tree.arrays()
 
         d1 = {name: np.array(branches[name]) for name in self.extra_data}
-        d1["X_mass"] = np.array(branches['X_mass'], dtype=int)
+        d1["X_mass"] = np.array(branches['X_mass'], dtype=float)
 
         centralJet_p4 = vector.zip({'pt': branches['centralJet_pt'], 
                                     'eta': branches['centralJet_eta'], 
