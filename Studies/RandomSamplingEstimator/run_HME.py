@@ -30,7 +30,6 @@ def main():
     print(f"Total events: {df.Count().GetValue()}")
     
     df = df.Filter(f"event % {mod} == {val}", "Evaluation selection")
-
     df = df.Filter("ncentralJet >= 4", "At least 4 jets for resolved topology and SL channel")
     
     df = df.Define("bq1_p4", "CreateP4(genb1_pt, genb1_eta, genb1_phi, genb1_mass)")
@@ -94,7 +93,7 @@ def main():
     output = np.column_stack((np.array(result["hme_onshell"]), np.array(result["hme_offshell"])))
     np.savetxt("hme_output.txt", output, delimiter=' ', fmt='%10.5f')
     
-    print("\nCutflow repot:")
+    print("\nCutflow report:")
     df.Report().Print()
 
 if __name__ == '__main__':
