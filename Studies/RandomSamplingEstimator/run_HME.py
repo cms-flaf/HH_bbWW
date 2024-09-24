@@ -6,7 +6,7 @@ import numpy as np
 def main():
     parser = argparse.ArgumentParser(prog='train_net', description='Runs Random Sampling Heavy Mass Estimator')
     parser.add_argument('file', type=str, help="Input file")
-    parser.add_argument('mod', type=int, help="Value module which event shoulbe selected")
+    parser.add_argument('mod', type=int, help="Value modulo which event should be selected")
     parser.add_argument('val', type=int, help="Value for event selection")
 
     args = parser.parse_args()
@@ -27,11 +27,11 @@ def main():
     ROOT.gInterpreter.Declare("""TRandom3 rg; rg.SetSeed(42);""")
 
     df = ROOT.RDataFrame("Events", input_file)
+    print(f"Total events: {df.Count().GetValue()}")
     
     df = df.Filter(f"event % {mod} == {val}", "Evaluation selection")
 
-    df = df.Filter("ncentralJet > 4", "At least 4 jets for resolved topology and SL channel")
-    df = df.Filter("(genb1_vis_pt > 0.0) && (genb2_vis_pt > 0.0) && (genV2prod1_vis_pt > 0.0) && (genV2prod2_vis_pt > 0.0)", "All quarks have gen match")
+    df = df.Filter("ncentralJet >= 4", "At least 4 jets for resolved topology and SL channel")
     
     df = df.Define("bq1_p4", "CreateP4(genb1_pt, genb1_eta, genb1_phi, genb1_mass)")
     df = df.Define("bq2_p4", "CreateP4(genb2_pt, genb2_eta, genb2_phi, genb2_mass)")
@@ -53,6 +53,8 @@ def main():
     df = df.Define("light_jets", "CreateP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass, light_jet_indices)")
     df = df.Define("best_onshell_pair", "ChooseBestPair(light_jets, Onshell())")
     df = df.Define("best_offshell_pair", "ChooseBestPair(light_jets, Offshell())")
+
+    print(f"HME events: {df.Count().GetValue()}")
 
     df = df.Define("input_onshell", """  RVecLV res;
                                          res.push_back(reco_bj1_p4);
@@ -91,7 +93,9 @@ def main():
     result = df.AsNumpy(["hme_onshell", "hme_offshell"])
     output = np.column_stack((np.array(result["hme_onshell"]), np.array(result["hme_offshell"])))
     np.savetxt("hme_output.txt", output, delimiter=' ', fmt='%10.5f')
-
+    
+    print("\nCutflow repot:")
+    df.Report().Print()
 
 if __name__ == '__main__':
     main()
