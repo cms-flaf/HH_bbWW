@@ -23,7 +23,7 @@ def GetHMEVariables(df, channel):
     df = df.Define("met", """HME::LorentzVectorF_t res(PuppiMET_pt, 0.0, PuppiMET_phi, 0.0);    
                           return res;""")
 		
-    df = df.Define("hme_mass", f"""auto hme = HME::EstimatorLTWrapper::Instance().GetEstimator().EstimateMass(jets, leptons, met, event, HME::Channel::{channel});
+    df = df.Define("hme_mass", f"""auto const& hme = HME::EstimatorLTWrapper::Instance().GetEstimator().EstimateMass(jets, leptons, met, event, HME::Channel::{channel});
                                 Float_t mass = -1.0f;
                                 if (hme.has_value())
                                 {{

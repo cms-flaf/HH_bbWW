@@ -7,6 +7,7 @@
 #include "EstimatorUtils.hpp"
 #include "EstimatorTools.hpp"
 
+
 namespace HME 
 {
     class EstimatorSingleLep final : public EstimatorBase
@@ -18,7 +19,6 @@ namespace HME
         ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label) override;
         OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id) override;
     };
-
     
     EstimatorSingleLep::EstimatorSingleLep(TString const& pdf_file_name)
     {
@@ -158,8 +158,6 @@ namespace HME
             res[static_cast<size_t>(EstimOut::integral)] = integral;
             return res;
         }
-        return res;
-    }
 
     OptArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id)
     {
