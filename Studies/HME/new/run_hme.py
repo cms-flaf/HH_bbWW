@@ -8,6 +8,7 @@ from hmeVariables import GetHMEVariables
 def main():
 	parser = argparse.ArgumentParser(prog='HME', description='Runs HME')
 	parser.add_argument('file', type=str, help="Input file")
+	parser.add_argument('channel', type=str, help="Channel (DL or SL)")
 	parser.add_argument('mod', type=int, help="Value modulo which event should be selected")
 	parser.add_argument('val', type=int, help="Value for event selection")
 
@@ -15,6 +16,10 @@ def main():
 	input_file = args.file
 	mod = args.mod
 	val = args.val
+	channel = args.channel
+
+	if channel not in ["SL", "DL"]:
+		raise RuntimeError(f"Attempting to evaluate HME for wrong channel {channel}, allowed options are SL or DL")
 
 	ROOT.gROOT.SetBatch(True)
 	ROOT.EnableImplicitMT(8)
@@ -23,20 +28,25 @@ def main():
 	df = ROOT.RDataFrame("Events", input_file)
 	print(f"Total events: {df.Count().GetValue()}")
 	df = df.Filter(f"event % {mod} == {val}", "Evaluation selection")
-	df = df.Filter(f"nJet >= 2", "jets")
-	df = df.Filter(f"lep1_pt > 0.0 && lep2_pt > 0.0", "leptons")
+	if channel == "DL":
+		df = df.Filter(f"ncentralJet >= 2", "jets")
+		df = df.Filter(f"lep1_pt > 0.0 && lep2_pt > 0.0", "leptons")
+	elif channel == "SL":
+		df = df.Filter(f"ncentralJet >= 4", "jets")
+		df = df.Filter(f"lep1_pt > 0.0", "leptons")
+	
 	hme_events = df.Count().GetValue()
 	print(f"HME events: {hme_events}")
 	
-	df = GetHMEVariables(df)
+	df = GetHMEVariables(df, channel)
 
 	c1 = ROOT.TCanvas("c1", "c1")
 	c1.SetGrid()
 	hist = df.Histo1D(("hme_mass", "HME X->HH mass", 100, -10, 2000), "hme_mass")
 	hist.GetXaxis().SetTitle("mass, [GeV]")
-	hist.GetXaxis().SetTitle("Count")
+	hist.GetYaxis().SetTitle("Count")
 	hist.Draw()
-	c1.SaveAs("hme.png")
+	c1.SaveAs(f"hme_{channel}.png")
 	end = time.perf_counter()
 
 	# df = df.Filter("hme_mass < 0.0")
