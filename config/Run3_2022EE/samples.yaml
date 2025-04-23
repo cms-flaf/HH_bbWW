@@ -1,5 +1,5 @@
 GLOBAL:
-  triggerFile: config/HH_bbWW/Run3_2022EE/triggers.yaml
+  triggerFile: config/Run3_2022EE/triggers.yaml
   sampleSelection:
     - drop ^.*
     - keep TTto2L2Nu
