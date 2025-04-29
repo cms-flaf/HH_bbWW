@@ -37,21 +37,8 @@ def main():
 	
 	hme_events = df.Count().GetValue()
 	print(f"HME events: {hme_events}")
-	
 	df = GetHMEVariables(df, channel)
-
-	c1 = ROOT.TCanvas("c1", "c1")
-	c1.SetGrid()
-	hist = df.Histo1D(("hme_mass", "HME X->HH mass", 100, -10, 2000), "hme_mass")
-	hist.GetXaxis().SetTitle("mass, [GeV]")
-	hist.GetYaxis().SetTitle("Count")
-	hist.Draw()
-	c1.SaveAs(f"hme_{channel}.png")
 	end = time.perf_counter()
-
-	# df = df.Filter("hme_mass < 0.0")
-	# hme_failed_events = df.Count().GetValue()
-	# print(f"HME success rate: {(1.0 - hme_failed_events/hme_events)*100.0:.2f}%")
 	print(f"Execution time: {(end - start):.2f}s")
 
 
