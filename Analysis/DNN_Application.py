@@ -15,7 +15,16 @@ import tqdm
 import FLAF.Common.Utilities as Utilities
 import uproot
 import onnxruntime as ort
+from FLAF.RunKit.run_tools import ps_call
+import shutil
 
+
+
+def getKeyNames(root_file_name):
+    root_file = ROOT.TFile(root_file_name, "READ")
+    key_names = [str(k.GetName()) for k in root_file.GetListOfKeys() if root_file.Get(str(k.GetName())).InheritsFrom("TTree")]
+    root_file.Close()
+    return key_names
 
 def createCentralQuantities(df_central, central_col_types, central_columns):
     map_creator = ROOT.analysis.MapCreator(*central_col_types)()
@@ -23,31 +32,40 @@ def createCentralQuantities(df_central, central_col_types, central_columns):
     return df_central
 
 
-def run_inference_on_events_tree(df_begin, models, globalConfig, dnnConfig, output_root_file, snapshotOptions, outFileName):
+def run_inference_on_events_tree(df_begin, models, globalConfig, dnnConfig, snapshotOptions):
     print(f"Running inference on the Events tree")
-    run_inference_for_tree(
+    # Create variables for DNN
+    df = analysis.defineAllP4(df_begin)
+    df = analysis.AddDNNVariables(df)
+    out_names = []
+    outFileName = 'tmp_Events.root'
+    out_name = run_inference_for_tree(
         tree_name="Events",
-        rdf=df_begin,
+        rdf=df,
         models=models,
         globalConfig=globalConfig,
         dnnConfig=dnnConfig,
-        output_root_file=output_root_file,
         snapshotOptions=snapshotOptions,
         outFileName=outFileName
     )
+    out_names.append(out_name)
     print(f"NN scores for Events tree saved in the output ROOT file")
+    return out_names
 
 # Not done yet
-def run_inference_on_uncertainty_trees(df_begin, inFileName, models, globalConfig, unc_cfg_dict, scales, output_root_file, snapshotOptions, period, mass, spin):
+def run_inference_on_uncertainty_trees(df_begin, models, globalConfig, dnnConfig, unc_cfg_dict, scales, inFileName, snapshotOptions):
     dfWrapped_central = Utilities.DataFrameBuilderBase(df_begin)
     colNames = dfWrapped_central.colNames
     colTypes = dfWrapped_central.colTypes
     dfWrapped_central.df = createCentralQuantities(df_begin, colTypes, colNames)
 
+    defaultColToSave = ["entryIndex", "luminosityBlock", "run", "event"]
+
     if dfWrapped_central.df.Filter("map_placeholder > 0").Count().GetValue() <= 0:
         raise RuntimeError("No events passed the map placeholder")
 
     snapshotOptions.fLazy = False
+    out_names = []
     for uncName in unc_cfg_dict['shape']:
         for scale in scales:
             treeName = f"Events_{uncName}{scale}"
@@ -60,24 +78,27 @@ def run_inference_on_uncertainty_trees(df_begin, inFileName, models, globalConfi
                     if "_nonValid" not in treeName_with_suffix:
                         dfWrapped_unc.CreateFromDelta(colNames, colTypes)
                     dfWrapped_unc.AddMissingColumns(colNames, colTypes)    
-                    dfW_unc = Utilities.DataFrameWrapper(dfWrapped_unc.df, defaultColToSave)
+                    # dfW_unc = Utilities.DataFrameWrapper(dfWrapped_unc.df, defaultColToSave)
                     
-
-                    run_inference_for_tree(
+                    # Create variables for DNN
+                    dfW_unc = analysis.defineAllP4(dfWrapped_unc.df)
+                    dfW_unc = analysis.AddDNNVariables(dfW_unc)
+                    outFileName = f'tmp_{treeName_with_suffix}.root'
+                    out_name = run_inference_for_tree(
                         tree_name=treeName_with_suffix,
-                        rdf=dfW_unc.df,
+                        rdf=dfW_unc,
                         models=models,
                         globalConfig=globalConfig,
-                        output_root_file=output_root_file,
+                        dnnConfig=dnnConfig,
                         snapshotOptions=snapshotOptions,
-                        period=period,
-                        mass=mass,
-                        spin=spin
+                        outFileName=outFileName
                     )
+                    out_names.append(out_name)
     
     print(f"NN scores saved to {output_file_name}")
+    return out_names
 
-def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, output_root_file, snapshotOptions, outFileName):
+def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, snapshotOptions, outFileName):
     #Features to use for DNN application (single vals)
     features = dnnConfig['features']
     #Features to use for DNN application (vectors and index)
@@ -96,8 +117,8 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, outp
 
     load_features.update(["entryIndex", "luminosityBlock", "run", "event"])
 
-    print("Loading these features")
-    print(load_features)
+    # print("Loading these features")
+    # print(load_features)
 
 
     nClasses = dnnConfig['nClasses'] if 'nClasses' in dnnConfig.keys() else 3
@@ -116,11 +137,11 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, outp
         # It is actually better to just save the thing and then re open the root file with uproot
 
         vars_to_save = Utilities.ListToVector(load_features)
-        rdf_filtered.Snapshot(f"Events", "test.root", vars_to_save, snapshotOptions)
+        rdf_filtered.Snapshot(tree_name, "test.root", vars_to_save, snapshotOptions)
 
         # Now open it with uproot!
         events = uproot.open("test.root")
-        branches = events['Events'].arrays(load_features)
+        branches = events[tree_name].arrays(load_features)
 
         all_predictions = np.zeros((len(param_mass_list), len(branches.event), nParity, nClasses))
 
@@ -191,24 +212,42 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, outp
                 # branches[f'dnn_M{param_mass}_DY'] = prediction.transpose()[2]
 
         #But we want to drop the features from this outfile
-        print("Dropping ", features_to_drop)
+        # print("Dropping ", features_to_drop)
         for feature in features_to_drop:
             del branches[feature]
 
-        #This will save the file
-        outfile = uproot.recreate(outFileName)
-        outfile['Events'] = branches
-
-        return outfile
 
 
-    run_inference_and_save(rdf)
+        # if os.path.isfile(outFileName):
+        #     with uproot.update(outFileName) as outfile:
+        #         print("Opened with update")
+        #         outfile[tree_name] = branches
+        #         print("Filled with tree")
+        #         print(branches)
+
+        # else:
+        #     print(f"File doesn't exist, creating {outFileName}")
+        #     with uproot.recreate(outFileName) as outfile:
+        #         outfile[tree_name] = branches
+        #         outfile.close()
+
+        with uproot.recreate(outFileName) as outfile:
+            outfile[tree_name] = branches
+            outfile.close()
+        
+        return outFileName
+
+
+
+
+    return run_inference_and_save(rdf)
 
 if __name__ == "__main__":
 
     sys.path.append(os.environ['ANALYSIS_PATH'])
     ROOT.gROOT.ProcessLine(".include "+ os.environ['ANALYSIS_PATH'])
     ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
+    ROOT.gROOT.ProcessLine(f'#include "FLAF/include/HistHelper.h"')
     ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisTools.h"')
     ROOT.gROOT.ProcessLine(f'#include "FLAF/include/pnetSF.h"')
     ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisMath.h"')
@@ -266,40 +305,39 @@ if __name__ == "__main__":
         print("Models Loaded----")
 
         output_file_name = f'{args.outFileName}'
-        output_root_file = ROOT.TFile('bad.root', "RECREATE")
-
-        # Create variables for DNN
-        # df = analysis.AddDNNVariablesForApplication(df_begin)
-        df = analysis.AddDNNVariables(df_begin)
 
         # Run inference on the Events tree
-        run_inference_on_events_tree(
-            df_begin=df,
+        events_file_names = run_inference_on_events_tree(
+            df_begin=df_begin,
             models=models,
             globalConfig=globalConfig,
             dnnConfig=dnnConfig,
-            output_root_file=output_root_file,
             snapshotOptions=snapshotOptions,
-            outFileName=output_file_name
         )
         
-        # # Run inference on uncertainty trees
-        # run_inference_on_uncertainty_trees(
-        #     df_begin=df_begin,
-        #     inFileName=args.inFile,
-        #     models=models,
-        #     globalConfig=globalConfig,
-        #     unc_cfg_dict=unc_cfg_dict,
-        #     scales=scales,
-        #     output_root_file=output_root_file,
-        #     snapshotOptions=snapshotOptions,
-        #     period=args.period,
-        #     mass=args.mass,
-        #     spin=args.spin
-        # )
+        # Run inference on uncertainty trees
+        unc_file_names = run_inference_on_uncertainty_trees(
+            df_begin=df_begin,
+            models=models,
+            globalConfig=globalConfig,
+            dnnConfig=dnnConfig,
+            unc_cfg_dict=unc_cfg_dict,
+            scales=scales,
+            inFileName=args.inFileName,
+            snapshotOptions=snapshotOptions,
+        )
         
-        output_root_file.Write()
-        output_root_file.Close()
+
+        #ps call
+        all_files = events_file_names + unc_file_names
+        hadd_str = f'hadd -f209 -j 6 -n 0 {output_file_name} '
+        hadd_str += ' '.join(f for f in all_files)
+        print(len(all_files))
+        print(hadd_str)
+        if len(all_files) > 1:
+            ps_call([hadd_str], True)
+        else:
+            shutil.copy(all_files[0],output_file_name)
 
         print(f"Processed and saved NN scores for all trees into {output_file_name}.")
 
