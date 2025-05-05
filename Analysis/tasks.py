@@ -119,7 +119,7 @@ class AnalysisCacheTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 if deepTauVersion!="":
                     anaCacheTupleProducer_cmd.extend([ '--deepTauVersion', deepTauVersion])
                 useDNNModel = "HH_bbWW" in self.global_params['analysis_config_area'] #Now bbtautau won't use this DNN model arg (even though this task is only for bbWW right now)
-                useDNNModel = 'bbww' == self.global_params['anlaysis_name']
+                useDNNModel = 'bbww' == self.global_params['analysis_name']
                 if useDNNModel:
                     dnnFolder = os.path.join(self.ana_path(), self.global_params['analysis_config_area'], 'DNN', 'v24') #'ResHH_Classifier.keras')
                     anaCacheTupleProducer_cmd.extend([ '--dnnFolder', dnnFolder])
