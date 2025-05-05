@@ -8,4 +8,22 @@ norm:
   MuonID_TightIDIso:
     expression: weight_lep1_MuonID_SF_LoosePFIso{scale}_rel * weight_lep2_MuonID_SF_LoosePFIso{scale}_rel * final_weight
     name: MuonID_TightIDIso
-shape: []
+  EleID_TightIDIso:
+    expression: weight_lep1_EleSF_wp80iso_EleID{scale}_rel * weight_lep2_EleSF_wp80iso_EleID{scale}_rel * final_weight
+    name: EleID_TightIDIso
+  EleID_TightIDNoIso:
+    expression: weight_lep1_EleSF_wp80noiso_EleID{scale}_rel * weight_lep2_EleSF_wp80noiso_EleID{scale}_rel * final_weight
+    name: EleID_TightIDNoIso
+
+  SingleEleTrg:
+    expression: weight_lep1_TrgSF_singleEleWpTight_singleEle{scale}_rel * weight_lep2_TrgSF_singleEleWpTight_singleEle{scale}_rel * final_weight
+    name: SingleEleTrg
+  SingleMuonTrg:
+    expression: weight_lep1_TrgSF_singleIsoMu_IsoMu24{scale}_rel * weight_lep2_TrgSF_singleIsoMu_IsoMu24{scale}_rel * final_weight
+    name: SingleMuonTrg
+
+
+shape:
+  - JER
+  - JES_Total
+  - EleES
