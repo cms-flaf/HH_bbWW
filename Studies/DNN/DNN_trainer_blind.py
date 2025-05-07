@@ -1849,6 +1849,8 @@ if __name__ == '__main__':
     parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on")
     parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
 
+    parser.add_argument('--setup-config', required=False, type=str, default='default_training_setup.yaml', help='Setup config for training')
+
     args = parser.parse_args()
 
     nParity = args.nParity
@@ -1856,57 +1858,63 @@ if __name__ == '__main__':
     output_folder = args.output_folder
   
 
-    setup = {
-        'learning_rate': 0.00001,
-        'adv_learning_rate': 0.0001,
-        'weight_decay': 0.004,
-        'adv_weight_decay': 0.004,
-        'adv_grad_factor': 1.0, #0.7
-        'class_grad_factor': 0.0, #0.0001, #0.0001,
-        'common_activation': 'tanh', #'relu'
-        'class_activation': 'tanh', #'relu'
-        'adv_activation': 'relu', #'relu'
-        'use_batch_norm': False,
-        'dropout': 0.0,
-        'n_common_layers': 10,
-        'n_common_units': 256,
-        'n_class_layers': 5,
-        'n_class_units': 128,
-        'n_adv_layers': 5,
-        'n_adv_units': 128,
-        'n_epochs': 5,
-        'patience': 100,
-        'apply_common_gradients': True,
-        'UseParametric': True,
-        'parametric_list': [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ],
-        'continue_training': True,
-        'continue_model': "DNN_Models/v32p9/ResHH_Classifier_parity0.keras",
+    # setup = {
+    #     'learning_rate': 0.00001,
+    #     'adv_learning_rate': 0.0001,
+    #     'weight_decay': 0.004,
+    #     'adv_weight_decay': 0.004,
+    #     'adv_grad_factor': 1.0, #0.7
+    #     'class_grad_factor': 0.0, #0.0001, #0.0001,
+    #     'common_activation': 'tanh', #'relu'
+    #     'class_activation': 'tanh', #'relu'
+    #     'adv_activation': 'relu', #'relu'
+    #     'use_batch_norm': False,
+    #     'dropout': 0.0,
+    #     'n_common_layers': 10,
+    #     'n_common_units': 256,
+    #     'n_class_layers': 5,
+    #     'n_class_units': 128,
+    #     'n_adv_layers': 5,
+    #     'n_adv_units': 128,
+    #     'n_epochs': 5,
+    #     'patience': 100,
+    #     'apply_common_gradients': True,
+    #     'UseParametric': True,
+    #     'parametric_list': [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ],
+    #     'continue_training': True,
+    #     'continue_model': "DNN_Models/v32p9/ResHH_Classifier_parity0.keras",
 
-        'batch_compression_factor': 10,
-        'adv_submodule_steps': 250,
-        'adv_submodule_tracker': 0,
+    #     'batch_compression_factor': 10,
+    #     'adv_submodule_steps': 250,
+    #     'adv_submodule_tracker': 0,
 
-        'features': [
-          'lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass',
-          'lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass', 
-          'met_pt', 'met_phi'
-        ],
-        'listfeatures': [
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3],
-        ],
-        'highlevelfeatures': [
-          'HT', 'dR_dilep', 'dR_dibjet', 
-          'dR_dilep_dibjet', 'dR_dilep_dijet',
-          'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
-          'dPhi_MET_dilep', 'dPhi_MET_dibjet',
-          'min_dR_lep0_jets', 'min_dR_lep1_jets',
-          'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
-          'll_mass', 'CosTheta_bb'
-        ],
-    }
+    #     'features': [
+    #       'lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass',
+    #       'lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass', 
+    #       'met_pt', 'met_phi'
+    #     ],
+    #     'listfeatures': [
+    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0],
+    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1],
+    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2],
+    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3],
+    #     ],
+    #     'highlevelfeatures': [
+    #       'HT', 'dR_dilep', 'dR_dibjet', 
+    #       'dR_dilep_dibjet', 'dR_dilep_dijet',
+    #       'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
+    #       'dPhi_MET_dilep', 'dPhi_MET_dibjet',
+    #       'min_dR_lep0_jets', 'min_dR_lep1_jets',
+    #       'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
+    #       'll_mass', 'CosTheta_bb'
+    #     ],
+    # }
+
+
+    setup = {}
+    with open(os.path.join('config', args.setup_config), 'r') as file:
+        setup = yaml.safe_load(file)  
+
 
     input_folder = "DNN_Datasets/Dataset_2025-03-28-12-49-16"
     output_folder = os.path.join("DNN_Models", output_folder)
