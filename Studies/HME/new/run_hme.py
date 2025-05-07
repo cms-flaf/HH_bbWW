@@ -29,15 +29,12 @@ def main():
 	print(f"Total events: {df.Count().GetValue()}")
 	df = df.Filter(f"event % {mod} == {val}", "Evaluation selection")
 	if channel == "DL":
-		df = df.Filter(f"ncentralJet >= 2", "jets")
-		df = df.Filter(f"lep1_pt > 0.0 && lep2_pt > 0.0", "leptons")
+		df = df.Define("has_necessary_inputs", "return (ncentralJet >= 2 && lep1_pt > 0.0 && lep2_pt > 0.0);")
 	elif channel == "SL":
-		df = df.Filter(f"ncentralJet >= 4", "jets")
-		df = df.Filter(f"lep1_pt > 0.0", "leptons")
+		df = df.Define("has_necessary_inputs", "return (ncentralJet >= 4 && lep1_pt > 0.0);")
 	
-	hme_events = df.Count().GetValue()
-	print(f"HME events: {hme_events}")
 	df = GetHMEVariables(df, channel)
+	df = df.Define("hme_mass", "return hme_output[static_cast<size_t>(HME::EstimOut::mass)];")
 
 	c1 = ROOT.TCanvas("c1", "c1")
 	c1.SetGrid()
