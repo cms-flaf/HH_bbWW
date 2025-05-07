@@ -327,11 +327,11 @@ def create_dict(config_dict, output_folder):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
-    parser.add_argument('--config', required=True, type=str, help="Config YAML")
+    parser.add_argument('--config', required=False, type=str, default='default_dataset.yaml' help="Config YAML")
 
     args = parser.parse_args()
 
-    with open(args.config, 'r') as file:
+    with open(os.paht.join('config', args.config), 'r') as file:
         config_dict = yaml.safe_load(file)
 
     output_base = "DNN_Datasets"
