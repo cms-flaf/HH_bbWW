@@ -57,8 +57,51 @@ uncertainties:
 
   - name: JER
     type: shape
+  # - name: JES_total # As of May8 2025 the JES uncertainty causes a cpp seg fault
+  #   type: shape
   - name: EleES
     type: shape
+
+
+  - name: QCD_scale_TT
+    type: lnN
+    processes:
+    - TT
+    value: [ 0.025, -0.036 ] # TT XS uncertainty in percentage from xsec yaml
+    # TT:
+    # crossSec: '923.6'
+    # reference: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO#Updated_reference_cross_sections
+    # unc: +22.6 -33.4 (scale) +/-  22.8 (PDF alphas) -24.6 +25.4 (mass) (to be multiplied by the BR)
+
+  - name: QCD_scale_DY
+    type: lnN
+    processes:
+    - DY
+    value: [ 0.007, -0.011 ] # DY XS uncertainty in percentage from xsec yaml
+    # DY_NNLO_QCD+NLO_EW:
+    # crossSec: 2094.2 * 3
+    # reference: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
+    # unc: +0.7% - 1.1%, +- 1.0% PDF alphas
+    
+  - name: PDF_alphas
+    hasMultipleValues: True
+    value:
+    - value: 0.025
+      type: lnN
+      processes:
+      - TT
+    - value: 0.01
+      type: lnN
+      processes:
+      - DY
+
+  - name: top_mass
+    hasMultipleValues: True
+    value: 
+    - value: [ 0.028, -0.027 ]
+      type: lnN
+      processes: 
+      - TT
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
