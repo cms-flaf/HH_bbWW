@@ -62,12 +62,12 @@ uncertainties:
   - name: EleES
     type: shape
 
-
+  # For multiple values, Konstantin says do [ down, up ]
   - name: QCD_scale_TT
     type: lnN
     processes:
     - TT
-    value: [ 0.025, -0.036 ] # TT XS uncertainty in percentage from xsec yaml
+    value: [ -0.036, 0.025 ] # TT XS uncertainty in percentage from xsec yaml
     # TT:
     # crossSec: '923.6'
     # reference: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO#Updated_reference_cross_sections
@@ -77,7 +77,7 @@ uncertainties:
     type: lnN
     processes:
     - DY
-    value: [ 0.007, -0.011 ] # DY XS uncertainty in percentage from xsec yaml
+    value: [ -0.011, 0.007 ] # DY XS uncertainty in percentage from xsec yaml
     # DY_NNLO_QCD+NLO_EW:
     # crossSec: 2094.2 * 3
     # reference: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
@@ -98,7 +98,7 @@ uncertainties:
   - name: top_mass
     hasMultipleValues: True
     value: 
-    - value: [ 0.028, -0.027 ]
+    - value: [ -0.027, 0.028 ]
       type: lnN
       processes: 
       - TT
