@@ -1846,16 +1846,17 @@ def validate_model(model_name, model_config, validation_file, validation_weight,
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
-    parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on")
-    parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
+    parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on for this call, default runs all")
+    # parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
 
-    parser.add_argument('--setup-config', required=False, type=str, default='default_training_setup.yaml', help='Setup config for training')
+    parser.add_argument('--setup-config', required=False, type=str, default='default_setup.yaml', help='Setup config for training')
 
     args = parser.parse_args()
 
     nParity = args.nParity
     print(f"We have parity {nParity}")
-    output_folder = args.output_folder
+    # output_folder = args.output_folder
+
   
 
     # setup = {
@@ -1916,7 +1917,9 @@ if __name__ == '__main__':
         setup = yaml.safe_load(file)  
 
 
-    input_folder = "DNN_Datasets/Dataset_2025-03-28-12-49-16"
+    # input_folder = "DNN_Datasets/Dataset_2025-03-28-12-49-16"
+    input_folder = setup['input_folder']
+    output_folder = setup['output_folder']
     output_folder = os.path.join("DNN_Models", output_folder)
 
 
