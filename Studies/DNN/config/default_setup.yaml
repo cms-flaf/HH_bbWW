@@ -1,17 +1,17 @@
 UseParametric: true
 adv_activation: relu
 adv_grad_factor: 1.0
-adv_learning_rate: 0.0001
-adv_submodule_steps: 250
-adv_submodule_tracker: 0
+adv_learning_rate: 0.001
+adv_submodule_steps: 10
+adv_submodule_tracker: 10
 adv_weight_decay: 0.004
 apply_common_gradients: true
-batch_compression_factor: 10
+batch_compression_factor: 1
 class_activation: tanh
-class_grad_factor: 0.0
+class_grad_factor: 0.1
 common_activation: tanh
 continue_model: DNN_Models/v32p9/ResHH_Classifier_parity0.keras
-continue_training: true
+continue_training: false
 dropout: 0.0
 features:
 - lep1_pt
@@ -42,6 +42,7 @@ highlevelfeatures:
 - MT2_blbl
 - ll_mass
 - CosTheta_bb
+input_folder: DNN_Datasets/Dataset_2025-03-28-12-49-16
 learning_rate: 1.0e-05
 listfeatures:
 - - - centralJet_pt
@@ -70,7 +71,8 @@ n_class_layers: 5
 n_class_units: 128
 n_common_layers: 10
 n_common_units: 256
-n_epochs: 5
+n_epochs: 20
+output_folder: v33
 parametric_list:
 - 250
 - 260

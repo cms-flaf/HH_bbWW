@@ -145,6 +145,7 @@ def create_file(config_dict, output_folder, out_filename):
     print("Going to snapshot")
     # Only need to save the prexisting columns plus the new DNN variables
     save_column_names = ROOT.std.vector("string")(df_out.GetColumnNames())
+    df_out = analysis.defineAllP4(df_out)
     df_out = analysis.AddDNNVariables(df_out)
     highlevel_names = [
         'HT', 'dR_dilep', 'dR_dibjet', 
