@@ -327,17 +327,18 @@ def create_dict(config_dict, output_folder):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
-    parser.add_argument('--config', required=False, type=str, default='default_dataset.yaml' help="Config YAML")
+    parser.add_argument('--config', required=False, type=str, default='default_dataset.yaml', help="Config YAML")
 
     args = parser.parse_args()
 
-    with open(os.paht.join('config', args.config), 'r') as file:
+    config_file = os.path.join('config', args.config)
+    with open(config_file, 'r') as file:
         config_dict = yaml.safe_load(file)
 
     output_base = "DNN_Datasets"
     output_folder = os.path.join(output_base, f"Dataset_{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}")
     os.makedirs(output_folder, exist_ok=True)
-    os.system(f"cp {args.config} {output_folder}/.")
+    os.system(f"cp {config_file} {output_folder}/.")
 
     print("Will create signal files")
     create_signal_files(config_dict, output_folder)
