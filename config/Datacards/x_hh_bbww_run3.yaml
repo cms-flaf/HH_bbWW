@@ -29,11 +29,11 @@ processes:
   # - W
   # - Other
 uncertainties:
-  - name: lumi_13TeV
+  - name: lumi_13p6TeV
     type: lnN
     value: 0.014 # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun3
-  #- name: eleID
-  #  type: auto
+
+
   - name: MuonID_TightID
     type: shape
   - name: MuonID_TightIDIso
@@ -55,12 +55,14 @@ uncertainties:
     eras:
     - Run3_2022EE
 
+
   - name: JER
     type: shape
   # - name: JES_total # As of May8 2025 the JES uncertainty causes a cpp seg fault
   #   type: shape
   - name: EleES
     type: shape
+
 
   # For multiple values, Konstantin says do [ down, up ]
   - name: QCD_scale_TT
@@ -82,6 +84,19 @@ uncertainties:
     # crossSec: 2094.2 * 3
     # reference: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
     # unc: +0.7% - 1.1%, +- 1.0% PDF alphas
+
+  - name: QCD_scale_ST
+    type: lnN
+    processes:
+    - ST
+    value: [ -0.022, +0.022 ]
+    # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
+
+  - name: QCD_scale_VV
+    type: lnN
+    processes:
+    - VV
+    value: 0.005 # This was uncertainty from XSDB
     
   - name: PDF_alphas
     hasMultipleValues: True
@@ -94,6 +109,10 @@ uncertainties:
       type: lnN
       processes:
       - DY
+    - value: 0.027
+      type: lnN
+      processes:
+      - ST
 
   - name: top_mass
     hasMultipleValues: True
@@ -102,6 +121,8 @@ uncertainties:
       type: lnN
       processes: 
       - TT
+    - value: [ -0.015, 0.015 ] # Taken from tW for now (largest unc percentage)
+      - ST
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
