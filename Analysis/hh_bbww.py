@@ -119,7 +119,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define("resolved", f"!boosted && centralJet_pt.size() >= 2")
         self.df = self.df.Define("res1b", f"!boosted && resolved && nSelBtag_jets == 1")
         self.df = self.df.Define("res2b", f"!boosted && resolved && nSelBtag_jets >= 2")
-        self.df = self.df.Define("res2b_Zveto_MbbSR", f"!boosted && resolved && nSelBtag_jets >= 2 && ( (lep1_type != lep2_type ) | ((lep1_type == lep2_type) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
+        self.df = self.df.Define("res1b_Zveto_MbbSR", f"res1b && ( (lep1_type != lep2_type ) | ((lep1_type == lep2_type) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
+        self.df = self.df.Define("res2b_Zveto_MbbSR", f"res2b && ( (lep1_type != lep2_type ) | ((lep1_type == lep2_type) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
         self.df = self.df.Define("inclusive", f"centralJet_pt.size() >= 2")
         self.df = self.df.Define("baseline",f"return true;")
 
