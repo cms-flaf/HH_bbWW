@@ -103,6 +103,7 @@ uncertainties:
     
   - name: PDF_alphas
     hasMultipleValues: True
+    type: lnN
     value:
     - value: 0.025
       type: lnN
@@ -119,12 +120,15 @@ uncertainties:
 
   - name: top_mass
     hasMultipleValues: True
+    type: lnN
     value: 
     - value: [ -0.027, 0.028 ]
       type: lnN
       processes: 
       - TT
     - value: [ -0.015, 0.015 ] # Taken from tW for now (largest unc percentage)
+      type: lnN
+      processes:
       - ST
 
 autolnNThr: 0.1
