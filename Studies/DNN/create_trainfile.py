@@ -65,6 +65,11 @@ def create_file(config_dict, output_folder, out_filename):
         nBatchStart = process['batch_start']
         nBatchEnd = nBatchStart+nEntriesPerBatch
 
+        if nEntriesPerBatch == 0:
+            print(f"Process has batch size of 0, skip the save loop")
+            continue
+
+
         #Load df_out, if first iter then load an empty, otherwise load the past file
         if step_idx == 0:
             df_out = ROOT.RDataFrame(nBatches*batch_size)
@@ -121,6 +126,9 @@ def create_file(config_dict, output_folder, out_filename):
         save_column_names.push_back('is_valid')
         df_out.Snapshot('Events', tmpnext_filename, save_column_names, snapshotOptions)
 
+        if step_idx == 0:
+            os.system(f"rm {tmp_filename}")
+
         tuple_maker.join()
 
         step_idx += 1
@@ -166,7 +174,7 @@ def create_file(config_dict, output_folder, out_filename):
 
     print(f"Finished create file, will copy tmp file to final output {out_filename}")
 
-    os.system(f"cp {tmpnext_filename} {out_filename}")
+    os.system(f"mv {tmpnext_filename} {out_filename}")
 
 
 

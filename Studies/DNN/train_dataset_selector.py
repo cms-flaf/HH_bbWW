@@ -188,6 +188,7 @@ def create_dict(config_dict, output_folder):
                             eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
                             process_dict[background_name][dataset_name]['weight_cut'] += eval(eval_string)
 
+                print(f"Finished background {dataset_name}, how many total? {process_dict[background_name][dataset_name]['total_cut']}")
 
 
 
@@ -241,6 +242,7 @@ def create_dict(config_dict, output_folder):
             for subprocess in process_dict[process]:
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
                 process_dict[process][subprocess]['batch_size'] = int(batch_dict[process] * process_dict[process][subprocess]['weight_cut'] / process_dict[process]['weight'])
+                print(f"Looking at subprocess {subprocess}")
                 nBatches = 0
                 if process_dict[process][subprocess]['batch_size'] != 0:
                     nBatches = int(process_dict[process][subprocess]['total_cut']/process_dict[process][subprocess]['batch_size'])
