@@ -2,10 +2,6 @@ import uproot
 import numpy as np
 import os
 
-fname = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/Studies/DNN/DNN_Datasets/Dataset_2025-03-28-12-49-16/batchfile{nParity}.root"
-outname = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/Studies/DNN/DNN_Datasets/Dataset_2025-03-28-12-49-16/weightfile{nParity}.root"
-
-
 
 def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_max=300):
 
@@ -26,9 +22,9 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
 
         hadronFlavour = branches["centralJet_hadronFlavour"]
 
-        type_to_name = {'1': 'Signal', '2': 'Signal', '8': 'TT', '5': 'DY'} #1 is Radion, 2 is Graviton
-        # type_to_target = {'1': 0, '2': 0, '8': 1, '5': 2}
-        type_to_target = {'1': 0, '2': 0, '8': 1, '5': 1}
+        type_to_name = {'1': 'Signal', '2': 'Signal', '8': 'TT', '5': 'DY', '9': 'ST'} # 1 is Radion, 2 is Graviton
+        # type_to_target = {'1': 0, '2': 0, '8': 1, '5': 2, '9': 3} # Multiclass type-to-target
+        type_to_target = {'1': 0, '2': 0, '8': 1, '5': 1, '9': 1} # Binary type-to-target
         sample_name = np.array([type_to_name[str(sample)] for sample in sample_type])
         class_targets = np.array([type_to_target[str(sample)] for sample in sample_type])
 
