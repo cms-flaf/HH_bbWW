@@ -27,7 +27,7 @@ namespace HME
     {
         if (ch == Channel::SL)
         {
-            throw std::runtime_error("EstimatorSigleLep is not yet implemented");
+            return m_estimator_sl.EstimateMass(jets, leptons, met, evt_id);
         }
         else if (ch == Channel::DL)
         {
