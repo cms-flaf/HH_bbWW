@@ -11,6 +11,9 @@ GLOBAL:
     #- keep ^QCD_PT.*
     #- keep ^QCD_HT.*
     # #- keep ^ST.*
+    - keep GluGluHToTauTau_M125.*
+    - keep GluGluHToWWTo2L2Nu_M125.*
+    - keep VBFHToWWTo2L2Nu_M125.*
     - keep ST_s_channel_antitop_4f_leptonDecays
     - keep ST_s_channel_top_4f_leptonDecays
     - keep ST_t_channel_antitop_4f_InclusiveDecays
