@@ -12,5 +12,5 @@ class HMEProducer:
         
         dfw.df = GetHMEVariables(dfw.df, self.cfg['channel'])
         for col in self.cfg['columns']:
-            dfw.DefineAndAppend(f"HME_{col}", f"static_cast<size_t>(HME::EstimOut::{col})")
+            dfw.DefineAndAppend(f"HME_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
         return dfw
