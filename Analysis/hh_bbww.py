@@ -85,23 +85,23 @@ def GetWeight(channel, cat, boosted_categories):
     return total_weight
 
 def GetLepWeight(lep_index):
-    weight_Ele = f"(lep{lep_index}_type == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
+    weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
 
     #Medium pT Muon SF
-    weight_Mu = f"(lep{lep_index}_type == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_LoosePFIsoCentral : 1.0)"
+    weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_LoosePFIsoCentral : 1.0)"
 
     #High pT Muon SF
-    #weight_Mu = f"(lep{lep_index}_type == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_HighPt_MuonID_SF_HighPtIDCentral * weight_lep{lep_index}_HighPt_MuonID_SF_RecoCentral * weight_lep{lep_index}_HighPt_MuonID_SF_TightIDCentral : 1.0)"
+    #weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_HighPt_MuonID_SF_HighPtIDCentral * weight_lep{lep_index}_HighPt_MuonID_SF_RecoCentral * weight_lep{lep_index}_HighPt_MuonID_SF_TightIDCentral : 1.0)"
 
     #No Muon SF
-    #weight_Mu = f"(lep{lep_index}_type == static_cast<int>(Leg::mu) ? 1.0 : 1.0)"
+    #weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? 1.0 : 1.0)"
 
     return f"{weight_Mu} * {weight_Ele}"
 
 
 def GetTriggerWeight():
-    weight_MuTrg = f"(lep1_type == static_cast<int>(Leg::mu) ? weight_lep1_TrgSF_singleIsoMu_Central : 1.0)"
-    weight_EleTrg = f"(lep1_type == static_cast<int>(Leg::e) ? weight_lep1_TrgSF_singleEleWpTight_Central : 1.0)"
+    weight_MuTrg = f"(lep1_legType == static_cast<int>(Leg::mu) ? weight_lep1_TrgSF_singleIsoMu_Central : 1.0)"
+    weight_EleTrg = f"(lep1_legType == static_cast<int>(Leg::e) ? weight_lep1_TrgSF_singleEleWpTight_Central : 1.0)"
 
     return f"{weight_MuTrg} * {weight_EleTrg}"
 
@@ -120,31 +120,31 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define("resolved", f"!boosted && centralJet_pt.size() >= 2")
         self.df = self.df.Define("res1b", f"!boosted && resolved && nSelBtag_jets == 1")
         self.df = self.df.Define("res2b", f"!boosted && resolved && nSelBtag_jets >= 2")
-        self.df = self.df.Define("res1b_Zveto_MbbSR", f"res1b && ( (lep1_type != lep2_type ) | ((lep1_type == lep2_type) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
-        self.df = self.df.Define("res2b_Zveto_MbbSR", f"res2b && ( (lep1_type != lep2_type ) | ((lep1_type == lep2_type) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
+        self.df = self.df.Define("res1b_Zveto_MbbSR", f"res1b && ( (lep1_legType != lep2_legType ) | ((lep1_legType == lep2_legType) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
+        self.df = self.df.Define("res2b_Zveto_MbbSR", f"res2b && ( (lep1_legType != lep2_legType ) | ((lep1_legType == lep2_legType) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
         self.df = self.df.Define("inclusive", f"centralJet_pt.size() >= 2")
         self.df = self.df.Define("baseline",f"return true;")
 
 
     def defineChannels(self):
-        #self.df = self.df.Define("channelId", f"(lep1_type*10) + lep2_type") #Muhammad moved this to anaTupleDef like a jerk
+        #self.df = self.df.Define("channelId", f"(lep1_legType*10) + lep2_legType") #Muhammad moved this to anaTupleDef like a jerk
         for channel in self.config['channelSelection']:
             ch_value = self.config['channelDefinition'][channel]
             #self.df = self.df.Define(f"{channel}", f"channelId=={ch_value}")
 
     def defineLeptonPreselection(self):
         #Later we will defined some lepton selections
-        self.df = self.df.Define("passed_singleIsoMu", "HLT_singleIsoMu && (lep1_type == 2 && lep1_HasMatching_singleIsoMu)")
-        self.df = self.df.Define("leadingleppT_ele", "((lep1_type == 1 && lep1_pt  > 32 ) || (lep2_type == 1 && lep2_pt  > 32))")
-        self.df = self.df.Define("leadingleppT_Mu", "((lep1_type == 2 && lep1_pt  > 25 ) || (lep1_type == 2 && lep2_pt  > 25))")
+        self.df = self.df.Define("passed_singleIsoMu", "HLT_singleIsoMu && (lep1_legType == 2 && lep1_HasMatching_singleIsoMu)")
+        self.df = self.df.Define("leadingleppT_ele", "((lep1_legType == 1 && lep1_pt  > 32 ) || (lep2_legType == 1 && lep2_pt  > 32))")
+        self.df = self.df.Define("leadingleppT_Mu", "((lep1_legType == 2 && lep1_pt  > 25 ) || (lep1_legType == 2 && lep2_pt  > 25))")
         self.df = self.df.Define("leadingleppT", "(leadingleppT_ele || leadingleppT_Mu)")   # 32 need to be changed to 25 for DL channel once Double lepton trigger SF are integrated
-        self.df = self.df.Define("subleadleppT", "(lep2_type < 1 || (lep1_pt > 15 && lep2_pt > 15))")
-        self.df = self.df.Define("fakeableleppT","(lep1_pt > 10 && (lep2_type < 1 || lep2_pt > 10))")
-        self.df = self.df.Define("fakeablelep","fakeableleppT && (((lep1_type == 1 && lep1_Electron_miniPFRelIso_all < 0.4) || (lep1_type == 2 && lep1_Muon_pfRelIso04_all< 0.4)) || ((lep2_type < 1 ) || ((lep2_type == 1 && lep2_Electron_miniPFRelIso_all < 0.4) || (lep2_type == 2 && lep2_Muon_pfRelIso04_all < 0.4)) ) )")
-        self.df = self.df.Define("tightlep", "((lep1_type == 2 && lep1_Muon_tightId == 1) || (lep1_type == 1 && lep1_Electron_mvaNoIso_WP80 == 1)) && (lep2_type < 1 || ((lep2_type == 2 && lep2_Muon_tightId == 1 ) || (lep2_type == 1 && lep2_Electron_mvaNoIso_WP80 == 1)))")
-        self.df = self.df.Define("tightlep_Iso"," (((lep1_type == 1 && lep1_Electron_miniPFRelIso_all < 0.25) || (lep1_type == 2 && lep1_Muon_pfRelIso04_all < 0.25)) || ((lep2_type < 1 ) || ((lep2_type == 1 && lep2_Electron_miniPFRelIso_all < 0.25) || (lep2_type == 2 && lep2_Muon_pfRelIso04_all < 0.25)) ) )")
-        self.df = self.df.Define("Single_lep_trg","(HLT_singleIsoMu && (lep1_type == 2 && lep1_HasMatching_singleIsoMu)) || (HLT_singleEleWpTight && (lep1_type == 1 && lep1_HasMatching_singleEleWpTight)) ")
-        self.df = self.df.Define("event_selection","leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_type < 1 ||  diLep_mass > 12 )")
+        self.df = self.df.Define("subleadleppT", "(lep2_legType < 1 || (lep1_pt > 15 && lep2_pt > 15))")
+        self.df = self.df.Define("fakeableleppT","(lep1_pt > 10 && (lep2_legType < 1 || lep2_pt > 10))")
+        self.df = self.df.Define("fakeablelep","fakeableleppT && (((lep1_legType == 1 && lep1_Electron_miniPFRelIso_all < 0.4) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all< 0.4)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_miniPFRelIso_all < 0.4) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.4)) ) )")
+        self.df = self.df.Define("tightlep", "((lep1_legType == 2 && lep1_Muon_tightId == 1) || (lep1_legType == 1 && lep1_Electron_mvaNoIso_WP80 == 1)) && (lep2_legType < 1 || ((lep2_legType == 2 && lep2_Muon_tightId == 1 ) || (lep2_legType == 1 && lep2_Electron_mvaNoIso_WP80 == 1)))")
+        self.df = self.df.Define("tightlep_Iso"," (((lep1_legType == 1 && lep1_Electron_miniPFRelIso_all < 0.25) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.25)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_miniPFRelIso_all < 0.25) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.25)) ) )")
+        self.df = self.df.Define("Single_lep_trg","(HLT_singleIsoMu && (lep1_legType == 2 && lep1_HasMatching_singleIsoMu)) || (HLT_singleEleWpTight && (lep1_legType == 1 && lep1_HasMatching_singleEleWpTight)) ")
+        self.df = self.df.Define("event_selection","leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )")
 
     def defineJetSelections(self):
         self.df = self.df.Define("jet1_isvalid", "centralJet_pt.size() > 0")
@@ -162,7 +162,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
 
     def defineQCDRegions(self):
-        self.df = self.df.Define("OS", "(lep2_type < 1) || (lep1_charge*lep2_charge < 0)")
+        self.df = self.df.Define("OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)")
         self.df = self.df.Define("SS", "!OS")
         self.df = self.df.Define("Iso", "tightlep_Iso")
         self.df = self.df.Define("AntiIso", f"!Iso")
@@ -174,20 +174,20 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
     def defineControlRegions(self):
         #Define Single Muon Control Region (W Region) -- Require Muon + High MT (>50)
         #Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
-        self.df = self.df.Define("Zpeak_0b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 0 ")
-        self.df = self.df.Define("Zpeak_1b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 1 ")
-        self.df = self.df.Define("Zpeak_2b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 2 ")
-        self.df = self.df.Define("ZVeto_0b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 0 ")
-        self.df = self.df.Define("ZVeto_1b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 1 ")
-        self.df = self.df.Define("ZVeto_2b", f"(lep1_type == lep2_type ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 2 ")
-        self.df = self.df.Define("TTbar_CR",f"OS_Iso && lep1_type == lep2_type && diLep_mass > 100 ")
-        self.df = self.df.Define("Lep1Lep2Jet1Jet2_mass", f"(lep1_type == 2 && lep2_type == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0")
-        self.df = self.df.Define("Lep1Jet1Jet2_mass", f"(lep1_type == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0")
+        self.df = self.df.Define("Zpeak_0b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 0 ")
+        self.df = self.df.Define("Zpeak_1b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 1 ")
+        self.df = self.df.Define("Zpeak_2b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 2 ")
+        self.df = self.df.Define("ZVeto_0b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 0 ")
+        self.df = self.df.Define("ZVeto_1b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 1 ")
+        self.df = self.df.Define("ZVeto_2b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 2 ")
+        self.df = self.df.Define("TTbar_CR",f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 ")
+        self.df = self.df.Define("Lep1Lep2Jet1Jet2_mass", f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0")
+        self.df = self.df.Define("Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0")
 
     def calculateMT(self):
-        self.df = self.df.Define("MT_lep1", f"(lep1_type > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0")
-        self.df = self.df.Define("MT_lep2", f"(lep2_type > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0")
-        self.df = self.df.Define("MT_tot", f"(lep1_type > 0 && lep2_type > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, DeepMETResolutionTune_p4) : 0.0")
+        self.df = self.df.Define("MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0")
+        self.df = self.df.Define("MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0")
+        self.df = self.df.Define("MT_tot", f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, DeepMETResolutionTune_p4) : 0.0")
 
     def selectTrigger(self, trigger):
         self.df = self.df.Filter(trigger)
@@ -253,13 +253,13 @@ def AddDNNVariables(df):
     df = df.Define('min_dR_lep0_jets', f"MinDeltaR(lep1_p4, centralJet_p4)")
     df = df.Define('min_dR_lep1_jets', f"MinDeltaR(lep2_p4, centralJet_p4)")
 
-    df = df.Define('MT', f"(lep1_type > 0 && lep2_type > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, met_p4) : -100.")
-    df = df.Define('MT2', f'(lep1_type > 0 && lep2_type > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], met_p4)) : -100.')
+    df = df.Define('MT', f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, met_p4) : -100.")
+    df = df.Define('MT2', f'(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], met_p4)) : -100.')
 
     #Functional form of MT2 claculation
-    df = df.Define('MT2_ll', f'(lep1_type > 0 && lep2_type > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + met_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.')
-    df = df.Define('MT2_bb', f'(lep1_type > 0 && lep2_type > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + met_p4, 80.4, 80.4)) : -100.')
-    df = df.Define('MT2_blbl', f'(lep1_type > 0 && lep2_type > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[1], met_p4, 0.0, 0.0)) : -100.')
+    df = df.Define('MT2_ll', f'(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + met_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.')
+    df = df.Define('MT2_bb', f'(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + met_p4, 80.4, 80.4)) : -100.')
+    df = df.Define('MT2_blbl', f'(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[1], met_p4, 0.0, 0.0)) : -100.')
 
     df = df.Define('CosTheta_bb', f'(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(centralJet_p4[0], centralJet_p4[1]) : -100.')
     df = df.Define(f"bb_mass","centralJet_pt.size() > 1 ? (centralJet_p4[0]+centralJet_p4[1]).mass() : -100.")
@@ -268,8 +268,8 @@ def AddDNNVariables(df):
 
 
     df = df.Define("diLep_p4", "(lep1_p4+lep2_p4)")
-    df = df.Define(f"ll_mass", f"(lep1_type > 0 && lep2_type > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
-    df = df.Define(f"diLep_mass", f"(lep1_type > 0 && lep2_type > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
+    df = df.Define(f"ll_mass", f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
+    df = df.Define(f"diLep_mass", f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
     df = df.Define("Lep1Lep2Jet1Jet2_p4", "(centralJet_pt.size() >= 2) ? (lep1_p4+lep2_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()")
     df = df.Define("Lep1Jet1Jet2_p4", "(centralJet_pt.size() >= 2) ? (lep1_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()")
