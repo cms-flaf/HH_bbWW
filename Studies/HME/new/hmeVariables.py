@@ -1,6 +1,6 @@
 import ROOT
-ROOT.gROOT.ProcessLine('#include "include/EstimatorLTWrapper.hpp"')
-ROOT.gROOT.ProcessLine('#include "include/Constants.hpp"')
+ROOT.gROOT.ProcessLine('#include "Studies/HME/new/include/EstimatorLTWrapper.hpp"')
+ROOT.gROOT.ProcessLine('#include "Studies/HME/new/include/Constants.hpp"')
 
 
 def GetHMEVariables(df, channel):

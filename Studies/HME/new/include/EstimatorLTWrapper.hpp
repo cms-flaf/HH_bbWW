@@ -7,8 +7,8 @@
 
 namespace HME
 {
-    inline static const TString pdf_sl_name = "pdf_sl.root";
-    inline static const TString pdf_dl_name = "pdf_dl.root";
+    inline static const TString pdf_sl_name = "Studies/HME/new/pdf_sl.root";
+    inline static const TString pdf_dl_name = "Studies/HME/new/pdf_dl.root";
 
     class EstimatorLTWrapper
     {
