@@ -21,7 +21,7 @@ bjet_preselection_branch : "Jet_sel"
 
 payload_producer_to_run: HME
 payload_producers:
-  path: HH_bbWW.Analysis.PayloadProducers
+  producers_module_name: Analysis.PayloadProducers 
   HME:
     producer_name: HMEProducer # __init__(self, cfg) run(self, df) self.format (RDF, awkward), 
     channel: "DL"
