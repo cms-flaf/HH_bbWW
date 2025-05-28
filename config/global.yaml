@@ -36,8 +36,8 @@ channels_to_consider:
   - muMu
 
 channelDefinition:
-  e: 10 #Second lepton doesn't exist
-  mu: 20
+  e: 1 #Second lepton doesn't exist
+  mu: 2
   eE: 11
   eMu: 12
   muMu: 22
@@ -48,21 +48,38 @@ categories:
   - baseline
   - res1b
   - res2b
+  - res1b_Zveto_MbbSR
+  - res2b_Zveto_MbbSR
 
 region_default: SR
+
+SignRegions:
+  - OS_Iso
+  - SS_Iso
+  - OS_AntiIso
+  - SS_AntiIso
+  # - Zpeak_0b
+  # - Zpeak_1b
+  # - Zpeak_2b
+  # - ZVeto_0b
+  # - ZVeto_1b
+  # - ZVeto_2b
+  # - TTbar_CR
+
 
 QCDRegions:
   - OS_Iso
   - SS_Iso
   - OS_AntiIso
   - SS_AntiIso
-  - Zpeak_0b
-  - Zpeak_1b
-  - Zpeak_2b
-  - ZVeto_0b
-  - ZVeto_1b
-  - ZVeto_2b
-  - TTbar_CR
+  # - Zpeak_0b
+  # - Zpeak_1b
+  # - Zpeak_2b
+  # - ZVeto_0b
+  # - ZVeto_1b
+  # - ZVeto_2b
+  # - TTbar_CR
+
 boosted_categories: []
 
 
