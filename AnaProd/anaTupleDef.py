@@ -177,9 +177,6 @@ def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal
         hltBranches = dfw.Apply(trigger_class.ApplyTriggers, lepton_legs, isData, applyTriggerFilter )
         dfw.colToSave.extend(hltBranches)
 
-    for leg_name in lepton_legs:
-        dfw.Redefine(f"{leg_name}_legType", f"static_cast<int>({leg_name}_legType)")
-
     dfw.DefineAndAppend("channelId","static_cast<int>(HwwCandidate.channel())")
     channel_to_select = " || ".join(f"HwwCandidate.channel()==Channel::{ch}" for ch in channels)#global_params["channelSelection"])
     dfw.Filter(channel_to_select, "select channels")
