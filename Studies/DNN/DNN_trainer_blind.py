@@ -172,6 +172,8 @@ class DataWrapper():
         self.mbb_name = mbb_name
         
 
+
+
     # Not worth the work, use datset.map instead to change parametric values
     # Can get the random param values from tf.random.categorical()
     def get_generator(self, file_name, weight_file_name, batch_size):
@@ -611,6 +613,7 @@ class DataWrapper():
 
             plot_name = os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}.pdf')
             canvas.SaveAs(plot_name)
+            canvas.Close()
             os.system(f"imgcat {plot_name}")
 
 
@@ -634,7 +637,6 @@ class DataWrapper():
                 ROOT_ClassOutput_CR_high.SetBinContent(binnum+1, class_out_hist_CR_high[binnum])
                 ROOT_ClassOutput_CR_high.SetBinError(binnum+1, class_out_hist_CR_high[binnum]**(0.5))
                 
-
             ROOT_ClassOutput_SR.Scale(1.0/ROOT_ClassOutput_SR.Integral())
             ROOT_ClassOutput_CR_high.Scale(1.0/ROOT_ClassOutput_CR_high.Integral())
 
@@ -643,7 +645,7 @@ class DataWrapper():
             p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
             p1.SetTopMargin(0)
             p1.Draw()
-            
+
             p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
             p2.SetTopMargin(0)
             p2.SetBottomMargin(0)
@@ -692,14 +694,11 @@ class DataWrapper():
 
             p2.SetGrid()
 
-
             canvas.SaveAs(os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
-
+            canvas.Close()
 
 
             # Adv Plots
-
-
             adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask])
             adv_out_hist_SR_w2, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask]**2)
             adv_out_hist_CR_high, bins = np.histogram(pred_adv[CR_high_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[CR_high_mask])
@@ -719,6 +718,7 @@ class DataWrapper():
             if ROOT_AdvOutput_SR.Integral() == 0:
               print(f"Process {process_name} has no adv entries, maybe the weights are all 0 for adv?")
               continue
+
 
 
             ROOT_AdvOutput_SR.Scale(1.0/ROOT_AdvOutput_SR.Integral())
@@ -784,6 +784,7 @@ class DataWrapper():
 
             plot_name = os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}.pdf')
             canvas.SaveAs(plot_name)
+            canvas.Close()
             os.system(f"imgcat {plot_name}")
 
 
@@ -864,7 +865,7 @@ class DataWrapper():
             p2.SetGrid()
 
             canvas.SaveAs(os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
-
+            canvas.Close()
 
 
 
@@ -1010,7 +1011,7 @@ class EpochCounterCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         self.model.epoch_counter.assign_add(1.0)
         return
-
+    
 class AdvOnlyCallback(tf.keras.callbacks.Callback):
   def __init__(self, train_dataset, nSteps=100, TrackerWindowSize=10, on_batch=True, on_epoch=False, continue_training=False, quiet=False):
     self.train_dataset = train_dataset.repeat()
@@ -1531,22 +1532,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
      dw.AddInputFeaturesList(*list_feature)
   dw.AddHighLevelFeatures(setup['highlevelfeatures'])
 
-  # dw.AddInputFeatures(['lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass'])
-  # dw.AddInputFeatures(['lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass'])
-  # dw.AddInputFeatures(['met_pt', 'met_phi'])
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3)
-  # dw.AddHighLevelFeatures([
-  #                         'HT', 'dR_dilep', 'dR_dibjet', 
-  #                         'dR_dilep_dibjet', 'dR_dilep_dijet',
-  #                         'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
-  #                         'dPhi_MET_dilep', 'dPhi_MET_dibjet',
-  #                         'min_dR_lep0_jets', 'min_dR_lep1_jets',
-  #                         'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
-  #                         'll_mass', 'CosTheta_bb'
-  #                         ])
 
   dw.SetBinary(True)
   dw.UseParametric(setup['UseParametric'])
@@ -1603,6 +1588,45 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, 2), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
   train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
 
+  parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
+  print(train_tf_dataset)
+  print(list(train_tf_dataset.as_numpy_iterator()))
+
+  @tf.function
+  def new_param_map(*x):
+    dataset = x
+    features = dataset[0]
+
+    # Need to randomize the features parametric mass
+    random_param_mass = tf.random.categorical(tf.math.log([list(parametric_mass_probability)]), tf.shape(features)[0], dtype=tf.int64)
+
+    mass_values = tf.constant(dw.param_list)
+    mass_keys = tf.constant(np.arange(len(dw.param_list)))
+    table = tf.lookup.StaticHashTable(
+       tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+       default_value = -1
+    )
+
+    actual_new_mass = table.lookup(random_param_mass)
+    actual_new_mass = tf.cast(actual_new_mass, tf.float64)
+
+    # Lastly we need to keep the signal events the correct mass
+    class_targets = dataset[1][0]
+    old_mass_mask = tf.cast(class_targets[:,0], tf.float64)
+    new_mass_mask = tf.cast(class_targets[:,1], tf.float64)
+
+    actual_mass = old_mass_mask * features[:,-1] + new_mass_mask * actual_new_mass
+    actual_mass = tf.transpose(actual_mass)
+
+    features = tf.concat([features[:,:-1], actual_mass], axis=-1)
+    new_dataset = (features, dataset[1])
+    return new_dataset
+
+  train_tf_dataset = train_tf_dataset.map(new_param_map)
+
+  print('After map')
+  print(train_tf_dataset)
+
   val_batch_size = setup['batch_compression_factor']*val_batch_size
   val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, 2), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(val_batch_size, drop_remainder=True)
   val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
@@ -1616,7 +1640,8 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   input_signature = [tf.TensorSpec(input_shape, tf.double, name='x')]
   callbacks = [
       ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
-                      patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                      # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                      patience=setup['patience'], save_callback=None, input_signature=input_signature),
       tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
       EpochCounterCallback(),
       AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
@@ -1672,9 +1697,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
 
 
 def adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, nParity, batch_size=1000):
-
-  print("Can I just continue training the same model?")
-
   dnnConfig = {}
   with open(model_config, 'r') as file:
     dnnConfig = yaml.safe_load(file)  
@@ -1849,68 +1871,13 @@ if __name__ == '__main__':
     parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on for this call, default runs all")
     # parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
 
-    parser.add_argument('--setup-config', required=False, type=str, default='default_setup.yaml', help='Setup config for training')
+    parser.add_argument('--setup-config', required=False, type=str, default='default_training_setup_doubleLep.yaml', help='Setup config for training')
 
     args = parser.parse_args()
 
     nParity = args.nParity
     print(f"We have parity {nParity}")
     # output_folder = args.output_folder
-
-  
-
-    # setup = {
-    #     'learning_rate': 0.00001,
-    #     'adv_learning_rate': 0.0001,
-    #     'weight_decay': 0.004,
-    #     'adv_weight_decay': 0.004,
-    #     'adv_grad_factor': 1.0, #0.7
-    #     'class_grad_factor': 0.0, #0.0001, #0.0001,
-    #     'common_activation': 'tanh', #'relu'
-    #     'class_activation': 'tanh', #'relu'
-    #     'adv_activation': 'relu', #'relu'
-    #     'use_batch_norm': False,
-    #     'dropout': 0.0,
-    #     'n_common_layers': 10,
-    #     'n_common_units': 256,
-    #     'n_class_layers': 5,
-    #     'n_class_units': 128,
-    #     'n_adv_layers': 5,
-    #     'n_adv_units': 128,
-    #     'n_epochs': 5,
-    #     'patience': 100,
-    #     'apply_common_gradients': True,
-    #     'UseParametric': True,
-    #     'parametric_list': [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ],
-    #     'continue_training': True,
-    #     'continue_model': "DNN_Models/v32p9/ResHH_Classifier_parity0.keras",
-
-    #     'batch_compression_factor': 10,
-    #     'adv_submodule_steps': 250,
-    #     'adv_submodule_tracker': 0,
-
-    #     'features': [
-    #       'lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass',
-    #       'lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass', 
-    #       'met_pt', 'met_phi'
-    #     ],
-    #     'listfeatures': [
-    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0],
-    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1],
-    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2],
-    #       [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3],
-    #     ],
-    #     'highlevelfeatures': [
-    #       'HT', 'dR_dilep', 'dR_dibjet', 
-    #       'dR_dilep_dibjet', 'dR_dilep_dijet',
-    #       'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
-    #       'dPhi_MET_dilep', 'dPhi_MET_dibjet',
-    #       'min_dR_lep0_jets', 'min_dR_lep1_jets',
-    #       'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
-    #       'll_mass', 'CosTheta_bb'
-    #     ],
-    # }
-
 
     setup = {}
     with open(os.path.join('config', args.setup_config), 'r') as file:
@@ -1923,7 +1890,6 @@ if __name__ == '__main__':
     output_folder = os.path.join("DNN_Models", output_folder)
 
 
-    #290258-02052
     yaml_list = [fname for fname in os.listdir(input_folder) if fname.startswith('batch_config_parity')]
 
     modelname_parity = []
@@ -1961,14 +1927,15 @@ if __name__ == '__main__':
               train_weight = os.path.join(input_folder, f'weightfile{i}.root')
               test_file = os.path.join(input_folder, f'batchfile{j}.root')
               test_weight = os.path.join(input_folder, f'weightfile{j}.root')
-              if first_pass:
+              if first_pass and setup['do_step2']:
                 adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, j)
                 first_pass = False
 
               model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', 'best.onnx')
               validate_model(model_name, model_config, test_file, test_weight, j)
-              model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', f'best_step2.onnx')
-              validate_model(model_name, model_config, test_file, test_weight, j)
+              if setup['do_step2']:
+                model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', f'best_step2.onnx')
+                validate_model(model_name, model_config, test_file, test_weight, j)
 
     finally:
         kInit_cond.acquire()
