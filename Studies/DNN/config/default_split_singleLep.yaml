@@ -2,22 +2,23 @@ batch_dict:
   GluGlutoRadion: 100 #It is important to put signal first since signal has extra branches
   GluGlutoBulkGraviton: 100
   TT: 1000
-  DY: 550
+  # DY: 550
   ST: 250
+  W: 550
 
 
 storage_folder: /eos/user/d/daebi/bbWW/anaTuples/may22/Run3_2022EE/
 
-selection_branches: ['lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt']
+selection_branches: ['lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt', 'SelectedFatJet_pt']
 
 #Cuts for uproot
-selection_cut: (tree['lep1_legType'] > 0) & (tree['lep2_legType'] <= 0) & (ak.count(tree['centralJet_pt'], axis=1) > 1)
+selection_cut: (tree['lep1_legType'] > 0) & (tree['lep2_legType'] <= 0) & ( (ak.count(tree['centralJet_pt'], axis=1) > 1) | (ak.count(tree['SelectedFatJet_pt'], axis=1) > 0) )
 parity_func: (tree['event']%{nParity} == {parity_scan})
 
 nParity: 4
 
 #Cuts for RDF in creating the training file
-iterate_cut: (lep1_legType > 0) && (lep2_legType <= 0) && (centralJet_pt.size() > 1) && (event%{nParity} == {parity_scan})
+iterate_cut: (lep1_legType > 0) && (lep2_legType <= 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size() > 0) ) && (event%{nParity} == {parity_scan})
 
 
 signal:
@@ -73,3 +74,7 @@ background:
       ST_tW_top_2L2Nu: []
       ST_tW_top_4Q: []
       ST_tW_top_LNu2Q: []
+  W:
+    class_value: 4
+    background_datasets:
+      
