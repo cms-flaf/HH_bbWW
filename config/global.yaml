@@ -7,7 +7,7 @@ signal_types:
   - GluGluToBulkGraviton
 corrections:
   - mu
-  - trg
+  - trgSF
   - ele
   - eleES
   - pu
