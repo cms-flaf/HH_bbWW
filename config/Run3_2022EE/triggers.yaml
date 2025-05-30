@@ -11,6 +11,10 @@ singleIsoMu:
       online_obj:
         cut: TrigObj_id == 13 && (TrigObj_filterBits&8)!=0
       doMatching: True
+      jsonTRGcorrection_key: {
+        "2022_Summer22": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
+        "2022_Summer22EE": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight"
+      }
 
 singleIsoMuHT:
   channels:
@@ -25,6 +29,8 @@ singleIsoMuHT:
       online_obj:
         cut: TrigObj_id == 13 && (TrigObj_filterBits&32)!=0
       doMatching: False
+
+
 singleIsoEleHT:
   channels:
     - eE
@@ -38,6 +44,9 @@ singleIsoEleHT:
       online_obj:
         cut: TrigObj_id == 11 && (TrigObj_filterBits&32)!=0
       doMatching: False
+
+
+
 singleEleWpTight:
   channels:
     - eMu
@@ -51,6 +60,10 @@ singleEleWpTight:
       online_obj:
         cut: TrigObj_id == 11 && (TrigObj_filterBits&2)!=0
       doMatching: True
+      jsonTRGcorrection_key: {
+        "2022_Summer22": "Electron-HLT-SF",
+        "2022_Summer22EE": "Electron-HLT-SF"
+      }
 
 diElec:
   channels:
