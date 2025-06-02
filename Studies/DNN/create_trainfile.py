@@ -9,6 +9,7 @@ import Analysis.hh_bbww as analysis
 
 ROOT.gROOT.SetBatch(True)
 ROOT.EnableThreadSafety()
+# ROOT.EnableImplicitMT(4)
 
 sys.path.append(os.environ['ANALYSIS_PATH'])
 ana_path = os.environ['ANALYSIS_PATH']
@@ -64,6 +65,11 @@ def create_file(config_dict, output_folder, out_filename):
         nEntriesPerBatch = process['batch_size']
         nBatchStart = process['batch_start']
         nBatchEnd = nBatchStart+nEntriesPerBatch
+
+        if nEntriesPerBatch == 0:
+            print(f"Process has batch size of 0, skip the save loop")
+            continue
+
 
         #Load df_out, if first iter then load an empty, otherwise load the past file
         if step_idx == 0:
@@ -121,6 +127,9 @@ def create_file(config_dict, output_folder, out_filename):
         save_column_names.push_back('is_valid')
         df_out.Snapshot('Events', tmpnext_filename, save_column_names, snapshotOptions)
 
+        if step_idx != 0:
+            os.system(f"rm {tmp_filename}")
+
         tuple_maker.join()
 
         step_idx += 1
@@ -145,6 +154,7 @@ def create_file(config_dict, output_folder, out_filename):
     print("Going to snapshot")
     # Only need to save the prexisting columns plus the new DNN variables
     save_column_names = ROOT.std.vector("string")(df_out.GetColumnNames())
+    df_out = analysis.defineAllP4(df_out)
     df_out = analysis.AddDNNVariables(df_out)
     highlevel_names = [
         'HT', 'dR_dilep', 'dR_dibjet', 
@@ -165,7 +175,8 @@ def create_file(config_dict, output_folder, out_filename):
 
     print(f"Finished create file, will copy tmp file to final output {out_filename}")
 
-    os.system(f"cp {tmpnext_filename} {out_filename}")
+    os.system(f"mv {tmpnext_filename} {out_filename}")
+    os.system(f"rm {tmp_filename}")
 
 
 
