@@ -6,10 +6,11 @@ GLOBAL:
     - keep TTto2L2Nu
     - keep TTtoLNu2Q
     - keep TTto4Q
+    
     - keep ^QCD.*MuEnrichedPt5
     - keep ^QCD.*EMEnriched
     ## - keep ^QCD
-    ## - keep ^DY
+
     ##- keep ^ST.*
     - keep ST_s_channel_antitop_4f_leptonDecays
     - keep ST_s_channel_top_4f_leptonDecays
@@ -21,13 +22,17 @@ GLOBAL:
     - keep ST_tW_top_2L2Nu
     - keep ST_tW_top_4Q
     - keep ST_tW_top_LNu2Q
-    # #- keep ^GluGlutoRadiontoHHto2B2Vto2B2L2Nu.*
-    - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
-    - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_450
-    - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_800
+
+    - keep ^GluGlutoRadiontoHHto.*
+    - keep ^GluGlutoBulkGravitontoHHto.*
+    # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
+    # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_450
+    # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_800
+
     - keep DYto2L_M_10to50_amcatnloFXFX
     - keep DYto2L_M_50_amcatnloFXFX
     ## - keep ^DY.*
+
     ##- keep ^WtoLNu_amcatnloFXFX SL
     - keep TTWH
     - keep TTWW
@@ -37,6 +42,7 @@ GLOBAL:
     - keep WW
     - keep WZ
     - keep ZZ
+
     - keep ^EGamma_.*
     - keep ^Muon_.*
     - keep ^DoubleMuon_.*

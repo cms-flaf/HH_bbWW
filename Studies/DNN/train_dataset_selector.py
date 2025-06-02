@@ -188,6 +188,7 @@ def create_dict(config_dict, output_folder):
                             eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
                             process_dict[background_name][dataset_name]['weight_cut'] += eval(eval_string)
 
+                print(f"Finished background {dataset_name}, how many total? {process_dict[background_name][dataset_name]['total_cut']}")
 
 
 
@@ -241,6 +242,7 @@ def create_dict(config_dict, output_folder):
             for subprocess in process_dict[process]:
                 if subprocess.startswith('total') or subprocess.startswith('weight'): continue
                 process_dict[process][subprocess]['batch_size'] = int(batch_dict[process] * process_dict[process][subprocess]['weight_cut'] / process_dict[process]['weight'])
+                print(f"Looking at subprocess {subprocess}")
                 nBatches = 0
                 if process_dict[process][subprocess]['batch_size'] != 0:
                     nBatches = int(process_dict[process][subprocess]['total_cut']/process_dict[process][subprocess]['batch_size'])
@@ -327,17 +329,18 @@ def create_dict(config_dict, output_folder):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
-    parser.add_argument('--config', required=True, type=str, help="Config YAML")
+    parser.add_argument('--config', required=False, type=str, default='default_dataset.yaml', help="Config YAML")
 
     args = parser.parse_args()
 
-    with open(args.config, 'r') as file:
+    config_file = os.path.join('config', args.config)
+    with open(config_file, 'r') as file:
         config_dict = yaml.safe_load(file)
 
     output_base = "DNN_Datasets"
     output_folder = os.path.join(output_base, f"Dataset_{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}")
     os.makedirs(output_folder, exist_ok=True)
-    os.system(f"cp {args.config} {output_folder}/.")
+    os.system(f"cp {config_file} {output_folder}/.")
 
     print("Will create signal files")
     create_signal_files(config_dict, output_folder)
