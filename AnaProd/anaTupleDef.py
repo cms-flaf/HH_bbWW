@@ -5,6 +5,7 @@ from Corrections.Corrections import Corrections
 loadTF = False
 loadHHBtag = False
 lepton_legs = [ "lep1", "lep2" ]
+offline_legs = [ "lep1", "lep2"]
 
 
 Muon_int_observables = ["Muon_tightId","Muon_highPtId","Muon_pfIsoId"]
@@ -72,7 +73,8 @@ FatJetObservablesMC = ["hadronFlavour","partonFlavour"]
 SubJetObservables = ["btagDeepB", "eta", "mass", "phi", "pt", "rawFactor"]
 SubJetObservablesMC = ["hadronFlavour","partonFlavour"]
 
-defaultColToSave = ["entryIndex","luminosityBlock", "run","event", "sample_type", "sample_name", "period", "X_mass", "X_spin", "isData","PuppiMET_pt", "PuppiMET_phi", "nJet","DeepMETResolutionTune_pt", "DeepMETResolutionTune_phi","DeepMETResponseTune_pt", "DeepMETResponseTune_phi","PV_npvs"]
+# defaultColToSave = ["entryIndex","luminosityBlock", "run","event", "sample_type", "sample_name", "period", "X_mass", "X_spin", "isData","PuppiMET_pt", "PuppiMET_phi", "nJet","DeepMETResolutionTune_pt", "DeepMETResolutionTune_phi","DeepMETResponseTune_pt", "DeepMETResponseTune_phi","PV_npvs"]
+defaultColToSave = ["FullEventId","luminosityBlock", "run","event", "sample_type", "period", "X_mass", "X_spin", "isData","PuppiMET_pt", "PuppiMET_phi", "nJet","DeepMETResolutionTune_pt", "DeepMETResolutionTune_phi","DeepMETResponseTune_pt", "DeepMETResponseTune_phi","PV_npvs"]
 
 def getDefaultColumnsToSave(isData):
     colToSave = defaultColToSave.copy()
@@ -81,7 +83,7 @@ def getDefaultColumnsToSave(isData):
     return colToSave
 
 
-def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal, global_params, channels):
+def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal, applyTriggerFilter, global_params, channels):
     print(f"Adding variables for {syst_name}")
     # dfw.Apply(CommonBaseline.SelectRecoP4, syst_name, global_params["nano_version"])
     dfw.Apply(AnaBaseline.RecoHWWCandidateSelection)
@@ -106,7 +108,7 @@ def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal
             dfw.DefineAndAppend( f"lep{leg_idx+1}_{var_name}", full_define_expr)
         for var in PtEtaPhiM:
             LegVar(var, f"HwwCandidate.leg_p4.at({leg_idx}).{var}()", var_type='float', default='0.f')
-        LegVar('type', f"HwwCandidate.leg_type.at({leg_idx})", var_type='int', default='static_cast<int>(Leg::none)')
+        LegVar('legType', f"HwwCandidate.leg_type.at({leg_idx})", default='Leg::none') # Save the two for now, type is used in many corrections
         LegVar('charge', f"HwwCandidate.leg_charge.at({leg_idx})", var_type='int', default='0')
         LegVar('iso', f"HwwCandidate.leg_rawIso.at({leg_idx})", var_type='float', default='0')
         for muon_obs in Muon_observables:
@@ -174,8 +176,9 @@ def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal
     dfw.DefineAndAppend("met_phi", f"static_cast<float>({pf_str}_p4.phi())")
 
     if trigger_class is not None:
-        hltBranches = dfw.Apply(trigger_class.ApplyTriggers, lepton_legs, 'Hww', isData, isSignal )
+        hltBranches = dfw.Apply(trigger_class.ApplyTriggers, lepton_legs, isData, applyTriggerFilter )
         dfw.colToSave.extend(hltBranches)
+
     dfw.DefineAndAppend("channelId","static_cast<int>(HwwCandidate.channel())")
     channel_to_select = " || ".join(f"HwwCandidate.channel()==Channel::{ch}" for ch in channels)#global_params["channelSelection"])
     dfw.Filter(channel_to_select, "select channels")

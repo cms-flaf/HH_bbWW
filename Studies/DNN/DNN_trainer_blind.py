@@ -19,11 +19,8 @@ import copy
 
 
 import threading
-from FLAF.RunKit.crabLaw import update_kinit_thread
+from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
 
-
-thread = threading.Thread(target=update_kinit_thread)
-thread.start()
 
 
 tf.keras.backend.clear_session()
@@ -174,6 +171,83 @@ class DataWrapper():
             print("What are you doing? You already defined the mbb branch")
         self.mbb_name = mbb_name
         
+
+
+
+    # Not worth the work, use datset.map instead to change parametric values
+    # Can get the random param values from tf.random.categorical()
+    def get_generator(self, file_name, weight_file_name, batch_size):
+        print(f"Reading file {file_name}")
+        file = uproot.open(file_name)
+        tree = file['Events']
+
+        print(f"Reading weight file {weight_file_name}")
+        file = uproot.open(weight_file_name)
+        weight_tree = file['weight_tree']
+
+        features_to_load = []
+        features_to_load = features_to_load + self.feature_names
+        for listfeature in self.listfeature_names:
+           if listfeature[0] not in features_to_load: features_to_load.append(listfeature[0])
+        features_to_load = features_to_load + self.highlevelfeatures_names
+
+        features_to_load.append(self.mbb_name)
+        features_to_load.append('X_mass')
+
+        entry_start = 0
+        entry_stop = entry_start + batch_size
+
+        #Some kind of loop to only get a small chunk?
+        while entry_stop < tree.num_entries:
+            branches = tree.arrays(features_to_load, entry_start=entry_start, entry_stop=entry_stop)
+            weight_branches = weight_tree.arrays(entry_start=entry_start, entry_stop=entry_stop)
+
+            gen_features = np.array([getattr(branches, feature_name) for feature_name in self.feature_names]).transpose()
+            print("Got features, but its a np array")
+
+            default_value = 0.0
+            if self.listfeature_names != None: 
+                gen_listfeatures = np.array([ak.fill_none(ak.pad_none(getattr(branches, feature_name), index+1), default_value)[:,index] for [feature_name,index] in self.listfeature_names]).transpose()
+            print("Got the list features")
+
+            #Need to append the value features and the listfeatures together
+            if self.listfeature_names != None: 
+                print("We have list features!")
+                gen_features = np.append(gen_features, gen_listfeatures, axis=1)
+
+            if self.highlevelfeatures_names != None: 
+                gen_hlv = np.array([getattr(branches, feature_name) for feature_name in self.highlevelfeatures_names]).transpose()
+                gen_features = np.append(gen_features, gen_hlv, axis=1)
+
+
+            gen_mbb = np.array(getattr(branches, self.mbb_name))
+            # self.mbb, self.mbb_region, self.mbb_region_binary, self.mbb_region_random = self.SetMbbRegion(branches)
+            print("Set mbb regions")
+
+            #Add parametric variable
+            gen_param_values = np.array([[x if (x > 0) else np.random.choice(self.param_list) for x in getattr(branches, 'X_mass') ]]).transpose()
+            print("Got the param values")
+
+
+            gen_features_no_param = gen_features
+            if self.use_parametric: gen_features = np.append(gen_features, gen_param_values, axis=1)
+
+            gen_class_weight = np.array(getattr(weight_branches, 'class_weight'))
+            gen_adv_weight = np.array(getattr(weight_branches, 'adv_weight'))
+            gen_class_target = np.array(getattr(weight_branches, 'class_target'))
+            gen_adv_target = np.array(getattr(weight_branches, 'adv_target'))
+
+
+
+            yield gen_features, gen_class_target, gen_adv_target, gen_class_weight, gen_adv_weight
+
+            entry_start = entry_stop
+
+
+
+
+
+
     def ReadFile(self, file_name, entry_start=None, entry_stop=None):
         if self.feature_names == None:
             print("Uknown branches to read! DefineInputFeatures first!")
@@ -369,424 +443,429 @@ class DataWrapper():
         # We want to make some validation of the Adv output
         os.makedirs(save_path, exist_ok=True)
 
-        para_masspoint = 300
-        if self.use_parametric: self.SetPredictParamValue(para_masspoint)
-        features = self.features_paramSet if self.use_parametric else self.features_no_param
+        para_masspoint_list = [300, 450, 800]
+        for para_masspoint in para_masspoint_list:
+          if self.use_parametric: self.SetPredictParamValue(para_masspoint)
+          features = self.features_paramSet if self.use_parametric else self.features_no_param
 
-        pred = sess.run(None, {'x': features})
-        pred_class = pred[0]
-        pred_signal = pred_class[:,0]
-        pred_adv = pred[1][:,0]
+          pred = sess.run(None, {'x': features})
+          pred_class = pred[0]
+          pred_signal = pred_class[:,0]
+          pred_adv = pred[1][:,0]
 
 
 
-        adv_weight = self.adv_weight
-        class_weight = self.class_weight
+          adv_weight = self.adv_weight
+          class_weight = self.class_weight
 
 
-        adv_loss_vec = binary_focal_crossentropy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32), tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
-        adv_loss = round(np.average(adv_loss_vec, weights=adv_weight),3)
-        adv_accuracy_vec = accuracy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32))[:,0]
-        adv_accuracy = round(np.average(adv_accuracy_vec, weights=adv_weight),3)
+          adv_loss_vec = binary_focal_crossentropy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32), tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          adv_loss = round(np.average(adv_loss_vec, weights=adv_weight),3)
+          adv_accuracy_vec = accuracy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32))[:,0]
+          adv_accuracy = round(np.average(adv_accuracy_vec, weights=adv_weight),3)
 
-        class_loss_vec = categorical_crossentropy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
-        print("Class loss vec")
-        print(class_loss_vec)
-        class_loss = round(np.average(class_loss_vec, weights=class_weight),3)
-        print("Class loss")
-        print(class_loss)
-        class_accuracy_vec = categorical_accuracy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
-        class_accuracy = round(np.average(class_accuracy_vec, weights=class_weight),3)
+          class_loss_vec = categorical_crossentropy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          print("Class loss vec")
+          print(class_loss_vec)
+          class_loss = round(np.average(class_loss_vec, weights=class_weight),3)
+          print("Class loss")
+          print(class_loss)
+          class_accuracy_vec = categorical_accuracy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          class_accuracy = round(np.average(class_accuracy_vec, weights=class_weight),3)
 
 
 
-        # Class Plots
-        # Lets build Masks
-        Sig_SR_mask = (self.class_target == 0) & (self.adv_target == 0)
-        Sig_CR_high_mask = (self.class_target == 0) & (self.adv_target == 1)
+          # Class Plots
+          # Lets build Masks
+          Sig_SR_mask = (self.class_target == 0) & (self.adv_target == 0)
+          Sig_CR_high_mask = (self.class_target == 0) & (self.adv_target == 1)
 
-        TT_SR_mask = (self.class_target == 1) & (self.adv_target == 0)
-        TT_CR_high_mask = (self.class_target == 1) & (self.adv_target == 1)
+          TT_SR_mask = (self.class_target == 1) & (self.adv_target == 0)
+          TT_CR_high_mask = (self.class_target == 1) & (self.adv_target == 1)
 
-        DY_SR_mask = (self.class_target == 2) & (self.adv_target == 0)
-        DY_CR_high_mask = (self.class_target == 2) & (self.adv_target == 1)
+          DY_SR_mask = (self.class_target == 2) & (self.adv_target == 0)
+          DY_CR_high_mask = (self.class_target == 2) & (self.adv_target == 1)
 
-        # Set class quantiles based on signal
-        nQuantBins = 10
-        quant_binning_class = np.zeros(nQuantBins+1) # Need +1 because 10 bins actually have 11 edges
-        quant_binning_class[1:nQuantBins] = np.quantile(pred_signal[Sig_SR_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]) # Change list to something dynamic with nQuantBins
-        quant_binning_class[-1] = 1.0 
-        print("We found quant binning class")
-        print(quant_binning_class)
+          # Set class quantiles based on signal
+          nQuantBins = 10
+          quant_binning_class = np.zeros(nQuantBins+1) # Need +1 because 10 bins actually have 11 edges
+          quant_binning_class[1:nQuantBins] = np.quantile(pred_signal[Sig_SR_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]) # Change list to something dynamic with nQuantBins
+          quant_binning_class[-1] = 1.0 
+          print("We found quant binning class")
+          print(quant_binning_class)
 
 
-        quant_binning_adv = np.zeros(nQuantBins+1) # Need +1 because 10 bins actually have 11 edges
-        quant_binning_adv[1:nQuantBins] = np.quantile(pred_adv[TT_SR_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]) # Change list to something dynamic with nQuantBins
-        quant_binning_adv[-1] = 1.0 
-        print("We found quant binning adv")
-        print(quant_binning_adv)
+          quant_binning_adv = np.zeros(nQuantBins+1) # Need +1 because 10 bins actually have 11 edges
+          quant_binning_adv[1:nQuantBins] = np.quantile(pred_adv[TT_SR_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]) # Change list to something dynamic with nQuantBins
+          quant_binning_adv[-1] = 1.0 
+          print("We found quant binning adv")
+          print(quant_binning_adv)
 
 
-        mask_dict = {
-          'Signal': {
-            'SR': Sig_SR_mask,
-            'CR_high': Sig_CR_high_mask,
-          },
-          'TT': {
-            'SR': TT_SR_mask,
-            'CR_high': TT_CR_high_mask,
-          },
-          # 'DY': { # DY weight is turned off
-          #   'SR': DY_SR_mask,
-          #   'CR_high': DY_CR_high_mask,
-          # },
-        }
+          mask_dict = {
+            'Signal': {
+              'SR': Sig_SR_mask,
+              'CR_high': Sig_CR_high_mask,
+            },
+            'TT': {
+              'SR': TT_SR_mask,
+              'CR_high': TT_CR_high_mask,
+            },
+            # 'DY': { # DY weight is turned off
+            #   'SR': DY_SR_mask,
+            #   'CR_high': DY_CR_high_mask,
+            # },
+          }
 
-        # Lets look at Sig
+          # Lets look at Sig
 
 
-        # Lets look at TT
+          # Lets look at TT
 
-        for process_name in mask_dict.keys():
-          SR_mask = mask_dict[process_name]['SR']
-          CR_high_mask = mask_dict[process_name]['CR_high']
+          for process_name in mask_dict.keys():
+            SR_mask = mask_dict[process_name]['SR']
+            CR_high_mask = mask_dict[process_name]['CR_high']
 
 
 
 
 
 
-          class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[SR_mask])
-          class_out_hist_SR_w2, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[SR_mask]**2)
-          class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[CR_high_mask])
-          class_out_hist_CR_high_w2, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[CR_high_mask]**2)
+            class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[SR_mask])
+            class_out_hist_SR_w2, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[SR_mask]**2)
+            class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[CR_high_mask])
+            class_out_hist_CR_high_w2, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0), weights=class_weight[CR_high_mask]**2)
 
-          # Don't use weights for class
-          # class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0))
-          # class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0))
+            # Don't use weights for class
+            # class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=quant_binning_class, range=(0.0, 1.0))
+            # class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=quant_binning_class, range=(0.0, 1.0))
 
-          ROOT_ClassOutput_SR = ROOT.TH1D(f"ClassOutput_{process_name}_SR", f"ClassOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
-          ROOT_ClassOutput_CR_high = ROOT.TH1D(f"ClassOutput_{process_name}_CR_high", f"ClassOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
+            ROOT_ClassOutput_SR = ROOT.TH1D(f"ClassOutput_{process_name}_SR", f"ClassOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
+            ROOT_ClassOutput_CR_high = ROOT.TH1D(f"ClassOutput_{process_name}_CR_high", f"ClassOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
 
-          for binnum in range(nQuantBins):
-              ROOT_ClassOutput_SR.SetBinContent(binnum+1, class_out_hist_SR[binnum])
-              ROOT_ClassOutput_SR.SetBinError(binnum+1, class_out_hist_SR_w2[binnum]**(0.5))
-              
-              ROOT_ClassOutput_CR_high.SetBinContent(binnum+1, class_out_hist_CR_high[binnum])
-              ROOT_ClassOutput_CR_high.SetBinError(binnum+1, class_out_hist_CR_high_w2[binnum]**(0.5))
-              
+            for binnum in range(nQuantBins):
+                ROOT_ClassOutput_SR.SetBinContent(binnum+1, class_out_hist_SR[binnum])
+                ROOT_ClassOutput_SR.SetBinError(binnum+1, class_out_hist_SR_w2[binnum]**(0.5))
+                
+                ROOT_ClassOutput_CR_high.SetBinContent(binnum+1, class_out_hist_CR_high[binnum])
+                ROOT_ClassOutput_CR_high.SetBinError(binnum+1, class_out_hist_CR_high_w2[binnum]**(0.5))
+                
 
-          ROOT_ClassOutput_SR.Scale(1.0/ROOT_ClassOutput_SR.Integral())
-          ROOT_ClassOutput_CR_high.Scale(1.0/ROOT_ClassOutput_CR_high.Integral())
+            ROOT_ClassOutput_SR.Scale(1.0/ROOT_ClassOutput_SR.Integral())
+            ROOT_ClassOutput_CR_high.Scale(1.0/ROOT_ClassOutput_CR_high.Integral())
 
 
-          canvas = ROOT.TCanvas("c1", "c1", 800, 600)
-          p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
-          p1.SetTopMargin(0)
-          p1.Draw()
-          
-          p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
-          p2.SetTopMargin(0)
-          p2.SetBottomMargin(0)
-          p2.Draw()
+            canvas = ROOT.TCanvas("c1", "c1", 800, 600)
+            p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
+            p1.SetTopMargin(0)
+            p1.Draw()
+            
+            p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
+            p2.SetTopMargin(0)
+            p2.SetBottomMargin(0)
+            p2.Draw()
 
-          p1.cd()
+            p1.cd()
 
-          plotlabel = f"Class Output for {process_name}"
-          ROOT_ClassOutput_SR.Draw()
-          ROOT_ClassOutput_SR.SetTitle(plotlabel)
-          ROOT_ClassOutput_SR.SetStats(0)
-          min_val = max(0.0001, min(ROOT_ClassOutput_SR.GetMinimum(), ROOT_ClassOutput_CR_high.GetMinimum()))
-          max_val = max(ROOT_ClassOutput_SR.GetMaximum(), ROOT_ClassOutput_CR_high.GetMaximum())
-          ROOT_ClassOutput_SR.GetYaxis().SetRangeUser(0.1*min_val, 20) # 1000*max_val)
+            plotlabel = f"Class Output for {process_name}"
+            ROOT_ClassOutput_SR.Draw()
+            ROOT_ClassOutput_SR.SetTitle(plotlabel)
+            ROOT_ClassOutput_SR.SetStats(0)
+            min_val = max(0.0001, min(ROOT_ClassOutput_SR.GetMinimum(), ROOT_ClassOutput_CR_high.GetMinimum()))
+            max_val = max(ROOT_ClassOutput_SR.GetMaximum(), ROOT_ClassOutput_CR_high.GetMaximum())
+            ROOT_ClassOutput_SR.GetYaxis().SetRangeUser(0.1*min_val, 20) # 1000*max_val)
 
-          ROOT_ClassOutput_CR_high.SetLineColor(ROOT.kRed)
-          ROOT_ClassOutput_CR_high.Draw("same")
+            ROOT_ClassOutput_CR_high.SetLineColor(ROOT.kRed)
+            ROOT_ClassOutput_CR_high.Draw("same")
 
 
-          legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
-          legend.AddEntry(ROOT_ClassOutput_SR, f"{process_name} m_bb SR")
-          legend.AddEntry(ROOT_ClassOutput_CR_high, f"{process_name} m_bb CR High")
-          legend.Draw()
+            legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
+            legend.AddEntry(ROOT_ClassOutput_SR, f"{process_name} m_bb SR")
+            legend.AddEntry(ROOT_ClassOutput_CR_high, f"{process_name} m_bb CR High")
+            legend.Draw()
 
 
-          chi2_value = ROOT_ClassOutput_SR.Chi2Test(ROOT_ClassOutput_CR_high, option='WW')
+            chi2_value = ROOT_ClassOutput_SR.Chi2Test(ROOT_ClassOutput_CR_high, option='WW')
 
 
-          pt = ROOT.TPaveText(0.1,0.8,0.4,0.9, "NDC")
-          pt.AddText(f"Loss {class_loss}")
-          pt.AddText(f"Accuracy {class_accuracy}")
-          pt.AddText(f"Chi2 {chi2_value}")
-          pt.Draw()
+            pt = ROOT.TPaveText(0.1,0.8,0.4,0.9, "NDC")
+            pt.AddText(f"Loss {class_loss}")
+            pt.AddText(f"Accuracy {class_accuracy}")
+            pt.AddText(f"Chi2 {chi2_value}")
+            pt.Draw()
 
-          print(f"Setting canvas to log scale with range {min_val}, {max_val}")
-          p1.SetLogy()
-          p1.SetGrid()
+            print(f"Setting canvas to log scale with range {min_val}, {max_val}")
+            p1.SetLogy()
+            p1.SetGrid()
 
-          p2.cd()
+            p2.cd()
 
-          ROOT_ClassOutput_Ratio = ROOT_ClassOutput_SR.Clone()
-          ROOT_ClassOutput_Ratio.Divide(ROOT_ClassOutput_CR_high)
-          ROOT_ClassOutput_Ratio.SetTitle("Ratio (SR/CR)")
-          ROOT_ClassOutput_Ratio.GetYaxis().SetRangeUser(0.0, 2.0)
-          ROOT_ClassOutput_Ratio.Draw()
+            ROOT_ClassOutput_Ratio = ROOT_ClassOutput_SR.Clone()
+            ROOT_ClassOutput_Ratio.Divide(ROOT_ClassOutput_CR_high)
+            ROOT_ClassOutput_Ratio.SetTitle("Ratio (SR/CR)")
+            ROOT_ClassOutput_Ratio.GetYaxis().SetRangeUser(0.5, 1.5)
+            ROOT_ClassOutput_Ratio.GetYaxis().SetNdivisions(5)
+            ROOT_ClassOutput_Ratio.Draw()
 
-          p2.SetGrid()
+            p2.SetGrid()
 
 
-          plot_name = os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}.pdf')
-          canvas.SaveAs(plot_name)
-          os.system(f"imgcat {plot_name}")
+            plot_name = os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}.pdf')
+            canvas.SaveAs(plot_name)
+            canvas.Close()
+            os.system(f"imgcat {plot_name}")
 
 
 
 
-          class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=nQuantBins, range=(0.0, 1.0), weights=class_weight[SR_mask])
-          class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0), weights=class_weight[CR_high_mask])
+            class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=nQuantBins, range=(0.0, 1.0), weights=class_weight[SR_mask])
+            class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0), weights=class_weight[CR_high_mask])
 
-          # Don't use class weights
-          # class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=nQuantBins, range=(0.0, 1.0))
-          # class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0))
+            # Don't use class weights
+            # class_out_hist_SR, bins = np.histogram(pred_signal[SR_mask], bins=nQuantBins, range=(0.0, 1.0))
+            # class_out_hist_CR_high, bins = np.histogram(pred_signal[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0))
 
-          ROOT_ClassOutput_SR = ROOT.TH1D(f"ClassOutput_{process_name}_SR", f"ClassOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
-          ROOT_ClassOutput_CR_high = ROOT.TH1D(f"ClassOutput_{process_name}_CR_high", f"ClassOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
+            ROOT_ClassOutput_SR = ROOT.TH1D(f"ClassOutput_{process_name}_SR", f"ClassOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
+            ROOT_ClassOutput_CR_high = ROOT.TH1D(f"ClassOutput_{process_name}_CR_high", f"ClassOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
 
-          for binnum in range(nQuantBins):
-              ROOT_ClassOutput_SR.SetBinContent(binnum+1, class_out_hist_SR[binnum])
-              ROOT_ClassOutput_SR.SetBinError(binnum+1, class_out_hist_SR[binnum]**(0.5))
-              
-              ROOT_ClassOutput_CR_high.SetBinContent(binnum+1, class_out_hist_CR_high[binnum])
-              ROOT_ClassOutput_CR_high.SetBinError(binnum+1, class_out_hist_CR_high[binnum]**(0.5))
-              
+            for binnum in range(nQuantBins):
+                ROOT_ClassOutput_SR.SetBinContent(binnum+1, class_out_hist_SR[binnum])
+                ROOT_ClassOutput_SR.SetBinError(binnum+1, class_out_hist_SR[binnum]**(0.5))
+                
+                ROOT_ClassOutput_CR_high.SetBinContent(binnum+1, class_out_hist_CR_high[binnum])
+                ROOT_ClassOutput_CR_high.SetBinError(binnum+1, class_out_hist_CR_high[binnum]**(0.5))
+                
+            ROOT_ClassOutput_SR.Scale(1.0/ROOT_ClassOutput_SR.Integral())
+            ROOT_ClassOutput_CR_high.Scale(1.0/ROOT_ClassOutput_CR_high.Integral())
 
-          ROOT_ClassOutput_SR.Scale(1.0/ROOT_ClassOutput_SR.Integral())
-          ROOT_ClassOutput_CR_high.Scale(1.0/ROOT_ClassOutput_CR_high.Integral())
 
+            canvas = ROOT.TCanvas("c1", "c1", 800, 600)
+            p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
+            p1.SetTopMargin(0)
+            p1.Draw()
 
-          canvas = ROOT.TCanvas("c1", "c1", 800, 600)
-          p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
-          p1.SetTopMargin(0)
-          p1.Draw()
-          
-          p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
-          p2.SetTopMargin(0)
-          p2.SetBottomMargin(0)
-          p2.Draw()
+            p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
+            p2.SetTopMargin(0)
+            p2.SetBottomMargin(0)
+            p2.Draw()
 
-          p1.cd()
+            p1.cd()
 
-          plotlabel = f"Class Output for {process_name}"
-          ROOT_ClassOutput_SR.Draw()
-          ROOT_ClassOutput_SR.SetTitle(plotlabel)
-          ROOT_ClassOutput_SR.SetStats(0)
-          min_val = max(0.0001, min(ROOT_ClassOutput_SR.GetMinimum(), ROOT_ClassOutput_CR_high.GetMinimum()))
-          max_val = max(ROOT_ClassOutput_SR.GetMaximum(), ROOT_ClassOutput_CR_high.GetMaximum())
-          ROOT_ClassOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
+            plotlabel = f"Class Output for {process_name}"
+            ROOT_ClassOutput_SR.Draw()
+            ROOT_ClassOutput_SR.SetTitle(plotlabel)
+            ROOT_ClassOutput_SR.SetStats(0)
+            min_val = max(0.0001, min(ROOT_ClassOutput_SR.GetMinimum(), ROOT_ClassOutput_CR_high.GetMinimum()))
+            max_val = max(ROOT_ClassOutput_SR.GetMaximum(), ROOT_ClassOutput_CR_high.GetMaximum())
+            ROOT_ClassOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
 
-          ROOT_ClassOutput_CR_high.SetLineColor(ROOT.kRed)
-          ROOT_ClassOutput_CR_high.Draw("same")
+            ROOT_ClassOutput_CR_high.SetLineColor(ROOT.kRed)
+            ROOT_ClassOutput_CR_high.Draw("same")
 
 
-          legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
-          legend.AddEntry(ROOT_ClassOutput_SR, f"{process_name} m_bb SR")
-          legend.AddEntry(ROOT_ClassOutput_CR_high, f"{process_name} m_bb CR High")
-          legend.Draw()
+            legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
+            legend.AddEntry(ROOT_ClassOutput_SR, f"{process_name} m_bb SR")
+            legend.AddEntry(ROOT_ClassOutput_CR_high, f"{process_name} m_bb CR High")
+            legend.Draw()
 
-          chi2_value = ROOT_ClassOutput_SR.Chi2Test(ROOT_ClassOutput_CR_high, option='WW')
+            chi2_value = ROOT_ClassOutput_SR.Chi2Test(ROOT_ClassOutput_CR_high, option='WW')
 
 
-          pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
-          pt.AddText(f"Loss {class_loss}")
-          pt.AddText(f"Accuracy {class_accuracy}")
-          pt.AddText(f"Chi2 {chi2_value}")
-          pt.Draw()
+            pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
+            pt.AddText(f"Loss {class_loss}")
+            pt.AddText(f"Accuracy {class_accuracy}")
+            pt.AddText(f"Chi2 {chi2_value}")
+            pt.Draw()
 
-          print(f"Setting canvas to log scale with range {min_val}, {max_val}")
-          p1.SetLogy()
-          p1.SetGrid()
+            print(f"Setting canvas to log scale with range {min_val}, {max_val}")
+            p1.SetLogy()
+            p1.SetGrid()
 
-          p2.cd()
+            p2.cd()
 
-          ROOT_ClassOutput_Ratio = ROOT_ClassOutput_SR.Clone()
-          ROOT_ClassOutput_Ratio.Divide(ROOT_ClassOutput_CR_high)
-          ROOT_ClassOutput_Ratio.SetTitle("Ratio (SR/CR)")
-          ROOT_ClassOutput_Ratio.GetYaxis().SetRangeUser(0.0, 2.0)
-          ROOT_ClassOutput_Ratio.Draw()
+            ROOT_ClassOutput_Ratio = ROOT_ClassOutput_SR.Clone()
+            ROOT_ClassOutput_Ratio.Divide(ROOT_ClassOutput_CR_high)
+            ROOT_ClassOutput_Ratio.SetTitle("Ratio (SR/CR)")
+            ROOT_ClassOutput_Ratio.GetYaxis().SetRangeUser(0.5, 1.5)
+            ROOT_ClassOutput_Ratio.GetYaxis().SetNdivisions(5)
+            ROOT_ClassOutput_Ratio.Draw()
 
-          p2.SetGrid()
+            p2.SetGrid()
 
+            canvas.SaveAs(os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
+            canvas.Close()
 
-          canvas.SaveAs(os.path.join(save_path, f'{process_name}_ClassOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
 
+            # Adv Plots
+            adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask])
+            adv_out_hist_SR_w2, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask]**2)
+            adv_out_hist_CR_high, bins = np.histogram(pred_adv[CR_high_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[CR_high_mask])
+            adv_out_hist_CR_high_w2, bins = np.histogram(pred_adv[CR_high_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[CR_high_mask]**2)
 
+            ROOT_AdvOutput_SR = ROOT.TH1D(f"AdvOutput_{process_name}_SR", f"AdvOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
+            ROOT_AdvOutput_CR_high = ROOT.TH1D(f"AdvOutput_{process_name}_CR_high", f"AdvOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
-          # Adv Plots
 
+            for binnum in range(nQuantBins):
+                ROOT_AdvOutput_SR.SetBinContent(binnum+1, adv_out_hist_SR[binnum])
+                ROOT_AdvOutput_SR.SetBinError(binnum+1, adv_out_hist_SR_w2[binnum]**(0.5))
+                
+                ROOT_AdvOutput_CR_high.SetBinContent(binnum+1, adv_out_hist_CR_high[binnum])
+                ROOT_AdvOutput_CR_high.SetBinError(binnum+1, adv_out_hist_CR_high_w2[binnum]**(0.5))
+                
+            if ROOT_AdvOutput_SR.Integral() == 0:
+              print(f"Process {process_name} has no adv entries, maybe the weights are all 0 for adv?")
+              continue
 
-          adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask])
-          adv_out_hist_SR_w2, bins = np.histogram(pred_adv[SR_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[SR_mask]**2)
-          adv_out_hist_CR_high, bins = np.histogram(pred_adv[CR_high_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[CR_high_mask])
-          adv_out_hist_CR_high_w2, bins = np.histogram(pred_adv[CR_high_mask], bins=quant_binning_adv, range=(0.0, 1.0), weights=adv_weight[CR_high_mask]**2)
 
-          ROOT_AdvOutput_SR = ROOT.TH1D(f"AdvOutput_{process_name}_SR", f"AdvOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
-          ROOT_AdvOutput_CR_high = ROOT.TH1D(f"AdvOutput_{process_name}_CR_high", f"AdvOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
+            ROOT_AdvOutput_SR.Scale(1.0/ROOT_AdvOutput_SR.Integral())
+            ROOT_AdvOutput_CR_high.Scale(1.0/ROOT_AdvOutput_CR_high.Integral())
 
-          for binnum in range(nQuantBins):
-              ROOT_AdvOutput_SR.SetBinContent(binnum+1, adv_out_hist_SR[binnum])
-              ROOT_AdvOutput_SR.SetBinError(binnum+1, adv_out_hist_SR_w2[binnum]**(0.5))
-              
-              ROOT_AdvOutput_CR_high.SetBinContent(binnum+1, adv_out_hist_CR_high[binnum])
-              ROOT_AdvOutput_CR_high.SetBinError(binnum+1, adv_out_hist_CR_high_w2[binnum]**(0.5))
-              
-          if ROOT_AdvOutput_SR.Integral() == 0:
-            print(f"Process {process_name} has no adv entries, maybe the weights are all 0 for adv?")
-            continue
 
 
-          ROOT_AdvOutput_SR.Scale(1.0/ROOT_AdvOutput_SR.Integral())
-          ROOT_AdvOutput_CR_high.Scale(1.0/ROOT_AdvOutput_CR_high.Integral())
 
+            canvas = ROOT.TCanvas("c1", "c1", 800, 600)
+            p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
+            p1.SetTopMargin(0)
+            p1.Draw()
+            
+            p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
+            p2.SetTopMargin(0)
+            p2.SetBottomMargin(0)
+            p2.Draw()
 
+            p1.cd()
 
+            plotlabel = f"Adv Output for {process_name}"
+            ROOT_AdvOutput_SR.Draw()
+            ROOT_AdvOutput_SR.SetTitle(plotlabel)
+            ROOT_AdvOutput_SR.SetStats(0)
+            min_val = max(0.0001, min(ROOT_AdvOutput_SR.GetMinimum(), ROOT_AdvOutput_CR_high.GetMinimum()))
+            max_val = max(ROOT_AdvOutput_SR.GetMaximum(), ROOT_AdvOutput_CR_high.GetMaximum())
+            ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
 
-          canvas = ROOT.TCanvas("c1", "c1", 800, 600)
-          p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
-          p1.SetTopMargin(0)
-          p1.Draw()
-          
-          p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
-          p2.SetTopMargin(0)
-          p2.SetBottomMargin(0)
-          p2.Draw()
+            ROOT_AdvOutput_CR_high.SetLineColor(ROOT.kRed)
+            ROOT_AdvOutput_CR_high.Draw("same")
 
-          p1.cd()
 
-          plotlabel = f"Adv Output for {process_name}"
-          ROOT_AdvOutput_SR.Draw()
-          ROOT_AdvOutput_SR.SetTitle(plotlabel)
-          ROOT_AdvOutput_SR.SetStats(0)
-          min_val = max(0.0001, min(ROOT_AdvOutput_SR.GetMinimum(), ROOT_AdvOutput_CR_high.GetMinimum()))
-          max_val = max(ROOT_AdvOutput_SR.GetMaximum(), ROOT_AdvOutput_CR_high.GetMaximum())
-          ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
+            legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
+            legend.AddEntry(ROOT_AdvOutput_SR, f"{process_name} m_bb SR")
+            legend.AddEntry(ROOT_AdvOutput_CR_high, f"{process_name} m_bb CR High")
+            legend.Draw()
 
-          ROOT_AdvOutput_CR_high.SetLineColor(ROOT.kRed)
-          ROOT_AdvOutput_CR_high.Draw("same")
+            chi2_value = ROOT_AdvOutput_SR.Chi2Test(ROOT_AdvOutput_CR_high, option='WW')
 
 
-          legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
-          legend.AddEntry(ROOT_AdvOutput_SR, f"{process_name} m_bb SR")
-          legend.AddEntry(ROOT_AdvOutput_CR_high, f"{process_name} m_bb CR High")
-          legend.Draw()
+            pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
+            pt.AddText(f"Loss {adv_loss}")
+            pt.AddText(f"Accuracy {adv_accuracy}")
+            pt.AddText(f"Chi2 {chi2_value}")
+            pt.Draw()
 
-          chi2_value = ROOT_AdvOutput_SR.Chi2Test(ROOT_AdvOutput_CR_high, option='WW')
 
+            print(f"Setting canvas to log scale with range {min_val}, {max_val}")
+            p1.SetLogy()
+            p1.SetGrid()
 
-          pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
-          pt.AddText(f"Loss {adv_loss}")
-          pt.AddText(f"Accuracy {adv_accuracy}")
-          pt.AddText(f"Chi2 {chi2_value}")
-          pt.Draw()
+            p2.cd()
 
+            ROOT_AdvOutput_Ratio = ROOT_AdvOutput_SR.Clone()
+            ROOT_AdvOutput_Ratio.Divide(ROOT_AdvOutput_CR_high)
+            ROOT_AdvOutput_Ratio.SetTitle("Ratio (SR/CR)")
+            ROOT_AdvOutput_Ratio.GetYaxis().SetRangeUser(0.5, 1.5)
+            ROOT_AdvOutput_Ratio.GetYaxis().SetNdivisions(5)
+            ROOT_AdvOutput_Ratio.Draw()
 
-          print(f"Setting canvas to log scale with range {min_val}, {max_val}")
-          p1.SetLogy()
-          p1.SetGrid()
+            p2.SetGrid()
 
-          p2.cd()
 
-          ROOT_AdvOutput_Ratio = ROOT_AdvOutput_SR.Clone()
-          ROOT_AdvOutput_Ratio.Divide(ROOT_AdvOutput_CR_high)
-          ROOT_AdvOutput_Ratio.SetTitle("Ratio (SR/CR)")
-          ROOT_AdvOutput_Ratio.GetYaxis().SetRangeUser(0.0, 2.0)
-          ROOT_AdvOutput_Ratio.Draw()
+            plot_name = os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}.pdf')
+            canvas.SaveAs(plot_name)
+            canvas.Close()
+            os.system(f"imgcat {plot_name}")
 
-          p2.SetGrid()
 
 
 
-          canvas.SaveAs(os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}.pdf'))
 
+            adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=nQuantBins, range=(0.0, 1.0), weights=adv_weight[SR_mask])
+            adv_out_hist_CR_high, bins = np.histogram(pred_adv[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0), weights=adv_weight[CR_high_mask])
 
+            ROOT_AdvOutput_SR = ROOT.TH1D(f"AdvOutput_{process_name}_SR", f"AdvOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
+            ROOT_AdvOutput_CR_high = ROOT.TH1D(f"AdvOutput_{process_name}_CR_high", f"AdvOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
 
+            for binnum in range(nQuantBins):
+                ROOT_AdvOutput_SR.SetBinContent(binnum+1, adv_out_hist_SR[binnum])
+                ROOT_AdvOutput_SR.SetBinError(binnum+1, adv_out_hist_SR[binnum]**(0.5))
+                
+                ROOT_AdvOutput_CR_high.SetBinContent(binnum+1, adv_out_hist_CR_high[binnum])
+                ROOT_AdvOutput_CR_high.SetBinError(binnum+1, adv_out_hist_CR_high[binnum]**(0.5))
+                
 
-          adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=nQuantBins, range=(0.0, 1.0), weights=adv_weight[SR_mask])
-          adv_out_hist_CR_high, bins = np.histogram(pred_adv[CR_high_mask], bins=nQuantBins, range=(0.0, 1.0), weights=adv_weight[CR_high_mask])
+            ROOT_AdvOutput_SR.Scale(1.0/ROOT_AdvOutput_SR.Integral())
+            ROOT_AdvOutput_CR_high.Scale(1.0/ROOT_AdvOutput_CR_high.Integral())
 
-          ROOT_AdvOutput_SR = ROOT.TH1D(f"AdvOutput_{process_name}_SR", f"AdvOutput_{process_name}_SR", nQuantBins, 0.0, 1.0)
-          ROOT_AdvOutput_CR_high = ROOT.TH1D(f"AdvOutput_{process_name}_CR_high", f"AdvOutput_{process_name}_CR_high", nQuantBins, 0.0, 1.0)
 
+            canvas = ROOT.TCanvas("c1", "c1", 800, 600)
+            p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
+            p1.SetTopMargin(0)
+            p1.Draw()
+            
+            p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
+            p2.SetTopMargin(0)
+            p2.SetBottomMargin(0)
+            p2.Draw()
 
-          for binnum in range(nQuantBins):
-              ROOT_AdvOutput_SR.SetBinContent(binnum+1, adv_out_hist_SR[binnum])
-              ROOT_AdvOutput_SR.SetBinError(binnum+1, adv_out_hist_SR[binnum]**(0.5))
-              
-              ROOT_AdvOutput_CR_high.SetBinContent(binnum+1, adv_out_hist_CR_high[binnum])
-              ROOT_AdvOutput_CR_high.SetBinError(binnum+1, adv_out_hist_CR_high[binnum]**(0.5))
-              
+            p1.cd()
 
-          ROOT_AdvOutput_SR.Scale(1.0/ROOT_AdvOutput_SR.Integral())
-          ROOT_AdvOutput_CR_high.Scale(1.0/ROOT_AdvOutput_CR_high.Integral())
+            plotlabel = f"Adv Output for {process_name}"
+            ROOT_AdvOutput_SR.Draw()
+            ROOT_AdvOutput_SR.SetTitle(plotlabel)
+            ROOT_AdvOutput_SR.SetStats(0)
+            min_val = max(0.0001, min(ROOT_AdvOutput_SR.GetMinimum(), ROOT_AdvOutput_CR_high.GetMinimum()))
+            max_val = max(ROOT_AdvOutput_SR.GetMaximum(), ROOT_AdvOutput_CR_high.GetMaximum())
+            ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
 
+            ROOT_AdvOutput_CR_high.SetLineColor(ROOT.kRed)
+            ROOT_AdvOutput_CR_high.Draw("same")
 
-          canvas = ROOT.TCanvas("c1", "c1", 800, 600)
-          p1 = ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0)
-          p1.SetTopMargin(0)
-          p1.Draw()
-          
-          p2 = ROOT.TPad("p2", "p2", 0.0, 0.1, 1.0, 0.3, 0, 0, 0)
-          p2.SetTopMargin(0)
-          p2.SetBottomMargin(0)
-          p2.Draw()
 
-          p1.cd()
+            legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
+            legend.AddEntry(ROOT_AdvOutput_SR, f"{process_name} m_bb SR")
+            legend.AddEntry(ROOT_AdvOutput_CR_high, f"{process_name} m_bb CR High")
+            legend.Draw()
 
-          plotlabel = f"Adv Output for {process_name}"
-          ROOT_AdvOutput_SR.Draw()
-          ROOT_AdvOutput_SR.SetTitle(plotlabel)
-          ROOT_AdvOutput_SR.SetStats(0)
-          min_val = max(0.0001, min(ROOT_AdvOutput_SR.GetMinimum(), ROOT_AdvOutput_CR_high.GetMinimum()))
-          max_val = max(ROOT_AdvOutput_SR.GetMaximum(), ROOT_AdvOutput_CR_high.GetMaximum())
-          ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
+            chi2_value = ROOT_AdvOutput_SR.Chi2Test(ROOT_AdvOutput_CR_high, option='WW')
 
-          ROOT_AdvOutput_CR_high.SetLineColor(ROOT.kRed)
-          ROOT_AdvOutput_CR_high.Draw("same")
 
+            pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
+            pt.AddText(f"Loss {adv_loss}")
+            pt.AddText(f"Accuracy {adv_accuracy}")
+            pt.AddText(f"Chi2 {chi2_value}")
+            pt.Draw()
 
-          legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
-          legend.AddEntry(ROOT_AdvOutput_SR, f"{process_name} m_bb SR")
-          legend.AddEntry(ROOT_AdvOutput_CR_high, f"{process_name} m_bb CR High")
-          legend.Draw()
 
-          chi2_value = ROOT_AdvOutput_SR.Chi2Test(ROOT_AdvOutput_CR_high, option='WW')
+            print(f"Setting canvas to log scale with range {min_val}, {max_val}")
+            p1.SetLogy()
+            p1.SetGrid()
 
+            p2.cd()
 
-          pt = ROOT.TPaveText(0.1,0.7,0.4,0.9, "NDC")
-          pt.AddText(f"Loss {adv_loss}")
-          pt.AddText(f"Accuracy {adv_accuracy}")
-          pt.AddText(f"Chi2 {chi2_value}")
-          pt.Draw()
+            ROOT_AdvOutput_Ratio = ROOT_AdvOutput_SR.Clone()
+            ROOT_AdvOutput_Ratio.Divide(ROOT_AdvOutput_CR_high)
+            ROOT_AdvOutput_Ratio.SetTitle("Ratio (SR/CR)")
+            ROOT_AdvOutput_Ratio.GetYaxis().SetRangeUser(0.5, 1.5)
+            ROOT_AdvOutput_Ratio.GetYaxis().SetNdivisions(5)
+            ROOT_AdvOutput_Ratio.Draw()
 
+            p2.SetGrid()
 
-          print(f"Setting canvas to log scale with range {min_val}, {max_val}")
-          p1.SetLogy()
-          p1.SetGrid()
-
-          p2.cd()
-
-          ROOT_AdvOutput_Ratio = ROOT_AdvOutput_SR.Clone()
-          ROOT_AdvOutput_Ratio.Divide(ROOT_AdvOutput_CR_high)
-          ROOT_AdvOutput_Ratio.SetTitle("Ratio (SR/CR)")
-          ROOT_AdvOutput_Ratio.GetYaxis().SetRangeUser(0.0, 2.0)
-          ROOT_AdvOutput_Ratio.Draw()
-
-          p2.SetGrid()
-
-          canvas.SaveAs(os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
-
+            canvas.SaveAs(os.path.join(save_path, f'{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}_raw.pdf'))
+            canvas.Close()
 
 
 
@@ -932,7 +1011,7 @@ class EpochCounterCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         self.model.epoch_counter.assign_add(1.0)
         return
-
+    
 class AdvOnlyCallback(tf.keras.callbacks.Callback):
   def __init__(self, train_dataset, nSteps=100, TrackerWindowSize=10, on_batch=True, on_epoch=False, continue_training=False, quiet=False):
     self.train_dataset = train_dataset.repeat()
@@ -1026,6 +1105,28 @@ class ModelCheckpoint(tf.keras.callbacks.Callback):
 
   def on_train_end(self, logs=None):
     self._print_msg()
+    if self.best == None:
+      print("Never found a best model, just save the last one")
+
+      dir_name = f'epoch_final.keras'
+      onnx_dir_name = f"epoch_final.onnx"
+      os.makedirs(self.filepath, exist_ok = True)
+      path = os.path.join(self.filepath, f'{dir_name}')
+      self.model.save(path)
+      if self.input_signature is not None:
+        onnx_model, _ = tf2onnx.convert.from_keras(self.model, self.input_signature, opset=13)
+        onnx.save(onnx_model, os.path.join(self.filepath, f"{onnx_dir_name}"))
+
+      path_best = os.path.join(self.filepath, 'best.onnx')
+      path_best_keras = os.path.join(self.filepath, 'best.keras')
+      if os.path.exists(path_best):
+        os.remove(path_best)
+        os.remove(path_best_keras)
+
+      os.symlink(onnx_dir_name, path_best)
+      os.symlink(dir_name, path_best_keras)
+
+
 
   def on_epoch_end(self, epoch, logs=None):
     self.epochs_since_last_save += 1
@@ -1092,15 +1193,15 @@ class AdversarialModel(tf.keras.Model):
     #     weight_decay=setup['adv_weight_decay']
     # )
 
-    self.adv_optimizer = tf.keras.optimizers.Adam(
-        learning_rate=setup['adv_learning_rate'],
-        # weight_decay=setup['adv_weight_decay']
-    )
-
-    # self.adv_optimizer = tf.keras.optimizers.Nadam(
+    # self.adv_optimizer = tf.keras.optimizers.Adam(
     #     learning_rate=setup['adv_learning_rate'],
     #     # weight_decay=setup['adv_weight_decay']
     # )
+
+    self.adv_optimizer = tf.keras.optimizers.Nadam(
+        learning_rate=setup['adv_learning_rate'],
+        weight_decay=setup['adv_weight_decay']
+    )
 
 
     self.apply_common_gradients = setup['apply_common_gradients']
@@ -1431,22 +1532,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
      dw.AddInputFeaturesList(*list_feature)
   dw.AddHighLevelFeatures(setup['highlevelfeatures'])
 
-  # dw.AddInputFeatures(['lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass'])
-  # dw.AddInputFeatures(['lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass'])
-  # dw.AddInputFeatures(['met_pt', 'met_phi'])
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2)
-  # dw.AddInputFeaturesList(['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3)
-  # dw.AddHighLevelFeatures([
-  #                         'HT', 'dR_dilep', 'dR_dibjet', 
-  #                         'dR_dilep_dibjet', 'dR_dilep_dijet',
-  #                         'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
-  #                         'dPhi_MET_dilep', 'dPhi_MET_dibjet',
-  #                         'min_dR_lep0_jets', 'min_dR_lep1_jets',
-  #                         'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
-  #                         'll_mass', 'CosTheta_bb'
-  #                         ])
 
   dw.SetBinary(True)
   dw.UseParametric(setup['UseParametric'])
@@ -1499,10 +1584,52 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   model.summary()
 
   batch_size = setup['batch_compression_factor']*batch_size
+
   train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, 2), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
+  train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
+
+  parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
+  print(train_tf_dataset)
+  print(list(train_tf_dataset.as_numpy_iterator()))
+
+  @tf.function
+  def new_param_map(*x):
+    dataset = x
+    features = dataset[0]
+
+    # Need to randomize the features parametric mass
+    random_param_mass = tf.random.categorical(tf.math.log([list(parametric_mass_probability)]), tf.shape(features)[0], dtype=tf.int64)
+
+    mass_values = tf.constant(dw.param_list)
+    mass_keys = tf.constant(np.arange(len(dw.param_list)))
+    table = tf.lookup.StaticHashTable(
+       tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+       default_value = -1
+    )
+
+    actual_new_mass = table.lookup(random_param_mass)
+    actual_new_mass = tf.cast(actual_new_mass, tf.float64)
+
+    # Lastly we need to keep the signal events the correct mass
+    class_targets = dataset[1][0]
+    old_mass_mask = tf.cast(class_targets[:,0], tf.float64)
+    new_mass_mask = tf.cast(class_targets[:,1], tf.float64)
+
+    actual_mass = old_mass_mask * features[:,-1] + new_mass_mask * actual_new_mass
+    actual_mass = tf.transpose(actual_mass)
+
+    features = tf.concat([features[:,:-1], actual_mass], axis=-1)
+    new_dataset = (features, dataset[1])
+    return new_dataset
+
+  train_tf_dataset = train_tf_dataset.map(new_param_map)
+
+  print('After map')
+  print(train_tf_dataset)
 
   val_batch_size = setup['batch_compression_factor']*val_batch_size
   val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, 2), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(val_batch_size, drop_remainder=True)
+  val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
 
 
   def save_predicate(model, logs):
@@ -1513,7 +1640,8 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   input_signature = [tf.TensorSpec(input_shape, tf.double, name='x')]
   callbacks = [
       ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
-                      patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                      # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                      patience=setup['patience'], save_callback=None, input_signature=input_signature),
       tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
       EpochCounterCallback(),
       AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
@@ -1569,9 +1697,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
 
 
 def adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, nParity, batch_size=1000):
-
-  print("Can I just continue training the same model?")
-
   dnnConfig = {}
   with open(model_config, 'r') as file:
     dnnConfig = yaml.safe_load(file)  
@@ -1624,8 +1749,8 @@ def adv_only_training(model_name, model_config, train_file, train_weight, test_f
   model2 = AdversarialModel(setup2)
   model2.compile(loss=None,
               optimizer=tf.keras.optimizers.Nadam(learning_rate=setup2['learning_rate'],
-                                                  # weight_decay=setup2['weight_decay']))
-              ))
+                                                  weight_decay=setup2['weight_decay']))
+              
 
   model2(dw.features)
 
@@ -1716,6 +1841,7 @@ def validate_model(model_name, model_config, validation_file, validation_weight,
     highlevel_features = dnnConfig['highlevelfeatures']
 
     parametric_list = dnnConfig['parametric_list']
+    use_parametric = dnnConfig['use_parametric']
 
     dw = DataWrapper()
     dw.AddInputFeatures(features)
@@ -1725,7 +1851,7 @@ def validate_model(model_name, model_config, validation_file, validation_weight,
 
 
     dw.SetBinary(True)
-    dw.UseParametric(False)
+    dw.UseParametric(use_parametric)
     dw.SetParamList(parametric_list)
 
     dw.AddInputLabel('sample_type')
@@ -1742,113 +1868,77 @@ def validate_model(model_name, model_config, validation_file, validation_weight,
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Create TrainTest Files for DNN.')
-    parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on")
-    parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
+    parser.add_argument('--nParity', required=False, type=int, default=None, help="nParity number to train on for this call, default runs all")
+    # parser.add_argument('--output-folder', required=False, type=str, default='tmp', help="Output folder name")
+
+    parser.add_argument('--setup-config', required=False, type=str, default='default_training_setup_doubleLep.yaml', help='Setup config for training')
 
     args = parser.parse_args()
 
     nParity = args.nParity
     print(f"We have parity {nParity}")
-    output_folder = args.output_folder
-  
+    # output_folder = args.output_folder
 
-    setup = {
-        'learning_rate': 0.000001,
-        'adv_learning_rate': 0.00001,
-        'weight_decay': 0.04,
-        'adv_weight_decay': 0.004,
-        'adv_grad_factor': 1.0, #0.7
-        'class_grad_factor': 0.001,
-        'common_activation': 'tanh', #'relu'
-        'class_activation': 'tanh', #'relu'
-        'adv_activation': 'relu', #'relu'
-        'use_batch_norm': False,
-        'dropout': 0.0,
-        'n_common_layers': 10,
-        'n_common_units': 256,
-        'n_class_layers': 5,
-        'n_class_units': 128,
-        'n_adv_layers': 5,
-        'n_adv_units': 128,
-        'n_epochs': 100,
-        'patience': 100,
-        'apply_common_gradients': True,
-        'UseParametric': True,
-        'parametric_list': [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ],
-        'continue_training': False,
-        'continue_model': None,
+    setup = {}
+    with open(os.path.join('config', args.setup_config), 'r') as file:
+        setup = yaml.safe_load(file)  
 
-        'batch_compression_factor': 1,
-        'adv_submodule_steps': 0,
-        'adv_submodule_tracker': 10,
 
-        'features': [
-          'lep1_pt', 'lep1_phi', 'lep1_eta', 'lep1_mass',
-          'lep2_pt', 'lep2_phi', 'lep2_eta', 'lep2_mass', 
-          'met_pt', 'met_phi'
-        ],
-        'listfeatures': [
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 0],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 1],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 2],
-          [['centralJet_pt', 'centralJet_phi', 'centralJet_eta', 'centralJet_mass'], 3],
-        ],
-        'highlevelfeatures': [
-          'HT', 'dR_dilep', 'dR_dibjet', 
-          'dR_dilep_dibjet', 'dR_dilep_dijet',
-          'dPhi_lep1_lep2', 'dPhi_jet1_jet2',
-          'dPhi_MET_dilep', 'dPhi_MET_dibjet',
-          'min_dR_lep0_jets', 'min_dR_lep1_jets',
-          'MT', 'MT2_ll', 'MT2_bb', 'MT2_blbl',
-          'll_mass', 'CosTheta_bb'
-        ],
-    }
-
-    input_folder = "DNN_Datasets/Dataset_2025-03-28-12-49-16"
+    # input_folder = "DNN_Datasets/Dataset_2025-03-28-12-49-16"
+    input_folder = setup['input_folder']
+    output_folder = setup['output_folder']
     output_folder = os.path.join("DNN_Models", output_folder)
 
 
-    #290258-02052
     yaml_list = [fname for fname in os.listdir(input_folder) if fname.startswith('batch_config_parity')]
 
     modelname_parity = []
 
-    for i, config_yaml in enumerate(yaml_list):
-        if nParity != None:
-           if i != nParity:
-              continue
-        print(f"Training on nParity {i}")
-        config_dict = {}
-        with open(os.path.join(input_folder, config_yaml), 'r') as file:
-            config_dict = yaml.safe_load(file)  
-
-        val_config_dict = {}
-        val_yaml = yaml_list[i+1] if (i+1) != len(yaml_list) else yaml_list[0]
-        with open(os.path.join(input_folder, val_yaml), 'r') as file:
-            val_config_dict = yaml.safe_load(file)  
-
-        model = train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict)
-
-        # We have nParity {nParity}, now lets try to learn the adv only part on this model
-        first_pass = True
-        for j in range(4):
-          if j == i: continue
-
-          model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', 'best.keras')
-          model_config = os.path.join(output_folder, 'dnn_config.yaml')
-          train_file = os.path.join(input_folder, f'batchfile{i}.root')
-          train_weight = os.path.join(input_folder, f'weightfile{i}.root')
-          test_file = os.path.join(input_folder, f'batchfile{j}.root')
-          test_weight = os.path.join(input_folder, f'weightfile{j}.root')
-          if first_pass:
-            adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, j)
-            first_pass = False
-
-          model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', 'best.onnx')
-          validate_model(model_name, model_config, test_file, test_weight, j)
-          model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', f'best_step2.onnx')
-          validate_model(model_name, model_config, test_file, test_weight, j)
+    try:
+       
+        thread = threading.Thread(target=update_kinit_thread)
+        thread.start()
 
 
+        for i, config_yaml in enumerate(yaml_list):
+            if nParity != None:
+              if i != nParity:
+                  continue
+            print(f"Training on nParity {i}")
+            config_dict = {}
+            with open(os.path.join(input_folder, config_yaml), 'r') as file:
+                config_dict = yaml.safe_load(file)  
 
-thread.join()
+            val_config_dict = {}
+            val_yaml = yaml_list[i+1] if (i+1) != len(yaml_list) else yaml_list[0]
+            with open(os.path.join(input_folder, val_yaml), 'r') as file:
+                val_config_dict = yaml.safe_load(file)  
+
+            model = train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict)
+
+            # We have nParity {nParity}, now lets try to learn the adv only part on this model
+            first_pass = True
+            for j in range(4):
+              if j == i: continue
+
+              model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', 'best.keras')
+              model_config = os.path.join(output_folder, 'dnn_config.yaml')
+              train_file = os.path.join(input_folder, f'batchfile{i}.root')
+              train_weight = os.path.join(input_folder, f'weightfile{i}.root')
+              test_file = os.path.join(input_folder, f'batchfile{j}.root')
+              test_weight = os.path.join(input_folder, f'weightfile{j}.root')
+              if first_pass and setup['do_step2']:
+                adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, j)
+                first_pass = False
+
+              model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', 'best.onnx')
+              validate_model(model_name, model_config, test_file, test_weight, j)
+              if setup['do_step2']:
+                model_name = os.path.join(output_folder, f'ResHH_Classifier_parity{i}', f'best_step2.onnx')
+                validate_model(model_name, model_config, test_file, test_weight, j)
+
+    finally:
+        kInit_cond.acquire()
+        kInit_cond.notify_all()
+        kInit_cond.release()
+        thread.join()
