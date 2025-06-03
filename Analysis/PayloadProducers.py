@@ -14,3 +14,11 @@ class HMEProducer:
         for col in self.cfg['columns']:
             dfw.DefineAndAppend(f"HME_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
         return dfw
+
+class DNNProducer:
+    def __init__(self, cfg):
+        self.cfg = cfg
+
+    def run(self, dfw):
+        print("Running DNN producer")
+        return dfw
