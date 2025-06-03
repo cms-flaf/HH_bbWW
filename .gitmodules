@@ -12,4 +12,4 @@
 	url = git@github.com:cms-flaf/StatInference.git
 [submodule "inference"]
 	path = inference
-	url = ssh://git@gitlab.cern.ch:7999/hh/tools/inference.git
+	url = ssh://git@gitlab.cern.ch:7999/cms-flaf/inference.git
