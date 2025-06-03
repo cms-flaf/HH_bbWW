@@ -100,8 +100,8 @@ def GetLepWeight(lep_index):
 
 
 def GetTriggerWeight():
-    weight_MuTrg = "1.0" # f"(lep1_legType == static_cast<int>(Leg::mu) ? weight_lep1_TrgSF_singleIsoMu_Central : 1.0)"
-    weight_EleTrg = "1.0" # f"(lep1_legType == static_cast<int>(Leg::e) ? weight_lep1_TrgSF_singleEleWpTight_Central : 1.0)"
+    weight_MuTrg = f"(lep1_legType == static_cast<int>(Leg::mu) ? weight_lep1_TrgSF_singleIsoMu_Central : 1.0)"
+    weight_EleTrg = f"(lep1_legType == static_cast<int>(Leg::e) ? weight_lep1_TrgSF_singleEleWpTight_Central : 1.0)"
 
     return f"{weight_MuTrg} * {weight_EleTrg}"
 

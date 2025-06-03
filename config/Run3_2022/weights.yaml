@@ -16,10 +16,10 @@ norm:
     name: EleID_TightIDNoIso
 
   SingleEleTrg:
-    expression: final_weight # weight_lep1_TrgSF_singleEleWpTight_singleEle{scale}_rel * weight_lep2_TrgSF_singleEleWpTight_singleEle{scale}_rel * final_weight
+    expression: weight_lep1_TrgSF_singleEleWpTight_singleEle{scale}_rel * weight_lep2_TrgSF_singleEleWpTight_singleEle{scale}_rel * final_weight
     name: SingleEleTrg
   SingleMuonTrg:
-    expression: final_weight # weight_lep1_TrgSF_singleIsoMu_IsoMu24{scale}_rel * weight_lep2_TrgSF_singleIsoMu_IsoMu24{scale}_rel * final_weight
+    expression: weight_lep1_TrgSF_singleIsoMu_IsoMu24{scale}_rel * weight_lep2_TrgSF_singleIsoMu_IsoMu24{scale}_rel * final_weight
     name: SingleMuonTrg
 
 
