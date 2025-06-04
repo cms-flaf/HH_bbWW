@@ -135,42 +135,42 @@ def getCustomisationSplit(customisations):
 
 
 
-class AnalysisCacheMergeTask(Task, HTCondorWorkflow, law.LocalWorkflow):
-    max_runtime = copy_param(HTCondorWorkflow.max_runtime, 5.0)
+# class AnalysisCacheMergeTask(Task, HTCondorWorkflow, law.LocalWorkflow):
+#     max_runtime = copy_param(HTCondorWorkflow.max_runtime, 5.0)
 
-    def workflow_requires(self):
-        workflow_dep = {}
-        for idx, prod_branches in self.branch_map.items():
-            workflow_dep[idx] = AnalysisCacheTask.req(self, branches=prod_branches)
-        return workflow_dep
+#     def workflow_requires(self):
+#         workflow_dep = {}
+#         for idx, prod_branches in self.branch_map.items():
+#             workflow_dep[idx] = AnalysisCacheTask.req(self, branches=prod_branches)
+#         return workflow_dep
 
-    def requires(self):
-        prod_branches = self.branch_data
-        deps = [ AnalysisCacheTask.req(self, max_runtime=AnaCacheTask.max_runtime._default, branch=prod_br) for prod_br in prod_branches ]
-        return deps
+#     def requires(self):
+#         prod_branches = self.branch_data
+#         deps = [ AnalysisCacheTask.req(self, max_runtime=AnaCacheTask.max_runtime._default, branch=prod_br) for prod_br in prod_branches ]
+#         return deps
 
-    def create_branch_map(self):
-        anaProd_branch_map = AnalysisCacheTask.req(self, branch=-1, branches=()).branch_map
-        prod_branches = []
-        for prod_br, (sample_name, sample_type) in anaProd_branch_map.items():
-            if sample_type == "data":
-                prod_branches.append(prod_br)
-        return { 0: prod_branches }
+#     def create_branch_map(self):
+#         anaProd_branch_map = AnalysisCacheTask.req(self, branch=-1, branches=()).branch_map
+#         prod_branches = []
+#         for prod_br, (sample_name, sample_type) in anaProd_branch_map.items():
+#             if sample_type == "data":
+#                 prod_branches.append(prod_br)
+#         return { 0: prod_branches }
 
-    def output(self, force_pre_output=False):
-        outFileName = 'nanoHTT_0.root'
-        output_path = os.path.join('anaCacheTuple', self.period, 'data',self.version, outFileName)
-        return self.remote_target(output_path, fs=self.fs_anaCacheTuple)
+#     def output(self, force_pre_output=False):
+#         outFileName = 'nanoHTT_0.root'
+#         output_path = os.path.join('anaCacheTuple', self.period, 'data',self.version, outFileName)
+#         return self.remote_target(output_path, fs=self.fs_anaCacheTuple)
 
-    def run(self):
-        producer_dataMerge = os.path.join(self.ana_path(), 'FLAF', 'AnaProd', 'MergeNtuples.py')
-        with contextlib.ExitStack() as stack:
-            local_inputs = [stack.enter_context(inp.localize('r')).path for inp in self.input()]
-            with self.output().localize("w") as tmp_local_file:
-                tmpFile = tmp_local_file.path
-                dataMerge_cmd = [ 'python3', producer_dataMerge, '--outFile', tmpFile]
-                dataMerge_cmd.extend(local_inputs)
-                #print(dataMerge_cmd)
-                ps_call(dataMerge_cmd,verbose=1)
+#     def run(self):
+#         producer_dataMerge = os.path.join(self.ana_path(), 'FLAF', 'AnaProd', 'MergeNtuples.py')
+#         with contextlib.ExitStack() as stack:
+#             local_inputs = [stack.enter_context(inp.localize('r')).path for inp in self.input()]
+#             with self.output().localize("w") as tmp_local_file:
+#                 tmpFile = tmp_local_file.path
+#                 dataMerge_cmd = [ 'python3', producer_dataMerge, '--outFile', tmpFile]
+#                 dataMerge_cmd.extend(local_inputs)
+#                 #print(dataMerge_cmd)
+#                 ps_call(dataMerge_cmd,verbose=1)
 
 
