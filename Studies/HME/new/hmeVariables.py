@@ -1,9 +1,10 @@
 import ROOT
-ROOT.gROOT.ProcessLine('#include "Studies/HME/new/include/Estimator.hpp"')
-ROOT.gROOT.ProcessLine('#include "Studies/HME/new/include/Constants.hpp"')
+import os
+ROOT.gROOT.ProcessLine(f'#include "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/include/Estimator.hpp"')
+ROOT.gROOT.ProcessLine(f'#include "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/include/Constants.hpp"')
 ROOT.gROOT.ProcessLine('TH1::AddDirectory(false)')
 ROOT.gROOT.ProcessLine('TH2::AddDirectory(false)')
-ROOT.gROOT.ProcessLine('auto estimator = std::make_unique<HME::Estimator>("Studies/HME/new/pdf_sl.root", "Studies/HME/new/pdf_dl.root");')
+ROOT.gROOT.ProcessLine(f'auto estimator = std::make_unique<HME::Estimator>("{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/pdf_sl.root", "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/pdf_dl.root");')
 
 
 def GetHMEVariables(df, channel):
