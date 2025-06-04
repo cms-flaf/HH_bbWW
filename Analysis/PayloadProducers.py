@@ -5,6 +5,8 @@ class HMEProducer:
         self.cfg = cfg
 
     def run(self, dfw):
+        if "ncentralJet" not in dfw.df.GetColumnNames():
+            dfw.Define("ncentralJet", "return centralJet_pt.size();")
         if self.cfg['channel'] == "DL":
             dfw.Define("has_necessary_inputs", "ncentralJet >= 2 && lep1_pt > 0.0 && lep2_pt > 0.0")
         elif self.cfg['channel'] == "SL":
