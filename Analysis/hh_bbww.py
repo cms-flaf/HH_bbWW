@@ -114,9 +114,9 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCutFlow(self):
         self.df = self.df.Define("cutflow", "int(0)")
-        cutflow_cuts = ["event_selection", "OS_Iso", "Zveto", "mbb_SR"]
-        for cut in cutflow_cuts:
-            self.df = self.df.Redefine("cutflow", f"{cut} ? cutflow+1 : cutflow")
+        cutflow_cuts = ["event_selection", "OS_Iso", "Zveto || OppFlavor", "mbb_SR"]
+        for i,cut in enumerate(cutflow_cuts):
+            self.df = self.df.Redefine("cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow")
 
     def defineCategories(self):
         self.df = self.df.Define("nSelBtag_jets", f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})")
@@ -128,7 +128,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         # We are throwing away events with a FatJet that are not b-tagged in this method
 
 
-        self.df = self.df.Define("SR", "( Zveto && mbb_SR )")
+        self.df = self.df.Define("SR", "( (Zveto || OppFlavor) && mbb_SR )")
         self.df = self.df.Define("res1b_SR", f"res1b && SR")
         self.df = self.df.Define("res2b_SR", f"res2b && SR")
         self.df = self.df.Define("boosted_SR", f"boosted && SR")
@@ -187,6 +187,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         #Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
         self.df = self.df.Define("Zpeak", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)")
         self.df = self.df.Define("Zveto", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)")
+        self.df = self.df.Define("OppFlavor", f"(lep1_legType != lep2_legType)")
         self.df = self.df.Define("TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 ")
         self.df = self.df.Define("mbb_SR", f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
         self.df = self.df.Define("Lep1Lep2Jet1Jet2_mass", f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0")
@@ -293,8 +294,8 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineJetSelections()
     dfForHistograms.defineQCDRegions()
-    dfForHistograms.defineCategories()
     dfForHistograms.defineControlRegions()
+    dfForHistograms.defineCategories()
     #dfForHistograms.defineBoostedVariables()
     #dfForHistograms.defineTriggers()
     #dfForHistograms.redefineWeights()
@@ -302,3 +303,4 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms
+
