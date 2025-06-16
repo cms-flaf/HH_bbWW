@@ -25,5 +25,5 @@ norm:
 
 shape:
   - JER
-  - JES_Total
+  # - JES_Total
   - EleES
