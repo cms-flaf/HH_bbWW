@@ -77,7 +77,7 @@ def run_inference_on_uncertainty_trees(df_begin, models, globalConfig, dnnConfig
                     print(f"  Processing {treeName_with_suffix}")
                     df_unc = ROOT.RDataFrame(treeName_with_suffix, inFileName)
                     dfWrapped_unc = Utilities.DataFrameBuilderBase(df_unc)
-                    if "_nonValid" not in treeName_with_suffix:
+                    if "_Valid" in treeName_with_suffix:
                         dfWrapped_unc.CreateFromDelta(colNames, colTypes)
                     dfWrapped_unc.AddMissingColumns(colNames, colTypes)    
                     # dfW_unc = Utilities.DataFrameWrapper(dfWrapped_unc.df, defaultColToSave)
@@ -128,8 +128,8 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, snap
     nParity = dnnConfig['nParity'] if 'nParity' in dnnConfig.keys() else 4
 
     use_parametric = dnnConfig['use_parametric']
-    param_mass_list = [250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000 ]
-
+    param_mass_list = [250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
+    
     class_names_list = dnnConfig['class_names'] if 'class_names' in dnnConfig.keys() else ['Signal', 'TT', 'DY']
 
     if not use_parametric:
