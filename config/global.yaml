@@ -14,6 +14,8 @@ corrections:
   - JEC
   - JER
   - btagShape
+# Note for later, Muhammad's common nTuples have 50% more events than mine?
+# But I found the answer, he did not require an HLT in the event while I do
 
 tagger_name: "particleNet"
 
@@ -43,13 +45,14 @@ channelDefinition:
   muMu: 22
 
 categories:
-  - inclusive
-  - boosted
-  - baseline
-  - res1b
-  - res2b
-  - res1b_Zveto_MbbSR
-  - res2b_Zveto_MbbSR
+  # - inclusive
+  # - boosted
+  # - baseline
+  # - res1b
+  # - res2b
+  - res1b_SR
+  - res2b_SR
+  - boosted_SR
 
 region_default: SR
 
