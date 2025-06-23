@@ -19,15 +19,16 @@ tagger_name: "particleNet"
 
 bjet_preselection_branch : "Jet_sel"
 
-producers_module_name: Analysis.PayloadProducers 
-payload_producers:
+payload_producers: 
   HME:
+    producers_module_name: Analysis.PayloadProducers
     producer_name: HMEProducer 
     channel: "DL"
     columns: 
       - mass
     dependencies:
   DNN:
+    producers_module_name: Analysis.PayloadProducers
     producer_name: DNNProducer
     channel: "DL"
     dependencies: 
