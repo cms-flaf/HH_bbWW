@@ -59,7 +59,9 @@ def run_inference_on_uncertainty_trees(df_begin, models, globalConfig, dnnConfig
     colTypes = dfWrapped_central.colTypes
     dfWrapped_central.df = createCentralQuantities(df_begin, colTypes, colNames)
 
-    defaultColToSave = ["entryIndex", "luminosityBlock", "run", "event"]
+    # defaultColToSave = ["entryIndex", "luminosityBlock", "run", "event"]
+    # With the new FullEventId we don't need to save these anymore
+    defaultColToSave = ["FullEventId"]
 
     if dfWrapped_central.df.Filter("map_placeholder > 0").Count().GetValue() <= 0:
         raise RuntimeError("No events passed the map placeholder")
@@ -115,7 +117,8 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, snap
 
     features_to_drop = load_features.copy() #We don't need to save these in the final file
 
-    load_features.update(["entryIndex", "luminosityBlock", "run", "event"])
+    # load_features.update(["entryIndex", "luminosityBlock", "run", "event"])
+    load_features.update(["FullEventId"])
 
     # print("Loading these features")
     # print(load_features)
@@ -142,8 +145,9 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, snap
         # Now open it with uproot!
         events = uproot.open("test.root")
         branches = events[tree_name].arrays(load_features)
+        event_branch = branches.FullEventId & 0xFFFFFFFF
 
-        all_predictions = np.zeros((len(param_mass_list), len(branches.event), nParity, nClasses))
+        all_predictions = np.zeros((len(param_mass_list), len(branches.FullEventId), nParity, nClasses))
 
         for parityIdx, [model, parityfunc] in enumerate(models):
             #We want to only apply the 3 models that are NOT trained on this parity
@@ -184,15 +188,14 @@ def run_inference_for_tree(tree_name, rdf, models, globalConfig, dnnConfig, snap
 
                 # Now we need to set the trained parity to 0
                 # But if there is only one model, then skip parity
-                event_branch = np.expand_dims(branches.event, axis=-1)
-                parity_filter = np.repeat(event_branch, nClasses, axis=-1)
+                event_num = np.expand_dims(event_branch, axis=-1) # We now get event_branch from the FullEventId branch earlier
+                parity_filter = np.repeat(event_num, nClasses, axis=-1)
                 if nParity != 1:
                     class_prediction = np.where(
                         parity_filter % nParity != parityIdx,
                         class_prediction,
                         0.0
                     )
-
                 all_predictions[param_idx,:,parityIdx,:] = class_prediction
 
 

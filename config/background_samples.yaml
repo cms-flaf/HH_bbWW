@@ -1,6 +1,12 @@
 ############## WJetsToLNu ##############
 WtoLNu_amcatnloFXFX:
   sampleType: W
+WtoLNu_0J_amcatnloFXFX:
+  sampleType: W
+WtoLNu_1J_amcatnloFXFX:
+  sampleType: W
+WtoLNu_2J_amcatnloFXFX:
+  sampleType: W
 ############## QCD_PT-*_EMEnriched ##############
 
 QCD_PT_10to30_EMEnriched:
@@ -119,6 +125,12 @@ TTtoLNu2Q:
 DYto2L_M_10to50_amcatnloFXFX:
   sampleType: DY
 DYto2L_M_50_amcatnloFXFX:
+  sampleType: DY
+DYto2L_M_50_0J_amcatnloFXFX:
+  sampleType: DY
+DYto2L_M_50_1J_amcatnloFXFX:
+  sampleType: DY
+DYto2L_M_50_2J_amcatnloFXFX:
   sampleType: DY
 
 ############## EWK ##############
