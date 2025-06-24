@@ -5,14 +5,14 @@ GLOBAL:
     - keep TTto2L2Nu
     - keep TTtoLNu2Q
     - keep TTto4Q
-    # #- keep ^TT.*
+    # - keep ^TT.*
 
     - keep ^QCD.*MuEnrichedPt5
     - keep ^QCD.*EMEnriched
-    #- keep ^QCD_PT.*
-    #- keep ^QCD_HT.*
+    # - keep ^QCD_PT.*
+    # - keep ^QCD_HT.*
 
-    # #- keep ^ST.*
+    #- keep ^ST.*
     - keep GluGluHToTauTau_M125.*
     - keep GluGluHToWWTo2L2Nu_M125.*
     - keep VBFHToWWTo2L2Nu_M125.*
@@ -33,11 +33,15 @@ GLOBAL:
     # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_450
     # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_800
 
-    ## - keep ^DY
+    # - keep ^DY
     - keep DYto2L_M_10to50_amcatnloFXFX
     - keep DYto2L_M_50_amcatnloFXFX
 
-    # # - keep WtoLNu_amcatnloFXFX
+    # - keep WtoLNu_amcatnloFXFX
+    - keep WtoLNu_0J_amcatnloFXFX
+    - keep WtoLNu_1J_amcatnloFXFX
+    - keep WtoLNu_2J_amcatnloFXFX
+
     - keep ^TTW
     - keep ^TTZ
     - keep WW

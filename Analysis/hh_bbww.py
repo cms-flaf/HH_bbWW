@@ -112,16 +112,27 @@ def AddQCDInHistDict(var, all_histograms, channels, categories, uncName, all_sam
 
 class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
-    def defineCategories(self):
+    def defineCutFlow(self):
+        self.df = self.df.Define("cutflow", "int(0)")
+        cutflow_cuts = ["event_selection", "OS_Iso", "Zveto || OppFlavor", "mbb_SR"]
+        for i,cut in enumerate(cutflow_cuts):
+            self.df = self.df.Redefine("cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow")
 
+    def defineCategories(self):
         self.df = self.df.Define("nSelBtag_jets", f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})")
-        self.df = self.df.Define("nSelBtag_fatjets", f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})") #fatjet wp to be updated according to pNet
-        self.df = self.df.Define("boosted", f"SelectedFatJet_pt.size() > 0 ")
-        self.df = self.df.Define("resolved", f"!boosted && centralJet_pt.size() >= 2")
-        self.df = self.df.Define("res1b", f"!boosted && resolved && nSelBtag_jets == 1")
-        self.df = self.df.Define("res2b", f"!boosted && resolved && nSelBtag_jets >= 2")
-        self.df = self.df.Define("res1b_Zveto_MbbSR", f"res1b && ( (lep1_legType != lep2_legType ) | ((lep1_legType == lep2_legType) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
-        self.df = self.df.Define("res2b_Zveto_MbbSR", f"res2b && ( (lep1_legType != lep2_legType ) | ((lep1_legType == lep2_legType) && (abs(diLep_mass - 91.1876) > 10)) ) && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
+        self.df = self.df.Define("nSelBtag_fatjets", f"int( SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 )")
+        self.df = self.df.Define("resolved", f"centralJet_pt.size() >= 2")
+        self.df = self.df.Define("res2b", f"resolved && nSelBtag_jets >= 2")
+        self.df = self.df.Define("boosted", f"!res2b && nSelBtag_fatjets > 0 ") # Greater than zero, but logic should only allow 0 or 1
+        self.df = self.df.Define("res1b", f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1")
+        # We are throwing away events with a FatJet that are not b-tagged in this method
+
+
+        self.df = self.df.Define("SR", "( (Zveto || OppFlavor) && mbb_SR )")
+        self.df = self.df.Define("res1b_SR", f"res1b && SR")
+        self.df = self.df.Define("res2b_SR", f"res2b && SR")
+        self.df = self.df.Define("boosted_SR", f"boosted && SR")
+
         self.df = self.df.Define("inclusive", f"centralJet_pt.size() >= 2")
         self.df = self.df.Define("baseline",f"return true;")
 
@@ -174,13 +185,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
     def defineControlRegions(self):
         #Define Single Muon Control Region (W Region) -- Require Muon + High MT (>50)
         #Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
-        self.df = self.df.Define("Zpeak_0b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 0 ")
-        self.df = self.df.Define("Zpeak_1b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 1 ")
-        self.df = self.df.Define("Zpeak_2b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10) && OS_Iso && nSelBtag_jets == 2 ")
-        self.df = self.df.Define("ZVeto_0b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 0 ")
-        self.df = self.df.Define("ZVeto_1b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 1 ")
-        self.df = self.df.Define("ZVeto_2b", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10) && OS_Iso && nSelBtag_jets == 2 ")
-        self.df = self.df.Define("TTbar_CR",f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 ")
+        self.df = self.df.Define("Zpeak", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)")
+        self.df = self.df.Define("Zveto", f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)")
+        self.df = self.df.Define("OppFlavor", f"(lep1_legType != lep2_legType)")
+        self.df = self.df.Define("TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 ")
+        self.df = self.df.Define("mbb_SR", f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150")
         self.df = self.df.Define("Lep1Lep2Jet1Jet2_mass", f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0")
         self.df = self.df.Define("Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0")
 
@@ -285,11 +294,13 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineJetSelections()
     dfForHistograms.defineQCDRegions()
-    dfForHistograms.defineCategories()
     dfForHistograms.defineControlRegions()
+    dfForHistograms.defineCategories()
     #dfForHistograms.defineBoostedVariables()
     #dfForHistograms.defineTriggers()
     #dfForHistograms.redefineWeights()
     #dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.calculateMT()
+    dfForHistograms.defineCutFlow()
     return dfForHistograms
+
