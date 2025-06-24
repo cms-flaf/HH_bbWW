@@ -135,40 +135,145 @@ def addAllVariables(dfw, syst_name, isData, trigger_class, lepton_legs, isSignal
         dfw.DefineAndAppend(f"Selected{ele_obs}" , f"RVecF({ele_obs}[Electron_presel])")
     for ele_obs in Electron_int_observables:
         dfw.DefineAndAppend(f"Selected{ele_obs}" , f"RVecI({ele_obs}[Electron_presel])")
+    # #save information for fatjets
+    # fatjet_obs = []
+    # fatjet_obs.extend(FatJetObservables)
+    # if not isData:
+    #     dfw.Define(f"FatJet_genJet_idx", f" FindMatching(FatJet_p4[FatJet_sel],GenJetAK8_p4,0.3)")
+    #     fatjet_obs.extend(JetObservablesMC)
+    # dfw.DefineAndAppend(f"SelectedFatJet_pt", f"v_ops::pt(FatJet_p4[FatJet_sel])")
+    # dfw.DefineAndAppend(f"SelectedFatJet_eta", f"v_ops::eta(FatJet_p4[FatJet_sel])")
+    # dfw.DefineAndAppend(f"SelectedFatJet_phi", f"v_ops::phi(FatJet_p4[FatJet_sel])")
+    # dfw.DefineAndAppend(f"SelectedFatJet_mass", f"v_ops::mass(FatJet_p4[FatJet_sel])")
+    # for fatjetVar in fatjet_obs:
+    #     if(f"FatJet_{fatjetVar}" not in dfw.df.GetColumnNames()): continue
+    #     dfw.DefineAndAppend(f"SelectedFatJet_{fatjetVar}", f"FatJet_{fatjetVar}[FatJet_sel]")
+    # subjet_obs = []
+    # subjet_obs.extend(SubJetObservables)
+    # if not isData:
+    #     dfw.Define(f"SubJet1_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx1],SubGenJetAK8_p4,0.3)")
+    #     dfw.Define(f"SubJet2_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx2],SubGenJetAK8_p4,0.3)")
+    #     fatjet_obs.extend(SubJetObservablesMC)
+    # for subJetIdx in [1,2]:
+    #     dfw.Define(f"SelectedFatJet_subJetIdx{subJetIdx}", f"FatJet_subJetIdx{subJetIdx}[FatJet_sel]")
+    #     dfw.Define(f"FatJet_SubJet{subJetIdx}_isValid", f" FatJet_subJetIdx{subJetIdx} >=0 && FatJet_subJetIdx{subJetIdx} < nSubJet")
+    #     dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_isValid", f"FatJet_SubJet{subJetIdx}_isValid[FatJet_sel]")
+    #     for subJetVar in subjet_obs:
+    #         dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}", f"""
+    #                             RVecF subjet_var(SelectedFatJet_pt.size(), 0.f);
+    #                             for(size_t fj_idx = 0; fj_idx<SelectedFatJet_pt.size(); fj_idx++) {{
+    #                                 auto sj_idx = SelectedFatJet_subJetIdx{subJetIdx}.at(fj_idx);
+    #                                 if(sj_idx >= 0 && sj_idx < SubJet_{subJetVar}.size()){{
+    #                                     subjet_var[fj_idx] = SubJet_{subJetVar}.at(sj_idx);
+    #                                 }}
+    #                             }}
+    #                             return subjet_var;
+    #                             """)
+            
+
+    # Instead of re-writing everything for sorting, lets just take the already finished Selected branches and append the sorted ones
     #save information for fatjets
     fatjet_obs = []
     fatjet_obs.extend(FatJetObservables)
     if not isData:
-        dfw.Define(f"FatJet_genJet_idx", f" FindMatching(FatJet_p4[FatJet_sel],GenJetAK8_p4,0.3)")
+        dfw.Define(f"tmp_FatJet_genJet_idx", f" FindMatching(FatJet_p4[FatJet_sel],GenJetAK8_p4,0.3)")
         fatjet_obs.extend(JetObservablesMC)
-    dfw.DefineAndAppend(f"SelectedFatJet_pt", f"v_ops::pt(FatJet_p4[FatJet_sel])")
-    dfw.DefineAndAppend(f"SelectedFatJet_eta", f"v_ops::eta(FatJet_p4[FatJet_sel])")
-    dfw.DefineAndAppend(f"SelectedFatJet_phi", f"v_ops::phi(FatJet_p4[FatJet_sel])")
-    dfw.DefineAndAppend(f"SelectedFatJet_mass", f"v_ops::mass(FatJet_p4[FatJet_sel])")
+    dfw.Define(f"tmp_SelectedFatJet_pt", f"v_ops::pt(FatJet_p4[FatJet_sel])")
+    dfw.Define(f"tmp_SelectedFatJet_eta", f"v_ops::eta(FatJet_p4[FatJet_sel])")
+    dfw.Define(f"tmp_SelectedFatJet_phi", f"v_ops::phi(FatJet_p4[FatJet_sel])")
+    dfw.Define(f"tmp_SelectedFatJet_mass", f"v_ops::mass(FatJet_p4[FatJet_sel])")
     for fatjetVar in fatjet_obs:
         if(f"FatJet_{fatjetVar}" not in dfw.df.GetColumnNames()): continue
-        dfw.DefineAndAppend(f"SelectedFatJet_{fatjetVar}", f"FatJet_{fatjetVar}[FatJet_sel]")
+        dfw.Define(f"tmp_SelectedFatJet_{fatjetVar}", f"FatJet_{fatjetVar}[FatJet_sel]")
     subjet_obs = []
     subjet_obs.extend(SubJetObservables)
     if not isData:
-        dfw.Define(f"SubJet1_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx1],SubGenJetAK8_p4,0.3)")
-        dfw.Define(f"SubJet2_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx2],SubGenJetAK8_p4,0.3)")
+        dfw.Define(f"tmp_SubJet1_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx1],SubGenJetAK8_p4,0.3)")
+        dfw.Define(f"tmp_SubJet2_genJet_idx", f" FindMatching(SubJet_p4[FatJet_subJetIdx2],SubGenJetAK8_p4,0.3)")
         fatjet_obs.extend(SubJetObservablesMC)
     for subJetIdx in [1,2]:
-        dfw.Define(f"SelectedFatJet_subJetIdx{subJetIdx}", f"FatJet_subJetIdx{subJetIdx}[FatJet_sel]")
-        dfw.Define(f"FatJet_SubJet{subJetIdx}_isValid", f" FatJet_subJetIdx{subJetIdx} >=0 && FatJet_subJetIdx{subJetIdx} < nSubJet")
-        dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_isValid", f"FatJet_SubJet{subJetIdx}_isValid[FatJet_sel]")
+        dfw.Define(f"tmp_SelectedFatJet_subJetIdx{subJetIdx}", f"FatJet_subJetIdx{subJetIdx}[FatJet_sel]")
+        dfw.Define(f"tmp_FatJet_SubJet{subJetIdx}_isValid", f" FatJet_subJetIdx{subJetIdx} >=0 && FatJet_subJetIdx{subJetIdx} < nSubJet")
+        dfw.Define(f"tmp_SelectedFatJet_SubJet{subJetIdx}_isValid", f"tmp_FatJet_SubJet{subJetIdx}_isValid[FatJet_sel]")
         for subJetVar in subjet_obs:
-            dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}", f"""
-                                RVecF subjet_var(SelectedFatJet_pt.size(), 0.f);
-                                for(size_t fj_idx = 0; fj_idx<SelectedFatJet_pt.size(); fj_idx++) {{
-                                    auto sj_idx = SelectedFatJet_subJetIdx{subJetIdx}.at(fj_idx);
+            dfw.Define(f"tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}", f"""
+                                RVecF subjet_var(tmp_SelectedFatJet_pt.size(), 0.f);
+                                for(size_t fj_idx = 0; fj_idx<tmp_SelectedFatJet_pt.size(); fj_idx++) {{
+                                    auto sj_idx = tmp_SelectedFatJet_subJetIdx{subJetIdx}.at(fj_idx);
                                     if(sj_idx >= 0 && sj_idx < SubJet_{subJetVar}.size()){{
                                         subjet_var[fj_idx] = SubJet_{subJetVar}.at(sj_idx);
                                     }}
                                 }}
                                 return subjet_var;
                                 """)
+            
+
+    dfw.Define("SelectedFatJet_idx", "CreateIndexes(tmp_SelectedFatJet_particleNet_XbbVsQCD.size())")
+    dfw.Define("SelectedFatJet_idxSorted", "ReorderObjects(tmp_SelectedFatJet_particleNet_XbbVsQCD, SelectedFatJet_idx)")
+
+    fatjet_obs = []
+    fatjet_obs.extend(FatJetObservables)
+    if not isData:
+        dfw.Define(f"FatJet_genJet_idx", f" Take(tmp_FatJet_genJet_idx, SelectedFatJet_idxSorted)")    
+    for var in PtEtaPhiM:
+        name = f"SelectedFatJet_{var}"
+        dfw.DefineAndAppend(name, f"Take(tmp_SelectedFatJet_{var}, SelectedFatJet_idxSorted)")
+    for fatjetVar in fatjet_obs:
+        if(f"FatJet_{fatjetVar}" not in dfw.df.GetColumnNames()): continue
+        dfw.DefineAndAppend(f"SelectedFatJet_{fatjetVar}", f"Take(tmp_SelectedFatJet_{fatjetVar}, SelectedFatJet_idxSorted)")
+    subjet_obs = []
+    subjet_obs.extend(SubJetObservables)
+    if not isData:
+        dfw.Define(f"SubJet1_genJet_idx", f" Take(tmp_SubJet1_genJet_idx, SelectedFatJet_idxSorted)")
+        dfw.Define(f"SubJet2_genJet_idx", f" Take(tmp_SubJet2_genJet_idx, SelectedFatJet_idxSorted)")
+        fatjet_obs.extend(SubJetObservablesMC)
+    for subJetIdx in [1,2]:
+        dfw.Define(f"SelectedFatJet_subJetIdx{subJetIdx}", f"Take(tmp_SelectedFatJet_subJetIdx{subJetIdx}, SelectedFatJet_idxSorted)")
+        dfw.Define(f"FatJet_SubJet{subJetIdx}_isValid", f" Take(tmp_FatJet_SubJet{subJetIdx}_isValid, SelectedFatJet_idxSorted)")
+        dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_isValid", f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_isValid, SelectedFatJet_idxSorted)")
+        for subJetVar in subjet_obs:
+            dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}", f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}, SelectedFatJet_idxSorted)")
+
+    #save information for fatjets
+    # fatjet_obs = []
+    # fatjet_obs.extend(FatJetObservables)
+    # dfw.Define("SelectedFatJet_idx", "CreateIndexes(FatJet_particleNet_XbbVsQCD[FatJet_sel].size())")
+    # dfw.Define("SelectedFatJet_idxSorted", "ReorderObjects(FatJet_particleNet_XbbVsQCD[FatJet_sel], SelectedFatJet_idx)")
+    # if not isData:
+    #     dfw.Define(f"FatJet_genJet_idx", f" Take(FindMatching(FatJet_p4[FatJet_sel],GenJetAK8_p4,0.3)), SelectedFatJet_idxSorted)")
+    #     fatjet_obs.extend(JetObservablesMC)
+    # for var in PtEtaPhiM:
+    #     name = f"SelectedFatJet_{var}"
+    #     dfw.DefineAndAppend(name, f"Take((FatJet_{var}[FatJet_sel]), SelectedFatJet_idxSorted)")
+    # for var in fatjet_obs:
+    #     if(f"FatJet_{var}" not in dfw.df.GetColumnNames()): continue
+    #     name = f"SelectedFatJet_{var}"
+    #     dfw.DefineAndAppend(name, f"Take((FatJet_{var}[FatJet_sel]), SelectedFatJet_idxSorted)")
+    # subjet_obs = []
+    # subjet_obs.extend(SubJetObservables)
+    # if not isData:
+    #     dfw.Define(f"SubJet1_genJet_idx", f" Take(FindMatching(SubJet_p4[FatJet_subJetIdx1],SubGenJetAK8_p4,0.3), SelectedFatJet_idxSorted)")
+    #     dfw.Define(f"SubJet2_genJet_idx", f" Take(FindMatching(SubJet_p4[FatJet_subJetIdx2],SubGenJetAK8_p4,0.3), SelectedFatJet_idxSorted)")
+    #     fatjet_obs.extend(SubJetObservablesMC)
+    # for subJetIdx in [1,2]:
+    #     dfw.Define(f"SelectedFatJet_subJetIdx{subJetIdx}", f"Take(FatJet_subJetIdx{subJetIdx}[FatJet_sel], SelectedFatJet_idxSorted)")
+    #     dfw.Define(f"FatJet_SubJet{subJetIdx}_isValid", f" Take(FatJet_subJetIdx{subJetIdx} >=0 && FatJet_subJetIdx{subJetIdx} < nSubJet, SelectedFatJet_idxSorted)")
+    #     dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_isValid", f"Take(FatJet_SubJet{subJetIdx}_isValid[FatJet_sel], SelectedFatJet_idxSorted)")
+    #     for subJetVar in subjet_obs:
+    #         dfw.DefineAndAppend(f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}", f"""Take(
+    #                             RVecF subjet_var(FatJet_pt.size(), 0.f);
+    #                             for(size_t fj_idx = 0; fj_idx<FatJet_pt.size(); fj_idx++) {{
+    #                                 auto sj_idx = FatJet_subJetIdx{subJetIdx}.at(fj_idx);
+    #                                 if(sj_idx >= 0 && sj_idx < SubJet_{subJetVar}.size()){{
+    #                                     subjet_var[fj_idx] = SubJet_{subJetVar}.at(sj_idx);
+    #                                 }}
+    #                             }}
+    #                             return subjet_var;
+    #                             , SelectedFatJet_idxSorted)""")
+
+
+
+
     pf_str = global_params["met_type"]
     dfw.DefineAndAppend(f"met_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())")
     dfw.DefineAndAppend(f"met_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())")
