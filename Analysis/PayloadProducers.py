@@ -14,7 +14,10 @@ class HMEProducer:
         
         dfw.df = GetHMEVariables(dfw.df, self.cfg['channel'])
         for col in self.cfg['columns']:
-            dfw.DefineAndAppend(f"HME_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
+            if col != 'valid':
+                dfw.DefineAndAppend(f"HME_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
+        if 'valid' in self.cfg['columns']:
+            dfw.DefineAndAppend("HME_valid", "return HME_mass > 0.0;")
         return dfw
 
 class DNNProducer:

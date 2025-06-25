@@ -28,6 +28,7 @@ payload_producers:
     channel: "DL"
     columns: 
       - mass
+      - valid
     dependencies:
   DNN:
     producers_module_name: Analysis.PayloadProducers
