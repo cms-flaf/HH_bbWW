@@ -7,8 +7,10 @@ GLOBAL:
     - keep TTtoLNu2Q
     - keep TTto4Q
     
-    - keep ^QCD.*MuEnrichedPt5
-    - keep ^QCD.*EMEnriched
+    # There are so many QCD samples and the MC is just not worth running
+    # Almost zero events pass selections
+    # - keep ^QCD.*MuEnrichedPt5
+    # - keep ^QCD.*EMEnriched
     ## - keep ^QCD
 
     ##- keep ^ST.*
@@ -23,6 +25,8 @@ GLOBAL:
     - keep ST_tW_top_4Q
     - keep ST_tW_top_LNu2Q
 
+    - keep GluGluHToBB_M125
+
     - keep ^GluGlutoRadiontoHHto.*
     - keep ^GluGlutoBulkGravitontoHHto.*
     # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
@@ -30,10 +34,17 @@ GLOBAL:
     # - keep GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_800
 
     - keep DYto2L_M_10to50_amcatnloFXFX
-    - keep DYto2L_M_50_amcatnloFXFX
+    # - keep DYto2L_M_50_amcatnloFXFX
+    - keep DYto2L_M_50_0J_amcatnloFXFX
+    - keep DYto2L_M_50_1J_amcatnloFXFX
+    - keep DYto2L_M_50_2J_amcatnloFXFX
     ## - keep ^DY.*
 
     ##- keep ^WtoLNu_amcatnloFXFX SL
+    - keep WtoLNu_0J_amcatnloFXFX
+    - keep WtoLNu_1J_amcatnloFXFX
+    - keep WtoLNu_2J_amcatnloFXFX
+
     - keep TTWH
     - keep TTWW
     - keep TTZH
