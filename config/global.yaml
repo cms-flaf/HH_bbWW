@@ -21,6 +21,22 @@ tagger_name: "particleNet"
 
 bjet_preselection_branch : "Jet_sel"
 
+payload_producers: 
+  HME:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: HMEProducer 
+    channel: "DL"
+    columns: 
+      - mass
+      - valid
+    dependencies:
+  DNN:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: DNNProducer
+    channel: "DL"
+    dependencies: 
+      - HME
+
 #This is for Analysis Selection
 channelSelection:
   - e
@@ -188,3 +204,4 @@ vars_to_plot:
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
   - PuppiMET_pt
   - PuppiMET_phi
+  - HME_mass

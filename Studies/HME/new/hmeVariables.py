@@ -1,6 +1,10 @@
 import ROOT
-ROOT.gROOT.ProcessLine('#include "include/EstimatorLTWrapper.hpp"')
-ROOT.gROOT.ProcessLine('#include "include/Constants.hpp"')
+import os
+ROOT.gROOT.ProcessLine(f'#include "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/include/Estimator.hpp"')
+ROOT.gROOT.ProcessLine(f'#include "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/include/Constants.hpp"')
+ROOT.gROOT.ProcessLine('TH1::AddDirectory(false)')
+ROOT.gROOT.ProcessLine('TH2::AddDirectory(false)')
+ROOT.gROOT.ProcessLine(f'auto estimator = std::make_unique<HME::Estimator>("{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/pdf_sl.root", "{os.environ["ANALYSIS_PATH"]}/Studies/HME/new/pdf_dl.root");')
 
 
 def GetHMEVariables(df, channel):
@@ -23,10 +27,10 @@ def GetHMEVariables(df, channel):
 
     df = df.Define("met", """HME::LorentzVectorF_t res(PuppiMET_pt, 0.0, PuppiMET_phi, 0.0);    
                           return res;""")
-		
+		  
     df = df.Define("hme_output", f"""if (has_necessary_inputs)
                                     {{
-                                        auto const& hme = HME::EstimatorLTWrapper::Instance().GetEstimator().EstimateMass(jets, leptons, met, event, HME::Channel::{channel});
+                                        auto const& hme = estimator->EstimateMass(jets, leptons, met, event, HME::Channel::{channel});
                                         if (hme.has_value())
                                         {{
                                             return hme.value();
