@@ -1,4 +1,9 @@
 from Studies.HME.new.hmeVariables import GetHMEVariables
+from Analysis.DNN_Application import ApplyDNN
+import Analysis.hh_bbww as analysis
+import ROOT
+import sys
+import os
 
 class HMEProducer:
     def __init__(self, cfg):
@@ -24,6 +29,27 @@ class DNNProducer:
     def __init__(self, cfg):
         self.cfg = cfg
 
+
+
+        sys.path.append(os.environ['ANALYSIS_PATH'])
+        ROOT.gROOT.ProcessLine(".include "+ os.environ['ANALYSIS_PATH'])
+        ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/HistHelper.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisTools.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/pnetSF.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisMath.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/MT2.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
+
     def run(self, dfw):
         print("Running DNN producer")
+        print(self.cfg)
+
+        dfw.df = analysis.defineAllP4(dfw.df)
+        dfw.df = analysis.AddDNNVariables(dfw.df)
+
+        dfw.df = ApplyDNN(dfw.df)
+        for col in self.cfg['columns']:
+            dfw.DefineAndAppend(f"DNN_{col}", f"return {col};")
+            dfw.df.Display(f'DNN_{col}').AsString() # I need this so the rdf doesn't segfault in final saving for some reason
         return dfw

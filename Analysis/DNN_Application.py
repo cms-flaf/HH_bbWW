@@ -6,7 +6,7 @@ import enum
 from typing import Any, Dict
 import ROOT
 import pandas as pd
-ROOT.ROOT.EnableImplicitMT()
+# ROOT.ROOT.EnableImplicitMT()
 import numpy as np
 import awkward as ak
 import tensorflow as tf
@@ -345,3 +345,176 @@ if __name__ == "__main__":
         print(f"Processed and saved NN scores for all trees into {output_file_name}.")
 
 
+
+
+
+
+
+def ApplyDNN(df):
+    import yaml
+    import os   
+    import sys
+    import Analysis.hh_bbww as analysis
+    import numpy as np
+    import uproot
+    import ROOT
+    snapshotOptions = ROOT.RDF.RSnapshotOptions()
+
+    dnnConfig = {}
+    dnnFolder = os.path.join("config", "DNN", "v24")
+    with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
+        dnnConfig = yaml.safe_load(file)  
+    modelname_parity = dnnConfig['modelname_parity']
+
+    models = [[os.path.join(dnnFolder, x),y] for x,y in modelname_parity]
+
+    #Features to use for DNN application (single vals)
+    features = dnnConfig['features']
+    #Features to use for DNN application (vectors and index)
+    list_features = dnnConfig['listfeatures']
+    #Features to use for DNN application (high level names to create)
+    highlevel_features = dnnConfig['highlevelfeatures']
+
+    nClasses = dnnConfig['nClasses'] if 'nClasses' in dnnConfig.keys() else 3
+    nParity = dnnConfig['nParity'] if 'nParity' in dnnConfig.keys() else 4
+
+
+    use_parametric = dnnConfig['use_parametric']
+    param_mass_list = [250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
+    
+    class_names_list = dnnConfig['class_names'] if 'class_names' in dnnConfig.keys() else ['Signal', 'TT', 'DY']
+
+    if not use_parametric:
+        param_mass_list = [0]
+
+    #Features to load from df to awkward
+    load_features = set()
+    load_features.update(features)
+    for feature in list_features:
+        load_features.update([feature[0]])
+    load_features.update(highlevel_features)
+
+    features_to_drop = load_features.copy() #We don't need to save these in the final file
+
+    load_features.update(["FullEventId"])
+
+    vars_to_save = Utilities.ListToVector(load_features)
+    tree_name = "Events"
+    df.Snapshot(tree_name, "test.root", vars_to_save, snapshotOptions)
+    # We want to change this to using ak.from_rdataframe and later do ak.to_rdataframe, but it is broken!
+    # Example test:
+    # rdf = ROOT.RDataFrame('Events', 'tmp_data.root')
+    # arrays = ak.from_rdataframe(rdf, 'lep1_pt')
+    # This works ^^
+    # ak.__version__ -> 2.6.7
+    # But inside law task it doesn't work
+    # ak.__version__ -> 2.6.3 # Why would law give a different version?
+    # And from_rdataframe returns error
+    # Traceback (most recent call last):
+    #   File "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/FLAF/Analysis/AnalysisCacheProducer.py", line 174, in <module>
+    #     all_files = createAnalysisCache(args.inFileName, args.outFileName.split('.')[0], unc_cfg_dict, global_cfg_dict, snapshotOptions, args.compute_unc_variations, args.deepTauVersion, args.producer)
+    #   File "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/FLAF/Analysis/AnalysisCacheProducer.py", line 77, in createAnalysisCache
+    #     dfw = producer.run(dfw)
+    #   File "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/Analysis/PayloadProducers.py", line 43, in run
+    #     arrays = from_rdataframe(rdf, 'lep1_pt')
+    #   File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/py3-awkward/2.6.3-648f0ac460565a99944b346d55f9e90d/lib/python3.9/site-packages/awkward/_dispatch.py", line 70, in dispatch
+    #     return gen_or_result
+    #   File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/py3-awkward/2.6.3-648f0ac460565a99944b346d55f9e90d/lib/python3.9/site-packages/awkward/_errors.py", line 85, in __exit__
+    #     self.handle_exception(exception_type, exception_value)
+    #   File "/cvmfs/cms.cern.ch/el9_amd64_gcc12/external/py3-awkward/2.6.3-648f0ac460565a99944b346d55f9e90d/lib/python3.9/site-packages/awkward/_errors.py", line 95, in handle_exception
+    #     raise self.decorate_exception(cls, exception)
+    # OSError: no such directory: /cvmfs/cms.cern.ch/el9_amd64_gcc12/external/py3-awkward/2.6.3-648f0ac460565a99944b346d55f9e90d/lib/python3.9/site-packages/awkward/_connect/header-only
+
+    # This error occurred while calling
+
+    #     ak.from_rdataframe(
+    #         RDataFrame-instance
+    #         'lep1_pt'
+    #     )
+
+    # Now open it with uproot!
+    events = uproot.open("test.root")
+    branches = events[tree_name].arrays(load_features)
+    event_branch = branches.FullEventId & 0xFFFFFFFF
+
+
+
+    all_predictions = np.zeros((len(param_mass_list), len(branches.FullEventId), nParity, nClasses))
+
+    for parityIdx, [model, parityfunc] in enumerate(models):
+        #We want to only apply the 3 models that are NOT trained on this parity
+        ones = np.ones_like(all_predictions)
+        zeros = np.zeros_like(all_predictions)
+
+        sess = ort.InferenceSession(f"{model}.onnx")
+
+        #Get single value array
+        array = np.array([getattr(branches, feature_name) for feature_name in features]).transpose()
+
+        #Get vector value array
+        default_value = 0.0
+        if list_features != None:
+            array_listfeatures = np.array([ak.fill_none(ak.pad_none(getattr(branches, feature_name), index+1), default_value)[:,index] for [feature_name,index] in list_features]).transpose()
+            #Need to append the value features and the listfeatures together
+            array = np.append(array, array_listfeatures, axis=1)
+
+        #Need to append the high level features and the other features together
+        if highlevel_features != None: 
+            array_highlevelfeatures = np.array([getattr(branches, feature_name) for feature_name in highlevel_features]).transpose()
+            array = np.append(array, array_highlevelfeatures, axis=1)
+
+
+        #Add parametric mass point to the array
+        for param_idx, param_mass in enumerate(param_mass_list):
+            param_array = np.array([[param_mass for x in array]]).transpose()
+            if use_parametric:
+                final_array = np.append(array, param_array, axis=1)
+            else:
+                final_array = array
+
+            # prediction = model.predict(final_array)
+            prediction = sess.run(None, {'x': final_array}) # Take only first entry, prediction is [ [Sig, TT, DY], [mBB_SR] ]
+
+            class_prediction = prediction[0]
+            adv_prediction = prediction[1]
+
+            # Now we need to set the trained parity to 0
+            # But if there is only one model, then skip parity
+            event_num = np.expand_dims(event_branch, axis=-1) # We now get event_branch from the FullEventId branch earlier
+            parity_filter = np.repeat(event_num, nClasses, axis=-1)
+            if nParity != 1:
+                class_prediction = np.where(
+                    parity_filter % nParity != parityIdx,
+                    class_prediction,
+                    0.0
+                )
+            all_predictions[param_idx,:,parityIdx,:] = class_prediction
+
+
+    all_predictions = np.sum(all_predictions, axis=2) # Need to take average of the existing parity branches
+    if nParity != 1: all_predictions = all_predictions/(nParity-1) # So we want to divide by nParity-1 (4 parity -> train with 1, apply with remaining 3)
+
+
+    # Last save the branches
+    for param_idx, param_mass in enumerate(param_mass_list):
+        this_param_prediction = all_predictions[param_idx,:,:] # Now we want to get the individual param masses predictions for filling
+
+        for class_idx, class_name in enumerate(class_names_list):
+            branches[f'M{param_mass}_{class_name}'] = this_param_prediction.transpose()[class_idx]
+
+
+    #But we want to drop the features from this outfile
+    # print("Dropping ", features_to_drop)
+    for feature in features_to_drop:
+        del branches[feature]
+
+
+    outFileName = 'tmp.root'
+    with uproot.recreate(outFileName) as outfile:
+        outfile[tree_name] = branches
+        outfile.close()
+
+    new_df = ROOT.RDataFrame(tree_name, outFileName)
+    
+
+    return new_df
