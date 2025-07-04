@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
 
 
-def ApplyDNN(df, counter=0):
+def ApplyDNN(df, cfg, counter=0):
     import yaml
     import os   
     import sys
@@ -361,7 +361,8 @@ def ApplyDNN(df, counter=0):
     snapshotOptions = ROOT.RDF.RSnapshotOptions()
 
     dnnConfig = {}
-    dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", "v24")
+    # dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", "v24")
+    dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", cfg['version'])
     with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
         dnnConfig = yaml.safe_load(file)  
     modelname_parity = dnnConfig['modelname_parity']
@@ -500,7 +501,7 @@ def ApplyDNN(df, counter=0):
         this_param_prediction = all_predictions[param_idx,:,:] # Now we want to get the individual param masses predictions for filling
 
         for class_idx, class_name in enumerate(class_names_list):
-            branches[f'M{param_mass}_{class_name}'] = this_param_prediction.transpose()[class_idx]
+            branches[f'M{param_mass}_{class_name}'] = this_param_prediction.transpose()[class_idx].astype(np.float32)
 
 
     #But we want to drop the features from this outfile
