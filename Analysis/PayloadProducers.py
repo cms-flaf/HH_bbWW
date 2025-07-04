@@ -51,7 +51,7 @@ class DNNProducer:
         dfw.df = analysis.defineAllP4(dfw.df)
         dfw.df = analysis.AddDNNVariables(dfw.df)
 
-        dfw.df = ApplyDNN(dfw.df, self.counter)
+        dfw.df = ApplyDNN(dfw.df, self.cfg, self.counter)
         for col in self.cfg['columns']:
             dfw.DefineAndAppend(f"DNN_{col}", f"return {col};")
             dfw.df.Display(f'DNN_{col}').AsString() # I need this so the rdf doesn't segfault in final saving for some reason
