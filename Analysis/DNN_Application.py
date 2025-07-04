@@ -350,7 +350,7 @@ if __name__ == "__main__":
 
 
 
-def ApplyDNN(df):
+def ApplyDNN(df, counter=0):
     import yaml
     import os   
     import sys
@@ -361,7 +361,7 @@ def ApplyDNN(df):
     snapshotOptions = ROOT.RDF.RSnapshotOptions()
 
     dnnConfig = {}
-    dnnFolder = os.path.join("config", "DNN", "v24")
+    dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", "v24")
     with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
         dnnConfig = yaml.safe_load(file)  
     modelname_parity = dnnConfig['modelname_parity']
@@ -400,7 +400,7 @@ def ApplyDNN(df):
 
     vars_to_save = Utilities.ListToVector(load_features)
     tree_name = "Events"
-    df.Snapshot(tree_name, "test.root", vars_to_save, snapshotOptions)
+    df.Snapshot(tree_name, f"test{counter}.root", vars_to_save, snapshotOptions)
     # We want to change this to using ak.from_rdataframe and later do ak.to_rdataframe, but it is broken!
     # Example test:
     # rdf = ROOT.RDataFrame('Events', 'tmp_data.root')
@@ -433,7 +433,7 @@ def ApplyDNN(df):
     #     )
 
     # Now open it with uproot!
-    events = uproot.open("test.root")
+    events = uproot.open(f"test{counter}.root")
     branches = events[tree_name].arrays(load_features)
     event_branch = branches.FullEventId & 0xFFFFFFFF
 
@@ -509,7 +509,7 @@ def ApplyDNN(df):
         del branches[feature]
 
 
-    outFileName = 'tmp.root'
+    outFileName = f'tmp{counter}.root'
     with uproot.recreate(outFileName) as outfile:
         outfile[tree_name] = branches
         outfile.close()
