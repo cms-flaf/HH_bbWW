@@ -22,7 +22,15 @@ tagger_name: "particleNet"
 bjet_preselection_branch : "Jet_sel"
 
 payload_producers: 
-  HME:
+  SingleLepHME:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: HMEProducer 
+    channel: "SL"
+    columns: 
+      - mass
+      - valid
+    dependencies:
+  DoubleLepHME:
     producers_module_name: Analysis.PayloadProducers
     producer_name: HMEProducer 
     channel: "DL"
