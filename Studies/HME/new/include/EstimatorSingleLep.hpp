@@ -15,8 +15,13 @@ namespace HME
         explicit EstimatorSingleLep(TString const& pdf_file_name);
         ~EstimatorSingleLep() override = default;
 
-        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label) override;
-        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id) override;
+        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label) override;
+        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, 
+                                             VecLVF_t const& leptons, 
+                                             LorentzVectorF_t const& met, 
+                                             std::vector<Float_t> const& btags,
+                                             std::vector<Float_t> const& light_tags, 
+                                             ULong64_t evt_id) override;
     };
 
     
@@ -32,7 +37,7 @@ namespace HME
     }
 
 
-    ArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label)
+    ArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label)
     {
         ArrF_t<ESTIM_OUT_SZ> res{};
         std::fill(res.begin(), res.end(), -1.0f);
@@ -143,7 +148,7 @@ namespace HME
             Float_t weight = 1.0/num_sol;
             for (auto mass: masses)
             {
-                m_res_mass->Fill(mass, weight);
+                m_res_mass->Fill(mass, weight*proba);
             }
         }
 
@@ -161,7 +166,12 @@ namespace HME
         return res;
     }
 
-    OptArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id)
+    OptArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateMass(VecLVF_t const& jets, 
+                                                             VecLVF_t const& leptons, 
+                                                             LorentzVectorF_t const& met, 
+                                                             std::vector<Float_t> const& btags,
+                                                             std::vector<Float_t> const& light_tags, 
+                                                             ULong64_t evt_id)
     {
         VecLVF_t particles(static_cast<size_t>(ObjSL::count));
         particles[static_cast<size_t>(ObjSL::lep)] = leptons[static_cast<size_t>(Lep::lep1)];
@@ -216,8 +226,9 @@ namespace HME
                             particles[static_cast<size_t>(ObjSL::lj2)] = jets[lj1_idx];
                         }
                         
+                        Float_t proba = btags[bj1_idx]*btags[bj2_idx]*light_tags[lj1_idx]*light_tags[lj2_idx];
                         TString comb_label = Form("b%zub%zuq%zuq%zu", bj1_idx, bj2_idx, lj1_idx, lj2_idx);
-                        ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, comb_label);
+                        ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, proba, comb_label);
                         if (comb_result[static_cast<size_t>(EstimOut::mass)] > 0.0)
                         {
                             results.push_back(comb_result);

@@ -28,9 +28,22 @@ def GetHMEVariables(df, channel):
     df = df.Define("met", """HME::LorentzVectorF_t res(PuppiMET_pt, 0.0, PuppiMET_phi, 0.0);    
                           return res;""")
 		  
+    df = df.Define("btags", """std::vector<Float_t> res;
+                           for (size_t i = 0; i < ncentralJet; ++i)
+                           {{
+                                res.emplace_back(centralJet_btagPNetB[i]);  
+                            }}
+                            return res;""")
+    df = df.Define("light_tags", """std::vector<Float_t> res;
+                           for (size_t i = 0; i < ncentralJet; ++i)
+                           {{
+                                res.emplace_back(centralJet_btagPNetQvG[i]);  
+                            }}
+                            return res;""")
+        
     df = df.Define("hme_output", f"""if (has_necessary_inputs)
                                     {{
-                                        auto const& hme = estimator->EstimateMass(jets, leptons, met, event, HME::Channel::{channel});
+                                        auto const& hme = estimator->EstimateMass(jets, leptons, met, btags, light_tags, event, HME::Channel::{channel});
                                         if (hme.has_value())
                                         {{
                                             return hme.value();
