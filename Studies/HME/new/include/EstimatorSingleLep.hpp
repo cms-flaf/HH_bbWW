@@ -235,9 +235,6 @@ namespace HME
                             integrals.push_back(comb_result[static_cast<size_t>(EstimOut::integral)]);
                         }
 
-                        // reset m_res_mass and use "clean" hist to build distribution for each combination
-                        // else keep filling histogram and only reset it when moving to another event
-                        ResetHist(m_res_mass);
                         used.erase(lj2_idx);
                     }
                     used.erase(lj1_idx);
@@ -249,10 +246,14 @@ namespace HME
 
         if (!results.empty())
         {
-            auto it = std::max_element(integrals.begin(), integrals.end());
-            size_t choice = it - integrals.begin();           
+            ArrF_t<ESTIM_OUT_SZ> res{};
+            int binmax = m_res_mass->GetMaximumBin(); 
+            res[static_cast<size_t>(EstimOut::mass)] = m_res_mass->GetXaxis()->GetBinCenter(binmax);
+            res[static_cast<size_t>(EstimOut::peak_value)] = m_res_mass->GetBinContent(binmax);
+            res[static_cast<size_t>(EstimOut::width)] = ComputeWidth(m_res_mass, Q16, Q84);
+            res[static_cast<size_t>(EstimOut::integral)] = m_res_mass->Integral();
             ResetHist(m_res_mass);
-            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(results[choice]);
+            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(res);
         }
         ResetHist(m_res_mass);
         return std::nullopt;

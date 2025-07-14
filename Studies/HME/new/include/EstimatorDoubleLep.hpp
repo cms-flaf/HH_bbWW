@@ -210,16 +210,20 @@ namespace HME
                 {
                     estimations.push_back(comb_result);
                 }
-
-                // clear the histogram to be reused 
-                ResetHist(m_res_mass);
             }
         }
 
         // success: at least one combination produced an estimate of X->HH mass
         if (!estimations.empty())
         {
-            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(estimations[0]);
+            ArrF_t<ESTIM_OUT_SZ> res{};
+            int binmax = m_res_mass->GetMaximumBin(); 
+            res[static_cast<size_t>(EstimOut::mass)] = m_res_mass->GetXaxis()->GetBinCenter(binmax);
+            res[static_cast<size_t>(EstimOut::peak_value)] = m_res_mass->GetBinContent(binmax);
+            res[static_cast<size_t>(EstimOut::width)] = ComputeWidth(m_res_mass, Q16, Q84);
+            res[static_cast<size_t>(EstimOut::integral)] = m_res_mass->Integral();
+            ResetHist(m_res_mass);
+            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(res);
         }
         return std::nullopt;
     }
