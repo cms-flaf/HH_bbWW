@@ -21,6 +21,9 @@ tagger_name: "particleNet"
 
 bjet_preselection_branch : "Jet_sel"
 
+nPbPerFile: 10_000 # 10fb-1 per split data file
+nEventsPerFile: 100_000 # 100k events per MC file
+
 payload_producers: 
   HME:
     producers_module_name: Analysis.PayloadProducers
@@ -34,7 +37,7 @@ payload_producers:
     producers_module_name: Analysis.PayloadProducers
     producer_name: DNNProducer
     channel: "DL"
-    vrsion: "v24"
+    version: "v24"
     columns:
       - M0_Signal
     dependencies: 
@@ -43,7 +46,7 @@ payload_producers:
   #   producers_module_name: Analysis.PayloadProducers
   #   producer_name: DNNProducer
   #   channel: "DL"
-  #   vrsion: "v35"
+  #   version: "v35"
   #   columns:
   #     - M250_Signal
   #     - M260_Signal
