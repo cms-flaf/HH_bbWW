@@ -48,7 +48,7 @@ namespace HME
     inline constexpr Float_t HIGGS_WIDTH = 0.004;
     inline constexpr Float_t TOL = 10e-7;
     inline constexpr int N_ATTEMPTS = 1;
-    inline constexpr int N_ITER = 1000;
+    inline constexpr int N_ITER = 10000;
     inline constexpr int CONTROL = 4;
 
     inline constexpr Float_t MAX_MASS = 4000.0;
@@ -61,7 +61,8 @@ namespace HME
     inline constexpr unsigned Q16 = 16;
     inline constexpr unsigned Q84 = 84;
 
-    inline constexpr size_t NUM_BEST_BTAG = 2;
+    inline constexpr size_t NUM_BEST_BTAG = 3;
+    inline constexpr size_t NUM_BEST_QVG = 3;
 
     inline static const std::unordered_map<PDF1_sl, TString> pdf1d_sl_names = { { PDF1_sl::numet_pt, "pdf_numet_pt" },
                                                                                 { PDF1_sl::numet_dphi, "pdf_numet_dphi" },
