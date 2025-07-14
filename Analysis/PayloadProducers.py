@@ -45,6 +45,7 @@ class DNNProducer:
     def run(self, dfw):
         print("Running DNN producer")
         print(self.cfg)
+        print(os.environ["ANALYSIS_PATH"])
         print(self.counter)
         self.counter += 1
 

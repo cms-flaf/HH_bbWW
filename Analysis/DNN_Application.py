@@ -362,7 +362,7 @@ def ApplyDNN(df, cfg, counter=0):
 
     dnnConfig = {}
     # dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", "v24")
-    dnnFolder = os.path.join("/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW/", "config", "DNN", cfg['version'])
+    dnnFolder = os.path.join(os.environ["ANALYSIS_PATH"], "config", "DNN", cfg['version'])
     with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
         dnnConfig = yaml.safe_load(file)  
     modelname_parity = dnnConfig['modelname_parity']
