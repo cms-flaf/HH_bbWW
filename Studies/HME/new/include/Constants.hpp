@@ -48,7 +48,7 @@ namespace HME
     inline constexpr Float_t HIGGS_WIDTH = 0.004;
     inline constexpr Float_t TOL = 10e-7;
     inline constexpr int N_ATTEMPTS = 1;
-    inline constexpr int N_ITER = 10000;
+    inline constexpr int N_ITER = 1000;
     inline constexpr int CONTROL = 4;
 
     inline constexpr Float_t MAX_MASS = 4000.0;
