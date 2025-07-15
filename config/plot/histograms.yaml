@@ -2501,7 +2501,14 @@ PuppiMET_phi:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-HME_mass:
+SingleLepHME_mass:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLepHME_mass:
   x_bins: "100|-10:2500"
   y_title: "Events"
   use_log_y: False
