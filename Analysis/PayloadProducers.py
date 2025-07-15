@@ -1,8 +1,9 @@
 from Studies.HME.new.hmeVariables import GetHMEVariables
 
 class HMEProducer:
-    def __init__(self, cfg):
+    def __init__(self, cfg, payload_name):
         self.cfg = cfg
+        self.payload_name = payload_name
 
     def run(self, dfw):
         if "ncentralJet" not in dfw.df.GetColumnNames():
@@ -19,9 +20,9 @@ class HMEProducer:
         dfw.df = GetHMEVariables(dfw.df, ch)
         for col in self.cfg['columns']:
             if col != 'valid':
-                dfw.DefineAndAppend(f"HME_{ch}_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
+                dfw.DefineAndAppend(f"{self.payload_name}_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
         if 'valid' in self.cfg['columns']:
-            dfw.DefineAndAppend(f"HME_{ch}_valid", f"return HME_{ch}_mass > 0.0;")
+            dfw.DefineAndAppend(f"{self.payload_name}_valid", f"return {self.payload_name}_mass > 0.0;")
         return dfw
 
 class DNNProducer:
