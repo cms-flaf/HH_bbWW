@@ -21,7 +21,7 @@ tagger_name: "particleNet"
 
 bjet_preselection_branch : "Jet_sel"
 
-nPbPerFile: 10_000 # 10fb-1 per split data file
+nPbPerFile: 5_000 # 5fb-1 per split data file
 nEventsPerFile: 100_000 # 100k events per MC file
 
 payload_producers: 
@@ -33,45 +33,47 @@ payload_producers:
       - mass
       - valid
     dependencies:
-  DNN:
-    producers_module_name: Analysis.PayloadProducers
-    producer_name: DNNProducer
-    channel: "DL"
-    version: "v24"
-    columns:
-      - M0_Signal
-    dependencies: 
-      - HME
+    n_cpus: 4
+    max_runtime: 30.0
   # DNN:
   #   producers_module_name: Analysis.PayloadProducers
   #   producer_name: DNNProducer
   #   channel: "DL"
-  #   version: "v35"
+  #   version: "v24"
   #   columns:
-  #     - M250_Signal
-  #     - M260_Signal
-  #     - M270_Signal
-  #     - M280_Signal
-  #     - M300_Signal
-  #     - M350_Signal
-  #     - M450_Signal
-  #     - M550_Signal
-  #     - M600_Signal
-  #     - M650_Signal
-  #     - M700_Signal
-  #     - M800_Signal
-  #     - M1000_Signal
-  #     - M1200_Signal
-  #     - M1400_Signal
-  #     - M1600_Signal
-  #     - M1800_Signal
-  #     - M2000_Signal
-  #     - M2500_Signal
-  #     - M3000_Signal
-  #     - M4000_Signal
-  #     - M5000_Signal
+  #     - M0_Signal
   #   dependencies: 
   #     - HME
+  DNN:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: DNNProducer
+    channel: "DL"
+    version: "v35"
+    columns:
+      - M250_Signal
+      - M260_Signal
+      - M270_Signal
+      - M280_Signal
+      - M300_Signal
+      - M350_Signal
+      - M450_Signal
+      - M550_Signal
+      - M600_Signal
+      - M650_Signal
+      - M700_Signal
+      - M800_Signal
+      - M1000_Signal
+      - M1200_Signal
+      - M1400_Signal
+      - M1600_Signal
+      - M1800_Signal
+      - M2000_Signal
+      - M2500_Signal
+      - M3000_Signal
+      - M4000_Signal
+      - M5000_Signal
+    dependencies: 
+      - HME
 
 #This is for Analysis Selection
 channelSelection:
