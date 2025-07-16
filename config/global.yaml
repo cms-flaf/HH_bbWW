@@ -35,6 +35,7 @@ payload_producers:
     dependencies:
     n_cpus: 4
     max_runtime: 30.0
+    cmssw_env: True
   # DNN:
   #   producers_module_name: Analysis.PayloadProducers
   #   producer_name: DNNProducer
