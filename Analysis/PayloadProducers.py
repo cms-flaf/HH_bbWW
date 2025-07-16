@@ -6,8 +6,9 @@ import sys
 import os
 
 class HMEProducer:
-    def __init__(self, cfg):
+    def __init__(self, cfg, payload_name):
         self.cfg = cfg
+        self.payload_name = payload_name
 
     def run(self, dfw):
         if "ncentralJet" not in dfw.df.GetColumnNames():
@@ -20,14 +21,16 @@ class HMEProducer:
         dfw.df = GetHMEVariables(dfw.df, self.cfg['channel'])
         for col in self.cfg['columns']:
             if col != 'valid':
-                dfw.DefineAndAppend(f"HME_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
+                dfw.DefineAndAppend(f"{self.payload_name}_{col}", f"return hme_output[static_cast<size_t>(HME::EstimOut::{col})];")
         if 'valid' in self.cfg['columns']:
-            dfw.DefineAndAppend("HME_valid", "return HME_mass > 0.0;")
+            dfw.DefineAndAppend(f"{self.payload_name}_valid", "return HME_mass > 0.0;")
         return dfw
 
 class DNNProducer:
-    def __init__(self, cfg):
+    def __init__(self, cfg, payload_name):
         self.cfg = cfg
+        self.payload_name = payload_name
+
         sys.path.append(os.environ['ANALYSIS_PATH'])
         ROOT.gROOT.ProcessLine(".include "+ os.environ['ANALYSIS_PATH'])
         ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
@@ -46,5 +49,5 @@ class DNNProducer:
 
         dfw.df = ApplyDNN(dfw.df, self.cfg)
         for col in self.cfg['columns']:
-            dfw.DefineAndAppend(f"DNN_{col}", f"return {col};")
+            dfw.DefineAndAppend(f"{self.payload_name}_{col}", f"return {col};")
         return dfw
