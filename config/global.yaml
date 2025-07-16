@@ -36,16 +36,18 @@ payload_producers:
     n_cpus: 4
     max_runtime: 30.0
     cmssw_env: True
-  # DNN:
-  #   producers_module_name: Analysis.PayloadProducers
-  #   producer_name: DNNProducer
-  #   channel: "DL"
-  #   version: "v24"
-  #   columns:
-  #     - M0_Signal
-  #   dependencies: 
-  #     - HME
   DNN:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: DNNProducer
+    channel: "DL"
+    version: "v24"
+    columns:
+      - M0_Signal
+    dependencies: 
+      - HME
+    n_cpus: 4
+    max_runtime: 2.0
+  DNNParametric:
     producers_module_name: Analysis.PayloadProducers
     producer_name: DNNProducer
     channel: "DL"
@@ -75,6 +77,8 @@ payload_producers:
       - M5000_Signal
     dependencies: 
       - HME
+    n_cpus: 4
+    max_runtime: 8.0
 
 #This is for Analysis Selection
 channelSelection:
