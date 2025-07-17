@@ -28,6 +28,7 @@ class HMEProducer:
 
 class DNNProducer:
     def __init__(self, cfg, payload_name):
+        import yaml
         self.cfg = cfg
         self.payload_name = payload_name
 
@@ -40,12 +41,53 @@ class DNNProducer:
         ROOT.gROOT.ProcessLine(f'#include "FLAF/include/MT2.h"')
         ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
 
-    def run(self, dfw):
+        dnnConfig = {}
+        dnnFolder = os.path.join(os.environ["ANALYSIS_PATH"], "config", "DNN", self.cfg['version'])
+        with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
+            dnnConfig = yaml.safe_load(file)
+
+        #Features to use for DNN application (single vals)
+        features = dnnConfig['features']
+        #Features to use for DNN application (vectors and index)
+        list_features = dnnConfig['listfeatures']
+        #Features to use for DNN application (high level names to create)
+        highlevel_features = dnnConfig['highlevelfeatures']
+
+        #Features to load from df to awkward
+        load_features = set()
+        load_features.update(features)
+        for feature in list_features:
+            load_features.update([feature[0]])
+        load_features.update(highlevel_features)
+
+        load_features.update(["FullEventId"])
+
+        self.vars_to_save = load_features
+
+    def prepare_dfw(self, dfw):
+        print("Running DNN preparer")
+
+        dfw.df = analysis.defineAllP4(dfw.df)
+        dfw.df = analysis.AddDNNVariables(dfw.df)
+
+        return dfw
+
+
+    def run(self, array):
+        print("Running DNN producer")
+
+        array = ApplyDNN(array, self.cfg)
+
+        return array
+
+    # Not using the dfw version anymore, but lets save it for now
+    def run_old(self, dfw):
         print("Running DNN producer")
         print(self.cfg)
 
         dfw.df = analysis.defineAllP4(dfw.df)
         dfw.df = analysis.AddDNNVariables(dfw.df)
+
 
         dfw.df = ApplyDNN(dfw.df, self.cfg)
         for col in self.cfg['columns']:
