@@ -7,6 +7,10 @@ import awkward as ak
 import onnxruntime as ort
 import psutil
 import yaml
+import os
+import ROOT
+import FLAF.Common.Utilities as Utilities
+
 
 
 def ApplyDNN(df, cfg):
@@ -47,6 +51,17 @@ def ApplyDNN(df, cfg):
     features_to_drop = load_features.copy() #We don't need to save these in the final file
 
     load_features.update(["FullEventId"])
+
+    # Sometimes (often) the ak.from_rdataframe() line will crash with MemoryError on the first uncertainty tree
+    # It ALWAYS passes the central call, but will often (90%) crash on the very first uncertainty (JER_UP)
+    # It doesn't seem to be python memory (psutil prints show only 2gb of ram usage), but instead ROOT/C++ memory
+    # df.Display(var).AsString() works, so it isn't corrupted, just MemoryErrors
+    # Saving a local file tmp.root seems to help the problem
+    snapshotOptions = ROOT.RDF.RSnapshotOptions()
+    snapshotOptions.fOverwriteIfExists=True
+    snapshotOptions.fMode="RECREATE"
+    varToSave = Utilities.ListToVector(list(load_features))
+    df.Snapshot(f"tmp", f'tmp.root', varToSave, snapshotOptions)
 
     branches = ak.from_rdataframe(df, load_features)
 
