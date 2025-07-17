@@ -47,6 +47,7 @@ payload_producers:
       - HME
     n_cpus: 4
     max_runtime: 2.0
+    awkward_based: True
   DNNParametric:
     producers_module_name: Analysis.PayloadProducers
     producer_name: DNNProducer
@@ -79,6 +80,7 @@ payload_producers:
       - HME
     n_cpus: 4
     max_runtime: 8.0
+    awkward_based: True
 
 #This is for Analysis Selection
 channelSelection:
