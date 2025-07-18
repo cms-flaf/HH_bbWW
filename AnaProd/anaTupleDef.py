@@ -16,7 +16,7 @@ Electron_float_observables = ["Electron_pfRelIso03_all","Electron_miniPFRelIso_a
 Electron_observables = Electron_int_observables + Electron_float_observables
 JetObservables = ["PNetRegPtRawCorr", "PNetRegPtRawCorrNeutrino", "PNetRegPtRawRes", "rawFactor",
                   "btagDeepFlavB", "btagDeepFlavCvB", "btagDeepFlavCvL", "btagDeepFlavQG",
-                  "btagPNetB", "btagPNetCvB", "btagPNetCvL", "btagPNetCvNotB", "btagPNetQvG", "ptRes", "idbtagPNetB"] # 2024
+                  "btagPNetB", "btagPNetCvB", "btagPNetCvL", "btagPNetCvNotB", "btagPNetQvG", "ptRes", "idbtagPNetB", "area"] # 2024
 
 JetObservablesMC = ["hadronFlavour", "partonFlavour"]
 

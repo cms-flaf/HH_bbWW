@@ -15,8 +15,13 @@ namespace HME
         explicit EstimatorSingleLep(TString const& pdf_file_name);
         ~EstimatorSingleLep() override = default;
 
-        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label) override;
-        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id) override;
+        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label) override;
+        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, 
+                                             VecLVF_t const& leptons, 
+                                             LorentzVectorF_t const& met, 
+                                             std::vector<Float_t> const& btags,
+                                             std::vector<Float_t> const& light_tags, 
+                                             ULong64_t evt_id) override;
     };
 
     
@@ -32,7 +37,7 @@ namespace HME
     }
 
 
-    ArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label)
+    ArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label)
     {
         ArrF_t<ESTIM_OUT_SZ> res{};
         std::fill(res.begin(), res.end(), -1.0f);
@@ -143,7 +148,7 @@ namespace HME
             Float_t weight = 1.0/num_sol;
             for (auto mass: masses)
             {
-                m_res_mass->Fill(mass, weight);
+                m_res_mass->Fill(mass, weight*proba);
             }
         }
 
@@ -161,87 +166,115 @@ namespace HME
         return res;
     }
 
-    OptArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id)
+    OptArrF_t<ESTIM_OUT_SZ> EstimatorSingleLep::EstimateMass(VecLVF_t const& jets, 
+                                                             VecLVF_t const& leptons, 
+                                                             LorentzVectorF_t const& met, 
+                                                             std::vector<Float_t> const& btags,
+                                                             std::vector<Float_t> const& light_tags, 
+                                                             ULong64_t evt_id)
     {
-        VecLVF_t particles(static_cast<size_t>(ObjSL::count));
+        using JetIdxPair_t = std::pair<size_t, size_t>; 
+
+        std::vector<LorentzVectorF_t> particles(static_cast<size_t>(ObjSL::count));
         particles[static_cast<size_t>(ObjSL::lep)] = leptons[static_cast<size_t>(Lep::lep1)];
         particles[static_cast<size_t>(ObjSL::met)] = met;
+        m_res_mass->SetNameTitle("X_mass", Form("X->HH mass: event %llu", evt_id));
 
-        std::vector<ArrF_t<ESTIM_OUT_SZ>> results;
-        std::vector<Float_t> integrals;
-        size_t num_bjets = jets.size() < NUM_BEST_BTAG ? jets.size() : NUM_BEST_BTAG;
-
-        std::unordered_set<size_t> used;
-        for (size_t bj1_idx = 0; bj1_idx < num_bjets; ++bj1_idx)
+        size_t n_jets = jets.size();
+        size_t num_bjets = n_jets < NUM_BEST_BTAG ? n_jets : NUM_BEST_BTAG;
+        std::map<JetIdxPair_t, std::vector<JetIdxPair_t>> jet_comb_candidates;
+        for (size_t i = 0; i < num_bjets; ++i)
         {
-            used.insert(bj1_idx);
-            for (size_t bj2_idx = bj1_idx + 1; bj2_idx < num_bjets; ++bj2_idx)
+            for (size_t j = i + 1; j < num_bjets; ++j)
             {
-                used.insert(bj2_idx);
-                if (jets[bj1_idx].Pt() > jets[bj2_idx].Pt())
+                jet_comb_candidates.insert({{i, j}, std::vector<JetIdxPair_t>()});
+            }   
+        }
+
+        // fill possible light jet indices
+        // 2 jets are used to form a bjet pair => n - 2 jets can be light jet candidates
+        size_t num_light_jets = std::min(n_jets - 2, NUM_BEST_QVG);
+        for (auto& [bjet_pair, light_jet_idx_pairs]: jet_comb_candidates)
+        {
+            auto [bj1_idx, bj2_idx] = bjet_pair;
+            std::vector<size_t> light_jet_indices;
+            for (size_t lj_idx = 0; lj_idx < n_jets; ++lj_idx)
+            {
+                if (lj_idx == bj1_idx || lj_idx == bj2_idx)
                 {
-                    particles[static_cast<size_t>(ObjSL::bj1)] = jets[bj1_idx];
-                    particles[static_cast<size_t>(ObjSL::bj2)] = jets[bj2_idx];
+                    continue;
+                }
+                light_jet_indices.push_back(lj_idx);
+            }
+            
+            // sort light jet indices by btagPNetQvG to easily select NUM_BEST_QVG best
+            auto ScoreCmp = [&light_tags](size_t i, size_t j)
+            {
+                return light_tags[i] > light_tags[j];
+            };
+            std::sort(light_jet_indices.begin(), light_jet_indices.end(), ScoreCmp);
+
+            // form all possible pairs of light jets
+            for (size_t i = 0; i < num_light_jets; ++i)
+            {
+                for (size_t j = i + 1; j < num_light_jets; ++j)
+                {
+                    light_jet_idx_pairs.emplace_back(light_jet_indices[i], light_jet_indices[j]);
+                }   
+            }
+        }
+
+        // loop over combination and estimate mass for each
+        std::vector<ArrF_t<ESTIM_OUT_SZ>> estimations;
+        for (auto const& [bjet_idx_pair, light_jet_idx_pairs]: jet_comb_candidates)
+        {
+            auto [bj1_idx, bj2_idx] = bjet_idx_pair;
+            if (jets[bj1_idx].Pt() > jets[bj2_idx].Pt())
+            {
+                particles[static_cast<size_t>(ObjSL::bj1)] = jets[bj1_idx];
+                particles[static_cast<size_t>(ObjSL::bj2)] = jets[bj2_idx];
+            }
+            else 
+            {
+                particles[static_cast<size_t>(ObjSL::bj1)] = jets[bj2_idx];
+                particles[static_cast<size_t>(ObjSL::bj2)] = jets[bj1_idx];
+            }
+
+            for (auto const& [lj1_idx, lj2_idx]: light_jet_idx_pairs)
+            {
+                if (jets[lj1_idx].Pt() > jets[lj2_idx].Pt())
+                {
+                    particles[static_cast<size_t>(ObjSL::lj1)] = jets[lj1_idx];
+                    particles[static_cast<size_t>(ObjSL::lj2)] = jets[lj2_idx];
                 }
                 else 
                 {
-                    particles[static_cast<size_t>(ObjSL::bj1)] = jets[bj2_idx];
-                    particles[static_cast<size_t>(ObjSL::bj2)] = jets[bj1_idx];
+                    particles[static_cast<size_t>(ObjSL::lj1)] = jets[lj2_idx];
+                    particles[static_cast<size_t>(ObjSL::lj2)] = jets[lj1_idx];
                 }
 
-                for (size_t lj1_idx = 0; lj1_idx < jets.size(); ++lj1_idx)
+                Float_t proba = btags[bj1_idx]*btags[bj2_idx]*light_tags[lj1_idx]*light_tags[lj2_idx];
+                TString comb_label = Form("b%zub%zuq%zuq%zu", bj1_idx, bj2_idx, lj1_idx, lj2_idx);
+                ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, proba, comb_label);
+
+                // success: mass > 0
+                if (comb_result[static_cast<size_t>(EstimOut::mass)] > 0.0)
                 {
-                    if (used.count(lj1_idx))
-                    {
-                        continue;
-                    }
-                    used.insert(lj1_idx);
-
-                    for (size_t lj2_idx = lj1_idx + 1; lj2_idx < jets.size(); ++lj2_idx)
-                    {
-                        if (used.count(lj2_idx))
-                        {
-                            continue;
-                        }
-                        used.insert(lj2_idx);
-
-                        if (jets[lj1_idx].Pt() > jets[lj2_idx].Pt())
-                        {
-                            particles[static_cast<size_t>(ObjSL::lj1)] = jets[lj1_idx];
-                            particles[static_cast<size_t>(ObjSL::lj2)] = jets[lj2_idx];
-                        }
-                        else 
-                        {
-                            particles[static_cast<size_t>(ObjSL::lj1)] = jets[lj2_idx];
-                            particles[static_cast<size_t>(ObjSL::lj2)] = jets[lj1_idx];
-                        }
-                        
-                        TString comb_label = Form("b%zub%zuq%zuq%zu", bj1_idx, bj2_idx, lj1_idx, lj2_idx);
-                        ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, comb_label);
-                        if (comb_result[static_cast<size_t>(EstimOut::mass)] > 0.0)
-                        {
-                            results.push_back(comb_result);
-                            integrals.push_back(comb_result[static_cast<size_t>(EstimOut::integral)]);
-                        }
-
-                        // reset m_res_mass and use "clean" hist to build distribution for each combination
-                        // else keep filling histogram and only reset it when moving to another event
-                        ResetHist(m_res_mass);
-                        used.erase(lj2_idx);
-                    }
-                    used.erase(lj1_idx);
+                    estimations.push_back(comb_result);
                 }
-                used.erase(bj2_idx);
             }
-            used.erase(bj1_idx);
         }
 
-        if (!results.empty())
+        if (!estimations.empty())
         {
-            auto it = std::max_element(integrals.begin(), integrals.end());
-            size_t choice = it - integrals.begin();           
+            ArrF_t<ESTIM_OUT_SZ> res{};
+            int binmax = m_res_mass->GetMaximumBin(); 
+            res[static_cast<size_t>(EstimOut::mass)] = m_res_mass->GetXaxis()->GetBinCenter(binmax);
+            res[static_cast<size_t>(EstimOut::peak_value)] = m_res_mass->GetBinContent(binmax);
+            res[static_cast<size_t>(EstimOut::width)] = ComputeWidth(m_res_mass, Q16, Q84);
+            res[static_cast<size_t>(EstimOut::integral)] = m_res_mass->Integral();
             ResetHist(m_res_mass);
-            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(results[choice]);
+            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(res);
         }
         ResetHist(m_res_mass);
         return std::nullopt;
