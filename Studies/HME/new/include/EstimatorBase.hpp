@@ -7,7 +7,6 @@
 #include "TRandom3.h"
 
 #include "Definitions.hpp"
-#include "EstimationRecorder.hpp"
 #include "Constants.hpp"
 
 namespace HME 
@@ -24,8 +23,13 @@ namespace HME
         EstimatorBase();
         virtual ~EstimatorBase() = default;
 
-        virtual ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label) = 0;
-        virtual OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id) = 0;
+        virtual ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label) = 0;
+        virtual OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, 
+                                                     VecLVF_t const& leptons, 
+                                                     LorentzVectorF_t const& met, 
+                                                     std::vector<Float_t> const& btags,
+                                                     std::vector<Float_t> const& light_tags, 
+                                                     ULong64_t evt_id) = 0;
 
         protected:
         HistVec_t<TH1F> m_pdf_1d;

@@ -25,7 +25,15 @@ nPbPerFile: 5_000 # 5fb-1 per split data file
 nEventsPerFile: 100_000 # 100k events per MC file
 
 payload_producers: 
-  HME:
+  SingleLepHME:
+    producers_module_name: Analysis.PayloadProducers
+    producer_name: HMEProducer 
+    channel: "SL"
+    columns: 
+      - mass
+      - valid
+    dependencies:
+  DoubleLepHME:
     producers_module_name: Analysis.PayloadProducers
     producer_name: HMEProducer 
     channel: "DL"
