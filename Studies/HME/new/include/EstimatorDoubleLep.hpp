@@ -23,8 +23,13 @@ namespace HME
         explicit EstimatorDoubleLep(TString const& pdf_file_name);
         ~EstimatorDoubleLep() override = default;
 
-        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label) override;
-        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id) override;
+        ArrF_t<ESTIM_OUT_SZ> EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label) override;
+        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, 
+                                             VecLVF_t const& leptons, 
+                                             LorentzVectorF_t const& met, 
+                                             std::vector<Float_t> const& btags,
+                                             std::vector<Float_t> const& light_tags, 
+                                             ULong64_t evt_id) override;
     };
 
     EstimatorDoubleLep::EstimatorDoubleLep(TString const& pdf_file_name)
@@ -38,7 +43,7 @@ namespace HME
         pf->Close();
     }
 
-    ArrF_t<ESTIM_OUT_SZ> EstimatorDoubleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, TString const& comb_label)
+    ArrF_t<ESTIM_OUT_SZ> EstimatorDoubleLep::EstimateCombination(VecLVF_t const& particles, ULong64_t evt_id, Float_t proba, TString const& comb_label)
     {
         ArrF_t<ESTIM_OUT_SZ> res{};
         std::fill(res.begin(), res.end(), -1.0f);
@@ -148,7 +153,7 @@ namespace HME
             Float_t weight = estimates.empty() ? 0.0 : 1.0/estimates.size();
             for (auto est: estimates)
             {
-                m_res_mass->Fill(est, weight);
+                m_res_mass->Fill(est, proba*weight);
             }
         }
 
@@ -165,7 +170,12 @@ namespace HME
         return res;
     }
 
-    OptArrF_t<ESTIM_OUT_SZ> EstimatorDoubleLep::EstimateMass(VecLVF_t const& jets, VecLVF_t const& leptons, LorentzVectorF_t const& met, ULong64_t evt_id)
+    OptArrF_t<ESTIM_OUT_SZ> EstimatorDoubleLep::EstimateMass(VecLVF_t const& jets, 
+                                                             VecLVF_t const& leptons, 
+                                                             LorentzVectorF_t const& met, 
+                                                             std::vector<Float_t> const& btags,
+                                                             std::vector<Float_t> const& light_tags, 
+                                                             ULong64_t evt_id)
     {
         VecLVF_t particles(static_cast<size_t>(ObjDL::count));
         particles[static_cast<size_t>(ObjDL::lep1)] = leptons[static_cast<size_t>(Lep::lep1)];
@@ -191,24 +201,29 @@ namespace HME
                     particles[static_cast<size_t>(ObjDL::bj2)] = jets[bj1_idx];
                 }
 
+                Float_t proba = btags[bj1_idx]*btags[bj2_idx];
                 TString comb_label = Form("b%zub%zu", bj1_idx, bj2_idx);
-                ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, comb_label);
+                ArrF_t<ESTIM_OUT_SZ> comb_result = EstimateCombination(particles, evt_id, proba, comb_label);
 
                 // success: mass > 0
                 if (comb_result[static_cast<size_t>(EstimOut::mass)] > 0.0)
                 {
                     estimations.push_back(comb_result);
                 }
-
-                // clear the histogram to be reused 
-                ResetHist(m_res_mass);
             }
         }
 
         // success: at least one combination produced an estimate of X->HH mass
         if (!estimations.empty())
         {
-            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(estimations[0]);
+            ArrF_t<ESTIM_OUT_SZ> res{};
+            int binmax = m_res_mass->GetMaximumBin(); 
+            res[static_cast<size_t>(EstimOut::mass)] = m_res_mass->GetXaxis()->GetBinCenter(binmax);
+            res[static_cast<size_t>(EstimOut::peak_value)] = m_res_mass->GetBinContent(binmax);
+            res[static_cast<size_t>(EstimOut::width)] = ComputeWidth(m_res_mass, Q16, Q84);
+            res[static_cast<size_t>(EstimOut::integral)] = m_res_mass->Integral();
+            ResetHist(m_res_mass);
+            return std::make_optional<ArrF_t<ESTIM_OUT_SZ>>(res);
         }
         return std::nullopt;
     }
