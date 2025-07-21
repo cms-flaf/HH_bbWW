@@ -52,7 +52,7 @@ payload_producers:
     columns:
       - M0_Signal
     dependencies: 
-      - HME
+      - DoubleLepHME
     n_cpus: 4
     max_runtime: 2.0
     awkward_based: True
@@ -85,7 +85,7 @@ payload_producers:
       - M4000_Signal
       - M5000_Signal
     dependencies: 
-      - HME
+      - DoubleLepHME
     n_cpus: 4
     max_runtime: 8.0
     awkward_based: True
@@ -259,7 +259,8 @@ vars_to_plot:
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
   - PuppiMET_pt
   - PuppiMET_phi
-  - HME_mass
+  - SingleLepHME_mass
+  - DoubleLepHME_mass
   - DNN_M0_Signal
   - DNNParametric_M250_Signal
   - DNNParametric_M260_Signal
