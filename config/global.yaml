@@ -81,6 +81,8 @@ payload_producers:
     n_cpus: 4
     max_runtime: 8.0
     awkward_based: True
+    work_dir: 'tmp_DNN/'
+    uproot_stepsize: '50MB'
 
 #This is for Analysis Selection
 channelSelection:

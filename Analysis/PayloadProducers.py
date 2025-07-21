@@ -78,6 +78,22 @@ class DNNProducer:
 
         array = ApplyDNN(array, self.cfg)
 
+
+        # Delete not-needed branches
+        for col in array.fields:
+            if col not in self.cfg['columns']:
+                if col != 'FullEventId':
+                    del array[col]
+                    
+        # Rename the branches
+        for col in self.cfg['columns']:
+            if col in array.fields:
+                array[f"{self.payload_name}_{col}"] = array[f"{col}"]
+                del array[f"{col}"]
+            else:
+                print(f"Expected column {col} not found in your payload array!")
+
+
         return array
 
     # Not using the dfw version anymore, but lets save it for now
