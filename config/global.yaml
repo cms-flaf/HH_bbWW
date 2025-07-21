@@ -252,3 +252,17 @@ vars_to_plot:
   - PuppiMET_pt
   - PuppiMET_phi
   - HME_mass
+  - DNN_M0_Signal
+  - DNNParametric_M250_Signal
+  - DNNParametric_M260_Signal
+  - DNNParametric_M270_Signal
+  - DNNParametric_M280_Signal
+  - DNNParametric_M300_Signal
+  - DNNParametric_M350_Signal
+  - DNNParametric_M450_Signal
+  - DNNParametric_M550_Signal
+  - DNNParametric_M600_Signal
+  - DNNParametric_M650_Signal
+  - DNNParametric_M700_Signal
+  - DNNParametric_M800_Signal
+  - DNNParametric_M1000_Signal
