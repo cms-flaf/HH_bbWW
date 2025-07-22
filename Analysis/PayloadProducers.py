@@ -66,7 +66,10 @@ class DNNProducer:
 
         load_features.update(["FullEventId"])
 
+        # What to save in tmp file
         self.vars_to_save = load_features
+        # What to save for final output
+        self.cols_to_save = [ f"{self.payload_name}_{col}" for col in self.cfg['columns'] ]
 
     def prepare_dfw(self, dfw):
         print("Running DNN preparer")

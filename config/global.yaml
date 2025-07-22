@@ -55,7 +55,7 @@ payload_producers:
     columns:
       - M0_Signal
     dependencies: 
-      - DoubleLepHME
+      # - DoubleLepHME
     n_cpus: 4
     max_runtime: 2.0
     cmssw_env: False
@@ -91,7 +91,7 @@ payload_producers:
       - M4000_Signal
       - M5000_Signal
     dependencies: 
-      - DoubleLepHME
+      # - DoubleLepHME # Currently DNN does not actually depend on HME yet
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
