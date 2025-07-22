@@ -33,6 +33,9 @@ payload_producers:
       - mass
       - valid
     dependencies:
+    n_cpus: 4
+    max_runtime: 30.0
+    cmssw_env: True
   DoubleLepHME:
     producers_module_name: Analysis.PayloadProducers
     producer_name: HMEProducer 
@@ -55,7 +58,10 @@ payload_producers:
       - DoubleLepHME
     n_cpus: 4
     max_runtime: 2.0
+    cmssw_env: False
     awkward_based: True
+    work_dir: 'tmp_DNN/'
+    uproot_stepsize: '50MB'
   DNNParametric:
     producers_module_name: Analysis.PayloadProducers
     producer_name: DNNProducer
@@ -88,6 +94,7 @@ payload_producers:
       - DoubleLepHME
     n_cpus: 4
     max_runtime: 8.0
+    cmssw_env: False
     awkward_based: True
     work_dir: 'tmp_DNN/'
     uproot_stepsize: '50MB'
