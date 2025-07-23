@@ -102,17 +102,3 @@ class DNNProducer:
 
 
         return array
-
-    # Not using the dfw version anymore, but lets save it for now
-    def run_old(self, dfw):
-        print("Running DNN producer")
-        print(self.cfg)
-
-        dfw.df = analysis.defineAllP4(dfw.df)
-        dfw.df = analysis.AddDNNVariables(dfw.df)
-
-
-        dfw.df = ApplyDNN(dfw.df, self.cfg)
-        for col in self.cfg['columns']:
-            dfw.DefineAndAppend(f"{self.payload_name}_{col}", f"return {col};")
-        return dfw
