@@ -1,4 +1,9 @@
 from Studies.HME.new.hmeVariables import GetHMEVariables
+from Analysis.DNN_Application import ApplyDNN
+import Analysis.hh_bbww as analysis
+import ROOT
+import sys
+import os
 
 class HMEProducer:
     def __init__(self, cfg, payload_name):
@@ -26,9 +31,82 @@ class HMEProducer:
         return dfw
 
 class DNNProducer:
-    def __init__(self, cfg):
-        self.cfg = cfg
+    def __init__(self, cfg, payload_name):
+        import yaml
+        import onnxruntime as ort
 
-    def run(self, dfw):
-        print("Running DNN producer")
+        self.cfg = cfg
+        self.payload_name = payload_name
+
+        sys.path.append(os.environ['ANALYSIS_PATH'])
+        ROOT.gROOT.ProcessLine(".include "+ os.environ['ANALYSIS_PATH'])
+        ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/HistHelper.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisTools.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/AnalysisMath.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/MT2.h"')
+        ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
+
+        dnnConfig = {}
+        dnnFolder = os.path.join(os.environ["ANALYSIS_PATH"], "config", "DNN", self.cfg['version'])
+        with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
+            dnnConfig = yaml.safe_load(file)
+
+        #Features to use for DNN application (single vals)
+        features = dnnConfig['features']
+        #Features to use for DNN application (vectors and index)
+        list_features = dnnConfig['listfeatures']
+        #Features to use for DNN application (high level names to create)
+        highlevel_features = dnnConfig['highlevelfeatures']
+
+        #Features to load from df to awkward
+        load_features = set()
+        load_features.update(features)
+        for feature in list_features:
+            load_features.update([feature[0]])
+        load_features.update(highlevel_features)
+
+        load_features.update(["FullEventId"])
+        load_features.update(["event"])
+
+        # What to save in tmp file
+        self.vars_to_save = load_features
+        # What to save for final output
+        self.cols_to_save = [ f"{self.payload_name}_{col}" for col in self.cfg['columns'] ]
+
+
+        modelname_parity = dnnConfig['modelname_parity']
+
+        self.models = [[ort.InferenceSession(f"{os.path.join(dnnFolder, x)}.onnx"),y] for x,y in modelname_parity]
+
+    def prepare_dfw(self, dfw):
+        print("Running DNN preparer")
+
+        dfw.df = analysis.defineAllP4(dfw.df)
+        dfw.df = analysis.AddDNNVariables(dfw.df)
+
         return dfw
+
+
+    def run(self, array):
+        print("Running DNN producer")
+
+        array = ApplyDNN(array, self.cfg, self.models)
+
+
+        # Delete not-needed branches
+        for col in array.fields:
+            if col not in self.cfg['columns']:
+                if col != 'FullEventId':
+                    del array[col]
+                    
+        # Rename the branches
+        for col in self.cfg['columns']:
+            if col in array.fields:
+                array[f"{self.payload_name}_{col}"] = array[f"{col}"]
+                del array[f"{col}"]
+            else:
+                print(f"Expected column {col} not found in your payload array!")
+
+
+        return array
