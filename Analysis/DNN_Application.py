@@ -33,8 +33,9 @@ def ApplyDNN(branches, cfg):
 
 
     use_parametric = dnnConfig['use_parametric']
-    param_mass_list = [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
-    
+    # param_mass_list = [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
+    param_mass_list = dnnConfig['parametric_list']
+
     class_names_list = dnnConfig['class_names'] if 'class_names' in dnnConfig.keys() else ['Signal', 'TT', 'DY']
 
     if not use_parametric:
