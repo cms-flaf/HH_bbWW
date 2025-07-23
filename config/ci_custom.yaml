@@ -1,0 +1,13 @@
+fs_default:
+  - /builds/cms-flaf/flaf_integration/output/HH_bbWW
+
+analysis_config_area: config
+compute_unc_variations: true
+compute_unc_histograms: true
+store_noncentral: true
+
+vars_to_plot:
+  - SingleLepHME_mass
+  - DoubleLepHME_mass
+  - DNN_M0_Signal
+  - DNNParametric_M250_Signal
