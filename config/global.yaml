@@ -26,7 +26,7 @@ nEventsPerFile: 100_000 # 100k events per MC file
 
 payload_producers: 
   SingleLepHME:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.LegacyHMEProducer.py
     producer_name: HMEProducer 
     channel: "SL"
     columns: 
@@ -37,7 +37,7 @@ payload_producers:
     max_runtime: 30.0
     cmssw_env: True
   DoubleLepHME:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.LegacyHMEProducer.py
     producer_name: HMEProducer 
     channel: "DL"
     columns: 
@@ -48,7 +48,7 @@ payload_producers:
     max_runtime: 30.0
     cmssw_env: True
   DNN:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "DL"
     version: "v24"
@@ -63,7 +63,7 @@ payload_producers:
     work_dir: 'tmp_DNN/'
     uproot_stepsize: '50MB'
   DNNParametric:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "DL"
     version: "v35"
