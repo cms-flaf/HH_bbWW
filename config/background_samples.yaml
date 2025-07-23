@@ -161,7 +161,7 @@ ST_s_channel_top_4f_leptonDecays:
   sampleType: ST
 ST_t_channel_antitop_4f_InclusiveDecays:
   sampleType: ST
-ST_t_channel_top_4f_InclusiveDecay:
+ST_t_channel_top_4f_InclusiveDecays:
   sampleType: ST
 ST_tW_antitop_2L2Nu:
   sampleType: ST
