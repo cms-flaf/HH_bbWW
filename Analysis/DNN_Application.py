@@ -58,7 +58,7 @@ def ApplyDNN(branches, cfg):
     # Initialize the final predictions per parametric per event per class
     all_predictions = np.zeros((len(param_mass_list), nEvents, nClasses))
 
-    event_number = branches.FullEventId & 0xFFFFFFFF
+    event_number = branches.event
 
     array = np.array([getattr(branches, feature_name) for feature_name in features]).transpose()
 
@@ -129,4 +129,3 @@ def ApplyDNN(branches, cfg):
     print(f"Current memory usage: {mem_mb:.2f} MB")
 
     return branches
-    

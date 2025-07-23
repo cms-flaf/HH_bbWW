@@ -65,6 +65,7 @@ class DNNProducer:
         load_features.update(highlevel_features)
 
         load_features.update(["FullEventId"])
+        load_features.update(["event"])
 
         # What to save in tmp file
         self.vars_to_save = load_features
