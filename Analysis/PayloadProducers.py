@@ -33,6 +33,8 @@ class HMEProducer:
 class DNNProducer:
     def __init__(self, cfg, payload_name):
         import yaml
+        import onnxruntime as ort
+
         self.cfg = cfg
         self.payload_name = payload_name
 
@@ -72,6 +74,11 @@ class DNNProducer:
         # What to save for final output
         self.cols_to_save = [ f"{self.payload_name}_{col}" for col in self.cfg['columns'] ]
 
+
+        modelname_parity = dnnConfig['modelname_parity']
+
+        self.models = [[ort.InferenceSession(f"{os.path.join(dnnFolder, x)}.onnx"),y] for x,y in modelname_parity]
+
     def prepare_dfw(self, dfw):
         print("Running DNN preparer")
 
@@ -84,7 +91,7 @@ class DNNProducer:
     def run(self, array):
         print("Running DNN producer")
 
-        array = ApplyDNN(array, self.cfg)
+        array = ApplyDNN(array, self.cfg, self.models)
 
 
         # Delete not-needed branches

@@ -12,14 +12,11 @@ import ROOT
 import FLAF.Common.Utilities as Utilities
 
 
-def ApplyDNN(branches, cfg):
+def ApplyDNN(branches, cfg, models):
     dnnConfig = {}
     dnnFolder = os.path.join(os.environ["ANALYSIS_PATH"], "config", "DNN", cfg['version'])
     with open(os.path.join(dnnFolder, "dnn_config.yaml"), 'r') as file:
         dnnConfig = yaml.safe_load(file)  
-    modelname_parity = dnnConfig['modelname_parity']
-
-    models = [[os.path.join(dnnFolder, x),y] for x,y in modelname_parity]
 
     #Features to use for DNN application (single vals)
     features = dnnConfig['features']
@@ -30,7 +27,6 @@ def ApplyDNN(branches, cfg):
 
     nClasses = dnnConfig['nClasses'] if 'nClasses' in dnnConfig.keys() else 3
     nParity = dnnConfig['nParity'] if 'nParity' in dnnConfig.keys() else 4
-
 
     use_parametric = dnnConfig['use_parametric']
     # param_mass_list = [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
@@ -78,9 +74,8 @@ def ApplyDNN(branches, cfg):
     # Initialize the local predictions including per parity, but this will be summed out later
     local_predictions = np.zeros((len(param_mass_list), len(array), nParity, nClasses))
 
-    for parityIdx, [model, parityfunc] in enumerate(models):
+    for parityIdx, [sess, parityfunc] in enumerate(models):
         #We want to only apply the 3 models that are NOT trained on this parity
-        sess = ort.InferenceSession(f"{model}.onnx")
 
         #Add parametric mass point to the array
         for param_idx, param_mass in enumerate(param_mass_list):
