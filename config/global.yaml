@@ -26,7 +26,7 @@ nEventsPerFile: 100_000 # 100k events per MC file
 
 payload_producers: 
   SingleLepHME:
-    producers_module_name: Analysis.LegacyHMEProducer.py
+    producers_module_name: Analysis.LegacyHMEProducer
     producer_name: HMEProducer 
     channel: "SL"
     columns: 
@@ -37,7 +37,7 @@ payload_producers:
     max_runtime: 30.0
     cmssw_env: True
   DoubleLepHME:
-    producers_module_name: Analysis.LegacyHMEProducer.py
+    producers_module_name: Analysis.LegacyHMEProducer
     producer_name: HMEProducer 
     channel: "DL"
     columns: 
@@ -235,50 +235,50 @@ scales:
 deepTauVersion: 2p1
 met_type: "PFMET"
 vars_to_plot:
-  - lep1_pt
-  - lep2_pt
-  - lep1_eta
-  - lep2_eta
-  - lep1_phi
-  - lep2_phi
-  - lep1_Muon_pfRelIso04_all
-  - lep2_Muon_pfRelIso04_all
-  - lep1_Electron_miniPFRelIso_all
-  - lep2_Electron_miniPFRelIso_all
-  - bjet1_btagPNetB
-  - bjet2_btagPNetB
-  - diLep_mass
-  - Lep1Jet1Jet2_mass
-  - Lep1Lep2Jet1Jet2_mass
-  - Njets
-  - bjet1_pt
-  - bjet2_pt
-  - HT
-  - dR_dilep
-  - dR_dibjet
-  - dR_dilep_dibjet
-  - dPhi_lep1_lep2
-  - dPhi_jet1_jet2
-  - dPhi_MET_dilep
-  - dPhi_MET_dibjet
-  - bb_mass
-  - bb_mass_PNetRegPtRawCorr
-  - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
-  - PuppiMET_pt
-  - PuppiMET_phi
+  # - lep1_pt
+  # - lep2_pt
+  # - lep1_eta
+  # - lep2_eta
+  # - lep1_phi
+  # - lep2_phi
+  # - lep1_Muon_pfRelIso04_all
+  # - lep2_Muon_pfRelIso04_all
+  # - lep1_Electron_miniPFRelIso_all
+  # - lep2_Electron_miniPFRelIso_all
+  # - bjet1_btagPNetB
+  # - bjet2_btagPNetB
+  # - diLep_mass
+  # - Lep1Jet1Jet2_mass
+  # - Lep1Lep2Jet1Jet2_mass
+  # - Njets
+  # - bjet1_pt
+  # - bjet2_pt
+  # - HT
+  # - dR_dilep
+  # - dR_dibjet
+  # - dR_dilep_dibjet
+  # - dPhi_lep1_lep2
+  # - dPhi_jet1_jet2
+  # - dPhi_MET_dilep
+  # - dPhi_MET_dibjet
+  # - bb_mass
+  # - bb_mass_PNetRegPtRawCorr
+  # - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
+  # - PuppiMET_pt
+  # - PuppiMET_phi
   - SingleLepHME_mass
   - DoubleLepHME_mass
   - DNN_M0_Signal
-  - DNNParametric_M250_Signal
-  - DNNParametric_M260_Signal
-  - DNNParametric_M270_Signal
-  - DNNParametric_M280_Signal
-  - DNNParametric_M300_Signal
-  - DNNParametric_M350_Signal
-  - DNNParametric_M450_Signal
-  - DNNParametric_M550_Signal
-  - DNNParametric_M600_Signal
-  - DNNParametric_M650_Signal
-  - DNNParametric_M700_Signal
-  - DNNParametric_M800_Signal
-  - DNNParametric_M1000_Signal
+  # - DNNParametric_M250_Signal
+  # - DNNParametric_M260_Signal
+  # - DNNParametric_M270_Signal
+  # - DNNParametric_M280_Signal
+  # - DNNParametric_M300_Signal
+  # - DNNParametric_M350_Signal
+  # - DNNParametric_M450_Signal
+  # - DNNParametric_M550_Signal
+  # - DNNParametric_M600_Signal
+  # - DNNParametric_M650_Signal
+  # - DNNParametric_M700_Signal
+  # - DNNParametric_M800_Signal
+  # - DNNParametric_M1000_Signal
