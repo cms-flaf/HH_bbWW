@@ -37,18 +37,6 @@ def ApplyDNN(branches, cfg, models):
     if not use_parametric:
         param_mass_list = [0]
 
-    #Features to load from df to awkward
-    load_features = set()
-    load_features.update(features)
-    for feature in list_features:
-        load_features.update([feature[0]])
-    load_features.update(highlevel_features)
-
-    features_to_drop = load_features.copy() #We don't need to save these in the final file
-    if 'ncentralJet' in branches.fields: features_to_drop.update(["ncentralJet"]) # I don't know why, but sometimes this is there?
-
-    load_features.update(["FullEventId"])
-
     nEvents = len(branches)
     print(f"Running DNN Over {nEvents} events")
 
@@ -106,7 +94,6 @@ def ApplyDNN(branches, cfg, models):
     # Reduce dimension by sum the parity axis from local to global
     all_predictions = np.sum(local_predictions, axis=2)
 
-
     if nParity != 1: all_predictions = all_predictions/(nParity-1) # So we want to divide by nParity-1 (4 parity -> train with 1, apply with remaining 3)
 
     # Last save the branches
@@ -115,9 +102,6 @@ def ApplyDNN(branches, cfg, models):
 
         for class_idx, class_name in enumerate(class_names_list):
             branches[f'M{param_mass}_{class_name}'] = this_param_prediction.transpose()[class_idx].astype(np.float32)
-
-    for feature in features_to_drop:
-        del branches[feature]
 
     print("Finishing call, memory?")
     process = psutil.Process(os.getpid())
