@@ -1,8 +1,4 @@
 from Studies.HME.new.hmeVariables import GetHMEVariables
-import Analysis.hh_bbww as analysis
-import ROOT
-import sys
-import os
 
 class HMEProducer:
     def __init__(self, cfg, payload_name):
