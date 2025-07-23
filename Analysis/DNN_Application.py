@@ -1,7 +1,7 @@
 #python3 /afs/cern.ch/work/p/prsolank/private/FLAF_8thJan/AnaProd/NNInterface.py --inModelDir /afs/cern.ch/work/p/prsolank/private/FLAF_8thJan/config/HH_bbtautau/nn_models --inFile /tmp/prsolank/luigi-tmp-416131263.root --outFileName /tmp/prsolank/luigi-tmp-862152055.root --uncConfig /afs/cern.ch/work/p/prsolank/private/FLAF_8thJan/config/Run2_2018/weights.yaml --globalConfig /afs/cern.ch/work/p/prsolank/private/FLAF_8thJan/config/HH_bbtautau/global.yaml --EraName e2018 --Mass 400 --Spin 2 --PairType 2
 
 from __future__ import annotations
-import os
+import os, sys
 import numpy as np
 import awkward as ak
 import onnxruntime as ort
@@ -10,12 +10,11 @@ import yaml
 import os
 import ROOT
 import FLAF.Common.Utilities as Utilities
+import Analysis.hh_bbww as analysis
 
 
 class DNNProducer:
     def __init__(self, cfg, payload_name):
-        import yaml
-        import onnxruntime as ort
 
         self.cfg = cfg
         self.payload_name = payload_name
@@ -73,7 +72,7 @@ class DNNProducer:
     def run(self, array):
         print("Running DNN producer")
 
-        array = ApplyDNN(array)
+        array = self.ApplyDNN(array)
 
 
         # Delete not-needed branches
@@ -94,8 +93,7 @@ class DNNProducer:
         return array
 
 
-    def ApplyDNN(branches):
-        cfg = self.cfg
+    def ApplyDNN(self, branches):
         models = self.models
         dnnConfig = self.dnnConfig 
 

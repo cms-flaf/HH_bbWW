@@ -1,5 +1,4 @@
 from Studies.HME.new.hmeVariables import GetHMEVariables
-from Analysis.DNN_Application import ApplyDNN
 import Analysis.hh_bbww as analysis
 import ROOT
 import sys
