@@ -60,7 +60,6 @@ payload_producers:
     max_runtime: 2.0
     cmssw_env: False
     awkward_based: True
-    work_dir: 'tmp_DNN/'
     uproot_stepsize: '50MB'
   DNNParametric:
     producers_module_name: Analysis.DNN_Application
@@ -96,7 +95,6 @@ payload_producers:
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: True
-    work_dir: 'tmp_DNN/'
     uproot_stepsize: '50MB'
 
 #This is for Analysis Selection
