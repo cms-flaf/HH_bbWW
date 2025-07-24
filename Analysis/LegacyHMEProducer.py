@@ -25,10 +25,3 @@ class HMEProducer:
             dfw.DefineAndAppend(f"{self.payload_name}_valid", f"return {self.payload_name}_mass > 0.0;")
         return dfw
 
-class DNNProducer:
-    def __init__(self, cfg):
-        self.cfg = cfg
-
-    def run(self, dfw):
-        print("Running DNN producer")
-        return dfw

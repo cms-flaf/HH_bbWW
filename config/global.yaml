@@ -21,29 +21,81 @@ tagger_name: "particleNet"
 
 bjet_preselection_branch : "Jet_sel"
 
+nPbPerFile: 5_000 # 5fb-1 per split data file
+nEventsPerFile: 100_000 # 100k events per MC file
+
 payload_producers: 
   SingleLepHME:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.LegacyHMEProducer
     producer_name: HMEProducer 
     channel: "SL"
     columns: 
       - mass
       - valid
     dependencies:
+    n_cpus: 4
+    max_runtime: 30.0
+    cmssw_env: True
   DoubleLepHME:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.LegacyHMEProducer
     producer_name: HMEProducer 
     channel: "DL"
     columns: 
       - mass
       - valid
     dependencies:
+    n_cpus: 4
+    max_runtime: 30.0
+    cmssw_env: True
   DNN:
-    producers_module_name: Analysis.PayloadProducers
+    producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "DL"
+    version: "v24"
+    columns:
+      - M0_Signal
     dependencies: 
-      - HME
+      # - DoubleLepHME
+    n_cpus: 4
+    max_runtime: 2.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+  DNNParametric:
+    producers_module_name: Analysis.DNN_Application
+    producer_name: DNNProducer
+    channel: "DL"
+    version: "v35"
+    columns:
+      - M250_Signal
+      - M260_Signal
+      - M270_Signal
+      - M280_Signal
+      - M300_Signal
+      - M350_Signal
+      - M450_Signal
+      - M550_Signal
+      - M600_Signal
+      - M650_Signal
+      - M700_Signal
+      - M800_Signal
+      - M1000_Signal
+      - M1200_Signal
+      - M1400_Signal
+      - M1600_Signal
+      - M1800_Signal
+      - M2000_Signal
+      - M2500_Signal
+      - M3000_Signal
+      - M4000_Signal
+      - M5000_Signal
+    dependencies: 
+      # - DoubleLepHME # Currently DNN does not actually depend on HME yet
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
 
 #This is for Analysis Selection
 channelSelection:
@@ -212,4 +264,19 @@ vars_to_plot:
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
   - PuppiMET_pt
   - PuppiMET_phi
-  - HME_mass
+  - SingleLepHME_mass
+  - DoubleLepHME_mass
+  - DNN_M0_Signal
+  - DNNParametric_M250_Signal
+  - DNNParametric_M260_Signal
+  - DNNParametric_M270_Signal
+  - DNNParametric_M280_Signal
+  - DNNParametric_M300_Signal
+  - DNNParametric_M350_Signal
+  - DNNParametric_M450_Signal
+  - DNNParametric_M550_Signal
+  - DNNParametric_M600_Signal
+  - DNNParametric_M650_Signal
+  - DNNParametric_M700_Signal
+  - DNNParametric_M800_Signal
+  - DNNParametric_M1000_Signal
