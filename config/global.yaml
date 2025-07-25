@@ -96,6 +96,21 @@ payload_producers:
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
+  LinHMEDNN:
+    producers_module_name: Analysis.Linear_HME_DNN
+    producer_name: LinHMEDNN
+    channel: "DL"
+    version: "v24"
+    columns:
+      - linear_hme_dnn
+    dependencies: 
+      - DoubleLepHME
+      - DNN
+    n_cpus: 4
+    max_runtime: 2.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
 
 #This is for Analysis Selection
 channelSelection:
