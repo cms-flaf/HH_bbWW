@@ -100,7 +100,6 @@ payload_producers:
     producers_module_name: Analysis.Linear_HME_DNN
     producer_name: LinHMEDNN
     channel: "DL"
-    version: "v24"
     columns:
       - linear_hme_dnn
     dependencies: 
@@ -109,8 +108,7 @@ payload_producers:
     n_cpus: 4
     max_runtime: 2.0
     cmssw_env: False
-    awkward_based: True
-    uproot_stepsize: '50MB'
+    awkward_based: False
 
 #This is for Analysis Selection
 channelSelection:
@@ -295,3 +293,17 @@ vars_to_plot:
   - DNNParametric_M700_Signal
   - DNNParametric_M800_Signal
   - DNNParametric_M1000_Signal
+  - LinHMEDNN_linear_hme_dnn_m250
+  - LinHMEDNN_linear_hme_dnn_m260
+  - LinHMEDNN_linear_hme_dnn_m270
+  - LinHMEDNN_linear_hme_dnn_m280
+  - LinHMEDNN_linear_hme_dnn_m300
+  - LinHMEDNN_linear_hme_dnn_m350
+  - LinHMEDNN_linear_hme_dnn_m450
+  - LinHMEDNN_linear_hme_dnn_m550
+  - LinHMEDNN_linear_hme_dnn_m600
+  - LinHMEDNN_linear_hme_dnn_m650
+  - LinHMEDNN_linear_hme_dnn_m700
+  - LinHMEDNN_linear_hme_dnn_m800
+  - LinHMEDNN_linear_hme_dnn_m1000
+  
