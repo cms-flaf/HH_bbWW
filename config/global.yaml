@@ -101,10 +101,22 @@ payload_producers:
     producer_name: LinHMEDNN
     channel: "DL"
     columns:
-      - linear_hme_dnn
+      - linear_hme_dnn_m250
+      - linear_hme_dnn_m260
+      - linear_hme_dnn_m270
+      - linear_hme_dnn_m280
+      - linear_hme_dnn_m300
+      - linear_hme_dnn_m350
+      - linear_hme_dnn_m450
+      - linear_hme_dnn_m550
+      - linear_hme_dnn_m600
+      - linear_hme_dnn_m650
+      - linear_hme_dnn_m700
+      - linear_hme_dnn_m800
+      - linear_hme_dnn_m1000
     dependencies: 
       - DoubleLepHME
-      - DNN
+      - DNNParametric
     n_cpus: 4
     max_runtime: 2.0
     cmssw_env: False
