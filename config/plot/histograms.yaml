@@ -507,7 +507,7 @@ DoubleLepHME_mass:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m250:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M250 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -515,7 +515,7 @@ LinHMEDNN_linear_hme_dnn_m250:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m260:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M260 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -523,7 +523,7 @@ LinHMEDNN_linear_hme_dnn_m260:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m270:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M270 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -531,7 +531,7 @@ LinHMEDNN_linear_hme_dnn_m270:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m280:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M280 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -539,7 +539,7 @@ LinHMEDNN_linear_hme_dnn_m280:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m300:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M300 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -547,7 +547,7 @@ LinHMEDNN_linear_hme_dnn_m300:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m350:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M350 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -555,7 +555,7 @@ LinHMEDNN_linear_hme_dnn_m350:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m450:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M450 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -563,7 +563,7 @@ LinHMEDNN_linear_hme_dnn_m450:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m550:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M550 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -571,7 +571,7 @@ LinHMEDNN_linear_hme_dnn_m550:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m600:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M600 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -579,7 +579,7 @@ LinHMEDNN_linear_hme_dnn_m600:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m650:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M650 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -587,7 +587,7 @@ LinHMEDNN_linear_hme_dnn_m650:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m700:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M700 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -595,7 +595,7 @@ LinHMEDNN_linear_hme_dnn_m700:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m800:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M800 in HMEbins"
   y_title: "Events"
   use_log_y: False
@@ -603,7 +603,7 @@ LinHMEDNN_linear_hme_dnn_m800:
   divide_by_bin_width: False
 
 LinHMEDNN_linear_hme_dnn_m1000:
-  x_bins: "100|0.0:10.0"
+  x_bins: "2500|0.0:25.0"
   x_title: "DNN M1000 in HMEbins"
   y_title: "Events"
   use_log_y: False
