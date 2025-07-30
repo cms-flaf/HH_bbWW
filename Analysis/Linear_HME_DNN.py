@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 class LinHMEDNN:
     def __init__(self, cfg, payload_name):
 
@@ -50,4 +51,3 @@ class LinHMEDNN:
         for col in self.cfg["columns"]:
             dfw.DefineAndAppend(f"{self.payload_name}_{col}", f"return {col};")
         return dfw
-
