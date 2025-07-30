@@ -5,7 +5,7 @@ class LinHMEDNN:
 
         self.cfg = cfg
         self.payload_name = payload_name
-    
+
         self.hme_bins = [
             -10,
             200,
@@ -31,7 +31,7 @@ class LinHMEDNN:
             2750,
             3500,
             4500,
-            10000
+            10000,
         ]
         self.n_bins = len(self.hme_bins) - 1
         self.hme_bins_string = ",".join(map(str, self.hme_bins))
