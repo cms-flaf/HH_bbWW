@@ -8,7 +8,6 @@ on:
 permissions:
   contents: read
 
-
 jobs:
   formatting-check:
     uses: cms-flaf/FLAF/.github/workflows/formatting-check.yaml@main
