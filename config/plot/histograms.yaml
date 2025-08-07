@@ -17,7 +17,7 @@ lep1_phi:
   divide_by_bin_width: False
 
 lep1_eta:
-  x_bins: "50|-2.5:2.5" #For now in HistPlotter, the getNewBins() function requires integers? Dumb!
+  x_bins: "50|-2.5:2.5"  # For now in HistPlotter, the getNewBins() function requires integers? Dumb!
   # x_bins: [-2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
   x_title: lep1_eta
   y_title: Events
