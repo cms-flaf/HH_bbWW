@@ -44,8 +44,8 @@ class LinHMEDNN:
                 f"linear_hme_dnn_m{mass}",
                 f"""
             static const Double_t bins[{self.n_bins+1}] = {{{self.hme_bins_string}}};
-            static TAxis axis({self.n_bins}, bins);
-            return axis.FindBin(DoubleLepHME_mass) + DNNParametric_M{mass}_Signal;
+            static const TAxis axis({self.n_bins}, bins);
+            return axis.FindFixBin(DoubleLepHME_mass) + DNNParametric_M{mass}_Signal;
             """,
             )
         for col in self.cfg["columns"]:
