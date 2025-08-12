@@ -11,3 +11,4 @@ vars_to_plot:
   - DoubleLepHME_mass
   - DNN_M0_Signal
   - DNNParametric_M250_Signal
+  - LinHMEDNN_linear_hme_dnn_m250

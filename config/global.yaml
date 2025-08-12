@@ -19,17 +19,17 @@ corrections:
 
 tagger_name: "particleNet"
 
-bjet_preselection_branch : "Jet_sel"
+bjet_preselection_branch: "Jet_sel"
 
-nPbPerFile: 5_000 # 5fb-1 per split data file
-nEventsPerFile: 100_000 # 100k events per MC file
+nPbPerFile: 5_000  # 5fb-1 per split data file
+nEventsPerFile: 100_000  # 100k events per MC file
 
-payload_producers: 
+payload_producers:
   SingleLepHME:
     producers_module_name: Analysis.LegacyHMEProducer
-    producer_name: HMEProducer 
+    producer_name: HMEProducer
     channel: "SL"
-    columns: 
+    columns:
       - mass
       - valid
     dependencies:
@@ -38,9 +38,9 @@ payload_producers:
     cmssw_env: True
   DoubleLepHME:
     producers_module_name: Analysis.LegacyHMEProducer
-    producer_name: HMEProducer 
+    producer_name: HMEProducer
     channel: "DL"
-    columns: 
+    columns:
       - mass
       - valid
     dependencies:
@@ -54,8 +54,8 @@ payload_producers:
     version: "v24"
     columns:
       - M0_Signal
-    dependencies: 
-      # - DoubleLepHME
+    dependencies:
+    # - DoubleLepHME
     n_cpus: 4
     max_runtime: 2.0
     cmssw_env: False
@@ -89,15 +89,40 @@ payload_producers:
       - M3000_Signal
       - M4000_Signal
       - M5000_Signal
-    dependencies: 
-      # - DoubleLepHME # Currently DNN does not actually depend on HME yet
+    dependencies:
+    # - DoubleLepHME # Currently DNN does not actually depend on HME yet
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
+  LinHMEDNN:
+    producers_module_name: Analysis.Linear_HME_DNN
+    producer_name: LinHMEDNN
+    channel: "DL"
+    columns:
+      - linear_hme_dnn_m250
+      - linear_hme_dnn_m260
+      - linear_hme_dnn_m270
+      - linear_hme_dnn_m280
+      - linear_hme_dnn_m300
+      - linear_hme_dnn_m350
+      - linear_hme_dnn_m450
+      - linear_hme_dnn_m550
+      - linear_hme_dnn_m600
+      - linear_hme_dnn_m650
+      - linear_hme_dnn_m700
+      - linear_hme_dnn_m800
+      - linear_hme_dnn_m1000
+    dependencies:
+      - DoubleLepHME
+      - DNNParametric
+    n_cpus: 4
+    max_runtime: 2.0
+    cmssw_env: False
+    awkward_based: False
 
-#This is for Analysis Selection
+# This is for Analysis Selection
 channelSelection:
   - e
   - mu
@@ -105,7 +130,7 @@ channelSelection:
   - eMu
   - muMu
 
-#This is for Histogram Making
+# This is for Histogram Making
 channels_to_consider:
   - e
   - mu
@@ -114,7 +139,7 @@ channels_to_consider:
   - muMu
 
 channelDefinition:
-  e: 1 #Second lepton doesn't exist
+  e: 1  # Second lepton doesn't exist
   mu: 2
   eE: 11
   eMu: 12
@@ -159,17 +184,15 @@ QCDRegions:
   # - ZVeto_2b
   # - TTbar_CR
 
-boosted_categories: []
+boosted_categories: [ ]
 
 
 triggers:
-  e: [singleEleWpTight]
-  mu: [singleIsoMu]
-  eE: [singleEleWpTight, diElec]
-  eMu: [singleIsoMu]
-  muMu: [singleIsoMu]
-
-
+  e: [ singleEleWpTight ]
+  mu: [ singleIsoMu ]
+  eE: [ singleEleWpTight, diElec ]
+  eMu: [ singleIsoMu ]
+  muMu: [ singleIsoMu ]
 
 
 application_regions:
@@ -180,7 +203,7 @@ application_regions:
     region_name: SingleMu_region
     region_cut: (true)
 
-sample_types_to_merge: #Use this for what samples to run limits on
+sample_types_to_merge:  # Use this for what samples to run limits on
   - DY
   - TT
   - W
@@ -218,13 +241,13 @@ samples_to_skip_hist:
   - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-700
   - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800
 
-var_only_boosted: []
+var_only_boosted: [ ]
 
-unc_to_not_consider_boosted: []
+unc_to_not_consider_boosted: [ ]
 
 uncs_to_exclude:
-  Run3_2022: []
-  Run3_2022EE: []
+  Run3_2022: [ ]
+  Run3_2022EE: [ ]
 
 storeExtraJets: False
 scales:
@@ -280,3 +303,16 @@ vars_to_plot:
   - DNNParametric_M700_Signal
   - DNNParametric_M800_Signal
   - DNNParametric_M1000_Signal
+  - LinHMEDNN_linear_hme_dnn_m250
+  - LinHMEDNN_linear_hme_dnn_m260
+  - LinHMEDNN_linear_hme_dnn_m270
+  - LinHMEDNN_linear_hme_dnn_m280
+  - LinHMEDNN_linear_hme_dnn_m300
+  - LinHMEDNN_linear_hme_dnn_m350
+  - LinHMEDNN_linear_hme_dnn_m450
+  - LinHMEDNN_linear_hme_dnn_m550
+  - LinHMEDNN_linear_hme_dnn_m600
+  - LinHMEDNN_linear_hme_dnn_m650
+  - LinHMEDNN_linear_hme_dnn_m700
+  - LinHMEDNN_linear_hme_dnn_m800
+  - LinHMEDNN_linear_hme_dnn_m1000
