@@ -19,7 +19,8 @@ BaseModel:
   #     - DY_stitched
   #     - VV
   signals:
-    - GluGluToRadion
-    - GluGluToBulkGraviton
+    # - GluGluToRadion
+    # - GluGluToBulkGraviton
+    - GluGluToRadion_DoubleLepton
   data:
     - Data_Full

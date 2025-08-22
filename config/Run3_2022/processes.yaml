@@ -83,7 +83,6 @@ VV:
 GluGluToRadion:
   name: "GluGluToRadion"
   color: "kBlack"
-  to_stitch: false
   datasets:
     - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_250
     - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_260
@@ -143,7 +142,14 @@ GluGluToRadion:
 GluGluToRadion_DoubleLepton:
   name: "GluGluToRadion_DoubleLepton"
   color: "kBlack"
-  to_stitch: false
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_(\d+) # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion2L_${MASS}
+    name_pattern: GluGluToRadion 2L mass ${MASS} GeV
+    to_plot: [ 300, 600, 1000 ]
+    plot_color: [ "kBlack", "kBlue", "kRed" ]
   datasets:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_250
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
@@ -167,16 +173,6 @@ GluGluToRadion_DoubleLepton:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_3000
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_4000
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_5000
-  datasets_to_plot:
-    GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_300:
-      name: "Radion-300 GeV"
-      color: "kBlack"
-    GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_600:
-      name: "Radion-600 GeV"
-      color: "kBlue"
-    GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1000:
-      name: "Radion-1000 GeV"
-      color: "kRed"
 
 
 GluGluToBulkGraviton:
@@ -268,6 +264,13 @@ Data_MuonEG:
 #   sub_processes:
 #     - DY_stitched
 #     - VV
+
+
+# Radion: # Create a group of processes to use by other categories (i.e. QCD uses mc_bkgs group)
+#   type: "group"
+#   sub_processes:
+#     - Radion_1L
+#     - Radion_2L
 
 # QCD:
 #   name: "QCD"
