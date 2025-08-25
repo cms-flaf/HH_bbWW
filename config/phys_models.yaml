@@ -22,5 +22,6 @@ BaseModel:
     # - GluGluToRadion
     # - GluGluToBulkGraviton
     - GluGluToRadion_DoubleLepton
+    - GluGluToRadion_SingleLepton
   data:
     - Data_Full

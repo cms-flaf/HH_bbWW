@@ -1,25 +1,3 @@
-# DY_stitched:
-#   name: "DY"
-#   cross_section_NNLO: 12 # NLO -> NNLO
-#   cross_section_NLO: 11 # NLO -> NNLO
-#   color: "blue" # eliminates need for plot.yaml
-#   datasets:
-#     - DY_MLL_50
-#     - DY_NJet0 # samples.yaml xs: DY_NJet0 # NLO
-#     - DY_NJet1
-#     ...
-#   processing:
-#     - name: stithcing
-#       stage: hist_making
-#       file: DY_stitching.py
-#     - name: scaling
-#       stage: hist_processing
-#       file: xs_scaling.py
-#     # - name: filter_true_lepton
-#     #   stage: hist_processing
-#     #   file: filter_true.py
-#   anaTupleProcessor: DY_stitch_bins.py
-
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
@@ -116,6 +94,7 @@ GluGluToRadion_DoubleLepton:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_5000
 
 
+
 GluGluToRadion_SingleLepton:
   name: "GluGluToRadion_SingleLepton"
   color: "kBlack"
@@ -207,55 +186,33 @@ GluGluToBulkGraviton:
 Data_Full:
   name: "Data"
   datasets:
-    - EGamma_Run2022C
-    - EGamma_Run2022D
-    - Muon_Run2022C
-    - Muon_Run2022D
-    - SingleMuon_Run2022C
-    - DoubleMuon_Run2022C
-    - MuonEG_Run2022C
-    - MuonEG_Run2022D
+    - EGamma_Run2022E
+    - EGamma_Run2022F
+    - EGamma_Run2022G
+    - Muon_Run2022E
+    - Muon_Run2022F
+    - Muon_Run2022G
+    - MuonEG_Run2022E
+    - MuonEG_Run2022F
+    - MuonEG_Run2022G
 
 Data_EGamma:
   name: "Data EGamma"
   datasets:
-    - EGamma_Run2022C
-    - EGamma_Run2022D
+    - EGamma_Run2022E
+    - EGamma_Run2022F
+    - EGamma_Run2022G
 
 Data_Muon:
   name: "Data Muon"
   datasets:
-    - SingleMuon_Run2022C
-    - DoubleMuon_Run2022C
-    - Muon_Run2022C
-    - Muon_Run2022D
+    - Muon_Run2022E
+    - Muon_Run2022F
+    - Muon_Run2022G
 
 Data_MuonEG:
   name: "Data MuonEG"
   datasets:
-    - MuonEG_Run2022C
-    - MuonEG_Run2022D
-
-# MC_bkgs: # Create a group of processes to use by other categories (i.e. QCD uses mc_bkgs group)
-#   type: "group"
-#   sub_processes:
-#     - DY_stitched
-#     - VV
-
-
-# Radion: # Create a group of processes to use by other categories (i.e. QCD uses mc_bkgs group)
-#   type: "group"
-#   sub_processes:
-#     - Radion_1L
-#     - Radion_2L
-
-# QCD:
-#   name: "QCD"
-#   color: "orange"
-#   datasets: [ data ]
-#   dependent_processes: [ mc_bkgs ]  # this is a group
-#   processing:
-#     - name: ABCD
-#       stage: hist_processing
-#       file: QCD_ABCD.py
-#   supress_negative_bins: true #
+    - MuonEG_Run2022E
+    - MuonEG_Run2022F
+    - MuonEG_Run2022G
