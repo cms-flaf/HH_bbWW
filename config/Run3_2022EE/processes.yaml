@@ -94,7 +94,6 @@ GluGluToRadion_DoubleLepton:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_5000
 
 
-
 GluGluToRadion_SingleLepton:
   name: "GluGluToRadion_SingleLepton"
   color: "kBlack"
