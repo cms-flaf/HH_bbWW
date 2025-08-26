@@ -12,7 +12,7 @@ GLOBAL:
     # - keep ^QCD_PT.*
     # - keep ^QCD_HT.*
 
-    #- keep ^ST.*
+    # - keep ^ST.*
     - keep GluGluHToTauTau_M125.*
     - keep GluGluHToWWTo2L2Nu_M125.*
     - keep VBFHToWWTo2L2Nu_M125.*
@@ -47,17 +47,17 @@ GLOBAL:
     - keep WW
     - keep WZ
     - keep ZZ
-    
+
     - keep ^EGamma_.*
     - keep ^Muon_.*
     - keep ^MuonEG_.*
 
-    # # - drop ^.*_ext[0-9]+$
+    # - drop ^.*_ext[0-9]+$
   use_stitching: false
 
 
-############## Start Resonant Signal samples)##############
-############## Signals(SL,S=0)##############
+# Start Resonant Signal samples) #
+# Signals(SL,S=0) #
 GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_250:
   sampleType: GluGluToRadion
   mass: 250
@@ -190,7 +190,7 @@ GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_5000:
   spin: 0
   crossSection: 1pb
   generator: madgraph
-############## Signals(SL,S=2)##############
+# Signals(SL,S=2) #
 GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_250:
   sampleType: GluGluToBulkGraviton
   mass: 250
@@ -323,7 +323,7 @@ GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_5000:
   spin: 2
   crossSection: 1pb
   generator: madgraph
-############## Signals(DL,S=0)##############
+# Signals(DL,S=0) #
 GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_250:
   sampleType: GluGluToRadion
   mass: 250
@@ -456,7 +456,7 @@ GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_5000:
   spin: 0
   crossSection: 1pb
   generator: madgraph
-############## Signals(DL,S=2)##############
+# Signals(DL,S=2) #
 GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_250:
   sampleType: GluGluToBulkGraviton
   mass: 250
@@ -589,10 +589,5796 @@ GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_5000:
   spin: 2
   crossSection: 1pb
   generator: madgraph
-############## Finished Resonant Signal samples)##############
-############## Start non -Resonant Signal samples)##############
-#cross section twiki https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWGHH ###
-#######GGF########
+# Started YH samples #
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_100:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_125:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_150:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_200:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_300:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_400:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_500:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_60:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_600:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_70:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_80:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_800:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_90:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_95:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_100:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_1000:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_125:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_150:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_200:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_300:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_400:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_500:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_60:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_600:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_70:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_80:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_800:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_90:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_95:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_100:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_1000:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_1200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_125:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_150:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_300:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_400:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_500:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_60:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_600:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_70:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_80:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_800:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_90:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_95:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_100:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_1000:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_1200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_125:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_1400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_150:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_300:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_500:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_60:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_600:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_70:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_80:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_800:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_90:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_95:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_100:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_1000:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_1200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_125:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_1400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_150:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_1600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_300:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_500:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_60:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_70:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_80:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_800:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_90:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_95:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_100:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_1000:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_1200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_125:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_1400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_150:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_1600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_1800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_300:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_500:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_60:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_70:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_80:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_90:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_95:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_100:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_1000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_1200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_125:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_1400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_150:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_1600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_1800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_2000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_300:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_500:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_60:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_70:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_80:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_90:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_95:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_100:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_1000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_1200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_125:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_1400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_150:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_1600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_1800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_2000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_2600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_300:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_500:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_60:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_70:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_80:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_90:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_95:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_100:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_125:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_150:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_60:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_70:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_80:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_90:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_300_MY_95:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_100:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_1000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_1200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_125:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_1400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_150:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_1600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_1800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_2000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_2600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_300:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_3000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_500:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_60:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_70:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_80:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_90:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_95:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_100:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_1000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_1200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_125:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_1400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_150:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_1600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_1800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_2000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_2600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_300:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_3000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_3500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_60:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_70:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_80:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_90:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_95:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_100:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_125:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_150:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_200:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_60:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_70:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_80:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_90:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_400_MY_95:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_100:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_125:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_150:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_200:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_300:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_60:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_70:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_80:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_90:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_500_MY_95:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_100:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_125:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_150:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_200:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_300:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_400:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_60:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_70:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_80:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_90:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_550_MY_95:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_100:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_125:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_150:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_200:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_300:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_400:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_60:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_70:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_80:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_90:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_600_MY_95:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_100:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_125:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_150:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_200:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_300:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_400:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_500:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_60:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_70:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_80:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_90:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_650_MY_95:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_100:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_125:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_150:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_200:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_300:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_400:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_500:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_60:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_70:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_80:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_90:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_700_MY_95:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_100:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_125:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_150:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_200:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_300:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_400:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_500:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_60:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_600:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_70:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_80:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_90:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_800_MY_95:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_100:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_125:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_150:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_200:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_300:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_400:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_500:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_60:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_600:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_70:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_80:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_90:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2L2Nu_MX_900_MY_95:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_100:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_125:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_150:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_200:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_300:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_400:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_500:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_60:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_600:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_70:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_80:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_800:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_90:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_95:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_100:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_1000:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_125:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_150:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_200:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_300:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_400:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_500:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_60:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_600:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_70:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_80:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_800:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_90:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_95:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_100:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_1000:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_1200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_125:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_150:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_300:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_400:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_500:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_60:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_600:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_70:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_80:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_800:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_90:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_95:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_100:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_1000:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_1200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_125:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_1400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_150:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_300:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_500:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_60:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_600:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_70:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_80:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_800:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_90:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_95:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_100:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_1000:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_1200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_125:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_1400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_150:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_1600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_300:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_500:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_60:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_70:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_80:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_800:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_90:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_95:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_100:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_1000:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_1200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_125:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_1400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_150:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_1600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_1800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_300:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_500:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_60:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_70:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_80:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_90:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_95:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_100:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_1000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_1200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_125:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_1400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_150:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_1600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_1800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_2000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_300:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_500:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_60:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_70:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_80:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_90:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_95:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_100:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_1000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_1200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_125:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_1400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_150:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_1600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_1800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_2000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_2600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_300:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_500:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_60:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_70:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_80:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_90:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_95:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_100:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_125:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_150:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_60:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_70:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_80:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_90:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_95:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_100:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_1000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_1200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_125:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_1400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_150:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_1600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_1800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_2000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_2600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_300:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_3000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_500:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_60:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_70:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_80:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_90:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_95:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_100:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_1000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_1200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_125:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_1400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_150:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_1600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_1800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_2000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_2600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_300:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_3000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_3500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_60:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_70:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_80:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_90:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_95:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_100:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_125:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_150:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_200:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_60:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_70:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_80:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_90:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_95:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_100:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_125:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_150:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_200:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_300:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_60:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_70:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_80:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_90:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_95:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_100:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_125:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_150:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_200:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_300:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_400:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_60:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_70:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_80:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_90:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_95:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_100:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_125:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_150:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_200:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_300:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_400:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_60:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_70:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_80:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_90:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_95:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_100:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_125:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_150:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_200:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_300:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_400:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_500:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_60:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_70:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_80:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_90:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_95:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_100:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_125:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_150:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_200:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_300:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_400:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_500:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_60:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_70:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_80:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_90:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_95:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_100:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_125:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_150:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_200:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_300:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_400:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_500:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_60:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_600:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_70:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_80:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_90:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_95:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_100:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_125:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_150:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_200:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_300:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_400:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_500:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_60:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_600:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_70:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_80:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_90:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_95:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_200:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_300:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_400:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_500:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_600:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1000_MY_800:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_1000:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_200:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_300:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_400:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_500:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_600:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1200_MY_800:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_1000:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_1200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_300:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_400:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_500:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_600:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1400_MY_800:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_1000:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_1200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_1400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_300:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_500:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_600:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1600_MY_800:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_1000:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_1200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_1400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_1600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_300:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_500:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_1800_MY_800:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_1000:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_1200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_1400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_1600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_1800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_300:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_500:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2000_MY_800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_1000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_1200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_1400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_1600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_1800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_2000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_300:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_500:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_2500_MY_800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_1000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_1200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_1400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_1600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_1800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_2000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_2600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_300:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_500:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3000_MY_800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_1000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_1200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_1400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_1600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_1800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_2000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_2600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_300:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_3000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_500:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_3500_MY_800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_1000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_1200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_1400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_1600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_1800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_2000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_2600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_300:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_3000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_3500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_4000_MY_800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_400_MY_200:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_500_MY_200:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_500_MY_300:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_550_MY_200:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_550_MY_300:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_550_MY_400:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_600_MY_200:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_600_MY_300:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_600_MY_400:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_650_MY_200:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_650_MY_300:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_650_MY_400:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_650_MY_500:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_700_MY_200:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_700_MY_300:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_700_MY_400:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_700_MY_500:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_800_MY_200:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_800_MY_300:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_800_MY_400:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_800_MY_500:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_800_MY_600:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_900_MY_200:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_900_MY_300:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_900_MY_400:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_900_MY_500:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2L2Nu2B_MX_900_MY_600:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_200:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_300:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_400:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_500:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_600:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1000_MY_800:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_1000:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_200:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_300:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_400:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_500:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_600:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1200_MY_800:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_1000:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_1200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_300:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_400:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_500:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_600:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1400_MY_800:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_1000:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_1200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_1400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_300:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_500:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_600:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1600_MY_800:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_1000:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_1200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_1400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_1600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_300:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_500:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_1800_MY_800:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_1000:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_1200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_1400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_1600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_1800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_300:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_500:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2000_MY_800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_1000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_1200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_1400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_1600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_1800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_2000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_300:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_500:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_2500_MY_800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_1000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_1200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_1400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_1600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_1800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_2000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_2600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_300:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_500:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3000_MY_800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_1000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_1200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_1400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_1600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_1800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_2000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_2600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_300:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_3000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_500:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_3500_MY_800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_1000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_1200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_1400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_1600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_1800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_2000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_2600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_300:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_3000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_3500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_4000_MY_800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_400_MY_200:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_500_MY_200:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_500_MY_300:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_550_MY_200:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_550_MY_300:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_550_MY_400:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_600_MY_200:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_600_MY_300:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_600_MY_400:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_650_MY_200:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_650_MY_300:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_650_MY_400:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_650_MY_500:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_700_MY_200:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_700_MY_300:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_700_MY_400:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_700_MY_500:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_800_MY_200:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_800_MY_300:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_800_MY_400:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_800_MY_500:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_800_MY_600:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_900_MY_200:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_900_MY_300:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_900_MY_400:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_900_MY_500:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2W2Bto2Q1L1Nu2B_MX_900_MY_600:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_200:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_300:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_400:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_500:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_600:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1000_MY_800:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_1000:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_200:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_300:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_400:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_500:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_600:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1200_MY_800:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_1000:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_1200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_200:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_300:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_400:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_500:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_600:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1400_MY_800:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_1000:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_1200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_1400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_200:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_300:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_400:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_500:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_600:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1600_MY_800:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_1000:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_1200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_1400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_1600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_200:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_300:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_400:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_500:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_600:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_1800_MY_800:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_1000:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_1200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_1400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_1600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_1800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_200:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_300:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_400:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_500:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_600:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2000_MY_800:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_1000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_1200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_1400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_1600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_1800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_200:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_2000:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_300:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_400:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_500:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_600:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_2500_MY_800:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_1000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_1200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_1400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_1600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_1800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_200:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_2000:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_2600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_300:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_400:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_500:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_600:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3000_MY_800:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_1000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_1200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_1400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_1600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_1800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_200:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_2000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_2600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_300:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_3000:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_400:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_500:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_600:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_3500_MY_800:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_1000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_1200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_1400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_1600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_1800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_200:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_2000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_2600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_300:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_3000:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_3500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_400:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_500:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_600:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_4000_MY_800:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_400_MY_200:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_500_MY_200:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_500_MY_300:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_550_MY_200:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_550_MY_300:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_550_MY_400:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_600_MY_200:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_600_MY_300:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_600_MY_400:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_650_MY_200:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_650_MY_300:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_650_MY_400:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_650_MY_500:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_700_MY_200:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_700_MY_300:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_700_MY_400:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_700_MY_500:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_800_MY_200:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_800_MY_300:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_800_MY_400:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_800_MY_500:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_800_MY_600:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_900_MY_200:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_900_MY_300:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_900_MY_400:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_900_MY_500:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+XtoYHto2Z2Bto2L2J2B_MX_900_MY_600:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: 1pb
+  generator: madgraph
+# Finished YH samples #
+# Finished Resonant Signal samples) #
+# Start non -Resonant Signal samples) #
+# cross section twiki https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWGHH #
+# GGF #
 GluGlutoHHto2B2V_kl_1p00_kt_1p00_c2_0p00:
   sampleType: HHnonRes
   generator: powheg
@@ -605,7 +6391,7 @@ GluGlutoHHto2B2Vto2L2Nu_kl_2p45_kt_1p00_c2_0p00:
   sampleType: HHnonRes
   generator: powheg
   crossSection: 1pb
-#######VBF########
+# VBF #
 VBFHHto2B2V_CV_1_C2V_0_C3_1:
   sampleType: HHnonRes
   generator: madgraph
@@ -686,4 +6472,4 @@ VBFHHto2B2Vto2L2Nu_CV_m1p83_C2V_3p57_C3_m3p39:
   sampleType: HHnonRes
   generator: madgraph
   crossSection: 1pb
-############## Finished non -Resonant Signal samples)##############
+# Finished non -Resonant Signal samples) #
