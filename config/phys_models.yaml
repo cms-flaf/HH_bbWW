@@ -1,0 +1,27 @@
+BaseTestModel:
+  name: "Base Test Model"
+  backgrounds:
+    - TT_Inclusive
+    - DY_HighMass
+  signals:
+    - GluGluToRadion_DoubleLepton
+
+BaseModel:
+  name: "Base Model"
+  backgrounds:
+    - TT
+    - DY_LowMass
+    - DY_HighMass
+    - ST
+    - VV
+  # groups:
+  #   mc_bkgs:
+  #     - DY_stitched
+  #     - VV
+  signals:
+    # - GluGluToRadion
+    # - GluGluToBulkGraviton
+    - GluGluToRadion_DoubleLepton
+    - GluGluToRadion_SingleLepton
+  data:
+    - Data_Full
