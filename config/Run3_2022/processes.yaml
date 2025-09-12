@@ -1,0 +1,261 @@
+# DY_stitched:
+#   name: "DY"
+#   cross_section_NNLO: 12 # NLO -> NNLO
+#   cross_section_NLO: 11 # NLO -> NNLO
+#   color: "blue" # eliminates need for plot.yaml
+#   datasets:
+#     - DY_MLL_50
+#     - DY_NJet0 # samples.yaml xs: DY_NJet0 # NLO
+#     - DY_NJet1
+#     ...
+#   processing:
+#     - name: stithcing
+#       stage: hist_making
+#       file: DY_stitching.py
+#     - name: scaling
+#       stage: hist_processing
+#       file: xs_scaling.py
+#     # - name: filter_true_lepton
+#     #   stage: hist_processing
+#     #   file: filter_true.py
+#   anaTupleProcessor: DY_stitch_bins.py
+
+TT:
+  name: "t#bar{t}"
+  color: "kGreen-3"  # eliminates need for plot.yaml
+  datasets:
+    - TTto2L2Nu
+    - TTtoLNu2Q
+    - TTto4Q
+
+TT_Inclusive:
+  name: "t#bar{t} Inclusive"
+  color: "kGreen-3"
+  datasets:
+    - TT
+
+ST:
+  name: "ST"
+  color: "kPink+1"
+  datasets:
+    - ST_s_channel_antitop_4f_leptonDecays
+    - ST_s_channel_top_4f_leptonDecays
+    - ST_t_channel_antitop_4f_InclusiveDecays
+    - ST_t_channel_top_4f_InclusiveDecays
+    - ST_tW_antitop_2L2Nu
+    - ST_tW_antitop_4Q
+    - ST_tW_antitop_LNu2Q
+    - ST_tW_top_2L2Nu
+    - ST_tW_top_4Q
+    - ST_tW_top_LNu2Q
+
+DY_LowMass:
+  name: "DY M10to50"
+  color: "kAzure+10"
+  datasets:
+    - DYto2L_M_10to50_amcatnloFXFX
+
+DY_HighMass:
+  name: "DY M50"
+  cross_section_correction: 12/ 11  # NLO -> NNLO
+  color: "kAzure+7"
+  datasets:
+    - DYto2L_M_50_0J_amcatnloFXFX
+    - DYto2L_M_50_1J_amcatnloFXFX
+    - DYto2L_M_50_2J_amcatnloFXFX
+
+W:
+  name: "W"
+  color: "kGreen"  # eliminates need for plot.yaml
+  datasets:
+    - WtoLNu_0J_amcatnloFXFX
+    - WtoLNu_1J_amcatnloFXFX
+    - WtoLNu_2J_amcatnloFXFX
+
+VV:
+  name: "VV"
+  color: "kGreen"  # eliminates need for inputs.yaml
+  datasets:
+    - WW
+    - WZ
+    - ZZ
+
+GluGluToRadion_DoubleLepton:
+  name: "GluGluToRadion_DoubleLepton"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion2L_${MASS}
+    name_pattern: GluGluToRadion 2L mass ${MASS} GeV
+    to_plot: [ 300, 600, 1000 ]
+    plot_color: [ "kBlack", "kBlue", "kRed" ]
+  datasets:
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_250
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_270
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_280
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_300
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_350
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_450
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_550
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_600
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_650
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_700
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_800
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1000
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1200
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1400
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1600
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_1800
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_2000
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_2500
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_3000
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_4000
+    - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_5000
+
+
+GluGluToRadion_SingleLepton:
+  name: "GluGluToRadion_SingleLepton"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion1L_${MASS}
+    name_pattern: GluGluToRadion 1L mass ${MASS} GeV
+    to_plot: [ 300, 600, 1000 ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+  datasets:
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_250
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_260
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_270
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_280
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_300
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_350
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_450
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_550
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_600
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_650
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_700
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_800
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_1000
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_1200
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_1400
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_1600
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_1800
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_2000
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_2500
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_3000
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_4000
+    - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_5000
+
+
+GluGluToBulkGraviton:
+  name: "GluGluToBulkGraviton"
+  color: "kBlue"
+  to_stitch: false
+  datasets:
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_250
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_260
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_270
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_280
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_300
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_350
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_450
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_550
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_650
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_700
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_1000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_1200
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_1400
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_1600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_1800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_2000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_2500
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_3000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_4000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_5000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_250
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_260
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_270
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_280
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_300
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_350
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_450
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_550
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_650
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_700
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1200
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1400
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2500
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_3000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_4000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_5000
+  datasets_to_plot:
+
+
+Data_Full:
+  name: "Data"
+  datasets:
+    - EGamma_Run2022C
+    - EGamma_Run2022D
+    - Muon_Run2022C
+    - Muon_Run2022D
+    - SingleMuon_Run2022C
+    - DoubleMuon_Run2022C
+    - MuonEG_Run2022C
+    - MuonEG_Run2022D
+
+Data_EGamma:
+  name: "Data EGamma"
+  datasets:
+    - EGamma_Run2022C
+    - EGamma_Run2022D
+
+Data_Muon:
+  name: "Data Muon"
+  datasets:
+    - SingleMuon_Run2022C
+    - DoubleMuon_Run2022C
+    - Muon_Run2022C
+    - Muon_Run2022D
+
+Data_MuonEG:
+  name: "Data MuonEG"
+  datasets:
+    - MuonEG_Run2022C
+    - MuonEG_Run2022D
+
+# MC_bkgs: # Create a group of processes to use by other categories (i.e. QCD uses mc_bkgs group)
+#   type: "group"
+#   sub_processes:
+#     - DY_stitched
+#     - VV
+
+
+# Radion: # Create a group of processes to use by other categories (i.e. QCD uses mc_bkgs group)
+#   type: "group"
+#   sub_processes:
+#     - Radion_1L
+#     - Radion_2L
+
+# QCD:
+#   name: "QCD"
+#   color: "orange"
+#   datasets: [ data ]
+#   dependent_processes: [ mc_bkgs ]  # this is a group
+#   processing:
+#     - name: ABCD
+#       stage: hist_processing
+#       file: QCD_ABCD.py
+#   supress_negative_bins: true #
