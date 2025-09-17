@@ -38,31 +38,49 @@ ST:
   name: "ST"
   color: "kPink+1"
   datasets:
-    - ST_s_channel_antitop_4f_leptonDecays
-    - ST_s_channel_top_4f_leptonDecays
-    - ST_t_channel_antitop_4f_InclusiveDecays
-    - ST_t_channel_top_4f_InclusiveDecays
-    - ST_tW_antitop_2L2Nu
-    - ST_tW_antitop_4Q
-    - ST_tW_antitop_LNu2Q
-    - ST_tW_top_2L2Nu
-    - ST_tW_top_4Q
-    - ST_tW_top_LNu2Q
+    # - ST_s_channel_antitop_4f_leptonDecays
+    # - ST_s_channel_top_4f_leptonDecays
+    # - ST_t_channel_antitop_4f_InclusiveDecays
+    # - ST_t_channel_top_4f_InclusiveDecays
+    # - ST_tW_antitop_2L2Nu
+    # - ST_tW_antitop_4Q
+    # - ST_tW_antitop_LNu2Q
+    # - ST_tW_top_2L2Nu
+    # - ST_tW_top_4Q
+    # - ST_tW_top_LNu2Q
+    - TbarBtoLminusNuB_s_channel_4FS
+    - TBbartoLplusNuBbar_s_channel_4FS
+    - TbarBQ_t_channel_4FS
+    - TBbarQ_t_channel_4FS
+    - TbarWplusto2L2Nu
+    - TbarWplusto4Q
+    - TbarWplustoLNu2Q
+    - TWminusto2L2Nu
+    - TWminusto4Q
+    - TWminustoLNu2Q
 
 DY_LowMass:
   name: "DY M10to50"
   color: "kAzure+10"
   datasets:
-    - DYto2L_M_10to50_amcatnloFXFX
+    # - DYto2L_M_10to50_amcatnloFXFX
+    - DYto2E_M_10to50_amcatnloFXFX
+    - DYto2Mu_M_10to50_amcatnloFXFX
 
 DY_HighMass:
   name: "DY M50"
   cross_section_correction: 12/ 11  # NLO -> NNLO
   color: "kAzure+7"
   datasets:
-    - DYto2L_M_50_0J_amcatnloFXFX
-    - DYto2L_M_50_1J_amcatnloFXFX
-    - DYto2L_M_50_2J_amcatnloFXFX
+    # - DYto2L_M_50_0J_amcatnloFXFX
+    # - DYto2L_M_50_1J_amcatnloFXFX
+    # - DYto2L_M_50_2J_amcatnloFXFX
+    - DYto2E_M_50_0J_amcatnloFXFX
+    - DYto2E_M_50_1J_amcatnloFXFX
+    - DYto2E_M_50_2J_amcatnloFXFX
+    - DYto2Mu_M_50_0J_amcatnloFXFX
+    - DYto2Mu_M_50_1J_amcatnloFXFX
+    - DYto2Mu_M_50_2J_amcatnloFXFX
 
 W:
   name: "W"
