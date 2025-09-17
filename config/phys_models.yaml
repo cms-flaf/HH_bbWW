@@ -14,6 +14,7 @@ BaseModel:
     - DY_HighMass
     - ST
     - VV
+    - W
   # groups:
   #   mc_bkgs:
   #     - DY_stitched
@@ -23,5 +24,7 @@ BaseModel:
     # - GluGluToBulkGraviton
     - GluGluToRadion_DoubleLepton
     - GluGluToRadion_SingleLepton
+    - GluGluToBulkGraviton_DoubleLepton
+    - GluGluToBulkGraviton_SingleLepton
   data:
     - Data_Full

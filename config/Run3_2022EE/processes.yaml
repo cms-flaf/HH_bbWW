@@ -130,10 +130,53 @@ GluGluToRadion_SingleLepton:
     - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_5000
 
 
-GluGluToBulkGraviton:
-  name: "GluGluToBulkGraviton"
-  color: "kBlue"
-  to_stitch: false
+GluGluToBulkGraviton_DoubleLepton:
+  name: "GluGluToBulkGraviton_DoubleLepton"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton2L_${MASS}
+    name_pattern: GluGluToBulkGraviton 2L mass ${MASS} GeV
+    to_plot: [ 300, 600, 1000 ]
+    plot_color: [ "kBlack", "kBlue", "kRed" ]
+  datasets:
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_250
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_260
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_270
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_280
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_300
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_350
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_450
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_550
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_650
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_700
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1200
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1400
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1600
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1800
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2500
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_3000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_4000
+    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_5000
+
+
+GluGluToBulkGraviton_SingleLepton:
+  name: "GluGluToBulkGraviton_SingleLepton"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton1L_${MASS}
+    name_pattern: GluGluToBulkGraviton 1L mass ${MASS} GeV
+    to_plot: [ 300, 600, 1000 ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
   datasets:
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_250
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_260
@@ -157,29 +200,6 @@ GluGluToBulkGraviton:
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_3000
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_4000
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_5000
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_250
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_260
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_270
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_280
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_300
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_350
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_450
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_550
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_600
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_650
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_700
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_800
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1000
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1200
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1400
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1600
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_1800
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2000
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_2500
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_3000
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_4000
-    - GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_5000
-  datasets_to_plot:
 
 
 Data_Full:
