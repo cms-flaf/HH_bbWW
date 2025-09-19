@@ -286,6 +286,32 @@ def AddDNNVariables(df):
     return df
 
 
+def AddDeepHMEVariables(df):
+    kinematic_vars = ["px", "py", "pz", "E"]
+    func_names = {'px': 'Px', 'py': 'Py', 'pz': 'Pz', 'E': 'E'}
+    for var in kinematic_vars:
+        df = df.Define(f"centralJet_{var}", f"""RVecF res;
+                                               for (size_t i = 0; i < centralJet_p4.size(); ++i)
+                                               {{
+                                                    res.push_back(centralJet_p4.{func_names[var]});
+                                               }}
+                                               return res;
+                                            """)
+
+        df = df.Define(f"SelectedFatJet_{var}", f"""RVecF res;
+                                               for (size_t i = 0; i < SelectedFatJet_p4.size(); ++i)
+                                               {{
+                                                    res.push_back(SelectedFatJet_p4.{func_names[var]});
+                                               }}
+                                               return res;
+                                            """)
+
+        df = df.Define(f"lep1_{var}", f"lep1_p4.{func_names[var]}")
+        if channel == "DL":
+            df = df.Define(f"lep2_{var}", f"lep2_p4.{func_names[var]}")
+                
+    return df
+
 
 def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
