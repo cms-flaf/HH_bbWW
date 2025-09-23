@@ -79,13 +79,13 @@ datasim_text:
 
 cat_text:
   pos_ref: datasim_text
-  pos: [0.1, -0.079 ]
+  pos: [ 0.1, -0.079 ]
   text_size: 0.026
   font: 62
 
 ch_text:
   pos_ref: datasim_text
-  pos: [0.01, -0.08]
+  pos: [ 0.01, -0.08 ]
   text_size: 0.026
   font: 62
 

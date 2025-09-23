@@ -1,103 +1,103 @@
 features: &id001
-- lep1_pt
-- lep1_phi
-- lep1_eta
-- lep1_mass
-- lep2_pt
-- lep2_phi
-- lep2_eta
-- lep2_mass
-- met_pt
-- met_phi
+  - lep1_pt
+  - lep1_phi
+  - lep1_eta
+  - lep1_mass
+  - lep2_pt
+  - lep2_phi
+  - lep2_eta
+  - lep2_mass
+  - met_pt
+  - met_phi
 highlevelfeatures: &id002
-- HT
-- dR_dilep
-- dR_dibjet
-- dR_dilep_dibjet
-- dR_dilep_dijet
-- dPhi_lep1_lep2
-- dPhi_jet1_jet2
-- dPhi_MET_dilep
-- dPhi_MET_dibjet
-- MT
-- MT2_ll
-- MT2_bb
-- MT2_blbl
-- ll_mass
-- CosTheta_bb
+  - HT
+  - dR_dilep
+  - dR_dibjet
+  - dR_dilep_dibjet
+  - dR_dilep_dijet
+  - dPhi_lep1_lep2
+  - dPhi_jet1_jet2
+  - dPhi_MET_dilep
+  - dPhi_MET_dibjet
+  - MT
+  - MT2_ll
+  - MT2_bb
+  - MT2_blbl
+  - ll_mass
+  - CosTheta_bb
 listfeatures:
-- - centralJet_pt
-  - 0
-- - centralJet_phi
-  - 0
-- - centralJet_eta
-  - 0
-- - centralJet_mass
-  - 0
-- - centralJet_btagPNetB
-  - 0
-- - centralJet_pt
-  - 1
-- - centralJet_phi
-  - 1
-- - centralJet_eta
-  - 1
-- - centralJet_mass
-  - 1
-- - centralJet_btagPNetB
-  - 1
-- - centralJet_pt
-  - 2
-- - centralJet_phi
-  - 2
-- - centralJet_eta
-  - 2
-- - centralJet_mass
-  - 2
-- - centralJet_btagPNetB
-  - 2
-- - centralJet_pt
-  - 3
-- - centralJet_phi
-  - 3
-- - centralJet_eta
-  - 3
-- - centralJet_mass
-  - 3
-- - centralJet_btagPNetB
-  - 3
-- - SelectedFatJet_pt
-  - 0
-- - SelectedFatJet_phi
-  - 0
-- - SelectedFatJet_eta
-  - 0
-- - SelectedFatJet_mass
-  - 0
-- - SelectedFatJet_SubJet1_btagDeepB
-  - 0
-- - SelectedFatJet_SubJet1_eta
-  - 0
-- - SelectedFatJet_SubJet1_isValid
-  - 0
-- - SelectedFatJet_SubJet1_mass
-  - 0
-- - SelectedFatJet_SubJet1_phi
-  - 0
-- - SelectedFatJet_SubJet1_pt
-  - 0
-- - SelectedFatJet_SubJet2_btagDeepB
-  - 0
-- - SelectedFatJet_SubJet2_eta
-  - 0
-- - SelectedFatJet_SubJet2_isValid
-  - 0
-- - SelectedFatJet_SubJet2_mass
-  - 0
-- - SelectedFatJet_SubJet2_phi
-  - 0
-- - SelectedFatJet_SubJet2_pt
-  - 0
+  - - centralJet_pt
+    - 0
+  - - centralJet_phi
+    - 0
+  - - centralJet_eta
+    - 0
+  - - centralJet_mass
+    - 0
+  - - centralJet_btagPNetB
+    - 0
+  - - centralJet_pt
+    - 1
+  - - centralJet_phi
+    - 1
+  - - centralJet_eta
+    - 1
+  - - centralJet_mass
+    - 1
+  - - centralJet_btagPNetB
+    - 1
+  - - centralJet_pt
+    - 2
+  - - centralJet_phi
+    - 2
+  - - centralJet_eta
+    - 2
+  - - centralJet_mass
+    - 2
+  - - centralJet_btagPNetB
+    - 2
+  - - centralJet_pt
+    - 3
+  - - centralJet_phi
+    - 3
+  - - centralJet_eta
+    - 3
+  - - centralJet_mass
+    - 3
+  - - centralJet_btagPNetB
+    - 3
+  - - SelectedFatJet_pt
+    - 0
+  - - SelectedFatJet_phi
+    - 0
+  - - SelectedFatJet_eta
+    - 0
+  - - SelectedFatJet_mass
+    - 0
+  - - SelectedFatJet_SubJet1_btagDeepB
+    - 0
+  - - SelectedFatJet_SubJet1_eta
+    - 0
+  - - SelectedFatJet_SubJet1_isValid
+    - 0
+  - - SelectedFatJet_SubJet1_mass
+    - 0
+  - - SelectedFatJet_SubJet1_phi
+    - 0
+  - - SelectedFatJet_SubJet1_pt
+    - 0
+  - - SelectedFatJet_SubJet2_btagDeepB
+    - 0
+  - - SelectedFatJet_SubJet2_eta
+    - 0
+  - - SelectedFatJet_SubJet2_isValid
+    - 0
+  - - SelectedFatJet_SubJet2_mass
+    - 0
+  - - SelectedFatJet_SubJet2_phi
+    - 0
+  - - SelectedFatJet_SubJet2_pt
+    - 0
 model_setup:
   UseParametric: true
   adv_activation: relu
@@ -120,47 +120,47 @@ model_setup:
   input_folder: DNN_Datasets/Dataset_2025-05-30-01-19-55/
   learning_rate: 0.001
   listfeatures:
-  - - - centralJet_pt
-      - centralJet_phi
-      - centralJet_eta
-      - centralJet_mass
-      - centralJet_btagPNetB
-    - 0
-  - - - centralJet_pt
-      - centralJet_phi
-      - centralJet_eta
-      - centralJet_mass
-      - centralJet_btagPNetB
-    - 1
-  - - - centralJet_pt
-      - centralJet_phi
-      - centralJet_eta
-      - centralJet_mass
-      - centralJet_btagPNetB
-    - 2
-  - - - centralJet_pt
-      - centralJet_phi
-      - centralJet_eta
-      - centralJet_mass
-      - centralJet_btagPNetB
-    - 3
-  - - - SelectedFatJet_pt
-      - SelectedFatJet_phi
-      - SelectedFatJet_eta
-      - SelectedFatJet_mass
-      - SelectedFatJet_SubJet1_btagDeepB
-      - SelectedFatJet_SubJet1_eta
-      - SelectedFatJet_SubJet1_isValid
-      - SelectedFatJet_SubJet1_mass
-      - SelectedFatJet_SubJet1_phi
-      - SelectedFatJet_SubJet1_pt
-      - SelectedFatJet_SubJet2_btagDeepB
-      - SelectedFatJet_SubJet2_eta
-      - SelectedFatJet_SubJet2_isValid
-      - SelectedFatJet_SubJet2_mass
-      - SelectedFatJet_SubJet2_phi
-      - SelectedFatJet_SubJet2_pt
-    - 0
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 0
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 1
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 2
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 3
+    - - - SelectedFatJet_pt
+        - SelectedFatJet_phi
+        - SelectedFatJet_eta
+        - SelectedFatJet_mass
+        - SelectedFatJet_SubJet1_btagDeepB
+        - SelectedFatJet_SubJet1_eta
+        - SelectedFatJet_SubJet1_isValid
+        - SelectedFatJet_SubJet1_mass
+        - SelectedFatJet_SubJet1_phi
+        - SelectedFatJet_SubJet1_pt
+        - SelectedFatJet_SubJet2_btagDeepB
+        - SelectedFatJet_SubJet2_eta
+        - SelectedFatJet_SubJet2_isValid
+        - SelectedFatJet_SubJet2_mass
+        - SelectedFatJet_SubJet2_phi
+        - SelectedFatJet_SubJet2_pt
+      - 0
   n_adv_layers: 5
   n_adv_units: 128
   n_class_layers: 5
@@ -170,44 +170,44 @@ model_setup:
   n_epochs: 20
   output_folder: v35
   parametric_list: &id003
-  - 250
-  - 260
-  - 270
-  - 280
-  - 300
-  - 350
-  - 450
-  - 550
-  - 600
-  - 650
-  - 700
-  - 800
-  - 1000
-  - 1200
-  - 1400
-  - 1600
-  - 1800
-  - 2000
-  - 2500
-  - 3000
-  - 4000
-  - 5000
+    - 250
+    - 260
+    - 270
+    - 280
+    - 300
+    - 350
+    - 450
+    - 550
+    - 600
+    - 650
+    - 700
+    - 800
+    - 1000
+    - 1200
+    - 1400
+    - 1600
+    - 1800
+    - 2000
+    - 2500
+    - 3000
+    - 4000
+    - 5000
   patience: 100
   use_batch_norm: false
   weight_decay: 0.004
 modelname_parity:
-- - ResHH_Classifier_parity0
-  - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
-    > 0) ) && (event%4 == 0)
-- - ResHH_Classifier_parity1
-  - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
-    > 0) ) && (event%4 == 1)
-- - ResHH_Classifier_parity2
-  - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
-    > 0) ) && (event%4 == 2)
-- - ResHH_Classifier_parity3
-  - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
-    > 0) ) && (event%4 == 3)
+  - - ResHH_Classifier_parity0
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 0)
+  - - ResHH_Classifier_parity1
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 1)
+  - - ResHH_Classifier_parity2
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 2)
+  - - ResHH_Classifier_parity3
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 3)
 nClasses: 2
 class_names:
   - Signal

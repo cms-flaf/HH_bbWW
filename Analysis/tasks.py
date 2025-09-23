@@ -8,65 +8,82 @@ import threading
 
 from FLAF.RunKit.run_tools import ps_call
 from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
-from FLAF.run_tools.law_customizations import Task, HTCondorWorkflow, copy_param,get_param_value
+from FLAF.run_tools.law_customizations import (
+    Task,
+    HTCondorWorkflow,
+    copy_param,
+    get_param_value,
+)
+
 # from FLAF.AnaProd.tasks import AnaTupleTask, DataMergeTask, AnaCacheTupleTask, DataCacheMergeTask, AnaCacheTask
-from FLAF.AnaProd.tasks import AnaTupleTask, DataMergeTask, DataCacheMergeTask, AnaCacheTask
+from FLAF.AnaProd.tasks import (
+    AnaTupleTask,
+    DataMergeTask,
+    DataCacheMergeTask,
+    AnaCacheTask,
+)
 
 unc_cfg_dict = None
+
+
 def load_unc_config(unc_cfg):
     global unc_cfg_dict
-    with open(unc_cfg, 'r') as f:
+    with open(unc_cfg, "r") as f:
         unc_cfg_dict = yaml.safe_load(f)
     return unc_cfg_dict
 
 
 def getYear(period):
     year_dict = {
-        'Run2_2016_HIPM':'2016_HIPM',
-        'Run2_2016':'2016',
-        'Run2_2017':'2017',
-        'Run2_2018':'2018',
-        'Run3_2022':'2022',
-        'Run3_2022EE':'2022EE',
-        'Run3_2023':'2023',
-        'Run3_2023BPix':'2023BPix',
+        "Run2_2016_HIPM": "2016_HIPM",
+        "Run2_2016": "2016",
+        "Run2_2017": "2017",
+        "Run2_2018": "2018",
+        "Run3_2022": "2022",
+        "Run3_2022EE": "2022EE",
+        "Run3_2023": "2023",
+        "Run3_2023BPix": "2023BPix",
     }
     return year_dict[period]
+
 
 def parseVarEntry(var_entry):
     if type(var_entry) == str:
         var_name = var_entry
         need_cache = False
     else:
-        var_name = var_entry['name']
-        need_cache = var_entry.get('need_cache', False)
+        var_name = var_entry["name"]
+        need_cache = var_entry.get("need_cache", False)
     return var_name, need_cache
 
-def GetSamples(samples, backgrounds, signals=['GluGluToRadion','GluGluToBulkGraviton']):
+
+def GetSamples(
+    samples, backgrounds, signals=["GluGluToRadion", "GluGluToBulkGraviton"]
+):
     global samples_to_consider
-    samples_to_consider = ['data']
+    samples_to_consider = ["data"]
 
     for sample_name in samples.keys():
-        sample_type = samples[sample_name]['sampleType']
+        sample_type = samples[sample_name]["sampleType"]
         if sample_type in signals or sample_name in backgrounds:
             samples_to_consider.append(sample_name)
     return samples_to_consider
 
+
 def getCustomisationSplit(customisations):
     customisation_dict = {}
-    if customisations is None or len(customisations) == 0: return {}
+    if customisations is None or len(customisations) == 0:
+        return {}
     if type(customisations) == str:
-        customisations = customisations.split(';')
+        customisations = customisations.split(";")
     if type(customisations) != list:
-        raise RuntimeError(f'Invalid type of customisations: {type(customisations)}')
+        raise RuntimeError(f"Invalid type of customisations: {type(customisations)}")
     for customisation in customisations:
-        substrings = customisation.split('=')
-        if len(substrings) != 2 :
+        substrings = customisation.split("=")
+        if len(substrings) != 2:
             raise RuntimeError("len of substring is not 2!")
         customisation_dict[substrings[0]] = substrings[1]
     return customisation_dict
-
-
 
 
 # class AnalysisCacheTask(Task, HTCondorWorkflow, law.LocalWorkflow):
@@ -134,7 +151,6 @@ def getCustomisationSplit(customisations):
 #             thread.join()
 
 
-
 # class AnalysisCacheMergeTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 #     max_runtime = copy_param(HTCondorWorkflow.max_runtime, 5.0)
 
@@ -172,5 +188,3 @@ def getCustomisationSplit(customisations):
 #                 dataMerge_cmd.extend(local_inputs)
 #                 #print(dataMerge_cmd)
 #                 ps_call(dataMerge_cmd,verbose=1)
-
-

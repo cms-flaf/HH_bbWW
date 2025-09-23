@@ -33,36 +33,35 @@
     - QCDEM
   title: QCDEM
   color: QCDEM
-#- name: TTX
+# - name: TTX
 #  title: TTX
 #  color: kCyan
-#- name: GluGluToRadion
+# - name: GluGluToRadion
 #  title: GluGlu2L300
 #  color: kBlack
-#- name: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-450
+# - name: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-450
 #  title: GluGlu2L450
 #  color: kBlack
-#- name: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800
+# - name: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M-800
 #  title: GluGlu2L800
 #  color: kBlack
 
 
+# Pick some mass points and scale to see a shape distribution
 
-#Pick some mass points and scale to see a shape distribution
-
-#- name: GluGluToBulkGraviton_1250
-  #title: "GluGluBulkGraviton - 1250 GeV"
-  #type: signal
-  #color: kGreen
-  #scale: 0.05
-#- name: GluGluToRadion_1250
-  #title: "GluGluRadion - 1250"
-  #type: signal
-  #color: kCyan
-#- name: GluGluToRadion_700
-  #title: "GluGluRadion - 700 GeV"
-  #type: signal
-  #color: kBlue
+# - name: GluGluToBulkGraviton_1250
+#   title: "GluGluBulkGraviton - 1250 GeV"
+#   type: signal
+#   color: kGreen
+#   scale: 0.05
+# - name: GluGluToRadion_1250
+#   title: "GluGluRadion - 1250"
+#   type: signal
+#   color: kCyan
+# - name: GluGluToRadion_700
+#   title: "GluGluRadion - 700 GeV"
+#   type: signal
+#   color: kBlue
 - name: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
   title: "Radion-260 GeV"
   color: kViolet
@@ -84,19 +83,20 @@
   types:
     - signal
   scale: 1000
+  # scale: 0.05
 
-  #scale: 0.05
-#- name: VBFToBulkGraviton
+
+# - name: VBFToBulkGraviton
 #  title: "qqHH #rightarrow bb#tau#tau BulkGraviton"
 #  type: signal
 #  color: kMagenta
 #  scale: 5
-#- name: VBFToRadion
+# - name: VBFToRadion
 #  title: "qqHH #rightarrow bb#tau#tau Radion"
 #  type: signal
 #  color: kViolet+4
 #  scale: 5
-#- name: Other
+# - name: Other
 #  title: "other backgrounds"
 #  color: kRed-4
 #  types:
