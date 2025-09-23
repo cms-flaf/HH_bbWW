@@ -46,7 +46,6 @@ singleIsoEleHT:
       doMatching: False
 
 
-
 singleEleWpTight:
   channels:
     - eMu
@@ -112,7 +111,7 @@ EMu:
     - offline_obj:
         cut: "{obj}_legType == Leg::e && {obj}_pt > 25"
       online_obj:
-        cut:  TrigObj_id==11 && (TrigObj_filterBits&64)!=0
+        cut: TrigObj_id==11 && (TrigObj_filterBits&64)!=0
       doMatching: False
 MuE:
   channels:
@@ -130,7 +129,7 @@ MuE:
     - offline_obj:
         cut: "{obj}_legType == Leg::e && {obj}_pt > 14"
       online_obj:
-        cut:  TrigObj_id==11 && (TrigObj_filterBits&64)!=0
+        cut: TrigObj_id==11 && (TrigObj_filterBits&64)!=0
       doMatching: False
 
 # QuadPFJet:

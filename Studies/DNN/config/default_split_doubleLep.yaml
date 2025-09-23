@@ -1,5 +1,5 @@
 batch_dict:
-  GluGlutoRadion: 100 #It is important to put signal first since signal has extra branches
+  GluGlutoRadion: 100 # It is important to put signal first since signal has extra branches
   GluGlutoBulkGraviton: 100
   TT: 1000
   DY: 550
@@ -8,15 +8,15 @@ batch_dict:
 
 storage_folder: /eos/user/d/daebi/bbWW/anaTuples/may22/Run3_2022EE/
 
-selection_branches: ['lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt', 'SelectedFatJet_pt']
+selection_branches: [ 'lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt', 'SelectedFatJet_pt' ]
 
-#Cuts for uproot
+# Cuts for uproot
 selection_cut: (tree['lep1_legType'] > 0) & (tree['lep2_legType'] > 0) & ( (ak.count(tree['centralJet_pt'], axis=1) > 1) | (ak.count(tree['SelectedFatJet_pt'], axis=1) > 0) )
 parity_func: (tree['event']%{nParity} == {parity_scan})
 
 nParity: 4
 
-#Cuts for RDF in creating the training file
+# Cuts for RDF in creating the training file
 iterate_cut: (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size() > 0) ) && (event%{nParity} == {parity_scan})
 
 
@@ -46,20 +46,20 @@ signal:
 background:
   TT:
     class_value: 1
-    background_datasets: #If there is an extension, just add more to the list
-      #TT: #When we use TTinclusive and appropriately weight, we actually can not make many batches ):
-      #- TT_ext1
+    background_datasets: # If there is an extension, just add more to the list
+      # TT: #When we use TTinclusive and appropriately weight, we actually can not make many batches ):
+      # - TT_ext1
       TTto2L2Nu:
-      - TTto2L2Nu_ext1
+        - TTto2L2Nu_ext1
       TTto4Q:
-      - TTto4Q_ext1
+        - TTto4Q_ext1
       TTtoLNu2Q:
-      - TTtoLNu2Q_ext1
+        - TTtoLNu2Q_ext1
   DY:
     class_value: 2
     background_datasets:
-      DYto2L_M_10to50_amcatnloFXFX: []
-      DYto2L_M_50_amcatnloFXFX: []
+      DYto2L_M_10to50_amcatnloFXFX: [ ]
+      DYto2L_M_50_amcatnloFXFX: [ ]
   ST:
     class_value: 3
     background_datasets:
@@ -67,9 +67,9 @@ background:
       # ST_s_channel_top_4f_leptonDecays: []
       # ST_t_channel_antitop_4f_InclusiveDecays: []
       # ST_t_channel_top_4f_InclusiveDecays: []
-      ST_tW_antitop_2L2Nu: []
-      ST_tW_antitop_4Q: []
-      ST_tW_antitop_LNu2Q: []
-      ST_tW_top_2L2Nu: []
-      ST_tW_top_4Q: []
-      ST_tW_top_LNu2Q: []
+      ST_tW_antitop_2L2Nu: [ ]
+      ST_tW_antitop_4Q: [ ]
+      ST_tW_antitop_LNu2Q: [ ]
+      ST_tW_top_2L2Nu: [ ]
+      ST_tW_top_4Q: [ ]
+      ST_tW_top_LNu2Q: [ ]
