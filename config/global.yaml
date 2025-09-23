@@ -122,7 +122,16 @@ payload_producers:
     max_runtime: 2.0
     cmssw_env: False
     awkward_based: False
-
+  DeepHME:
+    producers_module_name: Analysis.DeepHMEProducer
+    producer_name: DeepHMEProducer
+    channel: "DL"
+    model_name: predict_quantiles3D_DL_v8
+    return_errors: True
+    columns:
+      - deepHME_mass
+      - deepHME_mass_error
+  
 # This is for Analysis Selection
 channelSelection:
   - e
