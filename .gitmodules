@@ -13,3 +13,6 @@
 [submodule "inference"]
 	path = inference
 	url = ssh://git@gitlab.cern.ch:7999/cms-flaf/inference.git
+[submodule "DeepHME"]
+	path = DeepHME
+	url = git@github.com:cms-flaf/DeepHME.git
