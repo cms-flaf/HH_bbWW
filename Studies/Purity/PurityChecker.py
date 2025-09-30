@@ -7,25 +7,24 @@ from statsmodels.stats.proportion import proportion_confint
 
 class PurityChecker:
     def __init__(self, sort_by):
-        self.sort_by = sort_by if 'centralJet_' in sort_by else 'centralJet_' + sort_by
-
+        self.sort_by = sort_by if "centralJet_" in sort_by else "centralJet_" + sort_by
 
     def ComputePurity(self, file_name, channel):
         file = uproot.open(file_name)
-        tree = file['Events']
+        tree = file["Events"]
         branches = tree.arrays()
 
-        jet_hadrFlav = branches['centralJet_hadronFlavour']
-        jet_trueBjetTag = branches['centralJet_TrueBjetTag']
+        jet_hadrFlav = branches["centralJet_hadronFlavour"]
+        jet_trueBjetTag = branches["centralJet_TrueBjetTag"]
         jet_btag = branches[self.sort_by]
 
-        has_at_least_2_reco_bjets = (ak.count_nonzero(jet_hadrFlav == 5, axis=1) >= 2)
+        has_at_least_2_reco_bjets = ak.count_nonzero(jet_hadrFlav == 5, axis=1) >= 2
 
-        reco_lep1_type = branches['lep1_type']
-        reco_lep2_type = branches['lep2_type']
+        reco_lep1_type = branches["lep1_type"]
+        reco_lep2_type = branches["lep2_type"]
 
-        gen_lep1_type = branches['lep1_genLep_kind']
-        gen_lep2_type = branches['lep2_genLep_kind']
+        gen_lep1_type = branches["lep1_genLep_kind"]
+        gen_lep2_type = branches["lep2_genLep_kind"]
 
         reco_lep1_mu = reco_lep1_type == 1
         reco_lep1_ele = reco_lep1_type == 0
@@ -43,7 +42,7 @@ class PurityChecker:
         lep2_correct = (reco_lep2_mu & gen_lep2_mu) | (reco_lep2_ele & gen_lep2_ele)
 
         corr_lep_reco = lep1_correct
-        if channel == 'dl':
+        if channel == "dl":
             corr_lep_reco = corr_lep_reco & lep2_correct
 
         presel = has_at_least_2_reco_bjets & corr_lep_reco
@@ -58,9 +57,11 @@ class PurityChecker:
         both_are_b_jets = (jet_trueBjetTag[:, 0]) & (jet_trueBjetTag[:, 1])
         success_trials = ak.count_nonzero(both_are_b_jets)
         total_trials = ak.count(both_are_b_jets)
-        purity = success_trials/total_trials
-        low, high = proportion_confint(success_trials, total_trials, alpha=0.32, method='beta')
+        purity = success_trials / total_trials
+        low, high = proportion_confint(
+            success_trials, total_trials, alpha=0.32, method="beta"
+        )
 
-        masspoint = branches['X_mass'][0]
+        masspoint = branches["X_mass"][0]
 
         return masspoint, purity, low, high
