@@ -129,8 +129,14 @@ payload_producers:
     model_name: predict_quantiles3D_DL_v8
     return_errors: True
     columns:
-      - deepHME_mass
-      - deepHME_mass_error
+      - mass
+      - mass_error
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    dependencies: 
   
 # This is for Analysis Selection
 channelSelection:
