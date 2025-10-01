@@ -144,8 +144,8 @@ payload_producers:
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
-    dependencies: 
-  
+    dependencies:
+
 # This is for Analysis Selection
 channelSelection:
   - e
@@ -340,3 +340,13 @@ vars_to_plot:
   - LinHMEDNN_linear_hme_dnn_m700
   - LinHMEDNN_linear_hme_dnn_m800
   - LinHMEDNN_linear_hme_dnn_m1000
+  - DeepHME_mass
+  - DeepHME_mass_error
+  - DeepHME_Hbb_px
+  - DeepHME_Hbb_py
+  - DeepHME_Hbb_pz
+  - DeepHME_Hbb_E
+  - DeepHME_HVV_px
+  - DeepHME_HVV_py
+  - DeepHME_HVV_pz
+  - DeepHME_HVV_E
