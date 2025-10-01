@@ -5,6 +5,9 @@ import awkward as ak
 import os
 from DeepHME.src.DeepHME import DeepHME
 
+higs_output_mapping = {"Hbb": {"px": 4, "py": 5, "pz": 6, "E": 7},
+                       "HVV": {"px": 0, "py": 1, "pz": 2, "E": 3}}
+
 class DeepHMEProducer:
     def __init__(self, cfg, payload_name):
         self.cfg = cfg
@@ -20,76 +23,82 @@ class DeepHMEProducer:
 
     def run(self, array):
         mass = None
-        errors = None
-        if self.cfg['return_errors']:
-            mass, errors = self.estimator.predict(event_id=array['event'],
-                                                lep1_pt=array['lep1_pt'], 
-                                                lep1_eta=array['lep1_eta'], 
-                                                lep1_phi=array['lep1_phi'], 
-                                                lep1_mass=array['lep1_mass'],
-                                                lep2_pt=array['lep2_pt'], 
-                                                lep2_eta=array['lep2_eta'], 
-                                                lep2_phi=array['lep2_phi'], 
-                                                lep2_mass=array['lep2_mass'],
-                                                met_pt=array['met_pt'], 
-                                                met_phi=array['met_phi'],
-                                                jet_pt=array['centralJet_pt'], 
-                                                jet_eta=array['centralJet_eta'], 
-                                                jet_phi=array['centralJet_phi'], 
-                                                jet_mass=array['centralJet_mass'], 
-                                                jet_btagPNetB=array['centralJet_btagPNetB'], 
-                                                jet_btagPNetCvB=array['centralJet_btagPNetCvB'], 
-                                                jet_btagPNetCvL=array['centralJet_btagPNetCvL'], 
-                                                jet_btagPNetCvNotB=array['centralJet_btagPNetCvNotB'], 
-                                                jet_btagPNetQvG=array['centralJet_btagPNetQvG'],
-                                                jet_PNetRegPtRawCorr=array['centralJet_PNetRegPtRawCorr'], 
-                                                jet_PNetRegPtRawCorrNeutrino=array['centralJet_PNetRegPtRawCorrNeutrino'], 
-                                                jet_PNetRegPtRawRes=array['centralJet_PNetRegPtRawRes'],
-                                                fatjet_pt=array['SelectedFatJet_pt'], 
-                                                fatjet_eta=array['SelectedFatJet_eta'], 
-                                                fatjet_phi=array['SelectedFatJet_phi'], 
-                                                fatjet_mass=array['SelectedFatJet_mass'],
-                                                fatjet_particleNet_QCD=array['SelectedFatJet_particleNet_QCD'], 
-                                                fatjet_particleNet_XbbVsQCD=array['SelectedFatJet_particleNet_XbbVsQCD'], 
-                                                fatjet_particleNetWithMass_QCD=array['SelectedFatJet_particleNetWithMass_QCD'], 
-                                                fatjet_particleNetWithMass_HbbvsQCD=array['SelectedFatJet_particleNetWithMass_HbbvsQCD'], 
-                                                fatjet_particleNet_massCorr=array['SelectedFatJet_particleNet_massCorr'],
-                                                output_format='mass')
-        else:
-            mass = self.estimator.predict(event_id=array['event'],
-                                        lep1_pt=array['lep1_pt'], 
-                                        lep1_eta=array['lep1_eta'], 
-                                        lep1_phi=array['lep1_phi'], 
-                                        lep1_mass=array['lep1_mass'],
-                                        lep2_pt=array['lep2_pt'], 
-                                        lep2_eta=array['lep2_eta'], 
-                                        lep2_phi=array['lep2_phi'], 
-                                        lep2_mass=array['lep2_mass'],
-                                        met_pt=array['met_pt'], 
-                                        met_phi=array['met_phi'],
-                                        jet_pt=array['centralJet_pt'], 
-                                        jet_eta=array['centralJet_eta'], 
-                                        jet_phi=array['centralJet_phi'], 
-                                        jet_mass=array['centralJet_mass'], 
-                                        jet_btagPNetB=array['centralJet_btagPNetB'], 
-                                        jet_btagPNetCvB=array['centralJet_btagPNetCvB'], 
-                                        jet_btagPNetCvL=array['centralJet_btagPNetCvL'], 
-                                        jet_btagPNetCvNotB=array['centralJet_btagPNetCvNotB'], 
-                                        jet_btagPNetQvG=array['centralJet_btagPNetQvG'],
-                                        jet_PNetRegPtRawCorr=array['centralJet_PNetRegPtRawCorr'], 
-                                        jet_PNetRegPtRawCorrNeutrino=array['centralJet_PNetRegPtRawCorrNeutrino'], 
-                                        jet_PNetRegPtRawRes=array['centralJet_PNetRegPtRawRes'],
-                                        fatjet_pt=array['SelectedFatJet_pt'], 
-                                        fatjet_eta=array['SelectedFatJet_eta'], 
-                                        fatjet_phi=array['SelectedFatJet_phi'], 
-                                        fatjet_mass=array['SelectedFatJet_mass'],
-                                        fatjet_particleNet_QCD=array['SelectedFatJet_particleNet_QCD'], 
-                                        fatjet_particleNet_XbbVsQCD=array['SelectedFatJet_particleNet_XbbVsQCD'], 
-                                        fatjet_particleNetWithMass_QCD=array['SelectedFatJet_particleNetWithMass_QCD'], 
-                                        fatjet_particleNetWithMass_HbbvsQCD=array['SelectedFatJet_particleNetWithMass_HbbvsQCD'], 
-                                        fatjet_particleNet_massCorr=array['SelectedFatJet_particleNet_massCorr'],
-                                        output_format='mass')     
+        mass_errors = None
+
+        pred = self.estimator.predict(event_id=array['event'],
+                                    lep1_pt=array['lep1_pt'], 
+                                    lep1_eta=array['lep1_eta'], 
+                                    lep1_phi=array['lep1_phi'], 
+                                    lep1_mass=array['lep1_mass'],
+                                    lep2_pt=array['lep2_pt'], 
+                                    lep2_eta=array['lep2_eta'], 
+                                    lep2_phi=array['lep2_phi'], 
+                                    lep2_mass=array['lep2_mass'],
+                                    met_pt=array['met_pt'], 
+                                    met_phi=array['met_phi'],
+                                    jet_pt=array['centralJet_pt'], 
+                                    jet_eta=array['centralJet_eta'], 
+                                    jet_phi=array['centralJet_phi'], 
+                                    jet_mass=array['centralJet_mass'], 
+                                    jet_btagPNetB=array['centralJet_btagPNetB'], 
+                                    jet_btagPNetCvB=array['centralJet_btagPNetCvB'], 
+                                    jet_btagPNetCvL=array['centralJet_btagPNetCvL'], 
+                                    jet_btagPNetCvNotB=array['centralJet_btagPNetCvNotB'], 
+                                    jet_btagPNetQvG=array['centralJet_btagPNetQvG'],
+                                    jet_PNetRegPtRawCorr=array['centralJet_PNetRegPtRawCorr'], 
+                                    jet_PNetRegPtRawCorrNeutrino=array['centralJet_PNetRegPtRawCorrNeutrino'], 
+                                    jet_PNetRegPtRawRes=array['centralJet_PNetRegPtRawRes'],
+                                    fatjet_pt=array['SelectedFatJet_pt'], 
+                                    fatjet_eta=array['SelectedFatJet_eta'], 
+                                    fatjet_phi=array['SelectedFatJet_phi'], 
+                                    fatjet_mass=array['SelectedFatJet_mass'],
+                                    fatjet_particleNet_QCD=array['SelectedFatJet_particleNet_QCD'], 
+                                    fatjet_particleNet_XbbVsQCD=array['SelectedFatJet_particleNet_XbbVsQCD'], 
+                                    fatjet_particleNetWithMass_QCD=array['SelectedFatJet_particleNetWithMass_QCD'], 
+                                    fatjet_particleNetWithMass_HbbvsQCD=array['SelectedFatJet_particleNetWithMass_HbbvsQCD'], 
+                                    fatjet_particleNet_massCorr=array['SelectedFatJet_particleNet_massCorr'],
+                                    output_format='mass')
         
+        if  self.cfg['return_errors']:
+            mass, mass_errors = pred
+        else:
+            mass = pred
+        
+        # for now we decided to not return errors for components of p4
+        p4, _ = self.estimator.predict(event_id=array['event'],
+                                    lep1_pt=array['lep1_pt'], 
+                                    lep1_eta=array['lep1_eta'], 
+                                    lep1_phi=array['lep1_phi'], 
+                                    lep1_mass=array['lep1_mass'],
+                                    lep2_pt=array['lep2_pt'], 
+                                    lep2_eta=array['lep2_eta'], 
+                                    lep2_phi=array['lep2_phi'], 
+                                    lep2_mass=array['lep2_mass'],
+                                    met_pt=array['met_pt'], 
+                                    met_phi=array['met_phi'],
+                                    jet_pt=array['centralJet_pt'], 
+                                    jet_eta=array['centralJet_eta'], 
+                                    jet_phi=array['centralJet_phi'], 
+                                    jet_mass=array['centralJet_mass'], 
+                                    jet_btagPNetB=array['centralJet_btagPNetB'], 
+                                    jet_btagPNetCvB=array['centralJet_btagPNetCvB'], 
+                                    jet_btagPNetCvL=array['centralJet_btagPNetCvL'], 
+                                    jet_btagPNetCvNotB=array['centralJet_btagPNetCvNotB'], 
+                                    jet_btagPNetQvG=array['centralJet_btagPNetQvG'],
+                                    jet_PNetRegPtRawCorr=array['centralJet_PNetRegPtRawCorr'], 
+                                    jet_PNetRegPtRawCorrNeutrino=array['centralJet_PNetRegPtRawCorrNeutrino'], 
+                                    jet_PNetRegPtRawRes=array['centralJet_PNetRegPtRawRes'],
+                                    fatjet_pt=array['SelectedFatJet_pt'], 
+                                    fatjet_eta=array['SelectedFatJet_eta'], 
+                                    fatjet_phi=array['SelectedFatJet_phi'], 
+                                    fatjet_mass=array['SelectedFatJet_mass'],
+                                    fatjet_particleNet_QCD=array['SelectedFatJet_particleNet_QCD'], 
+                                    fatjet_particleNet_XbbVsQCD=array['SelectedFatJet_particleNet_XbbVsQCD'], 
+                                    fatjet_particleNetWithMass_QCD=array['SelectedFatJet_particleNetWithMass_QCD'], 
+                                    fatjet_particleNetWithMass_HbbvsQCD=array['SelectedFatJet_particleNetWithMass_HbbvsQCD'], 
+                                    fatjet_particleNet_massCorr=array['SelectedFatJet_particleNet_massCorr'],
+                                    output_format='p4')
+
         # Delete not-needed array
         for col in array.fields:
             if col not in self.cfg['columns']:
@@ -98,6 +107,16 @@ class DeepHMEProducer:
 
         array[f"{self.payload_name}_mass"] = mass
         if 'mass_error' in self.cfg['columns']:
-            array[f"{self.payload_name}_mass_error"] = errors
+            array[f"{self.payload_name}_mass_error"] = mass_errors
+
+        # save energies and momenta of higgs bosons
+        higgses = ["Hbb", "HVV"]
+        for col in self.cfg["columns"]:
+            var = col.split('_')[-1]
+            for higgs in higgses:
+                if higgs in col:
+                    assert var in ['px', 'py', 'pz', 'E'], 'Attempting to save non-kinematic variable from predicted p4'
+                    idx = higs_output_mapping[higgs][var]
+                    array[f"{self.payload_name}_{higgs}_{var}"] = p4[:, idx]
     
         return array

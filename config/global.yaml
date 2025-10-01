@@ -131,6 +131,14 @@ payload_producers:
     columns:
       - mass
       - mass_error
+      - Hbb_px
+      - Hbb_py
+      - Hbb_pz
+      - Hbb_E
+      - HVV_px
+      - HVV_py
+      - HVV_pz
+      - HVV_E
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
