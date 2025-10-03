@@ -680,3 +680,143 @@ LinHMEDNN_linear_hme_dnn_m5000:
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+SingleLep_DeepHME_mass:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_mass:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_mass_error:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_mass_error:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_Hbb_px:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_Hbb_py:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_Hbb_pz:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_Hbb_E:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_HVV_px:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_HVV_py:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_HVV_pz:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+SingleLep_DeepHME_HVV_E:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_Hbb_px:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_Hbb_py:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_Hbb_pz:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_Hbb_E:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_HVV_px:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_HVV_py:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_HVV_pz:
+  x_bins: "100|-1000:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DoubleLep_DeepHME_HVV_E:
+  x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
