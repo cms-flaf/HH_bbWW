@@ -1410,6 +1410,7 @@ class AdversarialModel(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.setup = setup
 
+
         # self.batch_counter = tf.Variable(0)
         self.epoch_counter = tf.Variable(0.0)
 
@@ -2155,15 +2156,24 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
     for list_feature in setup["listfeatures"]:
         dw.AddInputFeaturesList(*list_feature)
     dw.AddHighLevelFeatures(setup["highlevelfeatures"])
+    dw = DataWrapper()
+    dw.AddInputFeatures(setup["features"])
+    for list_feature in setup["listfeatures"]:
+        dw.AddInputFeaturesList(*list_feature)
+    dw.AddHighLevelFeatures(setup["highlevelfeatures"])
 
     dw.UseParametric(setup["UseParametric"])
     dw.SetParamList(setup["parametric_list"])
     dw.SetOutputFolder(output_folder)
 
     # dw.AddInputLabel('sample_type')
+    # dw.AddInputLabel('sample_type')
 
     dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
 
+    # Prep a test dw
+    # Must copy before reading file so we can read the test file instead
+    dw_val = copy.deepcopy(dw)
     # Prep a test dw
     # Must copy before reading file so we can read the test file instead
     dw_val = copy.deepcopy(dw)
@@ -2200,7 +2210,9 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
     )
 
     model(dw.features)
+    model(dw.features)
 
+    model.summary()
     model.summary()
 
     batch_size = setup["batch_compression_factor"] * batch_size
@@ -2251,6 +2263,12 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
             dtype=tf.int64,
         )
 
+        mass_values = tf.constant(dw.param_list)
+        mass_keys = tf.constant(np.arange(len(dw.param_list)))
+        table = tf.lookup.StaticHashTable(
+            tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+            default_value=-1,
+        )
         mass_values = tf.constant(dw.param_list)
         mass_keys = tf.constant(np.arange(len(dw.param_list)))
         table = tf.lookup.StaticHashTable(
@@ -2617,9 +2635,14 @@ def adv_only_training(
     dw.SetParamList(parametric_list)
 
     dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
+    dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
 
     dw_val = copy.deepcopy(dw)
+    dw_val = copy.deepcopy(dw)
 
+    dw.ReadFile(train_file)
+    dw.ReadWeightFile(train_weight)
+    # dw.DefineTrainTestSet(batch_size, 0.0)
     dw.ReadFile(train_file)
     dw.ReadWeightFile(train_weight)
     # dw.DefineTrainTestSet(batch_size, 0.0)
@@ -2796,6 +2819,9 @@ def validate_model(
     dw = DataWrapper()
     dw.AddInputFeatures(features)
     for list_feature_key in list_features_dict.keys():
+        dw.AddInputFeaturesList(
+            list_features_dict[list_feature_key], int(list_feature_key)
+        )
         dw.AddInputFeaturesList(
             list_features_dict[list_feature_key], int(list_feature_key)
         )

@@ -5,49 +5,41 @@
 #include "EstimatorDoubleLep.hpp"
 #include "Definitions.hpp"
 
-namespace HME 
-{
-    class Estimator
-    {
-        public:
+namespace HME {
+    class Estimator {
+      public:
         Estimator(TString const& pdf_file_name_sl, TString const& pdf_file_name_dl);
-        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets, 
-                                             VecLVF_t const& leptons, 
-                                             LorentzVectorF_t const& met, 
+        OptArrF_t<ESTIM_OUT_SZ> EstimateMass(VecLVF_t const& jets,
+                                             VecLVF_t const& leptons,
+                                             LorentzVectorF_t const& met,
                                              std::vector<Float_t> const& btags,
-                                             std::vector<Float_t> const& light_tags, 
-                                             ULong64_t evt_id, Channel ch);
+                                             std::vector<Float_t> const& light_tags,
+                                             ULong64_t evt_id,
+                                             Channel ch);
 
-        private:
+      private:
         EstimatorSingleLep m_estimator_sl;
         EstimatorDoubleLep m_estimator_dl;
     };
 
     Estimator::Estimator(TString const& pdf_file_name_sl, TString const& pdf_file_name_dl)
-    :   m_estimator_sl(pdf_file_name_sl)
-    ,   m_estimator_dl(pdf_file_name_dl)
-    {}
+        : m_estimator_sl(pdf_file_name_sl), m_estimator_dl(pdf_file_name_dl) {}
 
-    OptArrF_t<ESTIM_OUT_SZ> Estimator::EstimateMass(VecLVF_t const& jets, 
-                                                    VecLVF_t const& leptons, 
-                                                    LorentzVectorF_t const& met, 
+    OptArrF_t<ESTIM_OUT_SZ> Estimator::EstimateMass(VecLVF_t const& jets,
+                                                    VecLVF_t const& leptons,
+                                                    LorentzVectorF_t const& met,
                                                     std::vector<Float_t> const& btags,
-                                                    std::vector<Float_t> const& light_tags, 
-                                                    ULong64_t evt_id, Channel ch)
-    {
-        if (ch == Channel::SL)
-        {
+                                                    std::vector<Float_t> const& light_tags,
+                                                    ULong64_t evt_id,
+                                                    Channel ch) {
+        if (ch == Channel::SL) {
             return m_estimator_sl.EstimateMass(jets, leptons, met, btags, light_tags, evt_id);
-        }
-        else if (ch == Channel::DL)
-        {
+        } else if (ch == Channel::DL) {
             return m_estimator_dl.EstimateMass(jets, leptons, met, btags, light_tags, evt_id);
-        }
-        else 
-        {
+        } else {
             throw std::runtime_error("Attempting to process data in unknown channel");
         }
     }
-}
+}  // namespace HME
 
 #endif

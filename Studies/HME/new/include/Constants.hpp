@@ -6,8 +6,7 @@
 
 #include "TString.h"
 
-namespace HME 
-{
+namespace HME {
     inline constexpr int SEED = 42;
 
     enum class Channel { SL, DL };
@@ -64,27 +63,28 @@ namespace HME
     inline constexpr size_t NUM_BEST_BTAG = 3;
     inline constexpr size_t NUM_BEST_QVG = 3;
 
-    inline static const std::unordered_map<PDF1_sl, TString> pdf1d_sl_names = { { PDF1_sl::numet_pt, "pdf_numet_pt" },
-                                                                                { PDF1_sl::numet_dphi, "pdf_numet_dphi" },
-                                                                                { PDF1_sl::nulep_deta, "pdf_nulep_deta" },
-                                                                                { PDF1_sl::hh_dphi, "pdf_hh_dphi" },
-                                                                                { PDF1_sl::mbb, "pdf_mbb" },
-                                                                                { PDF1_sl::mww, "pdf_mww_narrow" },
-                                                                                { PDF1_sl::hh_deta, "pdf_hh_deta" },
-                                                                                { PDF1_sl::q1, "pdf_q1" },
-                                                                                { PDF1_sl::b1, "pdf_b1" } };
+    inline static const std::unordered_map<PDF1_sl, TString> pdf1d_sl_names = {{PDF1_sl::numet_pt, "pdf_numet_pt"},
+                                                                               {PDF1_sl::numet_dphi, "pdf_numet_dphi"},
+                                                                               {PDF1_sl::nulep_deta, "pdf_nulep_deta"},
+                                                                               {PDF1_sl::hh_dphi, "pdf_hh_dphi"},
+                                                                               {PDF1_sl::mbb, "pdf_mbb"},
+                                                                               {PDF1_sl::mww, "pdf_mww_narrow"},
+                                                                               {PDF1_sl::hh_deta, "pdf_hh_deta"},
+                                                                               {PDF1_sl::q1, "pdf_q1"},
+                                                                               {PDF1_sl::b1, "pdf_b1"}};
 
-    inline static const std::unordered_map<PDF2_sl, TString> pdf2d_sl_names = { { PDF2_sl::b1b2, "pdf_b1b2" },
-                                                                                { PDF2_sl::q1q2, "pdf_q1q2" },
-                                                                                { PDF2_sl::mw1mw2, "pdf_mw1mw2" },
-                                                                                { PDF2_sl::hh_dEtadPhi, "pdf_hh_dEtadPhi" },
-                                                                                { PDF2_sl::hh_pt_e, "pdf_hh_pt_e" } };
+    inline static const std::unordered_map<PDF2_sl, TString> pdf2d_sl_names = {
+        {PDF2_sl::b1b2, "pdf_b1b2"},
+        {PDF2_sl::q1q2, "pdf_q1q2"},
+        {PDF2_sl::mw1mw2, "pdf_mw1mw2"},
+        {PDF2_sl::hh_dEtadPhi, "pdf_hh_dEtadPhi"},
+        {PDF2_sl::hh_pt_e, "pdf_hh_pt_e"}};
 
-    inline static const std::unordered_map<PDF1_dl, TString> pdf1d_dl_names = { { PDF1_dl::b1, "pdf_b1_run2" }, 
-                                                                                { PDF1_dl::mw_onshell, "pdf_mw_onshell" }};
-                                                                            
+    inline static const std::unordered_map<PDF1_dl, TString> pdf1d_dl_names = {{PDF1_dl::b1, "pdf_b1_run2"},
+                                                                               {PDF1_dl::mw_onshell, "pdf_mw_onshell"}};
+
     inline static const std::unordered_map<PDF2_dl, TString> pdf2d_dl_names = {};
 
-}
+}  // namespace HME
 
 #endif

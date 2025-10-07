@@ -122,6 +122,52 @@ payload_producers:
     max_runtime: 2.0
     cmssw_env: False
     awkward_based: False
+  DoubleLep_DeepHME:
+    producers_module_name: Analysis.DeepHMEProducer
+    producer_name: DeepHMEProducer
+    channel: "DL"
+    model_name: predict_quantiles3D_DL_v8
+    return_errors: True
+    columns:
+      - mass
+      - mass_error
+      - Hbb_px
+      - Hbb_py
+      - Hbb_pz
+      - Hbb_E
+      - HVV_px
+      - HVV_py
+      - HVV_pz
+      - HVV_E
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    dependencies:
+  SingleLep_DeepHME:
+    producers_module_name: Analysis.DeepHMEProducer
+    producer_name: DeepHMEProducer
+    channel: "SL"
+    model_name: predict_quantiles3D_SL_v3
+    return_errors: True
+    columns:
+      - mass
+      - mass_error
+      - Hbb_px
+      - Hbb_py
+      - Hbb_pz
+      - Hbb_E
+      - HVV_px
+      - HVV_py
+      - HVV_pz
+      - HVV_E
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    dependencies:
 
 # This is for Analysis Selection
 channelSelection:
@@ -317,3 +363,23 @@ vars_to_plot:
   - LinHMEDNN_linear_hme_dnn_m700
   - LinHMEDNN_linear_hme_dnn_m800
   - LinHMEDNN_linear_hme_dnn_m1000
+  - SingleLep_DeepHME_mass
+  - SingleLep_DeepHME_mass_error
+  - SingleLep_DeepHME_Hbb_px
+  - SingleLep_DeepHME_Hbb_py
+  - SingleLep_DeepHME_Hbb_pz
+  - SingleLep_DeepHME_Hbb_E
+  - SingleLep_DeepHME_HVV_px
+  - SingleLep_DeepHME_HVV_py
+  - SingleLep_DeepHME_HVV_pz
+  - SingleLep_DeepHME_HVV_E
+  - DoubleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass_error
+  - DoubleLep_DeepHME_Hbb_px
+  - DoubleLep_DeepHME_Hbb_py
+  - DoubleLep_DeepHME_Hbb_pz
+  - DoubleLep_DeepHME_Hbb_E
+  - DoubleLep_DeepHME_HVV_px
+  - DoubleLep_DeepHME_HVV_py
+  - DoubleLep_DeepHME_HVV_pz
+  - DoubleLep_DeepHME_HVV_E

@@ -10,7 +10,9 @@ import sys
 import gc
 
 
+
 def create_signal_files(config_dict, output_folder):
+    storage_folder = config_dict["storage_folder"]
     storage_folder = config_dict["storage_folder"]
 
     for signal_name in config_dict["signal"]:
