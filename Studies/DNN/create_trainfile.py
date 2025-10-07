@@ -206,5 +206,8 @@ if __name__ == '__main__':
         print(f"Starting batch {i} with yaml {yamlname}")
         config_dict = {}
         with open(os.path.join(output_folder, yamlname), 'r') as file:
-            config_dict = yaml.safe_load(file)            
+            config_dict = yaml.safe_load(file)           
+        if os.path.exists(os.path.join(output_folder, config_dict['meta_data']['input_filename'])):
+            print("File exists, skipping")
+            continue
         create_file(config_dict, output_folder, os.path.join(output_folder, config_dict['meta_data']['input_filename']))

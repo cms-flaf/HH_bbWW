@@ -85,6 +85,7 @@ class DataWrapper():
         self.adv_weight = None
         self.class_target = None
         self.adv_target = None
+        self.adv_regression_target = None
 
         self.train_features = None
         self.train_labels = None
@@ -94,6 +95,7 @@ class DataWrapper():
         self.train_adv_weight = None
         self.train_class_target = None
         self.train_adv_target = None
+        self.train_adv_regression_target = None
 
         self.test_features = None
         self.test_labels = None
@@ -103,6 +105,7 @@ class DataWrapper():
         self.test_adv_weight = None
         self.test_class_target = None
         self.test_adv_target = None
+        self.test_dav_regression_target = None
 
         self.param_list = [250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000 ]
         self.use_parametric = False
@@ -110,9 +113,6 @@ class DataWrapper():
         self.features_paramSet = None
 
         self.output_folder = ""
-
-    def SetBinary(self, use_binary):
-        self.binary = use_binary
 
     def SetOutputFolder(self, foldername):
         self.output_folder = foldername
@@ -172,82 +172,6 @@ class DataWrapper():
         self.mbb_name = mbb_name
         
 
-
-
-    # Not worth the work, use datset.map instead to change parametric values
-    # Can get the random param values from tf.random.categorical()
-    def get_generator(self, file_name, weight_file_name, batch_size):
-        print(f"Reading file {file_name}")
-        file = uproot.open(file_name)
-        tree = file['Events']
-
-        print(f"Reading weight file {weight_file_name}")
-        file = uproot.open(weight_file_name)
-        weight_tree = file['weight_tree']
-
-        features_to_load = []
-        features_to_load = features_to_load + self.feature_names
-        for listfeature in self.listfeature_names:
-           if listfeature[0] not in features_to_load: features_to_load.append(listfeature[0])
-        features_to_load = features_to_load + self.highlevelfeatures_names
-
-        features_to_load.append(self.mbb_name)
-        features_to_load.append('X_mass')
-
-        entry_start = 0
-        entry_stop = entry_start + batch_size
-
-        #Some kind of loop to only get a small chunk?
-        while entry_stop < tree.num_entries:
-            branches = tree.arrays(features_to_load, entry_start=entry_start, entry_stop=entry_stop)
-            weight_branches = weight_tree.arrays(entry_start=entry_start, entry_stop=entry_stop)
-
-            gen_features = np.array([getattr(branches, feature_name) for feature_name in self.feature_names]).transpose()
-            print("Got features, but its a np array")
-
-            default_value = 0.0
-            if self.listfeature_names != None: 
-                gen_listfeatures = np.array([ak.fill_none(ak.pad_none(getattr(branches, feature_name), index+1), default_value)[:,index] for [feature_name,index] in self.listfeature_names]).transpose()
-            print("Got the list features")
-
-            #Need to append the value features and the listfeatures together
-            if self.listfeature_names != None: 
-                print("We have list features!")
-                gen_features = np.append(gen_features, gen_listfeatures, axis=1)
-
-            if self.highlevelfeatures_names != None: 
-                gen_hlv = np.array([getattr(branches, feature_name) for feature_name in self.highlevelfeatures_names]).transpose()
-                gen_features = np.append(gen_features, gen_hlv, axis=1)
-
-
-            gen_mbb = np.array(getattr(branches, self.mbb_name))
-            # self.mbb, self.mbb_region, self.mbb_region_binary, self.mbb_region_random = self.SetMbbRegion(branches)
-            print("Set mbb regions")
-
-            #Add parametric variable
-            gen_param_values = np.array([[x if (x > 0) else np.random.choice(self.param_list) for x in getattr(branches, 'X_mass') ]]).transpose()
-            print("Got the param values")
-
-
-            gen_features_no_param = gen_features
-            if self.use_parametric: gen_features = np.append(gen_features, gen_param_values, axis=1)
-
-            gen_class_weight = np.array(getattr(weight_branches, 'class_weight'))
-            gen_adv_weight = np.array(getattr(weight_branches, 'adv_weight'))
-            gen_class_target = np.array(getattr(weight_branches, 'class_target'))
-            gen_adv_target = np.array(getattr(weight_branches, 'adv_target'))
-
-
-
-            yield gen_features, gen_class_target, gen_adv_target, gen_class_weight, gen_adv_weight
-
-            entry_start = entry_stop
-
-
-
-
-
-
     def ReadFile(self, file_name, entry_start=None, entry_stop=None):
         if self.feature_names == None:
             print("Uknown branches to read! DefineInputFeatures first!")
@@ -289,8 +213,7 @@ class DataWrapper():
 
 
         self.mbb = np.array(getattr(branches, self.mbb_name))
-        # self.mbb, self.mbb_region, self.mbb_region_binary, self.mbb_region_random = self.SetMbbRegion(branches)
-        print("Set mbb regions")
+        self.adv_regression_target = self.mbb
 
         #Add parametric variable
         self.param_values = np.array([[x if (x > 0) else np.random.choice(self.param_list) for x in getattr(branches, 'X_mass') ]]).transpose()
@@ -311,34 +234,6 @@ class DataWrapper():
         self.class_target = np.array(getattr(branches, 'class_target'))
         self.adv_target = np.array(getattr(branches, 'adv_target'))
 
-
-
-    def SetMbbRegion(self, branches):
-        print("Inside setting mbb region!")
-        # But we want to blind the adversarial part to Signal events, meaning we must filter them out
-        mbb = np.array(getattr(branches, self.mbb_name))
-        # Start region of CR_low, SR, CR_high
-        mbb_region = np.where(
-          mbb < 70,
-          -1,
-          np.where(
-            mbb < 150,
-            0,
-            1
-          )
-        )
-
-        mbb_region_binary = np.where(
-          (mbb_region == 0),
-          1,
-          0
-        )
-
-        mbb_region_random = np.random.choice(2, len(mbb))
-
-        return mbb, mbb_region, mbb_region_binary, mbb_region_random
-
-    
 
     def DefineTrainTestSet(self, batch_size, ratio):
         print("Create the self.train_features and self.train_labels lists here")
@@ -364,12 +259,14 @@ class DataWrapper():
         self.train_adv_weight = self.adv_weight[trainStart:trainEnd]
         self.train_class_target = self.class_target[trainStart:trainEnd]
         self.train_adv_target = self.adv_target[trainStart:trainEnd]
+        self.train_adv_regression_target = self.adv_regression_target[trainStart:trainEnd]
 
         self.test_features = self.features[testStart:testEnd]
         self.test_class_weight = self.class_weight[testStart:testEnd]
         self.test_adv_weight = self.adv_weight[testStart:testEnd]
         self.test_class_target = self.class_target[trainStart:trainEnd]
         self.test_adv_target = self.adv_target[trainStart:trainEnd]
+        self.test_adv_regression_target = self.adv_regression_target[trainStart:trainEnd]
 
 
     def monitor_param(self, model, param_value):
@@ -431,6 +328,10 @@ class DataWrapper():
         mbb_max = 200.0
         mbb_step = mbb_max / mbb_bins
 
+        # True mbb value
+        mbb_value = self.adv_regression_target
+        print("mbb_value is ", mbb_value)
+
         #After discussion with Konstanin, parametric dnn application should put in mass values for the point we want
         #So we will have a DNN output for masspoint 300, 400, 500, etc
         #For now, lets create a parametric_masspoints list and apply with those masses
@@ -458,19 +359,19 @@ class DataWrapper():
           adv_weight = self.adv_weight
           class_weight = self.class_weight
 
-
-          adv_loss_vec = binary_focal_crossentropy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32), tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          nClasses = setup['nClasses']
+          adv_loss_vec = binary_focal_crossentropy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32), tf.cast(tf.one_hot(self.class_target, nClasses), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
           adv_loss = round(np.average(adv_loss_vec, weights=adv_weight),3)
           adv_accuracy_vec = accuracy(tf.cast(self.adv_target, dtype=tf.float32), tf.cast(pred[1], dtype=tf.float32))[:,0]
           adv_accuracy = round(np.average(adv_accuracy_vec, weights=adv_weight),3)
 
-          class_loss_vec = categorical_crossentropy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          class_loss_vec = categorical_crossentropy(tf.cast(tf.one_hot(self.class_target, nClasses), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
           print("Class loss vec")
           print(class_loss_vec)
           class_loss = round(np.average(class_loss_vec, weights=class_weight),3)
           print("Class loss")
           print(class_loss)
-          class_accuracy_vec = categorical_accuracy(tf.cast(tf.one_hot(self.class_target, 2), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
+          class_accuracy_vec = categorical_accuracy(tf.cast(tf.one_hot(self.class_target, nClasses), dtype=tf.float32), tf.cast(pred_class, dtype=tf.float32))
           class_accuracy = round(np.average(class_accuracy_vec, weights=class_weight),3)
 
 
@@ -527,6 +428,24 @@ class DataWrapper():
             CR_high_mask = mask_dict[process_name]['CR_high']
 
 
+            print("Saving a tmp root file for this plot")
+            tmp_rootfile = uproot.recreate(f"{process_name}_AdvOutput_par{parity_index}_M{para_masspoint}.root")
+
+            print("Getting none type problem?")
+            print(SR_mask)
+            print(CR_high_mask)
+            tmp_mbb_value_SR = mbb_value[SR_mask]
+            tmp_classOutput_SR = pred_signal[SR_mask]
+            tmp_advOutput_SR = pred_adv[SR_mask]
+            tmp_SRdict = {'mbb': tmp_mbb_value_SR, 'classOutput': tmp_classOutput_SR, 'advOutput': tmp_advOutput_SR}
+
+            tmp_mbb_value_CR = mbb_value[CR_high_mask]
+            tmp_classOutput_CR = pred_signal[CR_high_mask]
+            tmp_advOutput_CR = pred_adv[CR_high_mask]
+            tmp_CRdict = {'mbb': tmp_mbb_value_CR, 'classOutput': tmp_classOutput_CR, 'advOutput': tmp_advOutput_CR}
+
+            tmp_rootfile['SignalRegion_Tree'] = tmp_SRdict
+            tmp_rootfile['ControlRegion_Tree'] = tmp_CRdict
 
 
 
@@ -786,9 +705,6 @@ class DataWrapper():
             canvas.SaveAs(plot_name)
             canvas.Close()
             os.system(f"imgcat {plot_name}")
-
-
-
 
 
             adv_out_hist_SR, bins = np.histogram(pred_adv[SR_mask], bins=nQuantBins, range=(0.0, 1.0), weights=adv_weight[SR_mask])
@@ -1181,12 +1097,8 @@ class AdversarialModel(tf.keras.Model):
     super().__init__(*args, **kwargs)
     self.setup = setup
 
-
     # self.batch_counter = tf.Variable(0)
     self.epoch_counter = tf.Variable(0.)
-
-    # print(self.epoch_counter.device)
-
 
     # self.adv_optimizer = tf.keras.optimizers.AdamW(
     #     learning_rate=setup['adv_learning_rate'],
@@ -1260,7 +1172,7 @@ class AdversarialModel(tf.keras.Model):
       add_layer(self.adv_layers, setup['n_adv_units'], setup['adv_activation'], f'adv_{n}')
 
 
-    self.class_output = tf.keras.layers.Dense(2, activation='softmax', name='class_output')
+    self.class_output = tf.keras.layers.Dense(setup['nClasses'], activation='softmax', name='class_output')
 
     self.adv_output = tf.keras.layers.Dense(1, activation='sigmoid', name='adv_output')
 
@@ -1320,11 +1232,6 @@ class AdversarialModel(tf.keras.Model):
       # This is to have the SignalRegion and ControlRegion have equal weights
 
       adv_loss = tf.reduce_mean(adv_loss_vec * adv_weight)
-
-      # tf.print("Debug adv loss")
-      # tf.print(adv_loss_vec)
-      # tf.print(adv_weight)
-      # tf.print(adv_loss)
 
       # Experimental ks test loss
       # Combine both class and adv loss into one 'loss' and put into only one optimizer
@@ -1512,6 +1419,314 @@ class AdversarialModel(tf.keras.Model):
 
 
 
+@tf.function
+def adv_regression_loss(target, output):
+  output = output[:,0]  # Un-nest the output (currently in shape [ [1], [2], [3], ...] and we want in shape [1, 2, 3])
+  # Scale the output to the targets (for now)
+  mbb_min = 50
+  mbb_max = 300
+  scaled_output = (output*(mbb_max - mbb_min) + mbb_min)
+  clipped_target = tf.clip_by_value(target, clip_value_min=mbb_min, clip_value_max=mbb_max)
+  # loss_pred = ((scaled_output - clipped_target) / scaled_output)**2
+  # cosh will go to nan for large x, so we need to scale it
+  # choose to scale down by mbb_max for now
+  diff = tf.abs(scaled_output - clipped_target)/(2.0*mbb_max)
+
+  loss_pred = tf.math.log(tf.cosh(diff))
+
+
+  # This isn't optimal because the mbb distribution is not uniform, but it is a good start
+  # random_output = tf.random.uniform(shape=tf.shape(scaled_output), minval=mbb_min, maxval=mbb_max, dtype=tf.float32)
+  # loss_random = ((random_output - clipped_target) / random_output)**2
+  # loss_random = tf.math.log(tf.cosh(random_output - clipped_target))
+
+  # We can get random realistic mbb distribution by just sampling the target distribution of this batch
+  # As long as the batch is large enough, it should be representative
+  random_indices = tf.random.uniform(shape=tf.shape(target), minval=0, maxval=tf.shape(target)[0], dtype=tf.int32)
+  random_samples = tf.gather(target, random_indices)
+  # loss_random_realistic = ((random_samples - clipped_target) / random_samples)**2
+  diff_random = tf.abs(random_samples - clipped_target)/(2.0*mbb_max)
+  loss_random_realistic = tf.math.log(tf.cosh(diff_random))  # This is a more stable loss function for regression
+
+  final_loss = tf.abs(loss_pred - loss_random_realistic)
+  return final_loss, loss_pred, loss_random_realistic
+
+
+
+class AdversarialModelRegression(tf.keras.Model):
+  '''Goal: discriminate class0 vs class1 vs class2 without learning features that can guess class_adv'''
+
+  def __init__(self, setup, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.setup = setup
+    
+    self.epoch_counter = tf.Variable(0.)
+
+    self.adv_optimizer = tf.keras.optimizers.Nadam(
+        learning_rate=setup['adv_learning_rate'],
+        weight_decay=setup['adv_weight_decay']
+    )
+
+
+    self.apply_common_gradients = setup['apply_common_gradients']
+    self.class_grad_factor = setup['class_grad_factor']
+
+    self.class_loss = categorical_crossentropy
+    self.class_accuracy = categorical_accuracy
+    self.class_loss_tracker = tf.keras.metrics.Mean(name="class_loss")
+    self.class_accuracy_tracker = tf.keras.metrics.Mean(name="class_accuracy")
+
+
+    self.adv_grad_factor = setup['adv_grad_factor']
+
+    self.adv_loss = adv_regression_loss
+    # self.adv_accuracy = tf.keras.metrics.RootMeanSquaredError()
+    self.adv_loss_tracker = tf.keras.metrics.Mean(name="adv_loss")
+    # self.adv_accuracy_tracker = tf.keras.metrics.Mean(name="adv_accuracy")
+
+    self.adv_loss_mbb_tracker = tf.keras.metrics.Mean(name="adv_mbb_loss")
+    self.adv_loss_random_tracker = tf.keras.metrics.Mean(name="adv_random_loss")
+
+    self.adv_loss_tracker_submodule = tf.keras.metrics.Mean(name="adv_loss")
+    # self.adv_accuracy_tracker_submodule = tf.keras.metrics.Mean(name="adv_accuracy")
+
+
+    self.common_layers = []
+
+    def add_layer(layer_list, n_units, activation, name):
+      layer = tf.keras.layers.Dense(n_units, activation=activation, name=name)
+      layer_list.append(layer)
+      if setup['dropout'] > 0:
+        dropout = tf.keras.layers.Dropout(setup['dropout'], name=name + '_dropout')
+        layer_list.append(dropout)
+      if setup['use_batch_norm']:
+        batch_norm = tf.keras.layers.BatchNormalization(name=name + '_batch_norm')
+        layer_list.append(batch_norm)
+
+    for n in range(setup['n_common_layers']):
+      add_layer(self.common_layers, setup['n_common_units'], setup['common_activation'], f'common_{n}')
+
+    self.class_layers = []
+    self.adv_layers = []
+    for n in range(setup['n_class_layers']):
+      add_layer(self.class_layers, setup['n_class_units'], setup['class_activation'], f'class_{n}')
+    for n in range(setup['n_adv_layers']):
+      add_layer(self.adv_layers, setup['n_adv_units'], setup['adv_activation'], f'adv_{n}')
+
+
+    self.class_output = tf.keras.layers.Dense(2, activation='softmax', name='class_output')
+
+    self.adv_output = tf.keras.layers.Dense(1, activation='sigmoid', name='adv_output')
+
+    self.output_names = ['class_output', 'adv_output']
+
+  def call(self, x):
+    x_common = self.call_common(x)
+    class_output = self.call_class(x_common)
+    adv_output = self.call_adv(x_common)
+    return class_output, adv_output
+
+  def call_common(self, x):
+    for layer in self.common_layers:
+      x = layer(x)
+    return x
+
+  def call_class(self, x_common):
+    x = x_common
+    for layer in self.class_layers:
+      x = layer(x)
+    class_output = self.class_output(x)
+    return class_output
+
+  def call_adv(self, x_common):
+    x = x_common
+    for layer in self.adv_layers:
+      x = layer(x)
+    adv_output = self.adv_output(x)
+    return adv_output
+
+  def _step(self, data, training):
+    x, y = data
+
+    y_class = tf.cast(y[0], dtype=tf.float32)
+    y_adv = tf.cast(y[1], dtype=tf.float32)
+
+
+    class_weight = tf.cast(y[2], dtype=tf.float32)
+    adv_weight = tf.cast(y[3], dtype=tf.float32)
+    
+
+    def compute_losses():
+      y_pred_class, y_pred_adv = self(x, training=training)
+
+      class_loss_vec = self.class_loss(y_class, y_pred_class)
+
+      class_loss = tf.reduce_mean(class_loss_vec * class_weight)
+
+      adv_loss_vec, adv_loss_mbb_vec, adv_loss_random_vec = self.adv_loss(y_adv, y_pred_adv)
+
+      adv_loss = tf.reduce_mean(adv_loss_vec * adv_weight)
+
+      return y_pred_class, class_loss_vec, class_loss, y_pred_adv, adv_loss_vec, adv_loss, adv_loss_mbb_vec, adv_loss_random_vec
+
+    if training:
+      with tf.GradientTape() as class_tape, tf.GradientTape() as adv_tape:
+        y_pred_class, class_loss_vec, class_loss, y_pred_adv, adv_loss_vec, adv_loss, adv_loss_mbb_vec, adv_loss_random_vec = compute_losses()
+    else:
+      y_pred_class, class_loss_vec, class_loss, y_pred_adv, adv_loss_vec, adv_loss, adv_loss_mbb_vec, adv_loss_random_vec = compute_losses()
+
+    class_accuracy_vec = self.class_accuracy(y_class, y_pred_class)
+
+    self.class_loss_tracker.update_state(class_loss_vec, sample_weight=class_weight)
+    self.class_accuracy_tracker.update_state(class_accuracy_vec, sample_weight=class_weight)
+
+    # adv_accuracy_vec = self.adv_accuracy(tf.expand_dims(y_adv, axis=-1), y_pred_adv)
+
+    self.adv_loss_tracker.update_state(adv_loss_vec, sample_weight=adv_weight)
+    self.adv_loss_mbb_tracker.update_state(adv_loss_mbb_vec, sample_weight=adv_weight)
+    self.adv_loss_random_tracker.update_state(adv_loss_random_vec, sample_weight=adv_weight)
+    # self.adv_accuracy_tracker.update_state(adv_accuracy_vec, sample_weight=adv_weight)
+
+    if training:
+      common_vars = [ var for var in self.trainable_variables if "/common" in var.path ]
+      class_vars = [ var for var in self.trainable_variables if "/class" in var.path ]
+      adv_vars = [ var for var in self.trainable_variables if "/adv" in var.path ]
+      n_common_vars = len(common_vars)
+
+
+      grad_class = class_tape.gradient(class_loss, common_vars + class_vars)
+      grad_class_excl = grad_class[n_common_vars:]
+
+      # grad_adv = adv_tape.gradient(adv_loss, common_vars + adv_vars)
+      grad_adv = adv_tape.gradient(adv_loss_mbb_vec, common_vars + adv_vars) # Don't minimize the final_loss, just try to minimize the true part
+      grad_adv_excl = grad_adv[n_common_vars:]
+
+      # Its actually crazy, if we do this regression method and give the loss a minimum at 'random', then we don't minus the adv part anymore
+      # grad_common = [ self.class_grad_factor * grad_class[i] - self.adv_grad_factor * grad_adv[i] \
+      grad_common = [ self.class_grad_factor * grad_class[i] - self.adv_grad_factor * grad_adv[i] \
+                      for i in range(len(common_vars)) ]
+
+      grad_common_no_adv = [ grad_class[i] \
+                      for i in range(len(common_vars)) ]
+
+      grad_common_only_adv = [ grad_adv[i] \
+                      for i in range(len(common_vars)) ]
+
+
+      @tf.function
+      def cond_true_fn():
+        if self.apply_common_gradients:
+          tf.cond(
+            self.epoch_counter == 0. and not self.setup['continue_training'],
+            true_fn = apply_common_no_adv,
+            false_fn = apply_common
+          )
+        return
+      
+      @tf.function
+      def apply_common_no_adv():
+        self.optimizer.apply_gradients(zip(grad_common_no_adv + grad_class_excl, common_vars + class_vars))
+        return 
+      
+      @tf.function
+      def apply_common():
+        self.optimizer.apply_gradients(zip(grad_common + grad_class_excl, common_vars + class_vars))
+        return 
+
+      @tf.function
+      def cond_false_fn():
+        return
+
+
+      cond_true_fn()
+      self.adv_optimizer.apply_gradients(zip(grad_adv_excl, adv_vars))
+
+
+    return { m.name: m.result() for m in self.metrics }
+
+
+
+
+  def _step_adv_only(self, data, training):
+    x, y = data
+
+    y_adv = tf.cast(y[1], dtype=tf.float32)
+
+    adv_weight = tf.cast(y[3], dtype=tf.float32)
+    
+
+    def compute_losses(x_common):
+      y_pred_adv = self.call_adv(x_common)
+
+      adv_loss_vec, adv_loss_random_vec = self.adv_loss(y_adv, y_pred_adv) # Focal loss
+      # adv_loss_vec = self.adv_loss(y_adv, y_pred_adv)
+      # We want to apply some weights onto the adv loss vector
+      # This is to have the SignalRegion and ControlRegion have equal weights
+
+      adv_loss = tf.reduce_mean(adv_loss_vec * adv_weight)
+
+
+      # tf.print("Adv only! Debug adv loss")
+      # tf.print(adv_loss_vec)
+      # tf.print(adv_weight)
+      # tf.print(adv_loss)
+
+      return y_pred_adv, adv_loss_vec, adv_loss
+
+    if training:
+      x_common = self.call_common(x)
+      with tf.GradientTape() as adv_tape:
+        y_pred_adv, adv_loss_vec, adv_loss = compute_losses(x_common)
+    else:
+      y_pred_adv, adv_loss_vec, adv_loss = compute_losses()
+
+
+    # adv_accuracy_vec = self.adv_accuracy(y_adv, y_pred_adv)
+
+
+    self.adv_loss_tracker_submodule.update_state(adv_loss_vec, sample_weight=adv_weight)
+    # self.adv_accuracy_tracker_submodule.update_state(adv_accuracy_vec, sample_weight=adv_weight)
+
+    if training:
+      adv_vars = [ var for var in self.trainable_variables if "/adv" in var.path ]
+
+
+      grad_adv = adv_tape.gradient(adv_loss, adv_vars)
+
+      self.adv_optimizer.apply_gradients(zip(grad_adv, adv_vars))
+
+    return
+
+ 
+
+  def train_step(self, data):
+    # tf.print("We are going to assign add batch counter")
+    # print("We are going to assign add batch counter")
+    # self.batch_counter = self.batch_counter.assign_add(1)
+    # tf.print("We did it")
+    # print("We did it")
+    return self._step(data, training=True)
+
+  def test_step(self, data):
+    return self._step(data, training=False)
+
+  @property
+  def metrics(self):
+    return [
+          self.class_loss_tracker,
+          self.class_accuracy_tracker,
+
+          self.adv_loss_tracker,
+          # self.adv_accuracy_tracker,
+
+          self.adv_loss_mbb_tracker,
+          self.adv_loss_random_tracker
+    ]
+
+
+
+
+
 
 def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   batch_size = config_dict['meta_data']['batch_dict']['batch_size']
@@ -1533,7 +1748,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   dw.AddHighLevelFeatures(setup['highlevelfeatures'])
 
 
-  dw.SetBinary(True)
   dw.UseParametric(setup['UseParametric'])
   dw.SetParamList(setup['parametric_list'])
   dw.SetOutputFolder(output_folder)
@@ -1541,7 +1755,6 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   # dw.AddInputLabel('sample_type')
 
   dw.SetMbbName('bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino')
-  # dw.SetMbbRegionName('adv_target')
 
   # Prep a test dw
   # Must copy before reading file so we can read the test file instead
@@ -1584,13 +1797,15 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
   model.summary()
 
   batch_size = setup['batch_compression_factor']*batch_size
-
-  train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, 2), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
+  nClasses = setup['nClasses']
+  train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
   train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
 
-  parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
-  print(train_tf_dataset)
-  print(list(train_tf_dataset.as_numpy_iterator()))
+  val_batch_size = setup['batch_compression_factor']*val_batch_size
+  val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, nClasses), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(val_batch_size, drop_remainder=True)
+  val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
+
+
 
   @tf.function
   def new_param_map(*x):
@@ -1598,6 +1813,7 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
     features = dataset[0]
 
     # Need to randomize the features parametric mass
+    parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
     random_param_mass = tf.random.categorical(tf.math.log([list(parametric_mass_probability)]), tf.shape(features)[0], dtype=tf.int64)
 
     mass_values = tf.constant(dw.param_list)
@@ -1623,14 +1839,7 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
     return new_dataset
 
   train_tf_dataset = train_tf_dataset.map(new_param_map)
-
-  print('After map')
-  print(train_tf_dataset)
-
-  val_batch_size = setup['batch_compression_factor']*val_batch_size
-  val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, 2), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(val_batch_size, drop_remainder=True)
-  val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
-
+  val_tf_dataset = val_tf_dataset.map(new_param_map)
 
   def save_predicate(model, logs):
       return (abs(logs['val_adv_accuracy'] - 0.5) < 0.001) # How do we stop the model from always guessing 0.49 or 0.51?
@@ -1696,6 +1905,188 @@ def train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
 
 
 
+
+
+
+def train_regression_dnn(setup, input_folder, output_folder, config_dict, val_config_dict):
+  batch_size = config_dict['meta_data']['batch_dict']['batch_size']
+  val_batch_size = val_config_dict['meta_data']['batch_dict']['batch_size']
+
+  input_file_name = os.path.join(input_folder, config_dict['meta_data']['input_filename'])
+  input_weight_name = os.path.join(input_folder, f"weight{config_dict['meta_data']['input_filename'][5:]}")
+
+  input_file_name_val = os.path.join(input_folder, val_config_dict['meta_data']['input_filename'])
+  input_weight_name_val = os.path.join(input_folder, f"weight{val_config_dict['meta_data']['input_filename'][5:]}")
+
+  model_name = config_dict['meta_data']['output_DNNname']
+  output_dnn_name = os.path.join(output_folder, model_name)
+
+  dw = DataWrapper()
+  dw.AddInputFeatures(setup['features'])
+  for list_feature in setup['listfeatures']:
+     dw.AddInputFeaturesList(*list_feature)
+  dw.AddHighLevelFeatures(setup['highlevelfeatures'])
+
+
+  dw.UseParametric(setup['UseParametric'])
+  dw.SetParamList(setup['parametric_list'])
+  dw.SetOutputFolder(output_folder)
+
+  # dw.AddInputLabel('sample_type')
+
+  dw.SetMbbName('bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino')
+
+  # Prep a test dw
+  # Must copy before reading file so we can read the test file instead
+  dw_val = copy.deepcopy(dw)
+
+  entry_start = 0
+  # entry_stop = batch_size * 500 # Only load 500 batches for debuging now
+
+  # Do you want to make a larger batch? May increase speed
+  entry_stop = None
+
+
+  dw.ReadFile(input_file_name, entry_start=entry_start, entry_stop=entry_stop)
+  dw.ReadWeightFile(input_weight_name, entry_start=entry_start, entry_stop=entry_stop)
+  print(config_dict)
+  # dw.DefineTrainTestSet(batch_size, 0.0)
+
+
+  dw_val.ReadFile(input_file_name_val, entry_start=entry_start, entry_stop=entry_stop)
+  dw_val.ReadWeightFile(input_weight_name_val, entry_start=entry_start, entry_stop=entry_stop)
+  # dw_val.DefineTrainTestSet(val_batch_size, 0.0)
+
+
+  os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+  os.environ['TF_DETERMINISTIC_OPS'] = '1'
+  tf.random.set_seed(42)
+
+
+  model = AdversarialModelRegression(setup)
+  model.compile(loss=None,
+              # optimizer=tf.keras.optimizers.AdamW(learning_rate=setup['learning_rate'],
+              #                                     weight_decay=setup['weight_decay']))
+              optimizer=tf.keras.optimizers.Nadam(learning_rate=setup['learning_rate'],
+                                                  weight_decay=setup['weight_decay']
+              )
+  )
+
+  model(dw.features)
+
+  model.summary()
+
+  batch_size = setup['batch_compression_factor']*batch_size
+
+  nClasses = setup['nClasses']
+  train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_regression_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
+  train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
+
+  val_batch_size = setup['batch_compression_factor']*val_batch_size
+  val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, nClasses), dw_val.adv_regression_target, dw_val.class_weight, dw_val.adv_weight))).batch(val_batch_size, drop_remainder=True)
+  val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
+
+
+
+  @tf.function
+  def new_param_map(*x):
+    dataset = x
+    features = dataset[0]
+
+    # Need to randomize the features parametric mass
+    parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
+    random_param_mass = tf.random.categorical(tf.math.log([list(parametric_mass_probability)]), tf.shape(features)[0], dtype=tf.int64)
+
+    mass_values = tf.constant(dw.param_list)
+    mass_keys = tf.constant(np.arange(len(dw.param_list)))
+    table = tf.lookup.StaticHashTable(
+       tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+       default_value = -1
+    )
+
+    actual_new_mass = table.lookup(random_param_mass)
+    actual_new_mass = tf.cast(actual_new_mass, tf.float64)
+
+    # Lastly we need to keep the signal events the correct mass
+    class_targets = dataset[1][0]
+    old_mass_mask = tf.cast(class_targets[:,0], tf.float64)
+    new_mass_mask = tf.cast(class_targets[:,1], tf.float64)
+
+    actual_mass = old_mass_mask * features[:,-1] + new_mass_mask * actual_new_mass
+    actual_mass = tf.transpose(actual_mass)
+
+    features = tf.concat([features[:,:-1], actual_mass], axis=-1)
+    new_dataset = (features, dataset[1])
+    return new_dataset
+
+  train_tf_dataset = train_tf_dataset.map(new_param_map)
+  val_tf_dataset = val_tf_dataset.map(new_param_map)
+
+  def save_predicate(model, logs):
+      return (abs(logs['val_adv_accuracy'] - 0.5) < 0.001) # How do we stop the model from always guessing 0.49 or 0.51?
+
+
+  input_shape = [None, dw.features.shape[1]]
+  input_signature = [tf.TensorSpec(input_shape, tf.double, name='x')]
+  callbacks = [
+      ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
+                      # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                      patience=setup['patience'], save_callback=None, input_signature=input_signature),
+      tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
+      EpochCounterCallback(),
+      AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
+      # AdvOnlyCallback(train_tf_dataset, nSteps=5000, TrackerWindowSize=100, on_batch=False, on_epoch=True, skip_epoch0=False, quiet=False),
+  ]
+
+
+
+  print("Save model configuration")
+  modelname_parity.append([model_name, config_dict['meta_data']['iterate_cut']])
+  features_config = {
+      'features': dw.feature_names,
+      'listfeatures': dw.listfeature_names,
+      'highlevelfeatures': dw.highlevelfeatures_names,
+      'use_parametric': dw.use_parametric,
+      'modelname_parity': modelname_parity,
+      'parametric_list': dw.param_list,
+      'model_setup': setup,
+      'nClasses': 2,
+      'nParity': 4,
+  }
+  
+  with open(os.path.join(dw.output_folder, 'dnn_config.yaml'), 'w') as file:
+      yaml.dump(features_config, file)
+
+
+  if setup['continue_training']:
+    model.load_weights(setup['continue_model'], skip_mismatch=True)
+
+
+
+  print("Fit model")
+  history = model.fit(
+      train_tf_dataset,
+      validation_data=val_tf_dataset,
+      verbose=1,
+      epochs=setup['n_epochs'],
+      shuffle=False,
+      callbacks=callbacks,
+  )
+
+
+  model.save(f"{output_dnn_name}.keras")
+
+  input_shape = [None, dw.features.shape[1]]
+  input_signature = [tf.TensorSpec(input_shape, tf.double, name='x')]
+  onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=13)
+  onnx.save(onnx_model, f"{output_dnn_name}.onnx")
+
+
+  return
+
+
+
+
 def adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, nParity, batch_size=1000):
   dnnConfig = {}
   with open(model_config, 'r') as file:
@@ -1723,7 +2114,6 @@ def adv_only_training(model_name, model_config, train_file, train_weight, test_f
     dw.AddInputFeaturesList(list_features_dict[list_feature_key], int(list_feature_key))
   dw.AddHighLevelFeatures(highlevel_features)
 
-  dw.SetBinary(True)
   dw.UseParametric(dnnConfig['use_parametric'])
   dw.SetParamList(parametric_list)
 
@@ -1784,9 +2174,47 @@ def adv_only_training(model_name, model_config, train_file, train_weight, test_f
   #   print(f"On layer {i} name {layer.name}")
   #   print(layer.get_config(), layer.get_weights())
 
-  train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, 2), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size)
+  nClasses = setup['nClasses']
+  train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size)
+  train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
 
-  val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, 2), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(batch_size)
+  val_tf_dataset = tf.data.Dataset.from_tensor_slices((dw_val.features, (tf.one_hot(dw_val.class_target, nClasses), dw_val.adv_target, dw_val.class_weight, dw_val.adv_weight))).batch(batch_size)
+  val_tf_dataset = val_tf_dataset.shuffle(len(val_tf_dataset), reshuffle_each_iteration=True)
+
+
+  @tf.function
+  def new_param_map(*x):
+    dataset = x
+    features = dataset[0]
+
+    # Need to randomize the features parametric mass
+    parametric_mass_probability = np.ones(len(dw.param_list)) * 1.0/len(dw.param_list)
+    random_param_mass = tf.random.categorical(tf.math.log([list(parametric_mass_probability)]), tf.shape(features)[0], dtype=tf.int64)
+
+    mass_values = tf.constant(dw.param_list)
+    mass_keys = tf.constant(np.arange(len(dw.param_list)))
+    table = tf.lookup.StaticHashTable(
+       tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+       default_value = -1
+    )
+
+    actual_new_mass = table.lookup(random_param_mass)
+    actual_new_mass = tf.cast(actual_new_mass, tf.float64)
+
+    # Lastly we need to keep the signal events the correct mass
+    class_targets = dataset[1][0]
+    old_mass_mask = tf.cast(class_targets[:,0], tf.float64)
+    new_mass_mask = tf.cast(class_targets[:,1], tf.float64)
+
+    actual_mass = old_mass_mask * features[:,-1] + new_mass_mask * actual_new_mass
+    actual_mass = tf.transpose(actual_mass)
+
+    features = tf.concat([features[:,:-1], actual_mass], axis=-1)
+    new_dataset = (features, dataset[1])
+    return new_dataset
+
+  train_tf_dataset = train_tf_dataset.map(new_param_map)
+  val_tf_dataset = val_tf_dataset.map(new_param_map)
 
 
   print("And continue training")
@@ -1850,7 +2278,6 @@ def validate_model(model_name, model_config, validation_file, validation_weight,
     dw.AddHighLevelFeatures(highlevel_features)
 
 
-    dw.SetBinary(True)
     dw.UseParametric(use_parametric)
     dw.SetParamList(parametric_list)
 
@@ -1880,7 +2307,7 @@ if __name__ == '__main__':
     # output_folder = args.output_folder
 
     setup = {}
-    with open(os.path.join('config', args.setup_config), 'r') as file:
+    with open(args.setup_config, 'r') as file:
         setup = yaml.safe_load(file)  
 
 
@@ -1914,7 +2341,13 @@ if __name__ == '__main__':
             with open(os.path.join(input_folder, val_yaml), 'r') as file:
                 val_config_dict = yaml.safe_load(file)  
 
-            model = train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict)
+            if setup['do_training']:
+              if setup['mbb_regression']:
+                print("Doing regression!")
+                model = train_regression_dnn(setup, input_folder, output_folder, config_dict, val_config_dict)
+              else:
+                model = train_dnn(setup, input_folder, output_folder, config_dict, val_config_dict)
+
 
             # We have nParity {nParity}, now lets try to learn the adv only part on this model
             first_pass = True
@@ -1928,6 +2361,7 @@ if __name__ == '__main__':
               test_file = os.path.join(input_folder, f'batchfile{j}.root')
               test_weight = os.path.join(input_folder, f'weightfile{j}.root')
               if first_pass and setup['do_step2']:
+                print(f"Do step2? {setup['do_step2']}")
                 adv_only_training(model_name, model_config, train_file, train_weight, test_file, test_weight, j)
                 first_pass = False
 
