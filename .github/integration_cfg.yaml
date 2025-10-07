@@ -3,6 +3,7 @@ authorized_users:
   - aebid
   - ahmad3213
   - abolshov
+  - valeriadamante
 
 expected_headers:
   - "@cms-flaf-bot test"
