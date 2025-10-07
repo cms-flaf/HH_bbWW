@@ -13,9 +13,11 @@ class_grad_factor: 0.1
 common_activation: tanh
 continue_model: DNN_Models/default/default.keras
 continue_training: false
+disco_activation: tanh
+disco_lambda_factor: 100
 do_step2: false
 do_training: true
-dropout: 0.1
+dropout: 0.0
 features:
 - lep1_pt
 - lep1_phi
@@ -89,14 +91,15 @@ listfeatures:
     - SelectedFatJet_SubJet2_phi
     - SelectedFatJet_SubJet2_pt
   - 0
-n_adv_layers: 5
+n_adv_layers: 3
 n_adv_units: 128
-n_class_layers: 5
+n_class_layers: 3
 n_class_units: 128
-n_common_layers: 10
+n_common_layers: 5
 n_common_units: 256
+n_disco_layers: 5
+n_disco_units: 512
 n_epochs: 40
-output_folder: v101_Double
 parametric_list:
 - 250
 - 260
@@ -123,4 +126,3 @@ parametric_list:
 patience: 100
 use_batch_norm: false
 weight_decay: 0.004
-mbb_regression: false

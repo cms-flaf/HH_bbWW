@@ -13,7 +13,7 @@ from FLAF.RunKit.run_tools import ps_call
 
 class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     training_configuration_dir = luigi.Parameter()
-    max_runtime = copy_param(HTCondorWorkflow.max_runtime, 24.0)
+    max_runtime = copy_param(HTCondorWorkflow.max_runtime, 48.0)
     n_cpus = copy_param(HTCondorWorkflow.n_cpus, 4)
 
     def __init__(self, *args, **kwargs):
@@ -22,6 +22,7 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     def create_branch_map(self):
         branches = {}
         DNN_Configurations = [ os.path.join(self.training_configuration_dir, x) for x in os.listdir(self.training_configuration_dir) if x.endswith('.yaml') ]
+        DNN_Configurations.sort()
         # open yaml training_configuration
         for DNN_Configuration in DNN_Configurations:
             with open(DNN_Configuration, 'r') as f:

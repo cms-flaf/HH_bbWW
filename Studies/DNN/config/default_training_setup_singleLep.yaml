@@ -6,13 +6,15 @@ adv_submodule_steps: 50
 adv_submodule_tracker: 0
 adv_weight_decay: 0.004
 apply_common_gradients: true
-batch_compression_factor: 10
+batch_compression_factor: 1
 nClasses: 5
 class_activation: tanh
 class_grad_factor: 0.1
 common_activation: tanh
 continue_model: DNN_Models/default/default.keras
 continue_training: false
+disco_activation: tanh
+disco_lambda_factor: 100
 do_step2: true
 do_training: false
 dropout: 0.0
@@ -84,8 +86,9 @@ n_class_layers: 5
 n_class_units: 128
 n_common_layers: 10
 n_common_units: 256
+n_disco_layers: 5
+n_disco_units: 512
 n_epochs: 40
-output_folder: v101_Single
 parametric_list:
 - 250
 - 260
@@ -110,6 +113,5 @@ parametric_list:
 - 4000
 - 5000
 patience: 100
-use_batch_norm: false
+use_batch_norm: true
 weight_decay: 0.004
-mbb_regression: false

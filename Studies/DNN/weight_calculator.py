@@ -10,7 +10,7 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
     out_file = uproot.recreate(outName)
 
     tree = in_file['Events']
-    branches_to_load = ["sample_type", "bb_mass", "bb_mass_PNetRegPtRawCorr", "bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino", "X_mass", "centralJet_hadronFlavour", "SelectedFatJet_hadronFlavour", "weight_MC_Lumi_pu"]
+    branches_to_load = ["sample_type", "bb_mass", "bb_mass_PNetRegPtRawCorr", "bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino", "X_mass", "centralJet_hadronFlavour", "SelectedFatJet_hadronFlavour", "weight_MC_Lumi_pu", "centralJet_pt", "SelectedFatJet_pt"]
     branches = tree.arrays(branches_to_load)
 
     sample_type = branches["sample_type"]
@@ -33,6 +33,43 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
     # Starting from their genWeight (includes XS and such)
     class_weight = branches['weight_MC_Lumi_pu']
     adv_weight = branches['weight_MC_Lumi_pu']
+    flat_jetpt_weight = branches['weight_MC_Lumi_pu']
+
+    # Flatten jet1:jet2 pt spectrum for resolved jets, and flatten fatjet pt spectrum for boosted jets
+    # Doing this to avoid the DNN learning mbb
+    # Get pt of jets
+    jet1_pt = np.where(
+        hadronFlavour[:,0] != 0,
+        branches['centralJet_pt'][:,0],
+        0.0
+    )
+    jet2_pt = np.where(
+        hadronFlavour[:,1] != 0,
+        branches['centralJet_pt'][:,1],
+        0.0
+    )
+
+    # Get histogram values
+    hist_2d, x_edges, y_edges = np.histogram2d(
+        jet1_pt,
+        jet2_pt,
+        bins=(20, 20),
+        range=((0, 1000), (0, 1000))
+    )
+    # Get bin for each event
+    jet1_bin = np.digitize(jet1_pt, x_edges) - 1
+    jet2_bin = np.digitize(jet2_pt, y_edges) - 1
+    # Get histogram value for each event
+    hist_values = hist_2d[jet1_bin, jet2_bin]
+    # Get weight to flatten
+    flat_jetpt_weight = np.where(
+        hist_values != 0,
+        1.0 / hist_values,
+        0.0
+    )
+    # Apply to both class and adv weights
+    class_weight = class_weight * flat_jetpt_weight
+    adv_weight = adv_weight * flat_jetpt_weight
 
 
     # First step, remove any sample types we want to

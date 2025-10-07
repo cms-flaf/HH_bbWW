@@ -31,7 +31,8 @@ if __name__ == '__main__':
         with open(args.validation_batch_config, 'r') as file:
             config_dict = yaml.safe_load(file)
 
-        model = DNNClass.validate_dnn(setup, args.validation_file, args.validation_weight_file, config_dict, args.output_file, args.model_name, args.model_config)
+        # model = DNNClass.validate_dnn(setup, args.validation_file, args.validation_weight_file, config_dict, args.output_file, args.model_name, args.model_config)
+        model = DNNClass.validate_disco_dnn(setup, args.validation_file, args.validation_weight_file, config_dict, args.output_file, args.model_name, args.model_config)
 
 
     finally:

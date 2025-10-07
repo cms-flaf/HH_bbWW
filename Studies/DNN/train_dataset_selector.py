@@ -161,6 +161,10 @@ def create_dict(config_dict, output_folder):
             class_value = background_dict['class_value']
             dataset_names = background_dict['background_datasets']
 
+            if background_name not in process_dict.keys():
+                print(f"Background {background_name} not in process_dict, skip")
+                continue
+
             print(f"Looping background {background_name}")
             for dataset_name in tqdm(dataset_names):
                 process_dict[background_name][dataset_name] = {
