@@ -21,11 +21,15 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
     def create_branch_map(self):
         branches = {}
-        DNN_Configurations = [ os.path.join(self.training_configuration_dir, x) for x in os.listdir(self.training_configuration_dir) if x.endswith('.yaml') ]
+        DNN_Configurations = [
+            os.path.join(self.training_configuration_dir, x)
+            for x in os.listdir(self.training_configuration_dir)
+            if x.endswith(".yaml")
+        ]
         DNN_Configurations.sort()
         # open yaml training_configuration
         for DNN_Configuration in DNN_Configurations:
-            with open(DNN_Configuration, 'r') as f:
+            with open(DNN_Configuration, "r") as f:
                 config = yaml.safe_load(f)
             br_idx = len(branches)
             branches[br_idx] = (config, DNN_Configuration)
@@ -36,19 +40,20 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         training_name = config["training_name"]
         outFolderName = f"{training_name}"
         output_path = os.path.join(
-            "DNNTraining",
-            self.version,
-            self.period,
-            training_name,
-            outFolderName)
+            "DNNTraining", self.version, self.period, training_name, outFolderName
+        )
         config_path = os.path.join(
             "DNNTraining",
             self.version,
             self.period,
             training_name,
-            os.path.basename(config_name))
-        return [ self.remote_target(output_path, fs=self.fs_anaTuple), self.remote_target(config_path, fs=self.fs_anaTuple) ]
-    
+            os.path.basename(config_name),
+        )
+        return [
+            self.remote_target(output_path, fs=self.fs_anaTuple),
+            self.remote_target(config_path, fs=self.fs_anaTuple),
+        ]
+
     def run(self):
         config, config_name = self.branch_data
         training_name = config["training_name"]
@@ -59,7 +64,6 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         print(f"At job_home {job_home}")
 
         tmpFolder = os.path.join(job_home, f"{training_name}")
-
 
         training_file = config["training_file"]
         weight_file = config["weight_file"]
@@ -88,7 +92,7 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             "--output_folder",
             tmpFolder,
             "--setup-config",
-            config_name
+            config_name,
         ]
         ps_call(dnn_trainer_cmd, verbose=1)
 
@@ -103,7 +107,6 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         if remove_job_home:
             shutil.rmtree(job_home)
-
 
 
 class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
@@ -124,30 +127,25 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         return branches
 
     def workflow_requires(self):
-        return {
-            "DNNTrainer": DNNTrainingTask.req(self)
-        }
+        return {"DNNTrainer": DNNTrainingTask.req(self)}
 
     def requires(self):
         config, config_name, n_branch = self.branch_data
         return DNNTrainingTask.req(
-                    self,
-                    branch=n_branch,
-                    max_runtime=DNNTrainingTask.max_runtime._default,
-                    branches=(),
-                )
+            self,
+            branch=n_branch,
+            max_runtime=DNNTrainingTask.max_runtime._default,
+            branches=(),
+        )
 
     def output(self):
         config, config_name, n_branch = self.branch_data
         training_name = config["training_name"]
         outFileName = f"validation.pdf"
         output_path = os.path.join(
-            "DNNTraining",
-            self.version,
-            self.period,
-            training_name,
-            outFileName)
-        return [ self.remote_target(output_path, fs=self.fs_anaTuple) ]
+            "DNNTraining", self.version, self.period, training_name, outFileName
+        )
+        return [self.remote_target(output_path, fs=self.fs_anaTuple)]
 
     def run(self):
         config, config_name, n_branch = self.branch_data
@@ -166,7 +164,9 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         tmp_local = os.path.join(self.input()[0].path, "best.onnx")
         # with self.input()[0].localize("r") as model_file, self.input()[1].localize("r") as model_config:
-        with self.remote_target(tmp_local, fs=self.fs_anaTuple).localize("r") as model_file, self.input()[1].localize("r") as model_config:
+        with self.remote_target(tmp_local, fs=self.fs_anaTuple).localize(
+            "r"
+        ) as model_file, self.input()[1].localize("r") as model_config:
             print(os.listdir())
             dnn_validator_cmd = [
                 "python3",
@@ -185,7 +185,7 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 "--model-name",
                 model_file.path,
                 "--model-config",
-                model_config.path
+                model_config.path,
             ]
             ps_call(dnn_validator_cmd, verbose=1)
 
@@ -196,4 +196,3 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         if remove_job_home:
             shutil.rmtree(job_home)
-
