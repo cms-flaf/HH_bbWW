@@ -78,7 +78,7 @@ class DeepHMEProducer:
             mass = pred
 
         # for now we decided to not return errors for components of p4
-        p4, _ = self.estimator.predict(
+        pred = self.estimator.predict(
             event_id=array["event"],
             lep1_pt=array["lep1_pt"],
             lep1_eta=array["lep1_eta"],
@@ -117,6 +117,13 @@ class DeepHMEProducer:
             fatjet_particleNet_massCorr=array["SelectedFatJet_particleNet_massCorr"],
             output_format="p4",
         )
+
+        p4 = None
+        p4_errors = None
+        if self.cfg["return_errors"]:
+            p4, p4_errors = pred
+        else:
+            p4 = pred
 
         # Delete not-needed array
         for col in array.fields:
