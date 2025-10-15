@@ -3,6 +3,7 @@ authorized_users:
   - aebid
   - ahmad3213
   - abolshov
+  - valeriadamante
 
 expected_headers:
   - "@cms-flaf-bot test"
@@ -19,6 +20,8 @@ variables:
   HH_bbWW_active: "1"
   HH_bbtautau_active: "0"
   H_mumu_active: "0"
+  HH_bbWW_task: "FLAF.Analysis.tasks.HistFromNtupleProducerTask"
+  HH_bbWW_dataset: "GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_350"
 
 gitlab_url: "https://gitlab.cern.ch/api/v4/projects/210600/trigger/pipeline"
 gitlab_branch: "master"
