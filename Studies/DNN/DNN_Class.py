@@ -74,6 +74,11 @@ class DataWrapper:
 
         self.features_paramSet = None
 
+        self.hmefriendfeatures_names = None
+        self.hme = None
+
+        self.X_mass = None
+
     def UseParametric(self, use_parametric):
         self.use_parametric = use_parametric
         print(f"Parametric feature set to {use_parametric}")
@@ -118,6 +123,12 @@ class DataWrapper:
         print(f"Added high level features {features}")
         print(f"New feature list {self.highlevelfeatures_names}")
 
+    def AddHMEFeatures(self, features):
+        if self.hmefriendfeatures_names == None:
+            self.hmefriendfeatures_names = features
+        else:
+            self.hmefriendfeatures_names = self.hmefriendfeatures_names + features
+
     def AddInputLabel(self, labels_name):
         if self.label_name != None:
             print("What are you doing? You already defined the input label branch")
@@ -128,7 +139,7 @@ class DataWrapper:
             print("What are you doing? You already defined the mbb branch")
         self.mbb_name = mbb_name
 
-    def ReadFile(self, file_name, entry_start=None, entry_stop=None):
+    def ReadFile(self, file_name, entry_start=None, entry_stop=None, hme_friend_file=None):
         if self.feature_names == None:
             print("Uknown branches to read! DefineInputFeatures first!")
             return
@@ -183,6 +194,7 @@ class DataWrapper:
                 ).transpose()
             print("Got the list features")
 
+
             # Need to append the value features and the listfeatures together
             if self.listfeature_names != None:
                 print("We have list features!")
@@ -206,14 +218,27 @@ class DataWrapper:
 
             # Add parametric variable
             # self.param_values = np.array([[x if (x > 0) else np.random.choice(self.param_list) for x in getattr(branches, 'X_mass') ]]).transpose()
+            self.X_mass = getattr(branches, "X_mass")
             self.param_values = np.array(
                 [getattr(branches, "X_mass")], dtype="float32"
             ).transpose()  # Init wrong parametric, later we will fill with random sample
             print("Got the param values")
 
-            self.features_no_param = self.features
-            if self.use_parametric:
-                self.features = np.append(self.features, self.param_values, axis=1)
+        if hme_friend_file:
+            print(f"Using HME Friend {hme_friend_file}")
+            with uproot.open(hme_friend_file) as file:
+                tree = file["Events"]
+                branches_hme = tree.arrays(
+                    ["SingleLep_DeepHME_mass", "SingleLep_DeepHME_mass_error", "DoubleLep_DeepHME_mass", "DoubleLep_DeepHME_mass_error"], entry_start=entry_start, entry_stop=entry_stop
+                )
+                if self.hmefriendfeatures_names != None:
+                    self.hme = np.array([getattr(branches_hme, feature_name) for feature_name in self.hmefriendfeatures_names], dtype="float32",).transpose()
+                    self.features = np.append(self.features, self.hme, axis=1)
+
+
+        self.features_no_param = self.features
+        if self.use_parametric:
+            self.features = np.append(self.features, self.param_values, axis=1)
 
         print(
             f"End read. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
@@ -1212,24 +1237,27 @@ class DiscoModel(tf.keras.Model):
         self.disco_layers = []
 
         def add_layer(layer_list, n_units, activation, name):
+            if setup["use_batch_norm"]:
+                batch_norm = tf.keras.layers.BatchNormalization(
+                    name=name + "_batch_norm"
+                )
+                layer_list.append(batch_norm)
+
             layer = tf.keras.layers.Dense(
                 n_units,
                 activation=activation,
                 name=name,
                 kernel_initializer="random_normal",
                 bias_initializer="random_normal",
-            )
+                kernel_regularizer=tf.keras.regularizers.l1(0.1),
+                            )
             layer_list.append(layer)
+
             if setup["dropout"] > 0:
                 dropout = tf.keras.layers.Dropout(
                     setup["dropout"], name=name + "_dropout"
                 )
                 layer_list.append(dropout)
-            if setup["use_batch_norm"]:
-                batch_norm = tf.keras.layers.BatchNormalization(
-                    name=name + "_batch_norm"
-                )
-                layer_list.append(batch_norm)
 
         for n in range(setup["n_disco_layers"]):
             add_layer(
@@ -1263,6 +1291,11 @@ class DiscoModel(tf.keras.Model):
 
         def compute_losses():
             y_pred_class = self(x, training=training)
+            # tf.print("Computing losses, take example 1")
+            # tf.print(x[0], summarize=-1)
+            # tf.print(y_class[0])
+            # tf.print(y_pred_class[0])
+            # tf.print("Finished safety check")
 
             class_loss_vec = self.class_loss(y_class, y_pred_class)
             disco_loss = (
@@ -1357,6 +1390,8 @@ def train_dnn(
     test_weight_file,
     test_config_dict,
     output_folder,
+    hme_friend_file=None,
+    test_hme_friend_file=None,
 ):
     batch_size = config_dict["meta_data"]["batch_dict"]["batch_size"]
     test_batch_size = test_config_dict["meta_data"]["batch_dict"]["batch_size"]
@@ -1370,6 +1405,8 @@ def train_dnn(
             dw.AddInputFeaturesList(*list_feature)
     if setup["highlevelfeatures"] != None:
         dw.AddHighLevelFeatures(setup["highlevelfeatures"])
+    if setup["hmefeatures"] != None:
+        dw.AddHMEFeatures(setup["hmefeatures"])
 
     dw.UseParametric(setup["UseParametric"])
     dw.SetParamList(setup["parametric_list"])
@@ -1386,12 +1423,12 @@ def train_dnn(
     # Do you want to make a larger batch? May increase speed
     entry_stop = None
 
-    dw.ReadFile(training_file, entry_start=entry_start, entry_stop=entry_stop)
+    dw.ReadFile(training_file, entry_start=entry_start, entry_stop=entry_stop, hme_friend_file=hme_friend_file)
     dw.ReadWeightFile(weight_file, entry_start=entry_start, entry_stop=entry_stop)
     print(config_dict)
     # dw.DefineTrainTestSet(batch_size, 0.0)
 
-    test_dw.ReadFile(test_training_file, entry_start=entry_start, entry_stop=entry_stop)
+    test_dw.ReadFile(test_training_file, entry_start=entry_start, entry_stop=entry_stop, hme_friend_file=test_hme_friend_file)
     test_dw.ReadWeightFile(
         test_weight_file, entry_start=entry_start, entry_stop=entry_stop
     )
@@ -1401,38 +1438,42 @@ def train_dnn(
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     tf.random.set_seed(42)
 
-    # Adversarial Dataset
-    # batch_size = setup['batch_compression_factor']*batch_size
-    # nClasses = setup['nClasses']
-    # train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
-    # train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
 
-    # test_batch_size = setup['batch_compression_factor']*test_batch_size
-    # test_tf_dataset = tf.data.Dataset.from_tensor_slices((test_dw.features, (tf.one_hot(test_dw.class_target, nClasses), test_dw.adv_target, test_dw.class_weight, test_dw.adv_weight))).batch(test_batch_size, drop_remainder=True)
-    # test_tf_dataset = test_tf_dataset.shuffle(len(test_tf_dataset), reshuffle_each_iteration=True)
 
-    # Disco Dataset
-    nClasses = setup["nClasses"]
-    train_tf_dataset = tf.data.Dataset.from_tensor_slices(
-        (dw.features, (tf.one_hot(dw.class_target, nClasses), dw.mbb, dw.class_weight))
-    ).batch(batch_size, drop_remainder=True)
-    train_tf_dataset = train_tf_dataset.shuffle(
-        len(train_tf_dataset), reshuffle_each_iteration=True
-    )
+    if getattr(setup, 'adv_model', False):
+      # Adversarial Dataset
+      batch_size = setup['batch_compression_factor']*batch_size
+      nClasses = setup['nClasses']
+      train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
+      train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
 
-    test_tf_dataset = tf.data.Dataset.from_tensor_slices(
-        (
-            test_dw.features,
-            (
-                tf.one_hot(test_dw.class_target, nClasses),
-                test_dw.mbb,
-                test_dw.class_weight,
-            ),
-        )
-    ).batch(test_batch_size, drop_remainder=True)
-    test_tf_dataset = test_tf_dataset.shuffle(
-        len(test_tf_dataset), reshuffle_each_iteration=True
-    )
+      test_batch_size = setup['batch_compression_factor']*test_batch_size
+      test_tf_dataset = tf.data.Dataset.from_tensor_slices((test_dw.features, (tf.one_hot(test_dw.class_target, nClasses), test_dw.adv_target, test_dw.class_weight, test_dw.adv_weight))).batch(test_batch_size, drop_remainder=True)
+      test_tf_dataset = test_tf_dataset.shuffle(len(test_tf_dataset), reshuffle_each_iteration=True)
+
+    else:
+      # Disco Dataset
+      nClasses = setup["nClasses"]
+      train_tf_dataset = tf.data.Dataset.from_tensor_slices(
+          (dw.features, (tf.one_hot(dw.class_target, nClasses), dw.mbb, dw.class_weight))
+      ).batch(batch_size, drop_remainder=True)
+      train_tf_dataset = train_tf_dataset.shuffle(
+          len(train_tf_dataset), reshuffle_each_iteration=True
+      )
+
+      test_tf_dataset = tf.data.Dataset.from_tensor_slices(
+          (
+              test_dw.features,
+              (
+                  tf.one_hot(test_dw.class_target, nClasses),
+                  test_dw.mbb,
+                  test_dw.class_weight,
+              ),
+          )
+      ).batch(test_batch_size, drop_remainder=True)
+      test_tf_dataset = test_tf_dataset.shuffle(
+          len(test_tf_dataset), reshuffle_each_iteration=True
+      )
 
     @tf.function
     def new_param_map(*x):
@@ -1462,7 +1503,7 @@ def train_dnn(
         # Lastly we need to keep the signal events the correct mass
         class_targets = dataset[1][0]
         old_mass_mask = tf.cast(class_targets[:, 0], tf.float32)
-        new_mass_mask = tf.cast(class_targets[:, 1], tf.float32)
+        new_mass_mask = tf.cast((class_targets[:, 0]==0), tf.float32)
 
         actual_mass = old_mass_mask * features[:, -1] + new_mass_mask * actual_new_mass
         actual_mass = tf.transpose(actual_mass)
@@ -1478,54 +1519,56 @@ def train_dnn(
     input_shape = [None, dw.features.shape[1]]
     input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
 
-    # AdversarialModel
-    # model = AdversarialModel(setup)
-    # model.compile(loss=None,
-    #             # optimizer=tf.keras.optimizers.AdamW(learning_rate=setup['learning_rate'],
-    #             #                                     weight_decay=setup['weight_decay']))
-    #             optimizer=tf.keras.optimizers.Nadam(learning_rate=setup['learning_rate'],
-    #                                                 weight_decay=setup['weight_decay']
-    #             )
-    # )
-    # model(dw.features)
-    # model.summary()
+    if getattr(setup, 'adv_model', False):
+      # AdversarialModel
+      model = AdversarialModel(setup)
+      model.compile(loss=None,
+                  # optimizer=tf.keras.optimizers.AdamW(learning_rate=setup['learning_rate'],
+                  #                                     weight_decay=setup['weight_decay']))
+                  optimizer=tf.keras.optimizers.Nadam(learning_rate=setup['learning_rate'],
+                                                      weight_decay=setup['weight_decay']
+                  )
+      )
+      model(dw.features)
+      model.summary()
 
-    # def save_predicate(model, logs):
-    #     return (abs(logs['val_adv_accuracy'] - 0.5) < 0.001) # How do we stop the model from always guessing 0.49 or 0.51?
+      def save_predicate(model, logs):
+          return (abs(logs['val_adv_accuracy'] - 0.5) < 0.001) # How do we stop the model from always guessing 0.49 or 0.51?
 
-    # callbacks = [
-    #     ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
-    #                     # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
-    #                     patience=setup['patience'], save_callback=None, input_signature=input_signature),
-    #     tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
-    #     EpochCounterCallback(),
-    #     AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
-    #     # AdvOnlyCallback(train_tf_dataset, nSteps=5000, TrackerWindowSize=100, on_batch=False, on_epoch=True, skip_epoch0=False, quiet=False),
-    # ]
+      callbacks = [
+          ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
+                          # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                          patience=setup['patience'], save_callback=None, input_signature=input_signature),
+          tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
+          EpochCounterCallback(),
+          AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
+          # AdvOnlyCallback(train_tf_dataset, nSteps=5000, TrackerWindowSize=100, on_batch=False, on_epoch=True, skip_epoch0=False, quiet=False),
+      ]
 
-    # DiscoModel
-    model = DiscoModel(setup)
-    model.compile(
-        loss=None,
-        optimizer=tf.keras.optimizers.Nadam(
-            learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
-        ),
-    )
-    model(dw.features)
-    model.summary()
+    else:
+      # DiscoModel
+      model = DiscoModel(setup)
+      model.compile(
+          loss=None,
+          optimizer=tf.keras.optimizers.Nadam(
+              learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
+          ),
+      )
+      model(dw.features)
+      model.summary()
 
-    callbacks = [
-        ModelCheckpoint(
-            output_dnn_name,
-            verbose=1,
-            monitor="val_class_loss",
-            mode="min",
-            min_rel_delta=1e-3,
-            patience=100,
-            save_callback=None,
-            input_signature=input_signature,
-        ),
-    ]
+      callbacks = [
+          ModelCheckpoint(
+              output_dnn_name,
+              verbose=1,
+              monitor="val_class_loss",
+              mode="min",
+              min_rel_delta=1e-3,
+              patience=100,
+              save_callback=None,
+              input_signature=input_signature,
+          ),
+      ]
 
     verbose = setup["verbose"] if "verbose" in setup else 0
     print("Fit model")
@@ -1586,6 +1629,7 @@ def validate_dnn(
     output_file,
     model_name,
     model_config,
+    hme_friend_file=None,
 ):
     print(f"Model load {model_name}")
     sess = ort.InferenceSession(model_name)
@@ -1604,6 +1648,8 @@ def validate_dnn(
             dw.AddInputFeaturesList(*list_feature)
     if dnnConfig["highlevelfeatures"] != None:
         dw.AddHighLevelFeatures(dnnConfig["highlevelfeatures"])
+    if dnnConfig["hmefeatures"] != None:
+        dw.AddHMEFeatures(dnnConfig["hmefeatures"])
 
     dw.UseParametric(use_parametric)
     dw.SetParamList(parametric_list)
@@ -1612,7 +1658,7 @@ def validate_dnn(
 
     dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
 
-    dw.ReadFile(validation_file)
+    dw.ReadFile(validation_file, hme_friend_file=hme_friend_file)
     dw.ReadWeightFile(validation_weight_file)
     # dw.validate_output(sess, model_name, output_file)
 
@@ -1661,7 +1707,8 @@ def validate_dnn(
 
         # Class Plots
         # Lets build Masks
-        Sig_SR_mask = (dw.class_target == 0) & (dw.adv_target == 0)
+        Sig_This_Mass = (dw.X_mass == para_masspoint)
+        Sig_SR_mask = (Sig_This_Mass) & (dw.class_target == 0) & (dw.adv_target == 0)
         Sig_CR_high_mask = (dw.class_target == 0) & (dw.adv_target == 1)
 
         TT_SR_mask = (dw.class_target == 1) & (dw.adv_target == 0)
@@ -2016,7 +2063,7 @@ def validate_dnn(
                 ROOT_AdvOutput_SR.GetMaximum(), ROOT_AdvOutput_CR_high.GetMaximum()
             )
             # ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.8*min_val, 20) # 1.5*max_val)
-            ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.0001, 20)  # 1.5*max_val)
+            ROOT_AdvOutput_SR.GetYaxis().SetRangeUser(0.000001, 20)  # 1.5*max_val)
 
             ROOT_AdvOutput_CR_high.SetLineColor(ROOT.kRed)
             ROOT_AdvOutput_CR_high.Draw("same")
@@ -2082,6 +2129,7 @@ def validate_disco_dnn(
     output_file,
     model_name,
     model_config,
+    hme_friend_file=None,
 ):
     print(f"Model load {model_name}")
     sess = ort.InferenceSession(model_name)
@@ -2100,6 +2148,8 @@ def validate_disco_dnn(
             dw.AddInputFeaturesList(*list_feature)
     if dnnConfig["highlevelfeatures"] != None:
         dw.AddHighLevelFeatures(dnnConfig["highlevelfeatures"])
+    if dnnConfig["hmefeatures"] != None:
+        dw.AddHMEFeatures(dnnConfig["hmefeatures"])
 
     dw.UseParametric(use_parametric)
     dw.SetParamList(parametric_list)
@@ -2108,7 +2158,7 @@ def validate_disco_dnn(
 
     dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
 
-    dw.ReadFile(validation_file)
+    dw.ReadFile(validation_file, hme_friend_file=hme_friend_file)
     dw.ReadWeightFile(validation_weight_file)
     # dw.validate_output(sess, model_name, output_file)
 
@@ -2143,7 +2193,8 @@ def validate_disco_dnn(
 
         # Class Plots
         # Lets build Masks
-        Sig_SR_mask = (dw.class_target == 0) & (dw.adv_target == 0)
+        Sig_This_Mass = (dw.X_mass == para_masspoint)
+        Sig_SR_mask = (Sig_This_Mass) & (dw.class_target == 0) & (dw.adv_target == 0)
         Sig_CR_high_mask = (dw.class_target == 0) & (dw.adv_target == 1)
 
         TT_SR_mask = (dw.class_target == 1) & (dw.adv_target == 0)

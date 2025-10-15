@@ -9,6 +9,8 @@ from tqdm import tqdm
 import ROOT
 import Analysis.hh_bbww as analysis
 
+import importlib
+
 ROOT.gROOT.SetBatch(True)
 ROOT.EnableThreadSafety()
 # ROOT.EnableImplicitMT(4)
@@ -428,6 +430,7 @@ def create_dict(config_dict, output_folder, era):
             "empty_dict_example"
         ] = empty_dict_example_file  # Example for empty dict structure
         machine_yaml["meta_data"]["input_filename"] = f"batchfile{nParity}.root"
+        machine_yaml["meta_data"]["hme_friend_filename"] = f"batchfile{nParity}_HME_Friend.root"
         machine_yaml["meta_data"][
             "output_DNNname"
         ] = f"ResHH_Classifier_parity{nParity}"
@@ -654,6 +657,51 @@ def create_file(config_dict, output_folder, out_filename):
     os.system(f"rm {tmp_filename}")
 
 
+def add_HME(config_dict, output_folder, input_filename, out_filename):
+    print(f"Starting add HME to {out_filename}")
+
+    with open(os.path.join(ana_path, "config/global.yaml")) as f:
+        global_cfg_dict = yaml.safe_load(f)
+
+    Single_producer_config = global_cfg_dict["payload_producers"]["SingleLep_DeepHME"]
+    Single_producers_module_name = Single_producer_config["producers_module_name"]
+    Single_producer_name = Single_producer_config["producer_name"]
+    Single_producers_module = importlib.import_module(Single_producers_module_name)
+    Single_producer_class = getattr(Single_producers_module, Single_producer_name)
+    Single_producer = Single_producer_class(Single_producer_config, "SingleLep_DeepHME")
+
+    Double_producer_config = global_cfg_dict["payload_producers"]["DoubleLep_DeepHME"]
+    Double_producers_module_name = Double_producer_config["producers_module_name"]
+    Double_producer_name = Double_producer_config["producer_name"]
+    Double_producers_module = importlib.import_module(Double_producers_module_name)
+    Double_producer_class = getattr(Double_producers_module, Double_producer_name)
+    Double_producer = Double_producer_class(Double_producer_config, "DoubleLep_DeepHME")
+
+    final_array = None
+    uproot_stepsize = Single_producer_config.get("uproot_stepsize", "100MB")
+    for array in uproot.iterate(
+        f"{input_filename}:Events", step_size=uproot_stepsize
+    ):  # For DNN 50MB translates to ~300_000 events
+        new_array1 = Single_producer.run(ak.copy(array))
+        new_array2 = Double_producer.run(ak.copy(array))
+        tmp_combo = new_array1
+        for branch in new_array2.fields:
+            if branch == "FullEventId": continue
+            tmp_combo[branch] = new_array2[branch]
+        if final_array is None:
+            final_array = tmp_combo
+        else:
+            final_array = ak.concatenate([final_array, tmp_combo])
+
+    uprootCompression = getattr(uproot, "ZLIB")
+    uprootCompression = uprootCompression(4)
+
+    with uproot.recreate(out_filename, compression=uprootCompression) as outfile:
+        outfile['Events'] = final_array
+
+    print(f"Finished add payloads to {out_filename}")
+
+
 def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_max=300):
     print(f"On file {inName}")
     in_file = uproot.open(inName)
@@ -728,11 +776,12 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
             bin_indices == 0, 1, bin_indices
         )  # If we are in the underflow bin, set to first bin
         bin_counts = hist[bin_indices - 1]  # Get the counts for each event
-        class_weight = np.where(
-            (sample_name == this_name) & (bin_counts > 0),
-            class_weight / bin_counts,
-            class_weight,
-        )
+        # For a non-blind don't norm class weights over mbb
+        # class_weight = np.where(
+        #     (sample_name == this_name) & (bin_counts > 0),
+        #     class_weight / bin_counts,
+        #     class_weight,
+        # )
         adv_weight = np.where(
             (sample_name == this_name) & (bin_counts > 0),
             adv_weight / bin_counts,
@@ -980,9 +1029,27 @@ if __name__ == "__main__":
             os.path.join(output_folder, config_dict["meta_data"]["input_filename"]),
         )
 
+    for i, yamlname in enumerate(yaml_list):
+        print(f"Starting HME {i} with yaml {yamlname}")
+        config_dict = {}
+        with open(os.path.join(output_folder, yamlname), "r") as file:
+            config_dict = yaml.safe_load(file)
+        HME_friend_name = os.path.join(output_folder, config_dict["meta_data"]["input_filename"]).split('.')[0] + "_HME_Friend.root"
+        if os.path.exists(
+            HME_friend_name
+        ):
+            print("File exists, skipping")
+            continue
+        add_HME(
+            config_dict,
+            output_folder,
+            os.path.join(output_folder, config_dict["meta_data"]["input_filename"]),
+            HME_friend_name,
+        )
+
     print("Finished making all the batch files, now we will make the weight files")
     inDir = output_folder
-    batchfiles = [x for x in os.listdir(inDir) if "batchfile" in x]
+    batchfiles = [x for x in os.listdir(inDir) if "batchfile" in x and "Friend" not in x]
 
     bb_low = 70
     bb_high = 150
