@@ -72,6 +72,9 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         test_weight_file = config["test_weight_file"]
         test_batch_config = config["test_batch_config"]
 
+        hme_friend_file = config["hme_friend_file"]
+        test_hme_friend_file = config["test_hme_friend_file"]
+
         # with config["training_file"].localize("r") as training_file, config["weight_file"].localize("r") as weight_file, config["batch_config"].localize("r") as batch_config, config["test_training_file"].localize("r") as test_training_file, config["test_weight_file"].localize("r") as test_weight_file, config["test_batch_config"].localize("r") as test_batch_config:
         dnn_trainer_cmd = [
             "python3",
@@ -93,6 +96,10 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             tmpFolder,
             "--setup-config",
             config_name,
+            "--hme_friend_file",
+            hme_friend_file,
+            "--test_hme_friend_file",
+            test_hme_friend_file,
         ]
         ps_call(dnn_trainer_cmd, verbose=1)
 
@@ -162,6 +169,8 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         valitation_weight_file = config["validation_weight_file"]
         valitation_batch_config = config["validation_batch_config"]
 
+        validation_hme_friend_file = config["validation_hme_friend_file"]
+
         tmp_local = os.path.join(self.input()[0].path, "best.onnx")
         # with self.input()[0].localize("r") as model_file, self.input()[1].localize("r") as model_config:
         with self.remote_target(tmp_local, fs=self.fs_anaTuple).localize(
@@ -186,6 +195,8 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 model_file.path,
                 "--model-config",
                 model_config.path,
+                "--validation_hme_friend_file",
+                validation_hme_friend_file,
             ]
             ps_call(dnn_validator_cmd, verbose=1)
 

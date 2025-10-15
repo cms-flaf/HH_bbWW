@@ -13,6 +13,9 @@ if __name__ == "__main__":
         "--validation_weight_file", required=True, type=str, help="Weight file"
     )
     parser.add_argument(
+        "--validation_hme_friend_file", required=False, type=str, default=None, help="Validation HME friend file"
+    )
+    parser.add_argument(
         "--validation_batch_config", required=True, type=str, help="Batch config file"
     )
     parser.add_argument("--output_file", required=True, type=str, help="Output Pdf")
@@ -52,6 +55,7 @@ if __name__ == "__main__":
             args.output_file,
             args.model_name,
             args.model_config,
+            args.validation_hme_friend_file,
         )
 
     finally:
