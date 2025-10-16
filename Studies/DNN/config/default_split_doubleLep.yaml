@@ -3,7 +3,7 @@ batch_dict:
   GluGlutoBulkGraviton: 100
   TT: 1200
   DY: 250
-  ST: 150
+  ST: 100
 
 
 storage_folder: /eos/user/d/daebi/bbWW_development/anaTuples/FullForTraining/

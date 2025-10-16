@@ -2,6 +2,7 @@ UseParametric: true
 adv_activation: relu
 adv_grad_factor: 1.0
 adv_learning_rate: 0.001
+adv_model: false
 adv_submodule_steps: 50
 adv_submodule_tracker: 0
 adv_weight_decay: 0.004
@@ -69,13 +70,11 @@ listfeatures:
     - SelectedFatJet_mass
     - SelectedFatJet_SubJet1_btagDeepB
     - SelectedFatJet_SubJet1_eta
-    - SelectedFatJet_SubJet1_isValid
     - SelectedFatJet_SubJet1_mass
     - SelectedFatJet_SubJet1_phi
     - SelectedFatJet_SubJet1_pt
     - SelectedFatJet_SubJet2_btagDeepB
     - SelectedFatJet_SubJet2_eta
-    - SelectedFatJet_SubJet2_isValid
     - SelectedFatJet_SubJet2_mass
     - SelectedFatJet_SubJet2_phi
     - SelectedFatJet_SubJet2_pt
