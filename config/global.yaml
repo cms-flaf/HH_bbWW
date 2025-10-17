@@ -182,16 +182,16 @@ payload_producers:
     awkward_based: False
     virtual_payload: True # Add support to avoid running payload as a cache, rather just running it in RAM live (if quick enough)
     masses:
-    - 250
-    - 350
-    - 550
-    - 800
+      - 250
+      - 350
+      - 550
+      - 800
     bins:
-    - [0p0, 0p2]
-    - [0p2, 0p4]
-    - [0p4, 0p6]
-    - [0p6, 0p8]
-    - [0p8, 1p0]
+      - [ 0p0, 0p2 ]
+      - [ 0p2, 0p4 ]
+      - [ 0p4, 0p6 ]
+      - [ 0p6, 0p8 ]
+      - [ 0p8, 1p0 ]
 
 # This is for Analysis Selection
 channelSelection:

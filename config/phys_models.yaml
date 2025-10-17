@@ -31,12 +31,10 @@ BaseModel:
 
 OnlyData:
   name: "Only Data"
-  backgrounds: []
-  signals: []
+  backgrounds: [ ]
+  signals: [ ]
   data:
     - Data_Full
-
-
 
 
 Run3_2023_Model:
@@ -53,4 +51,3 @@ Run3_2023_Model:
     - GluGluToRadion_SingleLepton
   data:
     - Data_Full
-

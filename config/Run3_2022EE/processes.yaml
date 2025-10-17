@@ -211,7 +211,6 @@ GluGluToBulkGraviton_SingleLepton:
     - GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_5000
 
 
-
 XtoYH_DoubleLepton:
   name: "GluGluToRadion_DoubleLepton"
   color: "kBlack"
@@ -243,8 +242,6 @@ XtoYH_DoubleLepton:
     - XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_125
     - XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_125
     - XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_125
-
-
 
 
 Data_Full:

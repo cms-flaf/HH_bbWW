@@ -100,10 +100,6 @@ GluGluToRadion_DoubleLepton:
     - XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_125
 
 
-
-
-
-
 GluGluToRadion_SingleLepton:
   name: "GluGluToRadion_SingleLepton"
   color: "kBlack"
