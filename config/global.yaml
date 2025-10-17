@@ -1,10 +1,10 @@
 anaTupleDef: AnaProd/anaTupleDef.py
 analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
-phys_model: BaseModel
+# phys_model: BaseModel
+phys_model: Run3_2023_Model
 signal_types:
   - GluGluToRadion
-  - GluGlutoRadion
   - GluGluToBulkGraviton
 corrections:
   - mu
@@ -168,6 +168,30 @@ payload_producers:
     awkward_based: True
     uproot_stepsize: '50MB'
     dependencies:
+  HMEinDNNBins:
+    producers_module_name: Analysis.HMEinDNNBins
+    producer_name: HMEinDNNBins
+    dependencies:
+      - SingleLep_DeepHME
+      - DoubleLep_DeepHME
+      - DNN_DL
+      - DNN_SL
+    n_cpus: 4
+    max_runtime: 2.0
+    cmssw_env: False
+    awkward_based: False
+    virtual_payload: True # Add support to avoid running payload as a cache, rather just running it in RAM live (if quick enough)
+    masses:
+    - 250
+    - 350
+    - 550
+    - 800
+    bins:
+    - [0p0, 0p2]
+    - [0p2, 0p4]
+    - [0p4, 0p6]
+    - [0p6, 0p8]
+    - [0p8, 1p0]
 
 # This is for Analysis Selection
 channelSelection:
