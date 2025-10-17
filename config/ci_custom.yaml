@@ -7,6 +7,7 @@ compute_unc_histograms: true
 store_noncentral: true
 
 variables:
+  - lep1_pt
   - SingleLepHME_mass
   - DoubleLepHME_mass
   - DNN_M0_Signal
