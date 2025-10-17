@@ -28,3 +28,29 @@ BaseModel:
     - GluGluToBulkGraviton_SingleLepton
   data:
     - Data_Full
+
+OnlyData:
+  name: "Only Data"
+  backgrounds: []
+  signals: []
+  data:
+    - Data_Full
+
+
+
+
+Run3_2023_Model:
+  name: "Run3 2023 Model"
+  backgrounds:
+    - TT
+    - DY_LowMass
+    - DY_HighMass
+    # - ST
+    - VV
+    - W
+  signals:
+    - GluGluToRadion_DoubleLepton
+    - GluGluToRadion_SingleLepton
+  data:
+    - Data_Full
+
