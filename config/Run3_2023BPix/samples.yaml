@@ -1,5 +1,5 @@
 GLOBAL:
-  triggerFile: config/Run3_2022/triggers.yaml
+  triggerFile: config/Run3_2023BPix/triggers.yaml
   sampleSelection:
     - drop ^.*
     - keep ^TT.*
