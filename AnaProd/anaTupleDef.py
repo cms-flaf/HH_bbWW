@@ -570,7 +570,7 @@ def addAllVariables(
         # save gen level H->bb
         dfw.Define(
             "H_to_bb",
-            """GetGenHBBCandidate(event, GenPart_pdgId, GenPart_daughters, GenPart_statusFlags, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenJet_p4, true)""",
+            """GetGenHBBCandidate(event, GenPart_pdgId, GenPart_daughters, GenPart_statusFlags, GenPart_pt, GenPart_eta, GenPart_phi, GenPart_mass, GenJet_p4, false)""",
         )
         for var in PtEtaPhiM:
             dfw.DefineAndAppend(
