@@ -1,0 +1,116 @@
+UseParametric: true
+adv_activation: relu
+adv_grad_factor: 1.0
+adv_learning_rate: 0.001
+adv_model: false
+adv_submodule_steps: 50
+adv_submodule_tracker: 0
+adv_weight_decay: 0.004
+apply_common_gradients: true
+batch_compression_factor: 1
+nClasses: 5
+class_activation: tanh
+class_grad_factor: 0.1
+common_activation: tanh
+continue_model: DNN_Models/default/default.keras
+continue_training: false
+disco_activation: tanh
+disco_lambda_factor: 100
+do_step2: true
+do_training: false
+dropout: 0.0
+features:
+  - lep1_pt
+  - lep1_phi
+  - lep1_eta
+  - lep1_mass
+  - met_pt
+  - met_phi
+highlevelfeatures:
+  - HT
+  - dR_dibjet
+  - dPhi_jet1_jet2
+  - dPhi_MET_dibjet
+  # - min_dR_lep0_jets # For some reason, this is sometines inf
+  # - min_dR_lep1_jets # Check event 2030682 in this dataset may30
+  - MT
+  - CosTheta_bb
+# input_folder: DNN_Datasets/Dataset_2025-05-30-01-19-55/
+input_folder: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v3/Dataset_Run3_2022/
+# input_folder: DNN_Datasets/Dataset_SmallTest/
+learning_rate: 0.001
+listfeatures:
+  - - - centralJet_pt
+      - centralJet_phi
+      - centralJet_eta
+      - centralJet_mass
+      - centralJet_btagPNetB
+    - 0
+  - - - centralJet_pt
+      - centralJet_phi
+      - centralJet_eta
+      - centralJet_mass
+      - centralJet_btagPNetB
+    - 1
+  - - - centralJet_pt
+      - centralJet_phi
+      - centralJet_eta
+      - centralJet_mass
+      - centralJet_btagPNetB
+    - 2
+  - - - centralJet_pt
+      - centralJet_phi
+      - centralJet_eta
+      - centralJet_mass
+      - centralJet_btagPNetB
+    - 3
+  - - - SelectedFatJet_pt
+      - SelectedFatJet_phi
+      - SelectedFatJet_eta
+      - SelectedFatJet_mass
+      - SelectedFatJet_SubJet1_btagDeepB
+      - SelectedFatJet_SubJet1_eta
+      - SelectedFatJet_SubJet1_mass
+      - SelectedFatJet_SubJet1_phi
+      - SelectedFatJet_SubJet1_pt
+      - SelectedFatJet_SubJet2_btagDeepB
+      - SelectedFatJet_SubJet2_eta
+      - SelectedFatJet_SubJet2_mass
+      - SelectedFatJet_SubJet2_phi
+      - SelectedFatJet_SubJet2_pt
+    - 0
+n_adv_layers: 5
+n_adv_units: 128
+n_class_layers: 5
+n_class_units: 128
+n_common_layers: 10
+n_common_units: 256
+n_disco_layers: 5
+n_disco_units: 512
+n_epochs: 40
+parametric_list:
+  - 250
+  - 260
+  - 270
+  - 280
+  - 300
+  - 350
+  - 450
+  - 550
+  - 600
+  - 650
+  - 700
+  - 800
+  - 1000
+  - 1200
+  - 1400
+  - 1600
+  - 1800
+  - 2000
+  - 2500
+  - 3000
+  - 4000
+  - 5000
+patience: 100
+use_batch_norm: true
+weight_decay: 0.004
