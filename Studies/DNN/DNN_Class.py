@@ -1618,6 +1618,24 @@ def train_dnn(
     onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=13)
     onnx.save(onnx_model, f"{output_dnn_name}.onnx")
 
+
+    modelname_parity = [output_dnn_name, config_dict["meta_data"]["iterate_cut"]]
+    features_config = {
+        "features": dw.feature_names,
+        "listfeatures": dw.listfeature_names,
+        "highlevelfeatures": dw.highlevelfeatures_names,
+        "hmefeatures": dw.hmefriendfeatures_names,
+        "use_parametric": dw.use_parametric,
+        "modelname_parity": modelname_parity,
+        "parametric_list": dw.param_list,
+        "model_setup": setup,
+        "nClasses": setup['nClasses'],
+        "nParity": 4,
+    }
+
+    with open(os.path.join(output_folder, "dnn_config.yaml"), "w") as file:
+        yaml.dump(features_config, file)
+
     return
 
 
