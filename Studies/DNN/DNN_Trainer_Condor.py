@@ -10,7 +10,13 @@ if __name__ == "__main__":
         "--training_file", required=True, type=str, help="Training file"
     )
     parser.add_argument("--weight_file", required=True, type=str, help="Weight file")
-    parser.add_argument("--hme_friend_file", required=False, type=str, default=None, help="HME friend file")
+    parser.add_argument(
+        "--hme_friend_file",
+        required=False,
+        type=str,
+        default=None,
+        help="HME friend file",
+    )
     parser.add_argument(
         "--batch_config", required=True, type=str, help="Batch config file"
     )
@@ -21,7 +27,11 @@ if __name__ == "__main__":
         "--test_weight_file", required=True, type=str, help="Test weight file"
     )
     parser.add_argument(
-        "--test_hme_friend_file", required=False, type=str, default=None, help="Test HME friend file"
+        "--test_hme_friend_file",
+        required=False,
+        type=str,
+        default=None,
+        help="Test HME friend file",
     )
     parser.add_argument(
         "--test_batch_config", required=True, type=str, help="Test batch config file"

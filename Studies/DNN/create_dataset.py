@@ -430,7 +430,9 @@ def create_dict(config_dict, output_folder, era):
             "empty_dict_example"
         ] = empty_dict_example_file  # Example for empty dict structure
         machine_yaml["meta_data"]["input_filename"] = f"batchfile{nParity}.root"
-        machine_yaml["meta_data"]["hme_friend_filename"] = f"batchfile{nParity}_HME_Friend.root"
+        machine_yaml["meta_data"][
+            "hme_friend_filename"
+        ] = f"batchfile{nParity}_HME_Friend.root"
         machine_yaml["meta_data"][
             "output_DNNname"
         ] = f"ResHH_Classifier_parity{nParity}"
@@ -686,7 +688,8 @@ def add_HME(config_dict, output_folder, input_filename, out_filename):
         new_array2 = Double_producer.run(ak.copy(array))
         tmp_combo = new_array1
         for branch in new_array2.fields:
-            if branch == "FullEventId": continue
+            if branch == "FullEventId":
+                continue
             tmp_combo[branch] = new_array2[branch]
         if final_array is None:
             final_array = tmp_combo
@@ -697,7 +700,7 @@ def add_HME(config_dict, output_folder, input_filename, out_filename):
     uprootCompression = uprootCompression(4)
 
     with uproot.recreate(out_filename, compression=uprootCompression) as outfile:
-        outfile['Events'] = final_array
+        outfile["Events"] = final_array
 
     print(f"Finished add payloads to {out_filename}")
 
@@ -1034,10 +1037,13 @@ if __name__ == "__main__":
         config_dict = {}
         with open(os.path.join(output_folder, yamlname), "r") as file:
             config_dict = yaml.safe_load(file)
-        HME_friend_name = os.path.join(output_folder, config_dict["meta_data"]["input_filename"]).split('.')[0] + "_HME_Friend.root"
-        if os.path.exists(
-            HME_friend_name
-        ):
+        HME_friend_name = (
+            os.path.join(
+                output_folder, config_dict["meta_data"]["input_filename"]
+            ).split(".")[0]
+            + "_HME_Friend.root"
+        )
+        if os.path.exists(HME_friend_name):
             print("File exists, skipping")
             continue
         add_HME(
@@ -1049,7 +1055,9 @@ if __name__ == "__main__":
 
     print("Finished making all the batch files, now we will make the weight files")
     inDir = output_folder
-    batchfiles = [x for x in os.listdir(inDir) if "batchfile" in x and "Friend" not in x]
+    batchfiles = [
+        x for x in os.listdir(inDir) if "batchfile" in x and "Friend" not in x
+    ]
 
     bb_low = 70
     bb_high = 150

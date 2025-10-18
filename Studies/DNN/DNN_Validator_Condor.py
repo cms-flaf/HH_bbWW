@@ -13,7 +13,11 @@ if __name__ == "__main__":
         "--validation_weight_file", required=True, type=str, help="Weight file"
     )
     parser.add_argument(
-        "--validation_hme_friend_file", required=False, type=str, default=None, help="Validation HME friend file"
+        "--validation_hme_friend_file",
+        required=False,
+        type=str,
+        default=None,
+        help="Validation HME friend file",
     )
     parser.add_argument(
         "--validation_batch_config", required=True, type=str, help="Batch config file"

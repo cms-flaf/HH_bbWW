@@ -139,7 +139,9 @@ class DataWrapper:
             print("What are you doing? You already defined the mbb branch")
         self.mbb_name = mbb_name
 
-    def ReadFile(self, file_name, entry_start=None, entry_stop=None, hme_friend_file=None):
+    def ReadFile(
+        self, file_name, entry_start=None, entry_stop=None, hme_friend_file=None
+    ):
         if self.feature_names == None:
             print("Uknown branches to read! DefineInputFeatures first!")
             return
@@ -194,7 +196,6 @@ class DataWrapper:
                 ).transpose()
             print("Got the list features")
 
-
             # Need to append the value features and the listfeatures together
             if self.listfeature_names != None:
                 print("We have list features!")
@@ -229,12 +230,24 @@ class DataWrapper:
             with uproot.open(hme_friend_file) as file:
                 tree = file["Events"]
                 branches_hme = tree.arrays(
-                    ["SingleLep_DeepHME_mass", "SingleLep_DeepHME_mass_error", "DoubleLep_DeepHME_mass", "DoubleLep_DeepHME_mass_error"], entry_start=entry_start, entry_stop=entry_stop
+                    [
+                        "SingleLep_DeepHME_mass",
+                        "SingleLep_DeepHME_mass_error",
+                        "DoubleLep_DeepHME_mass",
+                        "DoubleLep_DeepHME_mass_error",
+                    ],
+                    entry_start=entry_start,
+                    entry_stop=entry_stop,
                 )
                 if self.hmefriendfeatures_names != None:
-                    self.hme = np.array([getattr(branches_hme, feature_name) for feature_name in self.hmefriendfeatures_names], dtype="float32",).transpose()
+                    self.hme = np.array(
+                        [
+                            getattr(branches_hme, feature_name)
+                            for feature_name in self.hmefriendfeatures_names
+                        ],
+                        dtype="float32",
+                    ).transpose()
                     self.features = np.append(self.features, self.hme, axis=1)
-
 
         self.features_no_param = self.features
         if self.use_parametric:
@@ -1250,7 +1263,7 @@ class DiscoModel(tf.keras.Model):
                 kernel_initializer="random_normal",
                 bias_initializer="random_normal",
                 kernel_regularizer=tf.keras.regularizers.l1(0.1),
-                            )
+            )
             layer_list.append(layer)
 
             if setup["dropout"] > 0:
@@ -1423,12 +1436,22 @@ def train_dnn(
     # Do you want to make a larger batch? May increase speed
     entry_stop = None
 
-    dw.ReadFile(training_file, entry_start=entry_start, entry_stop=entry_stop, hme_friend_file=hme_friend_file)
+    dw.ReadFile(
+        training_file,
+        entry_start=entry_start,
+        entry_stop=entry_stop,
+        hme_friend_file=hme_friend_file,
+    )
     dw.ReadWeightFile(weight_file, entry_start=entry_start, entry_stop=entry_stop)
     print(config_dict)
     # dw.DefineTrainTestSet(batch_size, 0.0)
 
-    test_dw.ReadFile(test_training_file, entry_start=entry_start, entry_stop=entry_stop, hme_friend_file=test_hme_friend_file)
+    test_dw.ReadFile(
+        test_training_file,
+        entry_start=entry_start,
+        entry_stop=entry_stop,
+        hme_friend_file=test_hme_friend_file,
+    )
     test_dw.ReadWeightFile(
         test_weight_file, entry_start=entry_start, entry_stop=entry_stop
     )
@@ -1438,42 +1461,67 @@ def train_dnn(
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     tf.random.set_seed(42)
 
+    if getattr(setup, "adv_model", False):
+        # Adversarial Dataset
+        batch_size = setup["batch_compression_factor"] * batch_size
+        nClasses = setup["nClasses"]
+        train_tf_dataset = tf.data.Dataset.from_tensor_slices(
+            (
+                dw.features,
+                (
+                    tf.one_hot(dw.class_target, nClasses),
+                    dw.adv_target,
+                    dw.class_weight,
+                    dw.adv_weight,
+                ),
+            )
+        ).batch(batch_size, drop_remainder=True)
+        train_tf_dataset = train_tf_dataset.shuffle(
+            len(train_tf_dataset), reshuffle_each_iteration=True
+        )
 
-
-    if getattr(setup, 'adv_model', False):
-      # Adversarial Dataset
-      batch_size = setup['batch_compression_factor']*batch_size
-      nClasses = setup['nClasses']
-      train_tf_dataset = tf.data.Dataset.from_tensor_slices((dw.features, (tf.one_hot(dw.class_target, nClasses), dw.adv_target, dw.class_weight, dw.adv_weight))).batch(batch_size, drop_remainder=True)
-      train_tf_dataset = train_tf_dataset.shuffle(len(train_tf_dataset), reshuffle_each_iteration=True)
-
-      test_batch_size = setup['batch_compression_factor']*test_batch_size
-      test_tf_dataset = tf.data.Dataset.from_tensor_slices((test_dw.features, (tf.one_hot(test_dw.class_target, nClasses), test_dw.adv_target, test_dw.class_weight, test_dw.adv_weight))).batch(test_batch_size, drop_remainder=True)
-      test_tf_dataset = test_tf_dataset.shuffle(len(test_tf_dataset), reshuffle_each_iteration=True)
+        test_batch_size = setup["batch_compression_factor"] * test_batch_size
+        test_tf_dataset = tf.data.Dataset.from_tensor_slices(
+            (
+                test_dw.features,
+                (
+                    tf.one_hot(test_dw.class_target, nClasses),
+                    test_dw.adv_target,
+                    test_dw.class_weight,
+                    test_dw.adv_weight,
+                ),
+            )
+        ).batch(test_batch_size, drop_remainder=True)
+        test_tf_dataset = test_tf_dataset.shuffle(
+            len(test_tf_dataset), reshuffle_each_iteration=True
+        )
 
     else:
-      # Disco Dataset
-      nClasses = setup["nClasses"]
-      train_tf_dataset = tf.data.Dataset.from_tensor_slices(
-          (dw.features, (tf.one_hot(dw.class_target, nClasses), dw.mbb, dw.class_weight))
-      ).batch(batch_size, drop_remainder=True)
-      train_tf_dataset = train_tf_dataset.shuffle(
-          len(train_tf_dataset), reshuffle_each_iteration=True
-      )
+        # Disco Dataset
+        nClasses = setup["nClasses"]
+        train_tf_dataset = tf.data.Dataset.from_tensor_slices(
+            (
+                dw.features,
+                (tf.one_hot(dw.class_target, nClasses), dw.mbb, dw.class_weight),
+            )
+        ).batch(batch_size, drop_remainder=True)
+        train_tf_dataset = train_tf_dataset.shuffle(
+            len(train_tf_dataset), reshuffle_each_iteration=True
+        )
 
-      test_tf_dataset = tf.data.Dataset.from_tensor_slices(
-          (
-              test_dw.features,
-              (
-                  tf.one_hot(test_dw.class_target, nClasses),
-                  test_dw.mbb,
-                  test_dw.class_weight,
-              ),
-          )
-      ).batch(test_batch_size, drop_remainder=True)
-      test_tf_dataset = test_tf_dataset.shuffle(
-          len(test_tf_dataset), reshuffle_each_iteration=True
-      )
+        test_tf_dataset = tf.data.Dataset.from_tensor_slices(
+            (
+                test_dw.features,
+                (
+                    tf.one_hot(test_dw.class_target, nClasses),
+                    test_dw.mbb,
+                    test_dw.class_weight,
+                ),
+            )
+        ).batch(test_batch_size, drop_remainder=True)
+        test_tf_dataset = test_tf_dataset.shuffle(
+            len(test_tf_dataset), reshuffle_each_iteration=True
+        )
 
     @tf.function
     def new_param_map(*x):
@@ -1503,7 +1551,7 @@ def train_dnn(
         # Lastly we need to keep the signal events the correct mass
         class_targets = dataset[1][0]
         old_mass_mask = tf.cast(class_targets[:, 0], tf.float32)
-        new_mass_mask = tf.cast((class_targets[:, 0]==0), tf.float32)
+        new_mass_mask = tf.cast((class_targets[:, 0] == 0), tf.float32)
 
         actual_mass = old_mass_mask * features[:, -1] + new_mass_mask * actual_new_mass
         actual_mass = tf.transpose(actual_mass)
@@ -1519,56 +1567,77 @@ def train_dnn(
     input_shape = [None, dw.features.shape[1]]
     input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
 
-    if getattr(setup, 'adv_model', False):
-      # AdversarialModel
-      model = AdversarialModel(setup)
-      model.compile(loss=None,
-                  # optimizer=tf.keras.optimizers.AdamW(learning_rate=setup['learning_rate'],
-                  #                                     weight_decay=setup['weight_decay']))
-                  optimizer=tf.keras.optimizers.Nadam(learning_rate=setup['learning_rate'],
-                                                      weight_decay=setup['weight_decay']
-                  )
-      )
-      model(dw.features)
-      model.summary()
+    if getattr(setup, "adv_model", False):
+        # AdversarialModel
+        model = AdversarialModel(setup)
+        model.compile(
+            loss=None,
+            # optimizer=tf.keras.optimizers.AdamW(learning_rate=setup['learning_rate'],
+            #                                     weight_decay=setup['weight_decay']))
+            optimizer=tf.keras.optimizers.Nadam(
+                learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
+            ),
+        )
+        model(dw.features)
+        model.summary()
 
-      def save_predicate(model, logs):
-          return (abs(logs['val_adv_accuracy'] - 0.5) < 0.001) # How do we stop the model from always guessing 0.49 or 0.51?
+        def save_predicate(model, logs):
+            return (
+                abs(logs["val_adv_accuracy"] - 0.5) < 0.001
+            )  # How do we stop the model from always guessing 0.49 or 0.51?
 
-      callbacks = [
-          ModelCheckpoint(output_dnn_name, verbose=1, monitor="val_class_loss", mode='min', min_rel_delta=1e-3,
-                          # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
-                          patience=setup['patience'], save_callback=None, input_signature=input_signature),
-          tf.keras.callbacks.CSVLogger(f'{output_dnn_name}_training_log.csv', append=True),
-          EpochCounterCallback(),
-          AdvOnlyCallback(train_tf_dataset, nSteps=setup['adv_submodule_steps'], TrackerWindowSize=setup['adv_submodule_tracker'], on_batch=True, on_epoch=False, continue_training=setup['continue_training'], quiet=False),
-          # AdvOnlyCallback(train_tf_dataset, nSteps=5000, TrackerWindowSize=100, on_batch=False, on_epoch=True, skip_epoch0=False, quiet=False),
-      ]
+        callbacks = [
+            ModelCheckpoint(
+                output_dnn_name,
+                verbose=1,
+                monitor="val_class_loss",
+                mode="min",
+                min_rel_delta=1e-3,
+                # patience=setup['patience'], save_callback=None, predicate=save_predicate, input_signature=input_signature),
+                patience=setup["patience"],
+                save_callback=None,
+                input_signature=input_signature,
+            ),
+            tf.keras.callbacks.CSVLogger(
+                f"{output_dnn_name}_training_log.csv", append=True
+            ),
+            EpochCounterCallback(),
+            AdvOnlyCallback(
+                train_tf_dataset,
+                nSteps=setup["adv_submodule_steps"],
+                TrackerWindowSize=setup["adv_submodule_tracker"],
+                on_batch=True,
+                on_epoch=False,
+                continue_training=setup["continue_training"],
+                quiet=False,
+            ),
+            # AdvOnlyCallback(train_tf_dataset, nSteps=5000, TrackerWindowSize=100, on_batch=False, on_epoch=True, skip_epoch0=False, quiet=False),
+        ]
 
     else:
-      # DiscoModel
-      model = DiscoModel(setup)
-      model.compile(
-          loss=None,
-          optimizer=tf.keras.optimizers.Nadam(
-              learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
-          ),
-      )
-      model(dw.features)
-      model.summary()
+        # DiscoModel
+        model = DiscoModel(setup)
+        model.compile(
+            loss=None,
+            optimizer=tf.keras.optimizers.Nadam(
+                learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
+            ),
+        )
+        model(dw.features)
+        model.summary()
 
-      callbacks = [
-          ModelCheckpoint(
-              output_dnn_name,
-              verbose=1,
-              monitor="val_class_loss",
-              mode="min",
-              min_rel_delta=1e-3,
-              patience=100,
-              save_callback=None,
-              input_signature=input_signature,
-          ),
-      ]
+        callbacks = [
+            ModelCheckpoint(
+                output_dnn_name,
+                verbose=1,
+                monitor="val_class_loss",
+                mode="min",
+                min_rel_delta=1e-3,
+                patience=100,
+                save_callback=None,
+                input_signature=input_signature,
+            ),
+        ]
 
     verbose = setup["verbose"] if "verbose" in setup else 0
     print("Fit model")
@@ -1618,7 +1687,6 @@ def train_dnn(
     onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=13)
     onnx.save(onnx_model, f"{output_dnn_name}.onnx")
 
-
     modelname_parity = [output_dnn_name, config_dict["meta_data"]["iterate_cut"]]
     features_config = {
         "features": dw.feature_names,
@@ -1629,7 +1697,7 @@ def train_dnn(
         "modelname_parity": modelname_parity,
         "parametric_list": dw.param_list,
         "model_setup": setup,
-        "nClasses": setup['nClasses'],
+        "nClasses": setup["nClasses"],
         "nParity": 4,
     }
 
@@ -1725,7 +1793,7 @@ def validate_dnn(
 
         # Class Plots
         # Lets build Masks
-        Sig_This_Mass = (dw.X_mass == para_masspoint)
+        Sig_This_Mass = dw.X_mass == para_masspoint
         Sig_SR_mask = (Sig_This_Mass) & (dw.class_target == 0) & (dw.adv_target == 0)
         Sig_CR_high_mask = (dw.class_target == 0) & (dw.adv_target == 1)
 
@@ -2211,7 +2279,7 @@ def validate_disco_dnn(
 
         # Class Plots
         # Lets build Masks
-        Sig_This_Mass = (dw.X_mass == para_masspoint)
+        Sig_This_Mass = dw.X_mass == para_masspoint
         Sig_SR_mask = (Sig_This_Mass) & (dw.class_target == 0) & (dw.adv_target == 0)
         Sig_CR_high_mask = (dw.class_target == 0) & (dw.adv_target == 1)
 

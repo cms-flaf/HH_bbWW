@@ -1410,7 +1410,6 @@ class AdversarialModel(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.setup = setup
 
-
         # self.batch_counter = tf.Variable(0)
         self.epoch_counter = tf.Variable(0.0)
 

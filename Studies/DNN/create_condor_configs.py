@@ -15,16 +15,16 @@ var_parse_dict = {
     "adv_learning_rate": [0.0001],
     "adv_submodule_steps": [0],
     "class_grad_factor": [1.0],
-    "learning_rate": [ 0.00001 ],
-    "n_epochs": [ 100 ],
-    "dropout": [ 0.3 ],
+    "learning_rate": [0.00001],
+    "n_epochs": [100],
+    "dropout": [0.3],
     "weight_decay": [None],
     "adv_weight_decay": [None],
-    "disco_lambda_factor": [ 0 ],
-    "n_disco_layers": [ 5 ],
-    "n_disco_units": [ 256 ],
-    "disco_activation": [ "relu" ],
-    'hmefeatures': [ ['SingleLep_DeepHME_mass', 'SingleLep_DeepHME_mass_error'], None ]
+    "disco_lambda_factor": [0],
+    "n_disco_layers": [5],
+    "n_disco_units": [256],
+    "disco_activation": ["relu"],
+    "hmefeatures": [["SingleLep_DeepHME_mass", "SingleLep_DeepHME_mass_error"], None],
 }
 
 
