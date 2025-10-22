@@ -3,7 +3,7 @@ import ROOT
 if __name__ == "__main__":
     sys.path.append(os.environ["ANALYSIS_PATH"])
 
-from FLAF.Analysis.HistHelper import *
+from FLAF.Common.HistHelper import *
 from FLAF.Common.Utilities import *
 
 
@@ -15,39 +15,92 @@ WorkingPointsParticleNet = {
 }
 
 
-def createKeyFilterDict(global_cfg_dict, year):
-    reg_dict = {}
+# I comment this to save what was done before but it must be put in the format of the new createKeyFilterDict function
+# def createKeyFilterDict(global_cfg_dict, year):
+#     reg_dict = {}
+#     filter_str = ""
+#     channels_to_consider = global_cfg_dict['channels_to_consider']
+#     qcd_regions_to_consider = global_cfg_dict['QCDRegions']
+#     categories_to_consider = global_cfg_dict["categories"]
+#     #triggers = global_cfg_dict['hist_triggers']
+#     #mass_cut_limits = global_cfg_dict['mass_cut_limits']
+#     for ch in channels_to_consider:
+#         for reg in qcd_regions_to_consider:
+#             for cat in categories_to_consider:
+#                 #print(ch, reg, cat, filter_str)
+#                 #print()
+#                 #filter_base = f" ({ch} && {triggers[ch]} && {reg} && {cat})"
+
+#                 #Need to get the channel ID from config dict
+#                 filter_base = f" ((channelId == {global_cfg_dict['channelDefinition'][ch]}) && {reg} && {cat})"
+#                 filter_str = f"(" + filter_base
+#                 #print(ch, reg, cat, filter_str)
+#                 #print()
+#                 #for mass_name,mass_limits in mass_cut_limits.items():
+#                 #    filter_str+=f"&& ({mass_name} >= {mass_limits[0]})"
+#                 #print(filter_str)
+#                 #if cat != 'boosted' and cat!= 'baseline':
+#                 #    filter_str += "&& (b1_pt>0 && b2_pt>0)"
+#                 filter_str += ")"
+#                 #print(filter_str)
+#                 key = (ch, reg, cat)
+#                 reg_dict[key] = filter_str
+#                 #print(ch, reg, cat, filter_str)
+#                 #print()
+
+#     return reg_dict
+
+
+def createKeyFilterDict(global_params, period):
+    filter_dict = {}
     filter_str = ""
-    channels_to_consider = global_cfg_dict["channels_to_consider"]
-    qcd_regions_to_consider = global_cfg_dict["QCDRegions"]
-    categories_to_consider = global_cfg_dict["categories"]
-    # triggers = global_cfg_dict['hist_triggers']
-    # mass_cut_limits = global_cfg_dict['mass_cut_limits']
+    channels_to_consider = global_params["channels_to_consider"]
+    categories = global_params["categories"]
+    ### add custom categories eventually:
+    custom_categories = []
+    custom_categories_name = global_params.get(
+        "custom_categories", None
+    )  # can be extended to list of names
+    if custom_categories_name:
+        custom_categories = list(global_params.get(custom_categories_name, []))
+        if not custom_categories:
+            print("No custom categories found")
+    ### regions
+    custom_regions = []
+    custom_regions_name = global_params.get(
+        "custom_regions", None
+    )  # can be extended to list of names, if for example adding QCD regions + other control regions
+    if custom_regions_name:
+        custom_regions = list(global_params.get(custom_regions_name, []))
+        if not custom_regions:
+            print("No custom regions found")
+    all_categories = categories + custom_categories
+    custom_subcategories = list(global_params.get("custom_subcategories", []))
+    triggers_dict = global_params["triggers"]
     for ch in channels_to_consider:
-        for reg in qcd_regions_to_consider:
-            for cat in categories_to_consider:
-                # print(ch, reg, cat, filter_str)
-                # print()
-                # filter_base = f" ({ch} && {triggers[ch]} && {reg} && {cat})"
+        triggers_list = triggers_dict[ch]
+        triggers_list_complete = [f"HLT_{trg}" for trg in triggers_list]
+        triggers_str = "(" + " || ".join(triggers_list_complete) + ")"
+        print(triggers_str)
+        # if period in triggers_dict[ch].keys():
+        #     triggers = triggers_dict[ch][period]
+        for reg in custom_regions:
+            for cat in all_categories:
 
-                # Need to get the channel ID from config dict
-                filter_base = f" ((channelId == {global_cfg_dict['channelDefinition'][ch]}) && {reg} && {cat})"
-                filter_str = f"(" + filter_base
-                # print(ch, reg, cat, filter_str)
-                # print()
-                # for mass_name,mass_limits in mass_cut_limits.items():
-                #    filter_str+=f"&& ({mass_name} >= {mass_limits[0]})"
-                # print(filter_str)
-                # if cat != 'boosted' and cat!= 'baseline':
-                #    filter_str += "&& (b1_pt>0 && b2_pt>0)"
-                filter_str += ")"
-                # print(filter_str)
-                key = (ch, reg, cat)
-                reg_dict[key] = filter_str
-                # print(ch, reg, cat, filter_str)
-                # print()
-
-    return reg_dict
+                filter_base = f" ( (channelId == {global_params['channelDefinition'][ch]})  && {triggers_str} && {reg} && {cat} ) "
+                if custom_subcategories:
+                    for subcat in custom_subcategories:
+                        # filter_base += f"&& {custom_subcat}"
+                        filter_str = f"(" + filter_base + f" && {subcat}"
+                        filter_str += ")"
+                        key = (ch, reg, cat, subcat)
+                        filter_dict[key] = filter_str
+                else:
+                    filter_str = f"(" + filter_base
+                    filter_str += ")"
+                    key = (ch, reg, cat)
+                    filter_dict[key] = filter_str
+    return filter_dict
 
 
 def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
@@ -64,7 +117,7 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
     return f"{btag_weight}*{btagshape_weight}"
 
 
-def GetWeight(channel, cat, boosted_categories):
+def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     weights_to_apply = ["weight_MC_Lumi_pu"]
     total_weight = "*".join(weights_to_apply)
     for lep_index in [1, 2]:
@@ -120,36 +173,39 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             )
 
     def defineCategories(self):
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "nSelBtag_jets",
             f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})",
         )
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "nSelBtag_fatjets", f"int( SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 )"
         )
-        self.df = self.df.Define("resolved", f"centralJet_pt.size() >= 2")
-        self.df = self.df.Define("res2b", f"resolved && nSelBtag_jets >= 2")
-        self.df = self.df.Define(
+        self.DefineAndAppend("resolved", f"centralJet_pt.size() >= 2")
+        self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
+        self.DefineAndAppend(
             "boosted", f"!res2b && nSelBtag_fatjets > 0 "
         )  # Greater than zero, but logic should only allow 0 or 1
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "res1b", f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1"
         )
         # We are throwing away events with a FatJet that are not b-tagged in this method
 
-        self.df = self.df.Define("SR", "( (Zveto || OppFlavor) && mbb_SR )")
-        self.df = self.df.Define("res1b_SR", f"res1b && SR")
-        self.df = self.df.Define("res2b_SR", f"res2b && SR")
-        self.df = self.df.Define("boosted_SR", f"boosted && SR")
+        self.DefineAndAppend("SR", "( (Zveto || OppFlavor) && mbb_SR )")
+        self.DefineAndAppend("res1b_SR", f"res1b && SR")
+        self.DefineAndAppend("res2b_SR", f"res2b && SR")
+        self.DefineAndAppend("boosted_SR", f"boosted && SR")
 
-        self.df = self.df.Define("inclusive", f"centralJet_pt.size() >= 2")
-        self.df = self.df.Define("baseline", f"return true;")
+        self.DefineAndAppend("inclusive", f"centralJet_pt.size() >= 2")
+        self.DefineAndAppend("baseline", f"return true;")
 
     def defineChannels(self):
         # self.df = self.df.Define("channelId", f"(lep1_legType*10) + lep2_legType") #Muhammad moved this to anaTupleDef like a jerk
         for channel in self.config["channelSelection"]:
             ch_value = self.config["channelDefinition"][channel]
+            print(f"channel {channel} has value {ch_value}")
+            self.DefineAndAppend(channel, f"channelId=={ch_value}")
             # self.df = self.df.Define(f"{channel}", f"channelId=={ch_value}")
+            # self.colToSave.append(channel)
 
     def defineLeptonPreselection(self):
         # Later we will defined some lepton selections
@@ -226,41 +282,41 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )  # needs to be updated for ak8 PNet
 
     def defineQCDRegions(self):
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)"
         )
-        self.df = self.df.Define("SS", "!OS")
-        self.df = self.df.Define("Iso", "tightlep_Iso")
-        self.df = self.df.Define("AntiIso", f"!Iso")
-        self.df = self.df.Define("OS_Iso", f"OS && Iso && event_selection")
-        self.df = self.df.Define("SS_Iso", f"SS && Iso && event_selection")
-        self.df = self.df.Define("OS_AntiIso", f"OS && AntiIso && event_selection")
-        self.df = self.df.Define("SS_AntiIso", f"SS && AntiIso && event_selection")
+        self.DefineAndAppend("SS", "!OS")
+        self.DefineAndAppend("Iso", "tightlep_Iso")
+        self.DefineAndAppend("AntiIso", f"!Iso")
+        self.DefineAndAppend("OS_Iso", f"OS && Iso && event_selection")
+        self.DefineAndAppend("SS_Iso", f"SS && Iso && event_selection")
+        self.DefineAndAppend("OS_AntiIso", f"OS && AntiIso && event_selection")
+        self.DefineAndAppend("SS_AntiIso", f"SS && AntiIso && event_selection")
 
     def defineControlRegions(self):
         # Define Single Muon Control Region (W Region) -- Require Muon + High MT (>50)
         # Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "Zpeak",
             f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)",
         )
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "Zveto",
             f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
         )
-        self.df = self.df.Define("OppFlavor", f"(lep1_legType != lep2_legType)")
-        self.df = self.df.Define(
+        self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
+        self.DefineAndAppend(
             "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 "
         )
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "mbb_SR",
             f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150",
         )
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "Lep1Lep2Jet1Jet2_mass",
             f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
         )
-        self.df = self.df.Define(
+        self.DefineAndAppend(
             "Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
@@ -275,6 +331,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "MT_tot",
             f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, DeepMETResolutionTune_p4) : 0.0",
         )
+        # self.df.colToSave.append(['MT_lep1','MT_lep2','MT_tot']) # I don't know if you need these observables for further cuts in hist stages.
 
     def selectTrigger(self, trigger):
         self.df = self.df.Filter(trigger)
@@ -287,26 +344,30 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         for ch in self.config["channelSelection"]:
             for trg in self.config["triggers"][ch]:
                 trg_name = "HLT_" + trg
+                self.colToSave.append(trg_name)
                 if trg_name not in self.df.GetColumnNames():
                     print(f"{trg_name} not present in colNames")
                     self.df = self.df.Define(trg_name, "1")
-
-        singleTau_th_dict = self.config["singleTau_th"]
+        # singleTau_th_dict = self.config['singleTau_th']
         # singleMu_th_dict = self.config['singleMu_th']
         # singleEle_th_dict = self.config['singleEle_th']
         for trg_name, trg_dict in self.config["application_regions"].items():
             for key in trg_dict.keys():
                 region_name = trg_dict["region_name"]
-                region_cut = trg_dict["region_cut"].format(
-                    tau_th=singleTau_th_dict[self.period]
-                )
+                region_cut = trg_dict["region_cut"].format()
+                self.colToSave.append(region_name)
                 if region_name not in self.df.GetColumnNames():
                     self.df = self.df.Define(region_name, region_cut)
 
-    def __init__(self, df, config, period, **kwargs):
+    def DefineAndAppend(self, varToDefine, var_expression):
+        self.df = self.df.Define(varToDefine, var_expression)
+        self.colToSave.append(varToDefine)
+
+    def __init__(self, df, config, period, colToSave=[], **kwargs):
         super(DataFrameBuilderForHistograms, self).__init__(df, **kwargs)
         self.config = config
         self.period = period
+        self.colToSave = colToSave + ["channelId"]
         self.bTagWP = WorkingPointsParticleNet[period][
             "Medium"
         ]  # wp should go to global config.
@@ -440,15 +501,33 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     # dfForHistograms.defineChannels()
+    dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineJetSelections()
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
     # dfForHistograms.defineBoostedVariables()
-    # dfForHistograms.defineTriggers()
     # dfForHistograms.redefineWeights()
     # dfForHistograms.df = createInvMass(dfForHistograms.df)
     dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms
+
+
+# def PrepareDfForHistograms(dfForHistograms):
+#     dfForHistograms.defineChannels()
+#     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+#     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
+#     dfForHistograms.defineLeptonPreselection()
+#     dfForHistograms.defineJetSelections()
+#     dfForHistograms.defineQCDRegions()
+#     dfForHistograms.defineControlRegions()
+#     dfForHistograms.defineCategories()
+#     #dfForHistograms.defineBoostedVariables()
+#     # dfForHistograms.defineTriggers()
+#     #dfForHistograms.redefineWeights()
+#     #dfForHistograms.df = createInvMass(dfForHistograms.df)
+#     dfForHistograms.calculateMT()
+#     dfForHistograms.defineCutFlow()
+#     return dfForHistograms

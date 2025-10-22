@@ -6,11 +6,10 @@ compute_unc_variations: true
 compute_unc_histograms: true
 store_noncentral: true
 
-vars_to_plot:
+variables:
+  - lep1_pt
   - SingleLepHME_mass
   - DoubleLepHME_mass
   - DNN_M0_Signal
   - DNNParametric_M250_Signal
   - LinHMEDNN_linear_hme_dnn_m250
-  - DoubleLep_DeepHME_mass
-  - SingleLep_DeepHME_mass
