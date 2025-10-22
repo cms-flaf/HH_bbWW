@@ -1,13 +1,13 @@
 batch_dict:
   GluGlutoRadion: 100 # It is important to put signal first since signal has extra branches
   GluGlutoBulkGraviton: 100
-  TT: 1000
-  # DY: 550
-  ST: 250
-  W: 550
+  TT: 2800
+  # DY: 250
+  ST: 700
+  W: 300
 
 
-storage_folder: /eos/user/d/daebi/bbWW/anaTuples/may22/Run3_2022EE/
+storage_folder: /eos/user/d/daebi/bbWW_development/anaTuples/FullForTraining/
 
 selection_branches: [ 'lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt', 'SelectedFatJet_pt' ]
 
@@ -77,3 +77,6 @@ background:
   W:
     class_value: 4
     background_datasets:
+      WtoLNu_0J_amcatnloFXFX: [ ]
+      WtoLNu_1J_amcatnloFXFX: [ ]
+      WtoLNu_2J_amcatnloFXFX: [ ]

@@ -12,6 +12,7 @@ import gc
 
 def create_signal_files(config_dict, output_folder):
     storage_folder = config_dict["storage_folder"]
+    storage_folder = config_dict["storage_folder"]
 
     for signal_name in config_dict["signal"]:
         signal_dict = config_dict["signal"][signal_name]
@@ -198,6 +199,10 @@ def create_dict(config_dict, output_folder):
             background_dict = config_dict["background"][background_name]
             class_value = background_dict["class_value"]
             dataset_names = background_dict["background_datasets"]
+
+            if background_name not in process_dict.keys():
+                print(f"Background {background_name} not in process_dict, skip")
+                continue
 
             print(f"Looping background {background_name}")
             for dataset_name in tqdm(dataset_names):
