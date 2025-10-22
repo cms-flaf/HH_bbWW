@@ -51,11 +51,13 @@ def GetDfw(
     dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period, **kwargset)
 
     if df_caches:
+        k = 0
         for df_cache in df_caches:
             dfWrapped_cache = analysis.DataFrameBuilderForHistograms(
                 df_cache, global_params, period, **kwargset
             )
-            AddCacheColumnsInDf(dfw, dfWrapped_cache, cache_map_name)
+            AddCacheColumnsInDf(dfw, dfWrapped_cache, f"{cache_map_name}_{k}")
+            k += 1
 
     if shift == "Valid" and global_params["compute_unc_variations"]:
         dfw.CreateFromDelta(col_names_central, col_types_central)
