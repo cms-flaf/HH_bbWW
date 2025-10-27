@@ -37,17 +37,17 @@ OnlyData:
     - Data_Full
 
 
-Run3_2023_Model:
-  name: "Run3 2023 Model"
+Run3_Model:
+  name: "Run3 Model"
   backgrounds:
     - TT
     - DY_LowMass
     - DY_HighMass
-    # - ST
+    - ST
     - VV
     - W
   signals:
-    - GluGluToRadion_DoubleLepton
-    - GluGluToRadion_SingleLepton
+    - XtoHHto2B2W_SingleLepton
+    - XtoHHto2B2W_DoubleLepton
   data:
     - Data_Full
