@@ -1001,7 +1001,6 @@ DoubleLep_DeepHME_HVV_E:
   divide_by_bin_width: False
 
 
-
 HMEinDNNBins_HME_mass_DL_DNN_M250_0p0_0p2:
   x_bins: "100|-10:2500"
   y_title: "Events"
@@ -1127,9 +1126,6 @@ HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0:
   divide_by_bin_width: False
 
 
-
-
-
 DNNParametric_DL_NoHME_M250_Signal:
   x_bins: "1000|0.0:1.0"
   x_title: DNN M250 Signal
@@ -1233,8 +1229,6 @@ DNNParametric_DL_NoHME_M1000_Signal:
   use_log_y: True
   max_y_sf: 10.0
   divide_by_bin_width: False
-
-
 
 
 DNNParametric_SL_NoHME_M250_Signal:
