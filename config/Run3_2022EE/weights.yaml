@@ -23,7 +23,10 @@ norm:
     name: SingleMuonTrg
 
 
-shape:
-  - JER
-  - JES_Total
-  - EleES
+shape: # syst unc conventions here: https://gitlab.cern.ch/cms-analysis/general/systematics
+  JES_Total:
+    name: CMS_scale_j_{}
+  JER:
+    name: CMS_res_j_{}
+  EleES:
+    name: CMS_scale_e_{}
