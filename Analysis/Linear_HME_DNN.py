@@ -26,13 +26,21 @@ class LinHMEDNN:
         self.n_bins = len(self.hme_bins) - 1
         self.hme_bins_string = ",".join(map(str, self.hme_bins))
 
-        self.channel = cfg['channel']
+        self.channel = cfg["channel"]
 
     def run(self, dfw):
         for col in self.cfg["columns"]:
             mass = col.split("_")[-1][1:]
-            HME_var = "DoubleLep_DeepHME_mass" if self.channel == "DL" else "SingleLep_DeepHME_mass"
-            DNN_var = f"DNNParametric_DL_NoHME_M{mass}_Signal" if self.channel == "DL" else f"DNNParametric_SL_NoHME_M{mass}_Signal"
+            HME_var = (
+                "DoubleLep_DeepHME_mass"
+                if self.channel == "DL"
+                else "SingleLep_DeepHME_mass"
+            )
+            DNN_var = (
+                f"DNNParametric_DL_NoHME_M{mass}_Signal"
+                if self.channel == "DL"
+                else f"DNNParametric_SL_NoHME_M{mass}_Signal"
+            )
 
             dfw.Define(
                 f"linear_hme_dnn_m{mass}",
