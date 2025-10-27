@@ -24,6 +24,9 @@ norm:
 
 
 shape:
-  - JER
-  - JES_Total
-  - EleES
+  JER:
+    name: CMS_scale_j_{}
+  JES_Total:
+    name: CMS_res_j_{}
+  EleES:
+    name: CMS_scale_e_{}
