@@ -174,7 +174,9 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCategories(self):
         self.DefineAndAppend("SL", "channelId == 1 || channelId == 2")
-        self.DefineAndAppend("DL", "channelId == 11 || channelId == 12 || channelId == 22")
+        self.DefineAndAppend(
+            "DL", "channelId == 11 || channelId == 12 || channelId == 22"
+        )
 
         self.DefineAndAppend(
             "nSelBtag_jets",
@@ -183,10 +185,14 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend(
             "nSelBtag_fatjets", f"int( SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 )"
         )
-        self.DefineAndAppend("resolved", f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)")
+        self.DefineAndAppend(
+            "resolved",
+            f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+        )
         self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
         self.DefineAndAppend(
-            "boosted", f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) "
+            "boosted",
+            f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
         )  # Greater than zero, but logic should only allow 0 or 1
         self.DefineAndAppend(
             "res1b", f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1"
@@ -201,10 +207,19 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("inclusive", f"centralJet_pt.size() >= 2")
         self.DefineAndAppend("baseline", f"return true;")
 
-        self.DefineAndAppend("DL_OneAK8LooseB_OR_OneAk4LooseB", f"(centralJet_pt.size() >= 2 && bjet1_btagPNetB >= {self.bTagWP_Loose}) || (SelectedFatJet_pt.size() >= 1 && SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8)")
-        self.DefineAndAppend("SL_OneAK8LooseB_OR_OneAk4LooseB", f"(centralJet_pt.size() >= 4 && bjet1_btagPNetB >= {self.bTagWP_Loose}) || (SelectedFatJet_pt.size() >= 1 && centralJet_pt.size() >= 2 && (SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 || bjet1_btagPNetB >= {self.bTagWP_Loose})) || (SelectedFatJet_pt.size() >= 2 && (SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 || SelectedFatJet_particleNet_XbbVsQCD[1] >= 0.8))")
+        self.DefineAndAppend(
+            "DL_OneAK8LooseB_OR_OneAk4LooseB",
+            f"(centralJet_pt.size() >= 2 && bjet1_btagPNetB >= {self.bTagWP_Loose}) || (SelectedFatJet_pt.size() >= 1 && SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8)",
+        )
+        self.DefineAndAppend(
+            "SL_OneAK8LooseB_OR_OneAk4LooseB",
+            f"(centralJet_pt.size() >= 4 && bjet1_btagPNetB >= {self.bTagWP_Loose}) || (SelectedFatJet_pt.size() >= 1 && centralJet_pt.size() >= 2 && (SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 || bjet1_btagPNetB >= {self.bTagWP_Loose})) || (SelectedFatJet_pt.size() >= 2 && (SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 || SelectedFatJet_particleNet_XbbVsQCD[1] >= 0.8))",
+        )
 
-        self.DefineAndAppend("development", "inclusive && ( (lep2_legType > 0 && DL_OneAK8LooseB_OR_OneAk4LooseB) || (lep2_legType <= 0 && SL_OneAK8LooseB_OR_OneAk4LooseB) )")
+        self.DefineAndAppend(
+            "development",
+            "inclusive && ( (lep2_legType > 0 && DL_OneAK8LooseB_OR_OneAk4LooseB) || (lep2_legType <= 0 && SL_OneAK8LooseB_OR_OneAk4LooseB) )",
+        )
 
     def defineChannels(self):
         # self.df = self.df.Define("channelId", f"(lep1_legType*10) + lep2_legType") #Muhammad moved this to anaTupleDef like a jerk
@@ -384,10 +399,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.config = config
         self.period = period
         self.colToSave = colToSave + ["channelId"]
-        self.bTagWP = WorkingPointsParticleNet[period][
-            "Medium"
-        ]
-        self.bTagWP_Loose = WorkingPointsParticleNet[period]["Loose"]  # wp should go to global config.
+        self.bTagWP = WorkingPointsParticleNet[period]["Medium"]
+        self.bTagWP_Loose = WorkingPointsParticleNet[period][
+            "Loose"
+        ]  # wp should go to global config.
 
 
 def defineAllP4(df):
