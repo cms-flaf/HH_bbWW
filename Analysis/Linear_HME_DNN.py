@@ -9,43 +9,45 @@ class LinHMEDNN:
 
         self.hme_bins = [
             -10,
-            200,
             225,
             275,
             325,
             375,
             425,
-            475,
             525,
-            575,
-            625,
             675,
-            750,
             850,
-            950,
-            1100,
-            1300,
-            1500,
-            1700,
-            1900,
+            1250,
+            1750,
             2250,
-            2750,
-            3500,
-            4500,
+            3250,
             10000,
         ]
         self.n_bins = len(self.hme_bins) - 1
         self.hme_bins_string = ",".join(map(str, self.hme_bins))
 
+        self.channel = cfg["channel"]
+
     def run(self, dfw):
         for col in self.cfg["columns"]:
             mass = col.split("_")[-1][1:]
+            HME_var = (
+                "DoubleLep_DeepHME_mass"
+                if self.channel == "DL"
+                else "SingleLep_DeepHME_mass"
+            )
+            DNN_var = (
+                f"DNNParametric_DL_NoHME_M{mass}_Signal"
+                if self.channel == "DL"
+                else f"DNNParametric_SL_NoHME_M{mass}_Signal"
+            )
+
             dfw.Define(
                 f"linear_hme_dnn_m{mass}",
                 f"""
             static const Double_t bins[{self.n_bins+1}] = {{{self.hme_bins_string}}};
             static const TAxis axis({self.n_bins}, bins);
-            return axis.FindFixBin(DoubleLepHME_mass) + DNNParametric_M{mass}_Signal;
+            return axis.FindFixBin({HME_var}) + {DNN_var};
             """,
             )
         for col in self.cfg["columns"]:

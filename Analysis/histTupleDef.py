@@ -91,8 +91,10 @@ def DefineWeightForHistograms(
         dfw.df = dfw.df.Define(weight_name, total_weight_expression)
     if not isCentral and type(unc_cfg_dict) == dict:
         if (
-            uncName in unc_cfg_dict.keys()
-            and "expression" in unc_cfg_dict[uncName].keys()
+            uncName in unc_cfg_dict["norm"].keys()
+            and "expression" in unc_cfg_dict["norm"][uncName].keys()
         ):
-            weight_name = unc_cfg_dict[uncName]["expression"].format(scale=uncScale)
+            weight_name = unc_cfg_dict["norm"][uncName]["expression"].format(
+                scale=uncScale
+            )
     dfw.df = dfw.df.Define(final_weight_name, weight_name)

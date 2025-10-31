@@ -28,3 +28,26 @@ BaseModel:
     - GluGluToBulkGraviton_SingleLepton
   data:
     - Data_Full
+
+OnlyData:
+  name: "Only Data"
+  backgrounds: [ ]
+  signals: [ ]
+  data:
+    - Data_Full
+
+
+Run3_Model:
+  name: "Run3 Model"
+  backgrounds:
+    - TT
+    - DY_LowMass
+    - DY_HighMass
+    - ST
+    - VV
+    - W
+  signals:
+    - XtoHHto2B2W_SingleLepton
+    - XtoHHto2B2W_DoubleLepton
+  data:
+    - Data_Full

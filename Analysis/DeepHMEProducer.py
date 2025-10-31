@@ -28,7 +28,7 @@ class DeepHMEProducer:
             return_errors=cfg["return_errors"],
         )
 
-    def run(self, array):
+    def run(self, array, keep_all_columns=False):
         mass = None
         mass_errors = None
 
@@ -129,6 +129,8 @@ class DeepHMEProducer:
         for col in array.fields:
             if col not in self.cfg["columns"]:
                 if col != "FullEventId":
+                    if keep_all_columns:
+                        continue
                     del array[col]
 
         array[f"{self.payload_name}_mass"] = mass

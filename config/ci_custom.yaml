@@ -8,8 +8,8 @@ store_noncentral: true
 
 variables:
   - lep1_pt
-  - SingleLepHME_mass
-  - DoubleLepHME_mass
-  - DNN_M0_Signal
-  - DNNParametric_M250_Signal
-  - LinHMEDNN_linear_hme_dnn_m250
+  - SingleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass
+  # - DNN_M0_Signal # Remove DNN for now while I move to new version
+  # - DNNParametric_M250_Signal
+  # - LinHMEDNN_linear_hme_dnn_m250

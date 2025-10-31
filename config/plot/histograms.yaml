@@ -133,6 +133,7 @@ bjet2_btagPNetB:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
 DNN_M0_Signal:
   x_bins: "1000|0.0:1.0"
   x_title: DNN M0 Signal
@@ -505,181 +506,359 @@ DoubleLepHME_mass:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m250:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M250 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m250:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M250 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m260:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M260 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m260:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M260 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m270:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M270 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m270:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M270 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m280:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M280 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m280:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M280 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m300:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M300 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m300:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M300 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m350:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M350 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m350:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M350 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m450:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M450 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m450:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M450 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m550:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M550 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m550:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M550 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m600:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M600 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m600:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M600 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m650:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M650 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m650:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M650 in HMEbins"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m700:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M700 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m700:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M700 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m800:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M800 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m800:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M800 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m1000:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M1000 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m1000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M1000 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m1200:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M1200 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m1200:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M1200 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m1400:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M1400 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m1400:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M1400 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m1600:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M1600 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m1600:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M1600 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m1800:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M1800 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m1800:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M1800 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m2000:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M2000 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m2000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M2000 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m2500:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M2500 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m2500:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M2500 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m3000:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M3000 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m3000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M3000 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m4000:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M4000 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m4000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M4000 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-LinHMEDNN_linear_hme_dnn_m5000:
-  x_bins: "2500|0.0:25.0"
-  x_title: "DNN M5000 in HMEbins"
+LinHMEDNN_DL_linear_hme_dnn_m5000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN DL M5000 in HMEbins"
   y_title: "Events"
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+
+LinHMEDNN_SL_linear_hme_dnn_m250:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M250 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m260:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M260 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m270:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M270 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m280:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M280 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m300:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M300 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m350:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M350 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m450:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M450 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m550:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M550 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m600:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M600 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m650:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M650 in HMEbins"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m700:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M700 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m800:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M800 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m1000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M1000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m1200:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M1200 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m1400:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M1400 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m1600:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M1600 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m1800:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M1800 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m2000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M2000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m2500:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M2500 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m3000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M3000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m4000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M4000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+LinHMEDNN_SL_linear_hme_dnn_m5000:
+  x_bins: "1300|0.0:13.0"
+  x_title: "DNN SL M5000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 
 SingleLep_DeepHME_mass:
   x_bins: "100|-10:2500"
@@ -816,6 +995,466 @@ DoubleLep_DeepHME_HVV_pz:
 
 DoubleLep_DeepHME_HVV_E:
   x_bins: "100|0:1000"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+
+HMEinDNNBins_HME_mass_DL_DNN_M250_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M250_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M250_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M250_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M250_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_DL_DNN_M350_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M350_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M350_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M350_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M350_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_DL_DNN_M550_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M550_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M550_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M550_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M550_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_DL_DNN_M800_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M800_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M800_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M800_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+
+DNNParametric_DL_NoHME_M250_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M250 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M260_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M260 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M270_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M270 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M280_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M280 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M300_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M300 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M350_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M350 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M450_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M450 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M550_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M550 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M600_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M600 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M650_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M650 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M700_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M700 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M800_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M800 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_DL_NoHME_M1000_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M1000 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+
+DNNParametric_SL_NoHME_M250_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M250 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M260_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M260 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M270_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M270 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M280_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M280 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M300_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M300 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M350_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M350 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M450_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M450 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M550_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M550 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M600_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M600 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M650_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M650 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M700_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M700 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M800_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M800 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+DNNParametric_SL_NoHME_M1000_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M1000 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
+
+HMEinDNNBins_HME_mass_SL_DNN_M250_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M250_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M250_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M250_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M250_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_SL_DNN_M350_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M350_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M350_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M350_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M350_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_SL_DNN_M550_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M550_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M550_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M550_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M550_0p8_1p0:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HMEinDNNBins_HME_mass_SL_DNN_M800_0p0_0p2:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M800_0p2_0p4:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M800_0p4_0p6:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M800_0p6_0p8:
+  x_bins: "100|-10:2500"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+HMEinDNNBins_HME_mass_SL_DNN_M800_0p8_1p0:
+  x_bins: "100|-10:2500"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
