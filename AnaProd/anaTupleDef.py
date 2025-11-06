@@ -131,7 +131,7 @@ FatJetObservables = [
     "tau4",
 ]
 
-FatJetObservablesMC = [ "hadronFlavour" ]
+FatJetObservablesMC = ["hadronFlavour"]
 
 SubJetObservables = ["btagDeepB", "eta", "mass", "phi", "pt", "rawFactor"]
 SubJetObservablesMC = ["hadronFlavour", "partonFlavour"]
@@ -194,7 +194,9 @@ def addAllVariables(
     dfw.Apply(AnaBaseline.RecoHWWJetSelection)
     dfw.Apply(Corrections.getGlobal().jet.getEnergyResolution)
     dfw.Apply(Corrections.getGlobal().btag.getWPid)
-    dfw.Apply(Corrections.getGlobal().JetVetoMap.GetJetVetoMap) # Must init JetVetoMap before applying
+    dfw.Apply(
+        Corrections.getGlobal().JetVetoMap.GetJetVetoMap
+    )  # Must init JetVetoMap before applying
     dfw.Apply(CommonBaseline.ApplyJetVetoMap)
 
     PtEtaPhiM = ["pt", "eta", "phi", "mass"]

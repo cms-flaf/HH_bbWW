@@ -13,6 +13,7 @@ WorkingPointsParticleNet = {
     "Run3_2023BPix": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
 }
 
+
 def createKeyFilterDict(global_params, period):
     filter_dict = {}
     filter_str = ""
@@ -142,13 +143,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
         )  # Greater than zero, but logic should only allow 0 or 1
         self.DefineAndAppend(
-            "recovery", f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1"
+            "recovery",
+            f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1",
         )
         # We are throwing away events with a FatJet that are not b-tagged in this method
 
         self.DefineAndAppend("inclusive", f"centralJet_pt.size() >= 2")
         self.DefineAndAppend("baseline", f"return true;")
-
 
     def defineLeptonPreselection(self):
         # Later we will defined some lepton selections
@@ -201,7 +202,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
         )
 
-
         self.df = self.df.Define("bjet1_pt", "centralJet_pt[0]")
         self.df = self.df.Define("bjet1_phi", "centralJet_phi[0]")
         self.df = self.df.Define("bjet1_eta", "centralJet_eta[0]")
@@ -228,11 +228,22 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define("wjet2_eta", "Njets > 3 ? centralJet_eta[3] : -10.0")
         self.df = self.df.Define("wjet2_mass", "Njets > 3 ? centralJet_mass[3] : -10.0")
 
-        self.df = self.df.Define("fatbjet1_pt", "fatjet_isvalid ? SelectedFatJet_pt[0] : -10.0")
-        self.df = self.df.Define("fatbjet1_phi", "fatjet_isvalid ? SelectedFatJet_phi[0] : -10.0")
-        self.df = self.df.Define("fatbjet1_eta", "fatjet_isvalid ? SelectedFatJet_eta[0] : -10.0")
-        self.df = self.df.Define("fatbjet1_mass", "fatjet_isvalid ? SelectedFatJet_mass[0] : -10.0")
-        self.df = self.df.Define("fatbjet1_XbbVsQCD", "fatjet_isvalid ? SelectedFatJet_particleNet_XbbVsQCD[0] : -10.0")
+        self.df = self.df.Define(
+            "fatbjet1_pt", "fatjet_isvalid ? SelectedFatJet_pt[0] : -10.0"
+        )
+        self.df = self.df.Define(
+            "fatbjet1_phi", "fatjet_isvalid ? SelectedFatJet_phi[0] : -10.0"
+        )
+        self.df = self.df.Define(
+            "fatbjet1_eta", "fatjet_isvalid ? SelectedFatJet_eta[0] : -10.0"
+        )
+        self.df = self.df.Define(
+            "fatbjet1_mass", "fatjet_isvalid ? SelectedFatJet_mass[0] : -10.0"
+        )
+        self.df = self.df.Define(
+            "fatbjet1_XbbVsQCD",
+            "fatjet_isvalid ? SelectedFatJet_particleNet_XbbVsQCD[0] : -10.0",
+        )
 
         self.df = self.df.Define(
             "bsubjet1_btagDeepB",

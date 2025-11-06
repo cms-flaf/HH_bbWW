@@ -2,7 +2,7 @@ from FLAF.Common.Utilities import *
 
 channels = [
     "muMu",
-    "eMu", # Later test changing to 'muE'
+    "eMu",  # Later test changing to 'muE'
     "eE",
     "mu",
     "e",
@@ -100,7 +100,9 @@ def RecoHWWJetSelection(df):
     df = df.Define(
         "n_eff_Jets", "(FatJet_p4[FatJet_cleaned].size()*2)+(Jet_p4[Jet_sel].size())"
     )
-    df = df.Define("n_eff_jets_SL", "(is_SL && n_eff_Jets>=4)") # Could reduce to 3 later for recovery (missing jets)
+    df = df.Define(
+        "n_eff_jets_SL", "(is_SL && n_eff_Jets>=4)"
+    )  # Could reduce to 3 later for recovery (missing jets)
     df = df.Define("n_eff_jets_DL", "(!is_SL && n_eff_Jets>=2)")
 
     return df.Filter(" (n_eff_jets_SL || n_eff_jets_DL)", "Reco bjet candidates")
