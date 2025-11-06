@@ -83,7 +83,10 @@ GluGluToRadion_DoubleLepton:
     parameters: [ MASS ]
     process_name: GluGluToRadion2L_${MASS}
     name_pattern: GluGluToRadion 2L mass ${MASS} GeV
-    to_plot: [ 300, 600, 1000 ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "eE", "eMu", "muMu" ]
   datasets:
@@ -120,7 +123,10 @@ GluGluToRadion_SingleLepton:
     parameters: [ MASS ]
     process_name: GluGluToRadion1L_${MASS}
     name_pattern: GluGluToRadion 1L mass ${MASS} GeV
-    to_plot: [ 300, 600, 1000 ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu" ]
   datasets:
@@ -157,10 +163,10 @@ GluGluToBulkGraviton_DoubleLepton:
     parameters: [ MASS ]
     process_name: GluGluToBulkGraviton2L_${MASS}
     name_pattern: GluGluToBulkGraviton 2L mass ${MASS} GeV
-    to_plot: 
-     - [ '300' ]
-     - [ '600' ]
-     - [ '1000' ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "eE", "eMu", "muMu" ]
   datasets:
@@ -197,10 +203,10 @@ GluGluToBulkGraviton_SingleLepton:
     parameters: [ MASS ]
     process_name: GluGluToBulkGraviton1L_${MASS}
     name_pattern: GluGluToBulkGraviton 1L mass ${MASS} GeV
-    to_plot: 
-     - [ '300' ]
-     - [ '600' ]
-     - [ '1000' ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu" ]
   datasets:
@@ -237,10 +243,10 @@ XtoHHto2B2W_DoubleLepton:
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_2L_${MASS}
     name_pattern: Xto2B2W 2L ${MASS} GeV (x50)
-    to_plot: 
-     - [ '300' ]
-     - [ '600' ]
-     - [ '1000' ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "eE", "eMu", "muMu" ]
   datasets:
@@ -274,10 +280,10 @@ XtoHHto2B2W_SingleLepton:
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_1L_${MASS}
     name_pattern: Xto2B2W 1L ${MASS} GeV (x50)
-    to_plot: 
-     - [ '300' ]
-     - [ '600' ]
-     - [ '1000' ]
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "e", "mu" ]
   datasets:
