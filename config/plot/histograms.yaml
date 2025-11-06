@@ -219,7 +219,6 @@ bjet2_btagPNetB:
   divide_by_bin_width: False
 
 
-
 fatbjet1_phi:
   x_bins: "50|-3.2:3.2"
   # x_bins: [-3.2, -2.88, -2.56, -2.24, -1.92, -1.6, -1.28, -0.96, -0.64, -0.32, 0.0, 0.32, 0.64, 0.96, 1.28, 1.6, 1.92, 2.24, 2.56, 2.88, 3.2]
@@ -262,8 +261,6 @@ fatbjet1_XbbVsQCD:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
-
-
 
 
 DNN_M0_Signal:
@@ -574,20 +571,6 @@ bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
 Njets:
   x_bins: "10|0:10"
   x_title: Njets
-  y_title: Events
-  use_log_y: False
-  max_y_sf: 1.5
-  divide_by_bin_width: False
-bjet1_pt:
-  x_bins: "50|20:500"
-  x_title: bjet1_pt [GeV]
-  y_title: Events
-  use_log_y: False
-  max_y_sf: 1.5
-  divide_by_bin_width: False
-bjet2_pt:
-  x_bins: "50|20:500"
-  x_title: bjet2_pt [GeV]
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
@@ -953,7 +936,6 @@ LinHMEDNN_DL_linear_hme_dnn_m5000:
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
-
 
 
 LinHMEDNN_SL_linear_hme_dnn_m300:
