@@ -155,7 +155,7 @@ defaultColToSave = [
     "PV_npvs",
 ]
 
-# Add this function
+# Add this functionality eventually
 MCObservables = [
     "LHEPdfWeight",
     "LHEReweightingWeight",
@@ -172,8 +172,6 @@ def getDefaultColumnsToSave(isData):
     colToSave = defaultColToSave.copy()
     if not isData:
         colToSave.extend(["Pileup_nTrueInt"])
-        for obs in MCObservables:
-            colToSave.append(obs)
     return colToSave
 
 
