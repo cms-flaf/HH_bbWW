@@ -439,15 +439,18 @@ categories:
   - recovery
   - res2b
   - boosted
-  - baseline
+  # - baseline
   # - development
 
 QCDRegions:
   - OS_Iso
-  - SS_Iso
-  - OS_AntiIso
-  - SS_AntiIso
-  - ZVeto_OS_Iso
+
+  # Keep extra regions off so integration robot runs faster
+  # - SS_Iso
+  # - OS_AntiIso
+  # - SS_AntiIso
+  # - ZVeto_OS_Iso
+
   # - Zpeak_0b
   # - Zpeak_1b
   # - Zpeak_2b
