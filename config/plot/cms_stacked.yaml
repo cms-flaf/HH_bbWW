@@ -37,7 +37,7 @@ page_setup:
     - ana_text
     - cat_text
     - ch_text
-    - qcdreg_text
+    - customreg_text
   legend: legend
 
 legend:
@@ -90,7 +90,7 @@ ch_text:
   text_size: 0.026
   font: 62
 
-qcdreg_text:
+customreg_text:
   pos_ref: datasim_text
   pos: [ 0.24, -0.08 ]
   text_size: 0.020

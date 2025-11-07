@@ -13,7 +13,7 @@ channel_text:
   'eMu': 'e #mu'
   'muMu': '#mu #mu'
 
-qcdregion_text:
+customregion_text:
   'OS_Iso': 'OS, Isolated'
   'SS_Iso': 'SS, Isolated'
   'OS_AntiIso': 'OS, Non-Isolated'
