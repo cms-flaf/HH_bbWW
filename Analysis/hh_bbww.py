@@ -148,7 +148,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         # We are throwing away events with a FatJet that are not b-tagged in this method
 
-        self.DefineAndAppend("inclusive", f"centralJet_pt.size() >= 2")
+        self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
 
     def defineLeptonPreselection(self):
@@ -281,6 +281,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
 
         self.DefineAndAppend("ZVeto_OS_Iso", f"(Zveto || OppFlavor) && OS_Iso")
+
+        self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
 
         self.DefineAndAppend(
             "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 "

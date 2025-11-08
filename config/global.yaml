@@ -435,29 +435,19 @@ channelDefinition:
   muMu: 22
 
 categories:
-  # - inclusive
+  - inclusive
   - recovery
   - res2b
   - boosted
-  # - baseline
-  # - development
+  - baseline
 
 QCDRegions:
   - OS_Iso
-
-  # Keep extra regions off so integration robot runs faster
-  # - SS_Iso
-  # - OS_AntiIso
-  # - SS_AntiIso
-  # - ZVeto_OS_Iso
-
-  # - Zpeak_0b
-  # - Zpeak_1b
-  # - Zpeak_2b
-  # - ZVeto_0b
-  # - ZVeto_1b
-  # - ZVeto_2b
-  # - TTbar_CR
+  - SS_Iso
+  - OS_AntiIso
+  - SS_AntiIso
+  - ZVeto_OS_Iso
+  - ZPeak_OS_Iso
 
 boosted_categories: [ ]
 
@@ -552,64 +542,64 @@ variables:
   - lep1_Electron_pfRelIso03_all
   - lep2_Electron_pfRelIso03_all
 
-  # High Level Single Lepton
-  - SingleLep_DeepHME_mass
-  - SingleLep_DeepHME_mass_error
+  # # High Level Single Lepton
+  # - SingleLep_DeepHME_mass
+  # - SingleLep_DeepHME_mass_error
 
-  - LinHMEDNN_SL_linear_hme_dnn_m300
-  - LinHMEDNN_SL_linear_hme_dnn_m400
-  - LinHMEDNN_SL_linear_hme_dnn_m500
-  - LinHMEDNN_SL_linear_hme_dnn_m550
-  - LinHMEDNN_SL_linear_hme_dnn_m600
-  - LinHMEDNN_SL_linear_hme_dnn_m650
-  - LinHMEDNN_SL_linear_hme_dnn_m700
-  - LinHMEDNN_SL_linear_hme_dnn_m800
-  - LinHMEDNN_SL_linear_hme_dnn_m900
-  - LinHMEDNN_SL_linear_hme_dnn_m1000
+  # - LinHMEDNN_SL_linear_hme_dnn_m300
+  # - LinHMEDNN_SL_linear_hme_dnn_m400
+  # - LinHMEDNN_SL_linear_hme_dnn_m500
+  # - LinHMEDNN_SL_linear_hme_dnn_m550
+  # - LinHMEDNN_SL_linear_hme_dnn_m600
+  # - LinHMEDNN_SL_linear_hme_dnn_m650
+  # - LinHMEDNN_SL_linear_hme_dnn_m700
+  # - LinHMEDNN_SL_linear_hme_dnn_m800
+  # - LinHMEDNN_SL_linear_hme_dnn_m900
+  # - LinHMEDNN_SL_linear_hme_dnn_m1000
 
-  # High Level Double Lepton
-  - DoubleLep_DeepHME_mass
-  - DoubleLep_DeepHME_mass_error
+  # # High Level Double Lepton
+  # - DoubleLep_DeepHME_mass
+  # - DoubleLep_DeepHME_mass_error
 
-  - LinHMEDNN_DL_linear_hme_dnn_m300
-  - LinHMEDNN_DL_linear_hme_dnn_m400
-  - LinHMEDNN_DL_linear_hme_dnn_m500
-  - LinHMEDNN_DL_linear_hme_dnn_m550
-  - LinHMEDNN_DL_linear_hme_dnn_m600
-  - LinHMEDNN_DL_linear_hme_dnn_m650
-  - LinHMEDNN_DL_linear_hme_dnn_m700
-  - LinHMEDNN_DL_linear_hme_dnn_m800
-  - LinHMEDNN_DL_linear_hme_dnn_m900
-  - LinHMEDNN_DL_linear_hme_dnn_m1000
+  # - LinHMEDNN_DL_linear_hme_dnn_m300
+  # - LinHMEDNN_DL_linear_hme_dnn_m400
+  # - LinHMEDNN_DL_linear_hme_dnn_m500
+  # - LinHMEDNN_DL_linear_hme_dnn_m550
+  # - LinHMEDNN_DL_linear_hme_dnn_m600
+  # - LinHMEDNN_DL_linear_hme_dnn_m650
+  # - LinHMEDNN_DL_linear_hme_dnn_m700
+  # - LinHMEDNN_DL_linear_hme_dnn_m800
+  # - LinHMEDNN_DL_linear_hme_dnn_m900
+  # - LinHMEDNN_DL_linear_hme_dnn_m1000
 
-  # These can be done after HistTuple
-  - HMEinDNNBins_HME_mass_DL_DNN_M350_0p0_0p2
-  - HMEinDNNBins_HME_mass_DL_DNN_M350_0p2_0p4
-  - HMEinDNNBins_HME_mass_DL_DNN_M350_0p4_0p6
-  - HMEinDNNBins_HME_mass_DL_DNN_M350_0p6_0p8
-  - HMEinDNNBins_HME_mass_DL_DNN_M350_0p8_1p0
+  # # These can be done after HistTuple
+  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p0_0p2
+  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p2_0p4
+  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p4_0p6
+  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p6_0p8
+  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p8_1p0
 
-  - HMEinDNNBins_HME_mass_DL_DNN_M550_0p0_0p2
-  - HMEinDNNBins_HME_mass_DL_DNN_M550_0p2_0p4
-  - HMEinDNNBins_HME_mass_DL_DNN_M550_0p4_0p6
-  - HMEinDNNBins_HME_mass_DL_DNN_M550_0p6_0p8
-  - HMEinDNNBins_HME_mass_DL_DNN_M550_0p8_1p0
+  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p0_0p2
+  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p2_0p4
+  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p4_0p6
+  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p6_0p8
+  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p8_1p0
 
-  - HMEinDNNBins_HME_mass_DL_DNN_M300_0p0_0p2
-  - HMEinDNNBins_HME_mass_DL_DNN_M300_0p2_0p4
-  - HMEinDNNBins_HME_mass_DL_DNN_M300_0p4_0p6
-  - HMEinDNNBins_HME_mass_DL_DNN_M300_0p6_0p8
-  - HMEinDNNBins_HME_mass_DL_DNN_M300_0p8_1p0
+  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p0_0p2
+  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p2_0p4
+  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p4_0p6
+  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p6_0p8
+  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p8_1p0
 
-  - HMEinDNNBins_HME_mass_DL_DNN_M600_0p0_0p2
-  - HMEinDNNBins_HME_mass_DL_DNN_M600_0p2_0p4
-  - HMEinDNNBins_HME_mass_DL_DNN_M600_0p4_0p6
-  - HMEinDNNBins_HME_mass_DL_DNN_M600_0p6_0p8
-  - HMEinDNNBins_HME_mass_DL_DNN_M600_0p8_1p0
+  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p0_0p2
+  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p2_0p4
+  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p4_0p6
+  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p6_0p8
+  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p8_1p0
 
 
-  - HMEinDNNBins_HME_mass_DL_DNN_M800_0p0_0p2
-  - HMEinDNNBins_HME_mass_DL_DNN_M800_0p2_0p4
-  - HMEinDNNBins_HME_mass_DL_DNN_M800_0p4_0p6
-  - HMEinDNNBins_HME_mass_DL_DNN_M800_0p6_0p8
-  - HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0
+  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p0_0p2
+  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p2_0p4
+  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p4_0p6
+  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p6_0p8
+  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0
