@@ -152,28 +152,23 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("baseline", f"return true;")
 
     def defineLeptonPreselection(self):
-        # Later we will defined some lepton selections
-        self.df = self.df.Define(
-            "passed_singleIsoMu",
-            "HLT_singleIsoMu && (lep1_legType == 2 && lep1_HasMatching_singleIsoMu)",
-        )
         self.df = self.df.Define(
             "leadingleppT_ele",
             "((lep1_legType == 1 && lep1_pt  > 32 ) || (lep2_legType == 1 && lep2_pt  > 32))",
         )
         self.df = self.df.Define(
             "leadingleppT_Mu",
-            "((lep1_legType == 2 && lep1_pt  > 25 ) || (lep1_legType == 2 && lep2_pt  > 25))",
+            "((lep1_legType == 2 && lep1_pt  > 25 ) || (lep2_legType == 2 && lep2_pt  > 25))",
         )
         self.df = self.df.Define(
             "leadingleppT", "(leadingleppT_ele || leadingleppT_Mu)"
         )  # 32 need to be changed to 25 for DL channel once Double lepton trigger SF are integrated
         self.df = self.df.Define(
-            "subleadleppT", "(lep2_legType < 1 || (lep1_pt > 15 && lep2_pt > 15))"
+            "subleadleppT", "(lep2_legType < 1 || (lep1_pt > 10 && lep2_pt > 10))"
         )
         self.df = self.df.Define(
             "tightlep",
-            "((lep1_legType == 2 && lep1_Muon_tightId == 1) || (lep1_legType == 1 && lep1_Electron_mvaNoIso_WP80 == 1)) && (lep2_legType < 1 || ((lep2_legType == 2 && lep2_Muon_tightId == 1 ) || (lep2_legType == 1 && lep2_Electron_mvaNoIso_WP80 == 1)))",
+            "((lep1_legType == 2 && lep1_Muon_tightId == 1) || (lep1_legType == 1 && lep1_Electron_mvaIso_WP90 == 1)) && (lep2_legType < 1 || ((lep2_legType == 2 && lep2_Muon_tightId == 1 ) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP90 == 1)))",
         )
         self.df = self.df.Define(
             "tightlep_Iso",
@@ -181,7 +176,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             "Single_lep_trg",
-            "(HLT_singleIsoMu && (lep1_legType == 2 && lep1_HasMatching_singleIsoMu)) || (HLT_singleEleWpTight && (lep1_legType == 1 && lep1_HasMatching_singleEleWpTight)) ",
+            "(HLT_singleIsoMu && lep1_legType == 2 && lep1_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep1_legType == 1 && lep1_HasMatching_singleEleWpTight) ",
         )
         self.df = self.df.Define(
             "event_selection",
