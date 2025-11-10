@@ -128,7 +128,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend(
             "nSelBtag_jets",
             # f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})",
-            f"int(bjet1_btagPNetB >= {self.bTagWP_Loose}) + int(bjet2_btagPNetB >= {self.bTagWP_Loose})",
+            # f"int(bjet1_btagPNetB >= {self.bTagWP_Loose}) + int(bjet2_btagPNetB >= {self.bTagWP_Loose})",
+            f"int(bjet1_idbtagPNetB >= 1) + int(bjet2_idbtagPNetB >= 1)",  # ID 1 is loose
         )
         self.DefineAndAppend(
             "nSelBtag_fatjets", f"int( SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 )"
@@ -204,6 +205,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "bjet1_btagPNetB", "jet1_isvalid ? centralJet_btagPNetB[0] : -1.0"
         )
+        self.df = self.df.Devine("bjet1_idbtagPNetB", "jet1_isvalid ? centralJet_idbtagPNetB[0] : -1.0")
 
         self.df = self.df.Define("bjet2_pt", "centralJet_pt[1]")
         self.df = self.df.Define("bjet2_phi", "centralJet_phi[1]")
@@ -212,6 +214,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "bjet2_btagPNetB", "jet2_isvalid ? centralJet_btagPNetB[1] : -1.0"
         )
+        self.df = self.df.Devine("bjet2_idbtagPNetB", "jet2_isvalid ? centralJet_idbtagPNetB[1] : -1.0")
 
         self.df = self.df.Define("wjet1_pt", "Njets > 2 ? centralJet_pt[2] : -10.0")
         self.df = self.df.Define("wjet1_phi", "Njets > 2 ? centralJet_phi[2] : -10.0")
