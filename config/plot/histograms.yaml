@@ -576,7 +576,7 @@ dR_dilep:
   divide_by_bin_width: False
 dR_dibjet:
   x_bins: "25|0:5.0"
-  x_title: "dR between two jets"
+  x_title: "dR between two b-jets"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
