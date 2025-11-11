@@ -84,6 +84,7 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     for lep_index in [1, 2]:
         total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
     total_weight = f"{total_weight} * {GetTriggerWeight()}"
+    # Fake DY Section
     return total_weight
 
 
@@ -205,7 +206,9 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "bjet1_btagPNetB", "jet1_isvalid ? centralJet_btagPNetB[0] : -1.0"
         )
-        self.df = self.df.Devine("bjet1_idbtagPNetB", "jet1_isvalid ? centralJet_idbtagPNetB[0] : -1.0")
+        self.df = self.df.Define(
+            "bjet1_idbtagPNetB", "jet1_isvalid ? centralJet_idbtagPNetB[0] : -1.0"
+        )
 
         self.df = self.df.Define("bjet2_pt", "centralJet_pt[1]")
         self.df = self.df.Define("bjet2_phi", "centralJet_phi[1]")
@@ -214,7 +217,9 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "bjet2_btagPNetB", "jet2_isvalid ? centralJet_btagPNetB[1] : -1.0"
         )
-        self.df = self.df.Devine("bjet2_idbtagPNetB", "jet2_isvalid ? centralJet_idbtagPNetB[1] : -1.0")
+        self.df = self.df.Define(
+            "bjet2_idbtagPNetB", "jet2_isvalid ? centralJet_idbtagPNetB[1] : -1.0"
+        )
 
         self.df = self.df.Define("wjet1_pt", "Njets > 2 ? centralJet_pt[2] : -10.0")
         self.df = self.df.Define("wjet1_phi", "Njets > 2 ? centralJet_phi[2] : -10.0")
