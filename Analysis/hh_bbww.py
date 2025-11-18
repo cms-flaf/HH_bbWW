@@ -79,12 +79,12 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
 
 
 def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
+    # weights_to_apply = ["weight_MC_Lumi_pu", "ExtraDYWeight"]
     weights_to_apply = ["weight_MC_Lumi_pu"]
     total_weight = "*".join(weights_to_apply)
     for lep_index in [1, 2]:
         total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
     total_weight = f"{total_weight} * {GetTriggerWeight()}"
-    # Fake DY Section
     return total_weight
 
 
@@ -174,7 +174,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             "tightlep_Iso",
-            " (((lep1_legType == 1 && lep1_Electron_pfRelIso03_all < 0.15) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_pfRelIso03_all < 0.15) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",
+            # " (((lep1_legType == 1 && lep1_Electron_pfRelIso03_all < 0.15) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_pfRelIso03_all < 0.15) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",
+            " (((lep1_legType == 1) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )", # Remove any electron Iso since we use iso in the ID
         )
         self.df = self.df.Define(
             "Single_lep_trg",
@@ -285,6 +286,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend("ZVeto_OS_Iso", f"(Zveto || OppFlavor) && OS_Iso")
 
+        self.DefineAndAppend("ZVeto_SS_Iso", f"(Zveto || OppFlavor) && SS_Iso")
+
         self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
 
         self.DefineAndAppend(
@@ -302,16 +305,23 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
+    def addDYReweighting(self):
+        self.DefineAndAppend("ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0")
+        self.DefineAndAppend("ExtraDYWeight_ee_recovery", f"channelId == 11 && recovery ? 1.13 : 1.0")
+        self.DefineAndAppend("ExtraDYWeight_mumu_res2b", f"channelId == 22 && res2b ? 1.39 : 1.0")
+        self.DefineAndAppend("ExtraDYWeight_mumu_recovery", f"channelId == 22 && recovery ? 1.12 : 1.0")
+        self.DefineAndAppend("ExtraDYWeight", f"ExtraDYWeight_ee_res2b * ExtraDYWeight_ee_recovery * ExtraDYWeight_mumu_res2b * ExtraDYWeight_mumu_recovery")
+
     def calculateMT(self):
         self.df = self.df.Define(
-            "MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, met_p4) : 0.0"
+            "MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
-            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep1_p4, met_p4) : 0.0"
+            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
             "MT_tot",
-            f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, met_p4) : 0.0",
+            f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, PuppiMET_p4) : 0.0",
         )
 
     def selectTrigger(self, trigger):
@@ -375,7 +385,7 @@ def defineAllP4(df):
         f"centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4",
         f"GetP4(centralJet_pt*(1.0-centralJet_rawFactor)*centralJet_PNetRegPtRawCorr*centralJet_PNetRegPtRawCorrNeutrino, centralJet_eta, centralJet_phi, centralJet_mass)",
     )
-    for met_var in ["met"]:
+    for met_var in ["PuppiMET"]:
         df = df.Define(
             f"{met_var}_p4",
             f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>({met_var}_pt,0.,{met_var}_phi,0.)",
@@ -408,36 +418,36 @@ def AddDNNVariables(df):
         f"ROOT::Math::VectorUtil::DeltaPhi(centralJet_p4[0],centralJet_p4[1])",
     )
     df = df.Define(
-        "dPhi_MET_dilep", f"ROOT::Math::VectorUtil::DeltaPhi(met_p4,(lep1_p4+lep2_p4))"
+        "dPhi_MET_dilep", f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))"
     )
     df = df.Define(
         "dPhi_MET_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaPhi(met_p4,(centralJet_p4[0]+centralJet_p4[1]))",
+        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(centralJet_p4[0]+centralJet_p4[1]))",
     )
     df = df.Define("min_dR_lep0_jets", f"MinDeltaR(lep1_p4, centralJet_p4)")
     df = df.Define("min_dR_lep1_jets", f"MinDeltaR(lep2_p4, centralJet_p4)")
 
     df = df.Define(
         "MT",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, met_p4) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, PuppiMET_p4) : -100.",
     )
     df = df.Define(
         "MT2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], met_p4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], PuppiMET_p4)) : -100.",
     )
 
     # Functional form of MT2 claculation
     df = df.Define(
         "MT2_ll",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + met_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + PuppiMET_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.",
     )
     df = df.Define(
         "MT2_bb",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + met_p4, 80.4, 80.4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
     df = df.Define(
         "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[1], met_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[1], PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
 
     df = df.Define(
@@ -488,6 +498,7 @@ def PrepareDfForHistograms(dfForHistograms):
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
+    dfForHistograms.addDYReweighting()
     dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms
