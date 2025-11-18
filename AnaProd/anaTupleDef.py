@@ -8,7 +8,12 @@ lepton_legs = ["lep1", "lep2"]
 offline_legs = ["lep1", "lep2"]
 
 
-Muon_int_observables = ["Muon_mediumId", "Muon_tightId", "Muon_highPtId", "Muon_pfIsoId"]
+Muon_int_observables = [
+    "Muon_mediumId",
+    "Muon_tightId",
+    "Muon_highPtId",
+    "Muon_pfIsoId",
+]
 Muon_float_observables = [
     "Muon_tkRelIso",
     "Muon_pfRelIso04_all",
