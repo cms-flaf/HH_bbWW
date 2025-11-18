@@ -2,7 +2,7 @@ from FLAF.Common.Utilities import *
 
 channels = [
     "muMu",
-    "eMu",  # Later test changing to 'muE'
+    "eMu",
     "eE",
     "mu",
     "e",
@@ -45,7 +45,7 @@ def RecoHWWCandidateSelection(df):
     )
     # Can lower pT to 5 later when applying the soft muon SFs
 
-    df = df.Define("Electron_iso", "Electron_pfRelIso03_all")
+    df = df.Define("Electron_iso", "Electron_mvaIso")
     df = df.Define("Muon_iso", "Muon_pfRelIso04_all")
 
     cand_columns = []
