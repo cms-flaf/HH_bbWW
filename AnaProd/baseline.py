@@ -41,7 +41,7 @@ def RecoHWWCandidateSelection(df):
     df = df.Define(
         "Muon_sel",
         """
-        v_ops::pt(Muon_p4) > 10 && abs(v_ops::eta(Muon_p4)) < 2.4 && abs(Muon_dz) < 0.1 && abs(Muon_dxy) < 0.05 && abs(Muon_dxy) < 0.05 && Muon_sip3d <= 8 && Muon_pfIsoId >= 1 && Muon_tightId""",
+        v_ops::pt(Muon_p4) > 10 && abs(v_ops::eta(Muon_p4)) < 2.4 && abs(Muon_dz) < 0.1 && abs(Muon_dxy) < 0.05 && abs(Muon_dxy) < 0.05 && Muon_sip3d <= 8 && Muon_pfIsoId >= 1 && Muon_looseId""",
     )
     # Can lower pT to 5 later when applying the soft muon SFs
 
@@ -100,9 +100,6 @@ def RecoHWWJetSelection(df):
     df = df.Define(
         "n_eff_Jets", "(FatJet_p4[FatJet_cleaned].size()*2)+(Jet_p4[Jet_sel].size())"
     )
-    df = df.Define(
-        "n_eff_jets_SL", "(is_SL && n_eff_Jets>=4)"
-    )  # Could reduce to 3 later for recovery (missing jets)
-    df = df.Define("n_eff_jets_DL", "(!is_SL && n_eff_Jets>=2)")
 
-    return df.Filter(" (n_eff_jets_SL || n_eff_jets_DL)", "Reco bjet candidates")
+    # Lower preselected nJets to be >= 1 to prepare for fake estimation regions
+    return df.Filter("n_eff_Jets>=1", "Reco jet candidates")

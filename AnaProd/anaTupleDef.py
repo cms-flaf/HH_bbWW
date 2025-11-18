@@ -8,7 +8,7 @@ lepton_legs = ["lep1", "lep2"]
 offline_legs = ["lep1", "lep2"]
 
 
-Muon_int_observables = ["Muon_tightId", "Muon_highPtId", "Muon_pfIsoId"]
+Muon_int_observables = ["Muon_mediumId", "Muon_tightId", "Muon_highPtId", "Muon_pfIsoId"]
 Muon_float_observables = [
     "Muon_tkRelIso",
     "Muon_pfRelIso04_all",
@@ -383,30 +383,20 @@ def addAllVariables(
             )
 
     pf_str = global_params["met_type"]
-    if f"{pf_str}_pt_nano" in dfw.df.GetColumnNames():
-        dfw.Redefine(f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())")
-        dfw.Redefine(
-            f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())"
-        )
-    else:
-        dfw.DefineAndAppend(
-            f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())"
-        )
-        dfw.DefineAndAppend(
-            f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())"
-        )
-    if f"{pf_str}_pt" in dfw.df.GetColumnNames():
-        dfw.Redefine(f"{pf_str}_pt", f"static_cast<float>({pf_str}_p4.pt())")
-        dfw.Redefine(f"{pf_str}_phi", f"static_cast<float>({pf_str}_p4.phi())")
-        # Manually adding the PuppiMET_pt to the colToSave is required. Originally, the branches exist (so must be ReDefined), but are dropped
-        # Since they are dropped, and ReDefine does not add them to the save list, this must be done manually (or ReDefine needs to be ajudsted in FLAF)
-        if f"{pf_str}_pt" not in dfw.colToSave:
-            dfw.colToSave.append(f"{pf_str}_pt")
-        if f"{pf_str}_phi" not in dfw.colToSave:
-            dfw.colToSave.append(f"{pf_str}_phi")
-    else:
-        dfw.DefineAndAppend(f"{pf_str}_pt", f"static_cast<float>({pf_str}_p4.pt())")
-        dfw.DefineAndAppend(f"{pf_str}_phi", f"static_cast<float>({pf_str}_p4.phi())")
+    dfw.DefineAndAppend(
+        f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())"
+    )
+    dfw.DefineAndAppend(
+        f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())"
+    )
+
+    dfw.Redefine(f"{pf_str}_pt", f"static_cast<float>({pf_str}_p4.pt())")
+    dfw.Redefine(f"{pf_str}_phi", f"static_cast<float>({pf_str}_p4.phi())")
+    # Manually adding the PuppiMET_pt to the colToSave is required. Originally, the branches exist (so must be ReDefined), but are dropped
+    # Since they are dropped, and ReDefine does not add them to the save list, this must be done manually (or ReDefine needs to be ajudsted in FLAF)
+    for var in [f"{pf_str}_pt", f"{pf_str}_phi"]:
+        if var not in dfw.colToSave:
+            dfw.colToSave.append(var)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
