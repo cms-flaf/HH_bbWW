@@ -135,7 +135,7 @@ bjet1_phi:
   divide_by_bin_width: False
 
 bjet1_eta:
-  x_bins: "50|-2.5:2.5"  # For now in HistPlotter, the getNewBins() function requires integers? Dumb!
+  x_bins: "50|-2.5:2.5"
   x_title: bjet1_eta
   y_title: Events
   use_log_y: False
@@ -1167,7 +1167,7 @@ DoubleLep_DeepHME_mass_error:
 
 SingleLep_DeepHME_Hbb_px:
   x_bins: "100|-1000:1000"
-  x_title: "Single Lepton Deep HME Error"
+  x_title: "Single Lepton Deep HME Hbb px"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -1175,6 +1175,7 @@ SingleLep_DeepHME_Hbb_px:
 
 SingleLep_DeepHME_Hbb_py:
   x_bins: "100|-1000:1000"
+  x_title: "Single Lepton Deep HME Hbb py"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -1182,6 +1183,7 @@ SingleLep_DeepHME_Hbb_py:
 
 SingleLep_DeepHME_Hbb_pz:
   x_bins: "100|-1000:1000"
+  x_title: "Single Lepton Deep HME Hbb pz"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -1189,6 +1191,7 @@ SingleLep_DeepHME_Hbb_pz:
 
 SingleLep_DeepHME_Hbb_E:
   x_bins: "100|0:1000"
+  x_title: "Single Lepton Deep HME Hbb E"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -1723,7 +1726,7 @@ HMEinDNNBins_HME_mass_SL_DNN_M300_0p6_0p8:
   blind: True
 HMEinDNNBins_HME_mass_SL_DNN_M300_0p8_1p0:
   x_bins: "50|0:1500"
-  x_title: "HME (SL DNN M350 Bin 0.8-1.0)"
+  x_title: "HME (SL DNN M300 Bin 0.8-1.0)"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -1745,7 +1748,7 @@ HMEinDNNBins_HME_mass_SL_DNN_M600_0p2_0p4:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
-  blidn: True
+  blind: True
 HMEinDNNBins_HME_mass_SL_DNN_M600_0p4_0p6:
   x_bins: "50|0:1500"
   x_title: "HME (SL DNN M600 Bin 0.4-0.6)"
