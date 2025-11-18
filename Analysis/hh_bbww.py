@@ -175,7 +175,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "tightlep_Iso",
             # " (((lep1_legType == 1 && lep1_Electron_pfRelIso03_all < 0.15) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_pfRelIso03_all < 0.15) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",
-            " (((lep1_legType == 1) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )", # Remove any electron Iso since we use iso in the ID
+            " (((lep1_legType == 1) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",  # Remove any electron Iso since we use iso in the ID
         )
         self.df = self.df.Define(
             "Single_lep_trg",
@@ -306,11 +306,22 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
 
     def addDYReweighting(self):
-        self.DefineAndAppend("ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0")
-        self.DefineAndAppend("ExtraDYWeight_ee_recovery", f"channelId == 11 && recovery ? 1.13 : 1.0")
-        self.DefineAndAppend("ExtraDYWeight_mumu_res2b", f"channelId == 22 && res2b ? 1.39 : 1.0")
-        self.DefineAndAppend("ExtraDYWeight_mumu_recovery", f"channelId == 22 && recovery ? 1.12 : 1.0")
-        self.DefineAndAppend("ExtraDYWeight", f"ExtraDYWeight_ee_res2b * ExtraDYWeight_ee_recovery * ExtraDYWeight_mumu_res2b * ExtraDYWeight_mumu_recovery")
+        self.DefineAndAppend(
+            "ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0"
+        )
+        self.DefineAndAppend(
+            "ExtraDYWeight_ee_recovery", f"channelId == 11 && recovery ? 1.13 : 1.0"
+        )
+        self.DefineAndAppend(
+            "ExtraDYWeight_mumu_res2b", f"channelId == 22 && res2b ? 1.39 : 1.0"
+        )
+        self.DefineAndAppend(
+            "ExtraDYWeight_mumu_recovery", f"channelId == 22 && recovery ? 1.12 : 1.0"
+        )
+        self.DefineAndAppend(
+            "ExtraDYWeight",
+            f"ExtraDYWeight_ee_res2b * ExtraDYWeight_ee_recovery * ExtraDYWeight_mumu_res2b * ExtraDYWeight_mumu_recovery",
+        )
 
     def calculateMT(self):
         self.df = self.df.Define(
@@ -418,7 +429,8 @@ def AddDNNVariables(df):
         f"ROOT::Math::VectorUtil::DeltaPhi(centralJet_p4[0],centralJet_p4[1])",
     )
     df = df.Define(
-        "dPhi_MET_dilep", f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))"
+        "dPhi_MET_dilep",
+        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))",
     )
     df = df.Define(
         "dPhi_MET_dibjet",

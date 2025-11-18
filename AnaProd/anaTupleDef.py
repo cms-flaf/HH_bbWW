@@ -200,7 +200,10 @@ def addAllVariables(
     dfw.Define("Jet_isForward", "abs(v_ops::eta(Jet_p4)) > 2.5")
     for var in ["pt", "eta", "phi", "mass"]:
         dfw.DefineAndAppend(f"ForwardJet_{var}", f"v_ops::{var}(Jet_p4[Jet_isForward])")
-    for var in ["jetId", "puIdDisc"]: # These are not part of the v_ops namespace due to not being part of p4 vec
+    for var in [
+        "jetId",
+        "puIdDisc",
+    ]:  # These are not part of the v_ops namespace due to not being part of p4 vec
         dfw.DefineAndAppend(f"ForwardJet_{var}", f"Jet_{var}[Jet_isForward]")
 
     PtEtaPhiM = ["pt", "eta", "phi", "mass"]
@@ -382,10 +385,16 @@ def addAllVariables(
     pf_str = global_params["met_type"]
     if f"{pf_str}_pt_nano" in dfw.df.GetColumnNames():
         dfw.Redefine(f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())")
-        dfw.Redefine(f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())")
+        dfw.Redefine(
+            f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())"
+        )
     else:
-        dfw.DefineAndAppend(f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())")
-        dfw.DefineAndAppend(f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())")
+        dfw.DefineAndAppend(
+            f"{pf_str}_pt_nano", f"static_cast<float>({pf_str}_p4_nano.pt())"
+        )
+        dfw.DefineAndAppend(
+            f"{pf_str}_phi_nano", f"static_cast<float>({pf_str}_p4_nano.phi())"
+        )
     if f"{pf_str}_pt" in dfw.df.GetColumnNames():
         dfw.Redefine(f"{pf_str}_pt", f"static_cast<float>({pf_str}_p4.pt())")
         dfw.Redefine(f"{pf_str}_phi", f"static_cast<float>({pf_str}_p4.phi())")
