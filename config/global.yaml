@@ -4,16 +4,30 @@ analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
 corrections:
-  - mu
-  - trgSF
-  - ele
-  - eleES
-  - pu
-  - JEC
-  - JER
-  - btagShape
-  - muScaRe
-  - Jet_horns_fix
+  mu:
+    stage: HistTuple
+    columns:
+      pfRelIso04_all: Muon_pfRelIso04_all
+      tightId: Muon_tightId
+      tkRelIso: Muon_tkRelIso
+      highPtId: Muon_highPtId
+      mediumId: Muon_mediumId
+  trgSF: { stage: HistTuple }
+  ele: { stage: HistTuple }
+  muScaRe: { stage: HistTuple }
+  eleES: { stage: AnaTuple }
+  MC_Lumi_pu: { stage: AnaTuple }
+  pu: { stages: [ AnaCache, AnaTuple ] }
+  JEC: { stage: AnaTuple }
+  JER: { stage: AnaTuple }
+  btag:
+    stages: [ AnaTuple, HistTuple ]
+    modes:
+      AnaTuple: none # just load to define WP ID branches
+      HistTuple: shape
+    tagger: particleNet
+    jetCollection: centralJet
+  Jet_horns_fix: { stage: AnaTuple }
 
 treeName: "Events"
 tagger_name: "particleNet"
