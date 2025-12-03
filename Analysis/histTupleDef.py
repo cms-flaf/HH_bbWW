@@ -68,8 +68,12 @@ def GetDfw(
     new_dfw = analysis.PrepareDfForHistograms(dfw)
     return new_dfw
 
+
 central_df_weights_computed = False
-def DefineWeightForHistograms(*,
+
+
+def DefineWeightForHistograms(
+    *,
     dfw,
     isData,
     uncName,
@@ -98,7 +102,8 @@ def DefineWeightForHistograms(*,
         syst_name = getSystName(uncName, uncScale)
         is_central = uncName == central
 
-        dfw.df, all_weights = corrections.getNormalisationCorrections(dfw.df,
+        dfw.df, all_weights = corrections.getNormalisationCorrections(
+            dfw.df,
             lepton_legs=lepton_legs,
             offline_legs=offline_legs,
             trigger_names=triggers_to_use,
