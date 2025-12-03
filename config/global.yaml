@@ -12,14 +12,18 @@ corrections:
       tkRelIso: Muon_tkRelIso
       highPtId: Muon_highPtId
       mediumId: Muon_mediumId
-  trgSF: { stage: HistTuple }
+  trigger:
+    stage: HistTuple
+    mode: SF
   ele: { stage: HistTuple }
   muScaRe: { stage: HistTuple }
   eleES: { stage: AnaTuple }
   MC_Lumi_pu: { stage: AnaTuple }
   pu: { stages: [ AnaCache, AnaTuple ] }
   JEC: { stage: AnaTuple }
-  JER: { stage: AnaTuple }
+  JER:
+    stage: AnaTuple
+    apply_jet_horns_fix: true
   btag:
     stages: [ AnaTuple, HistTuple ]
     modes:
@@ -27,11 +31,8 @@ corrections:
       HistTuple: shape
     tagger: particleNet
     jetCollection: centralJet
-  Jet_horns_fix: { stage: AnaTuple }
 
 treeName: "Events"
-tagger_name: "particleNet"
-bjet_preselection_branch: "Jet_sel"
 
 nPbPerFile: 2_000  # 2fb-1 per split data file
 nEventsPerFile: 100_000  # 100k events per MC file
