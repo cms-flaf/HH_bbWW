@@ -201,7 +201,7 @@ def addAllVariables(
     dfw.Apply(AnaBaseline.RecoHWWCandidateSelection)
     dfw.Apply(AnaBaseline.RecoHWWJetSelection)
     dfw.Apply(Corrections.getGlobal().jet.getEnergyResolution)
-    dfw.Apply(Corrections.getGlobal().btag.getWPid)
+    dfw.Apply(Corrections.getGlobal().btag.getWPid, "Jet")
     dfw.Apply(
         Corrections.getGlobal().JetVetoMap.GetJetVetoMap
     )  # Must init JetVetoMap before applying

@@ -4,20 +4,35 @@ analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
 corrections:
-  - mu
-  - trgSF
-  - ele
-  - eleES
-  - pu
-  - JEC
-  - JER
-  - btagShape
-  - muScaRe
-  - Jet_horns_fix
+  mu:
+    stage: HistTuple
+    columns:
+      pfRelIso04_all: Muon_pfRelIso04_all
+      tightId: Muon_tightId
+      tkRelIso: Muon_tkRelIso
+      highPtId: Muon_highPtId
+      mediumId: Muon_mediumId
+  trigger:
+    stage: HistTuple
+    mode: SF
+  ele: { stage: HistTuple }
+  muScaRe: { stage: HistTuple }
+  eleES: { stage: AnaTuple }
+  MC_Lumi_pu: { stage: AnaTuple }
+  pu: { stages: [ AnaCache, AnaTuple ] }
+  JEC: { stage: AnaTuple }
+  JER:
+    stage: AnaTuple
+    apply_jet_horns_fix: true
+  btag:
+    stages: [ AnaTuple, HistTuple ]
+    modes:
+      AnaTuple: none # just load to define WP ID branches
+      HistTuple: shape
+    tagger: particleNet
+    jetCollection: centralJet
 
 treeName: "Events"
-tagger_name: "particleNet"
-bjet_preselection_branch: "Jet_sel"
 
 nPbPerFile: 2_000  # 2fb-1 per split data file
 nEventsPerFile: 100_000  # 100k events per MC file

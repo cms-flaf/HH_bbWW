@@ -1,6 +1,8 @@
 import importlib
 from FLAF.Common.Utilities import *
 from FLAF.Common.HistHelper import *
+from Corrections.Corrections import Corrections
+from Corrections.CorrectionsCore import getSystName, central
 
 if __name__ == "__main__":
     sys.path.append(os.environ["ANALYSIS_PATH"])
@@ -67,15 +69,54 @@ def GetDfw(
     return new_dfw
 
 
+central_df_weights_computed = False
+
+
 def DefineWeightForHistograms(
+    *,
     dfw,
+    isData,
     uncName,
     uncScale,
     unc_cfg_dict,
     hist_cfg_dict,
     global_params,
-    final_weight_name="weight_for_hists",
+    final_weight_name,
+    df_is_central,
 ):
+    global central_df_weights_computed
+    if not isData and (not central_df_weights_computed or not df_is_central):
+        corrections = Corrections.getGlobal()
+        lepton_legs = ["lep1", "lep2"]
+        offline_legs = ["lep1", "lep2"]
+        triggers_to_use = set()
+        channels = global_params["channelSelection"]
+        for channel in channels:
+            trigger_list = global_params.get("triggers", {}).get(channel, [])
+            for trigger in trigger_list:
+                if trigger not in corrections.trigger_dict.keys():
+                    raise RuntimeError(
+                        f"Trigger does not exist in triggers.yaml, {trigger}"
+                    )
+                triggers_to_use.add(trigger)
+        syst_name = getSystName(uncName, uncScale)
+        is_central = uncName == central
+
+        dfw.df, all_weights = corrections.getNormalisationCorrections(
+            dfw.df,
+            lepton_legs=lepton_legs,
+            offline_legs=offline_legs,
+            trigger_names=triggers_to_use,
+            syst_name=syst_name,
+            source_name=uncName,
+            ana_caches=None,
+            return_variations=is_central and global_params["compute_unc_histograms"],
+            isCentral=is_central,
+            use_genWeight_sign_only=True,
+        )
+        if df_is_central:
+            central_df_weights_computed = True
+
     categories = global_params["categories"]
     boosted_categories = global_params.get("boosted_categories", [])
     process_group = global_params["process_group"]
