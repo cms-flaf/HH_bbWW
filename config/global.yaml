@@ -16,7 +16,7 @@ corrections:
     stage: HistTuple
     mode: SF
   ele: { stage: HistTuple }
-  muScaRe: { stage: HistTuple }
+  muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
   MC_Lumi_pu: { stage: AnaTuple }
   pu: { stages: [ AnaCache, AnaTuple ] }
@@ -31,6 +31,8 @@ corrections:
       HistTuple: shape
     tagger: particleNet
     jetCollection: centralJet
+
+muonID_WP_for_triggerSF: "Tight"
 
 treeName: "Events"
 
