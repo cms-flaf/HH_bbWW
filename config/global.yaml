@@ -32,8 +32,16 @@ corrections:
       HistTuple: shape
     tagger: particleNet
     jetCollection: centralJet
+extraFormat_for_triggerMatchingAndSF:
+  pt: "nano"
+muon_pt_for_presel: "nano"
+mu_pt_for_triggerMatchingAndSF: "nano"
+mu_pt_for_selection: "pt"
 
-muonID_WP_for_triggerSF: "Tight"
+mu_pt_for_definitions: "ScaRe" # here options are different: corr, nano, bsConstrainedPt, roccor
+muonID_WP_for_triggerSF: "Tight" # only medium or tight for trigger SF, both iso and ID
+muIDWP: "Tight"
+muIsoWP: "Loose"
 
 treeName: "Events"
 
