@@ -12,6 +12,7 @@ corrections:
       tkRelIso: Muon_tkRelIso
       highPtId: Muon_highPtId
       mediumId: Muon_mediumId
+      looseId: Muon_looseId 
   trigger:
     stage: HistTuple
     mode: SF

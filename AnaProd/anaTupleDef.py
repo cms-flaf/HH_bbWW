@@ -14,6 +14,7 @@ Muon_int_observables = [
     "Muon_highPtId",
     "Muon_pfIsoId",
     "Muon_mediumPromptId",
+    "Muon_looseId",
     "Muon_miniIsoId",
     "Muon_mvaMuID_WP",
 ]
