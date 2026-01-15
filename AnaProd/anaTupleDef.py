@@ -195,6 +195,7 @@ def addAllVariables(
     applyTriggerFilter,
     global_params,
     channels,
+    dataset_cfg,
 ):
     print(f"Adding variables for {syst_name}")
     # dfw.Apply(CommonBaseline.SelectRecoP4, syst_name, global_params["nano_version"])
