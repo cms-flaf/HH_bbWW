@@ -87,7 +87,6 @@ uncertainties:
     type: shape
 
 
-
   - name: JER
     type: shape
   - name: JES_total
