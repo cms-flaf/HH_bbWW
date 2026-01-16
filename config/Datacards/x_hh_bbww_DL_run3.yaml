@@ -113,7 +113,7 @@ uncertainties:
   - name: QCD_scale_TT
     type: lnN
     processes:
-      - TTno4Q
+      - TT
     value: [ -0.036, 0.025 ] # TT XS uncertainty in percentage from xsec yaml
     # TT:
     # crossSec: '923.6'
