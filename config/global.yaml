@@ -12,11 +12,12 @@ corrections:
       tkRelIso: Muon_tkRelIso
       highPtId: Muon_highPtId
       mediumId: Muon_mediumId
+      looseId: Muon_looseId
   trigger:
     stage: HistTuple
     mode: SF
   ele: { stage: HistTuple }
-  muScaRe: { stage: HistTuple }
+  muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
   MC_Lumi_pu: { stage: AnaTuple }
   pu: { stages: [ AnaCache, AnaTuple ] }
@@ -31,6 +32,16 @@ corrections:
       HistTuple: shape
     tagger: particleNet
     jetCollection: centralJet
+extraFormat_for_triggerMatchingAndSF:
+  pt: "nano"
+muon_pt_for_presel: "nano"
+mu_pt_for_triggerMatchingAndSF: "nano"
+mu_pt_for_selection: "pt"
+
+mu_pt_for_definitions: "ScaRe" # here options are different: corr, nano, bsConstrainedPt, roccor
+muonID_WP_for_triggerSF: "Tight" # only medium or tight for trigger SF, both iso and ID
+muIDWP: "Tight"
+muIsoWP: "Loose"
 
 treeName: "Events"
 
