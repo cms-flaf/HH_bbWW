@@ -14,10 +14,11 @@ import Analysis.hh_bbww as analysis
 
 
 class DNNProducer:
-    def __init__(self, cfg, payload_name):
+    def __init__(self, cfg, payload_name, period):
 
         self.cfg = cfg
         self.payload_name = payload_name
+        self.period = period
 
         sys.path.append(os.environ["ANALYSIS_PATH"])
         ROOT.gROOT.ProcessLine(".include " + os.environ["ANALYSIS_PATH"])
@@ -77,12 +78,11 @@ class DNNProducer:
             for x, y in modelname_parity
         ]
 
-    def prepare_dfw(self, dfw):
+    def prepare_dfw(self, dfw, dataset):
         print("Running DNN preparer")
 
         dfw.df = analysis.defineAllP4(dfw.df)
         dfw.df = analysis.AddDNNVariables(dfw.df)
-
         return dfw
 
     def run(self, array):
