@@ -1867,7 +1867,7 @@ DL_DNN_m300_HME_Linear:
   x_title: "DNN DL M300 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
@@ -1885,7 +1885,7 @@ DL_DNN_m400_HME_Linear:
   x_title: "DNN DL M400 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
@@ -1903,7 +1903,7 @@ DL_DNN_m500_HME_Linear:
   x_title: "DNN DL M500 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
@@ -1921,7 +1921,7 @@ DL_DNN_m550_HME_Linear:
   x_title: "DNN DL M550 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
@@ -1954,7 +1954,7 @@ DL_DNN_m600_HME_Linear:
   x_title: "DNN DL M600 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
@@ -1973,7 +1973,7 @@ DL_DNN_m650_HME_Linear:
   x_title: "DNN DL M650 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
@@ -1991,7 +1991,7 @@ DL_DNN_m700_HME_Linear:
   x_title: "DNN DL M700 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
@@ -2009,7 +2009,7 @@ DL_DNN_m800_HME_Linear:
   x_title: "DNN DL M800 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
@@ -2027,7 +2027,7 @@ DL_DNN_m900_HME_Linear:
   x_title: "DNN DL M900 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
@@ -2045,7 +2045,7 @@ DL_DNN_m1000_HME_Linear:
   x_title: "DNN DL M1000 in HMEbins"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
+  max_y_sf: 100
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]
