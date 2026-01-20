@@ -13,3 +13,7 @@ variables:
   # - DNN_M0_Signal # Remove DNN for now while I move to new version
   # - DNNParametric_M250_Signal
   # - LinHMEDNN_linear_hme_dnn_m250
+
+  - name: lep1_pt_vs_eta
+    vars: [ lep1_pt, lep1_eta ]
+
