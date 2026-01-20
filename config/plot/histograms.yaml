@@ -29,6 +29,7 @@ lep1_pt_vs_eta:
   lep1_pt_title: lep1_pt [GeV]
   lep1_eta_title: lep1_eta
   var_list: [ lep1_pt, lep1_eta ]
+  plot_task: False
 
 lep1_pt:
   x_bins: "50|20:500"
