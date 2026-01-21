@@ -15,12 +15,6 @@ DY_M_10to50:
     - DYto2Mu_M_10to50_amcatnloFXFX
     - DYto2Tau_M_10to50_amcatnloFXFX
 
-custom_CI:
-  name: "custom for CI and test purposes"
-  color: "kAzure+10"
-  datasets:
-    - custom_CI
-
 DYto2E_M_50:
   processors: *DY_processors
   datasets:
