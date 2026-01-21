@@ -134,6 +134,7 @@ FatJetObservables = [
     "particleNet_XteVsQCD",
     "particleNet_XtmVsQCD",
     "particleNet_XttVsQCD",
+    "particleNetWithMass_HbbvsQCD",
     "particleNet_massCorr",
     "rawFactor",
     "tau1",
@@ -334,13 +335,23 @@ def addAllVariables(
                                 """,
             )
 
+    # dfw.Define(
+    #     "SelectedFatJet_idx",
+    #     "CreateIndexes(tmp_SelectedFatJet_particleNet_XbbVsQCD.size())",
+    # )
+    # dfw.Define(
+    #     "SelectedFatJet_idxSorted",
+    #     "ReorderObjects(tmp_SelectedFatJet_particleNet_XbbVsQCD, SelectedFatJet_idx)",
+    # )
+
+    # Nonres DL analysis uses HbbvsQCD branch, to use their corrections we must use the same
     dfw.Define(
         "SelectedFatJet_idx",
-        "CreateIndexes(tmp_SelectedFatJet_particleNet_XbbVsQCD.size())",
+        "CreateIndexes(tmp_SelectedFatJet_particleNetWithMass_HbbvsQCD.size())",
     )
     dfw.Define(
         "SelectedFatJet_idxSorted",
-        "ReorderObjects(tmp_SelectedFatJet_particleNet_XbbVsQCD, SelectedFatJet_idx)",
+        "ReorderObjects(tmp_SelectedFatJet_particleNetWithMass_HbbvsQCD, SelectedFatJet_idx)",
     )
 
     fatjet_obs = []
