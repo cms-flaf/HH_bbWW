@@ -19,3 +19,8 @@ OnlyData:
   signals: [ ]
   data:
     - Data_Full
+
+TestModel:
+  name: "Test model for CI"
+  backgrounds:
+    - custom_CI
