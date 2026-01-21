@@ -1,0 +1,9 @@
+triggerFile: config/Run3_2023BPix/triggers.yaml
+corrections:
+  btag:
+    stages: [ AnaTuple, HistTuple ]
+    modes:
+      AnaTuple: none # just load to define WP ID branches
+      HistTuple: none
+    tagger: UParTAK4
+    jetCollection: centralJet
