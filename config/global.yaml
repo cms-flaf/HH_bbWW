@@ -214,7 +214,7 @@ payload_producers:
     producers_module_name: Analysis.DeepHMEProducer
     producer_name: DeepHMEProducer
     channel: "SL"
-    model_name: predict_quantiles3D_SL_v3
+    model_name: predict_quantiles3D_SL_v4
     return_errors: True
     columns:
       - mass
