@@ -134,7 +134,6 @@ FatJetObservables = [
     "particleNet_XteVsQCD",
     "particleNet_XtmVsQCD",
     "particleNet_XttVsQCD",
-    "particleNetWithMass_HbbvsQCD",
     "particleNet_massCorr",
     "rawFactor",
     "tau1",
