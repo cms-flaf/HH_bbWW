@@ -99,7 +99,7 @@ payload_producers:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "DL"
-    version: "DoubleLepton_WithOutDeepHME"
+    version: "DoubleLepton_WithoutDeepHME"
     columns:
       # - M250_Signal
       # - M260_Signal
@@ -145,7 +145,7 @@ payload_producers:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "SL"
-    version: "SingleLepton_WithOutDeepHME"
+    version: "SingleLepton_WithoutDeepHME"
     columns:
       # - M250_Signal
       # - M260_Signal
