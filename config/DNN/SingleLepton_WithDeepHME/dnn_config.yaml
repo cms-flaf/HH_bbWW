@@ -162,7 +162,7 @@ model_setup:
   n_disco_layers: 5
   n_disco_units: 256
   n_epochs: 100
-  parametric_list: &id003
+  parametric_list: &id004
     - 250
     - 260
     - 270
@@ -220,5 +220,5 @@ class_names:
   - WJets
 nClasses: 5
 nParity: 4
-parametric_list: *id003
+parametric_list: *id004
 use_parametric: true
