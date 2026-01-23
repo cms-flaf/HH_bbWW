@@ -199,15 +199,15 @@ def addAllVariables(
     dataset_cfg,
 ):
     print(f"Adding variables for {syst_name}")
+    dfw.Apply(
+        Corrections.getGlobal().JetVetoMap.GetJetVetoMap
+    )  # Must init JetVetoMap before applying
+    dfw.Apply(CommonBaseline.ApplyJetVetoMap)
     # dfw.Apply(CommonBaseline.SelectRecoP4, syst_name, global_params["nano_version"])
     dfw.Apply(AnaBaseline.RecoHWWCandidateSelection)
     dfw.Apply(AnaBaseline.RecoHWWJetSelection)
     dfw.Apply(Corrections.getGlobal().jet.getEnergyResolution)
     dfw.Apply(Corrections.getGlobal().btag.getWPid, "Jet")
-    dfw.Apply(
-        Corrections.getGlobal().JetVetoMap.GetJetVetoMap
-    )  # Must init JetVetoMap before applying
-    dfw.Apply(CommonBaseline.ApplyJetVetoMap)
 
     dfw.Define("Jet_isForward", "abs(v_ops::eta(Jet_p4)) > 2.5")
     for var in ["pt", "eta", "phi", "mass"]:
