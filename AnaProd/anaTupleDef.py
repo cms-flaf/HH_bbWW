@@ -216,8 +216,6 @@ def addAllVariables(
         "jetId",
         "puIdDisc",
     ]:  # These are not part of the v_ops namespace due to not being part of p4 vec
-        if f"Jet_{var}" not in dfw.df.GetColumnNames():
-            continue
         dfw.DefineAndAppend(f"ForwardJet_{var}", f"Jet_{var}[Jet_isForward]")
 
     PtEtaPhiM = ["pt", "eta", "phi", "mass"]
@@ -260,8 +258,6 @@ def addAllVariables(
             default="0",
         )
         for muon_obs in Muon_observables:
-            if muon_obs not in dfw.df.GetColumnNames():
-                continue
             LegVar(
                 muon_obs,
                 f"{muon_obs}.at(HwwCandidate.leg_index.at({leg_idx}))",
@@ -269,8 +265,6 @@ def addAllVariables(
                 default="-1",
             )
         for ele_obs in Electron_observables:
-            if ele_obs not in dfw.df.GetColumnNames():
-                continue
             LegVar(
                 ele_obs,
                 f"{ele_obs}.at(HwwCandidate.leg_index.at({leg_idx}))",
@@ -301,8 +295,6 @@ def addAllVariables(
     dfw.Define(f"tmp_SelectedFatJet_phi", f"v_ops::phi(FatJet_p4[FatJet_sel])")
     dfw.Define(f"tmp_SelectedFatJet_mass", f"v_ops::mass(FatJet_p4[FatJet_sel])")
     for fatjetVar in fatjet_obs:
-        if f"FatJet_{fatjetVar}" not in dfw.df.GetColumnNames():
-            continue
         dfw.Define(f"tmp_SelectedFatJet_{fatjetVar}", f"FatJet_{fatjetVar}[FatJet_sel]")
     subjet_obs = []
     subjet_obs.extend(SubJetObservables)
@@ -330,8 +322,6 @@ def addAllVariables(
             f"tmp_FatJet_SubJet{subJetIdx}_isValid[FatJet_sel]",
         )
         for subJetVar in subjet_obs:
-            if f"SubJet_{subJetVar}" not in dfw.df.GetColumnNames():
-                continue
             dfw.Define(
                 f"tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}",
                 f"""
@@ -369,8 +359,6 @@ def addAllVariables(
             name, f"Take(tmp_SelectedFatJet_{var}, SelectedFatJet_idxSorted)"
         )
     for fatjetVar in fatjet_obs:
-        if f"tmp_SelectedFatJet_{fatjetVar}" not in dfw.df.GetColumnNames():
-            continue
         dfw.DefineAndAppend(
             f"SelectedFatJet_{fatjetVar}",
             f"Take(tmp_SelectedFatJet_{fatjetVar}, SelectedFatJet_idxSorted)",
@@ -403,13 +391,12 @@ def addAllVariables(
         for subJetVar in subjet_obs:
             if (
                 f"tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}"
-                not in dfw.df.GetColumnNames()
+                in dfw.df.GetColumnNames()
             ):
-                continue
-            dfw.DefineAndAppend(
-                f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}",
-                f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}, SelectedFatJet_idxSorted)",
-            )
+                dfw.DefineAndAppend(
+                    f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}",
+                    f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}, SelectedFatJet_idxSorted)",
+                )
 
     met_type = global_params["met_type"]
     dfw.DefineAndAppend(
@@ -493,8 +480,6 @@ def addAllVariables(
     if not isData:
         reco_jet_obs.extend(JetObservablesMC)
     for jet_obs in reco_jet_obs:
-        if f"Jet_{jet_obs}" not in dfw.df.GetColumnNames():
-            continue
         name = f"centralJet_{jet_obs}"
         dfw.DefineAndAppend(name, f"Take(Jet_{jet_obs}[Jet_sel], centralJet_idxSorted)")
     if isSignal:
