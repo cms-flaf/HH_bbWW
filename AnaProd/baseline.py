@@ -78,7 +78,7 @@ def RecoHWWCandidateSelection(df):
 def RecoHWWJetSelection(df):
     df = df.Define(
         "Jet_Incl",
-        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 2.5 && ( Jet_jetId & 2 )",
+        f"v_ops::pt(Jet_p4)>20 && abs(v_ops::eta(Jet_p4)) < 2.5  && ( Jet_passJetIdTight )",
     )
     df = df.Define(
         "FatJet_Incl",
