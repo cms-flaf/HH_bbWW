@@ -38,5 +38,5 @@ Current version `v2601`
 
 1. Run production
    ```bash
-   python python/submit_anaTuple_production.py --config config/anaTuple_production.yaml --user_config config/user_custom.yaml
+   law run AnaTupleMergeTask --version v2601 --period ERA
    ```
