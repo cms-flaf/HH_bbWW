@@ -186,7 +186,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )",
         )
 
-    def defineJetSelections(self):
+    def defineJetSelections(self, isData):
         self.df = self.df.Define("Njets", "centralJet_pt.size()")
         self.df = self.df.Define("jet1_isvalid", "Njets > 0")
         self.df = self.df.Define("jet2_isvalid", "Njets > 1")
@@ -227,12 +227,17 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "mass",
             "particleNet_XbbVsQCD",
             "particleNetWithMass_HbbvsQCD",
-            "hadronFlavour",
         ]
+        fatjet_mc_vars = ["hadronFlavour"]
         for var in fatjet_vars:
             self.df = self.df.Define(
                 f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
             )
+        if not isData:
+            for var in fatjet_mc_vars:
+                self.df = self.df.Define(
+                    f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
+                )
 
         self.df = self.df.Define(
             "bsubjet1_btagDeepB",
@@ -510,12 +515,12 @@ def AddDNNVariables(df):
     return df
 
 
-def PrepareDfForHistograms(dfForHistograms):
+def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
-    dfForHistograms.defineJetSelections()
+    dfForHistograms.defineJetSelections(isData)
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()

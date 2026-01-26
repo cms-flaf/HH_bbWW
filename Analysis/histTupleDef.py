@@ -3,6 +3,7 @@ from FLAF.Common.Utilities import *
 from FLAF.Common.HistHelper import *
 from Corrections.Corrections import Corrections
 from Corrections.CorrectionsCore import getSystName, central
+from FLAF.Common.Setup import Setup
 
 if __name__ == "__main__":
     sys.path.append(os.environ["ANALYSIS_PATH"])
@@ -31,10 +32,12 @@ def analysis_setup(setup):
     analysis = importlib.import_module(f"{analysis_import}")
 
 
-def GetDfw(df, global_params):
+def GetDfw(df, setup, dataset_name):
+    global_params = setup.global_params
+    isData = dataset_name == "data"
     period = global_params["era"]
     dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period)
-    new_dfw = analysis.PrepareDfForHistograms(dfw)
+    new_dfw = analysis.PrepareDfForHistograms(dfw, isData)
     return new_dfw
 
 
