@@ -23,6 +23,13 @@ lep1_eta:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+lep1_pt_vs_eta:
+  lep1_pt_bins: "50|20:500"
+  lep1_eta_bins: "50|-2.5:2.5"
+  lep1_pt_title: lep1_pt [GeV]
+  lep1_eta_title: lep1_eta
+  var_list: [ lep1_pt, lep1_eta ]
+
 lep1_pt:
   x_bins: "50|20:500"
   x_title: lep1_pt [GeV]
@@ -1141,7 +1148,7 @@ SingleLep_DeepHME_mass:
   blind: True
 
 DoubleLep_DeepHME_mass:
-  x_bins: "100|-10:2500"
+  x_bins: "100|0.0:2500"
   x_title: "Double Lepton Deep HME Mass"
   y_title: "Events"
   use_log_y: False
@@ -1477,7 +1484,7 @@ DNNParametric_DL_NoHME_M280_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M300_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M300 Signal
   y_title: Events
   use_log_y: True
@@ -1485,23 +1492,39 @@ DNNParametric_DL_NoHME_M300_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M350_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M350 Signal
   y_title: Events
   use_log_y: True
   max_y_sf: 10.0
   divide_by_bin_width: False
 
+DNNParametric_DL_NoHME_M400_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M400 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
 DNNParametric_DL_NoHME_M450_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M450 Signal
   y_title: Events
   use_log_y: True
   max_y_sf: 10.0
   divide_by_bin_width: False
 
+DNNParametric_DL_NoHME_M500_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M500 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
 DNNParametric_DL_NoHME_M550_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M550 Signal
   y_title: Events
   use_log_y: True
@@ -1509,7 +1532,7 @@ DNNParametric_DL_NoHME_M550_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M600_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M600 Signal
   y_title: Events
   use_log_y: True
@@ -1517,7 +1540,7 @@ DNNParametric_DL_NoHME_M600_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M650_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M650 Signal
   y_title: Events
   use_log_y: True
@@ -1525,7 +1548,7 @@ DNNParametric_DL_NoHME_M650_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M700_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M700 Signal
   y_title: Events
   use_log_y: True
@@ -1533,15 +1556,23 @@ DNNParametric_DL_NoHME_M700_Signal:
   divide_by_bin_width: False
 
 DNNParametric_DL_NoHME_M800_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M800 Signal
   y_title: Events
   use_log_y: True
   max_y_sf: 10.0
   divide_by_bin_width: False
 
+DNNParametric_DL_NoHME_M900_Signal:
+  x_bins: "1000|0.0:1.0"
+  x_title: DNN M900 Signal
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+
 DNNParametric_DL_NoHME_M1000_Signal:
-  x_bins: "100|0.0:1.0"
+  x_bins: "1000|0.0:1.0"
   x_title: DNN M1000 Signal
   y_title: Events
   use_log_y: True
@@ -1821,3 +1852,200 @@ mT_fix:
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+
+DL_DNN_m300_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 0, 250 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 250, 275 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 275, 300 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 300, 325 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 325, 350 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 350, 500 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M300 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m400_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 300, 350 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 350, 375 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 375, 400 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 400, 425 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 425, 450 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 450, 600 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M400 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m500_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 400, 450 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 450, 475 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 475, 500 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 500, 525 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 525, 550 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 550, 700 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M500 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m550_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 450, 500 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 500, 525 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 525, 550 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 550, 575 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 575, 600 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 600, 750 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M550 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m600_HME_Linear:
+  2d:
+    combined_bins:
+      # - {y_bin: [0,400], x_bins: "5|0.0:1.0"}
+      # - {y_bin: [400,700], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [700,2500], x_bins: "5|0.0:1.0"}
+
+      # - {y_bin: [0,300], x_bins: "2|0.0:1.0"}
+      # - {y_bin: [300,350], x_bins: "3|0.0:1.0"}
+      # - {y_bin: [400,450], x_bins: "4|0.0:1.0"}
+      # - {y_bin: [450,500], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [500,550], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [550,600], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [600,650], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [650,700], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [700,750], x_bins: [0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0]}
+      # - {y_bin: [750,1000], x_bins: "5|0.0:1.0"}
+
+      - { y_bin: [ 450, 500 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 500, 550 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 550, 600 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 600, 650 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 650, 700 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 700, 750 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M600 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
+
+
+DL_DNN_m650_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 550, 600 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 600, 625 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 625, 650 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 650, 675 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 675, 700 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 700, 850 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M650 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m700_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 600, 650 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 650, 675 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 675, 700 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 700, 725 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 725, 750 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 750, 900 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M700 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m800_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 700, 750 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 750, 775 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 775, 800 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 800, 825 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 825, 850 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 850, 1000 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M800 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m900_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 800, 850 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 850, 875 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 875, 900 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 900, 925 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 925, 950 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 950, 1100 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M900 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
+
+DL_DNN_m1000_HME_Linear:
+  2d:
+    combined_bins:
+      - { y_bin: [ 900, 950 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 950, 975 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 975, 1000 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 1000, 1025 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 1025, 1050 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+      - { y_bin: [ 1050, 1200 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
+  x_rebin: True
+  x_title: "DNN DL M1000 in HMEbins"
+  y_title: "Events"
+  use_log_y: True
+  max_y_sf: 100
+  divide_by_bin_width: False
+  blind: True
+  var_list: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]
