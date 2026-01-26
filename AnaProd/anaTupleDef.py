@@ -334,19 +334,9 @@ def addAllVariables(
                                 """,
             )
 
-    # dfw.Define(
-    #     "SelectedFatJet_idx",
-    #     "CreateIndexes(tmp_SelectedFatJet_particleNet_XbbVsQCD.size())",
-    # )
-    # dfw.Define(
-    #     "SelectedFatJet_idxSorted",
-    #     "ReorderObjects(tmp_SelectedFatJet_particleNet_XbbVsQCD, SelectedFatJet_idx)",
-    # )
-
-    # Nonres DL analysis uses HbbvsQCD branch, to use their corrections we must use the same
     dfw.Define(
         "SelectedFatJet_idx",
-        "CreateIndexes(tmp_SelectedFatJet_particleNetWithMass_HbbvsQCD.size())",
+        "CreateIndexes(tmp_SelectedFatJet_pt.size())",
     )
     dfw.Define(
         "SelectedFatJet_idxSorted",
