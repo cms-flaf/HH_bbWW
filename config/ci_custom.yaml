@@ -5,7 +5,7 @@ analysis_config_area: config
 compute_unc_variations: true
 compute_unc_histograms: true
 store_noncentral: true
-
+phys_model: TestModel
 variables:
   - lep1_pt
   - SingleLep_DeepHME_mass

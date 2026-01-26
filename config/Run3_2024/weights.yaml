@@ -36,3 +36,5 @@ shape:
     name: CMS_res_j_{}
   EleES:
     name: CMS_scale_e_{}
+  ScaRe:
+    name: CMS_ScaRe_mu_{}

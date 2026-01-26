@@ -2,10 +2,11 @@ from __future__ import annotations
 
 
 class LinHMEDNN:
-    def __init__(self, cfg, payload_name):
+    def __init__(self, cfg, payload_name, period):
 
         self.cfg = cfg
         self.payload_name = payload_name
+        self.period = period
 
         self.hme_bins_dict = {
             "DL": {
