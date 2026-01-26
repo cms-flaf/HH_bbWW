@@ -400,32 +400,32 @@ variables:
   - DoubleLep_DeepHME_mass
   - DoubleLep_DeepHME_mass_error
 
-  - name: DL_DNN_m300_HME_Linear
+  - name: DL_DNN_m300_vs_HME
     vars: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m400_HME_Linear
+  - name: DL_DNN_m400_vs_HME
     vars: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m500_HME_Linear
+  - name: DL_DNN_m500_vs_HME
     vars: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m550_HME_Linear
+  - name: DL_DNN_m550_vs_HME
     vars: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m600_HME_Linear
+  - name: DL_DNN_m600_vs_HME
     vars: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m650_HME_Linear
+  - name: DL_DNN_m650_vs_HME
     vars: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m700_HME_Linear
+  - name: DL_DNN_m700_vs_HME
     vars: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m800_HME_Linear
+  - name: DL_DNN_m800_vs_HME
     vars: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m900_HME_Linear
+  - name: DL_DNN_m900_vs_HME
     vars: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
 
-  - name: DL_DNN_m1000_HME_Linear
+  - name: DL_DNN_m1000_vs_HME
     vars: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]

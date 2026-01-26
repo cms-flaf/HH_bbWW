@@ -1854,7 +1854,7 @@ mT_fix:
   divide_by_bin_width: False
 
 
-DL_DNN_m300_HME_Linear:
+DL_DNN_m300_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 0, 250 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1872,7 +1872,7 @@ DL_DNN_m300_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m400_HME_Linear:
+DL_DNN_m400_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 300, 350 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1890,7 +1890,7 @@ DL_DNN_m400_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m500_HME_Linear:
+DL_DNN_m500_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 400, 450 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1908,7 +1908,7 @@ DL_DNN_m500_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m550_HME_Linear:
+DL_DNN_m550_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 450, 500 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1926,7 +1926,7 @@ DL_DNN_m550_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m600_HME_Linear:
+DL_DNN_m600_vs_HME:
   2d:
     combined_bins:
       # - {y_bin: [0,400], x_bins: "5|0.0:1.0"}
@@ -1960,7 +1960,7 @@ DL_DNN_m600_HME_Linear:
   var_list: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
 
 
-DL_DNN_m650_HME_Linear:
+DL_DNN_m650_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 550, 600 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1978,7 +1978,7 @@ DL_DNN_m650_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m700_HME_Linear:
+DL_DNN_m700_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 600, 650 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -1996,7 +1996,7 @@ DL_DNN_m700_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m800_HME_Linear:
+DL_DNN_m800_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 700, 750 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -2014,7 +2014,7 @@ DL_DNN_m800_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m900_HME_Linear:
+DL_DNN_m900_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 800, 850 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
@@ -2032,7 +2032,7 @@ DL_DNN_m900_HME_Linear:
   blind: True
   var_list: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
 
-DL_DNN_m1000_HME_Linear:
+DL_DNN_m1000_vs_HME:
   2d:
     combined_bins:
       - { y_bin: [ 900, 950 ], x_bins: [ 0.0, 0.5, 0.7, 0.8, 0.85, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0 ] }
