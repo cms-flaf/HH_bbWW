@@ -236,7 +236,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         if not isData:
             for var in fatjet_mc_vars:
                 self.df = self.df.Define(
-                    f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
+                    f"fatbjet_{var}",
+                    f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
                 )
 
         self.df = self.df.Define(
