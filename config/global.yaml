@@ -71,55 +71,6 @@ payload_producers:
     n_cpus: 4
     max_runtime: 30.0
     cmssw_env: True
-  DNN:
-    producers_module_name: Analysis.DNN_Application
-    producer_name: DNNProducer
-    channel: "DL"
-    version: "v24"
-    columns:
-      - M0_Signal
-    dependencies:
-    # - DoubleLepHME
-    n_cpus: 4
-    max_runtime: 2.0
-    cmssw_env: False
-    awkward_based: True
-    uproot_stepsize: '50MB'
-  # DNNParametric:
-  #   producers_module_name: Analysis.DNN_Application
-  #   producer_name: DNNProducer
-  #   channel: "DL"
-  #   version: "v35"
-  #   columns:
-  #     - M250_Signal
-  #     - M260_Signal
-  #     - M270_Signal
-  #     - M280_Signal
-  #     - M300_Signal
-  #     - M350_Signal
-  #     - M450_Signal
-  #     - M550_Signal
-  #     - M600_Signal
-  #     - M650_Signal
-  #     - M700_Signal
-  #     - M800_Signal
-  #     - M1000_Signal
-  #     - M1200_Signal
-  #     - M1400_Signal
-  #     - M1600_Signal
-  #     - M1800_Signal
-  #     - M2000_Signal
-  #     - M2500_Signal
-  #     - M3000_Signal
-  #     - M4000_Signal
-  #     - M5000_Signal
-  #   dependencies:
-  #   # - DoubleLepHME # Currently DNN does not actually depend on HME yet
-  #   n_cpus: 4
-  #   max_runtime: 8.0
-  #   cmssw_env: False
-  #   awkward_based: True
-  #   uproot_stepsize: '50MB'
   DNNParametric_DL_WithHME:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
@@ -159,7 +110,7 @@ payload_producers:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "DL"
-    version: "DoubleLepton_WithOutDeepHME"
+    version: "DoubleLepton_WithoutDeepHME"
     columns:
       # - M250_Signal
       # - M260_Signal
@@ -196,7 +147,6 @@ payload_producers:
       - M900_Signal
       - M1000_Signal
     dependencies:
-    # - DoubleLep_DeepHME
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
@@ -206,7 +156,7 @@ payload_producers:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     channel: "SL"
-    version: "SingleLepton_WithOutDeepHME"
+    version: "SingleLepton_WithoutDeepHME"
     columns:
       # - M250_Signal
       # - M260_Signal
@@ -243,89 +193,16 @@ payload_producers:
       - M900_Signal
       - M1000_Signal
     dependencies:
-    # - SingleLep_DeepHME
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
-  LinHMEDNN_DL:
-    producers_module_name: Analysis.Linear_HME_DNN
-    producer_name: LinHMEDNN
-    channel: "DL"
-    columns:
-      # - linear_hme_dnn_m250
-      # - linear_hme_dnn_m260
-      # - linear_hme_dnn_m270
-      # - linear_hme_dnn_m280
-      # - linear_hme_dnn_m300
-      # - linear_hme_dnn_m350
-      # - linear_hme_dnn_m450
-      # - linear_hme_dnn_m550
-      # - linear_hme_dnn_m600
-      # - linear_hme_dnn_m650
-      # - linear_hme_dnn_m700
-      # - linear_hme_dnn_m800
-      # - linear_hme_dnn_m1000
-
-      - linear_hme_dnn_m300
-      - linear_hme_dnn_m400
-      - linear_hme_dnn_m500
-      - linear_hme_dnn_m550
-      - linear_hme_dnn_m600
-      - linear_hme_dnn_m650
-      - linear_hme_dnn_m700
-      - linear_hme_dnn_m800
-      - linear_hme_dnn_m900
-      - linear_hme_dnn_m1000
-    dependencies:
-      - DoubleLep_DeepHME
-      - DNNParametric_DL_NoHME
-    n_cpus: 4
-    max_runtime: 2.0
-    cmssw_env: False
-    awkward_based: False
-  LinHMEDNN_SL:
-    producers_module_name: Analysis.Linear_HME_DNN
-    producer_name: LinHMEDNN
-    channel: "SL"
-    columns:
-      # - linear_hme_dnn_m250
-      # - linear_hme_dnn_m260
-      # - linear_hme_dnn_m270
-      # - linear_hme_dnn_m280
-      # - linear_hme_dnn_m300
-      # - linear_hme_dnn_m350
-      # - linear_hme_dnn_m450
-      # - linear_hme_dnn_m550
-      # - linear_hme_dnn_m600
-      # - linear_hme_dnn_m650
-      # - linear_hme_dnn_m700
-      # - linear_hme_dnn_m800
-      # - linear_hme_dnn_m1000
-
-      - linear_hme_dnn_m300
-      - linear_hme_dnn_m400
-      - linear_hme_dnn_m500
-      - linear_hme_dnn_m550
-      - linear_hme_dnn_m600
-      - linear_hme_dnn_m650
-      - linear_hme_dnn_m700
-      - linear_hme_dnn_m800
-      - linear_hme_dnn_m900
-      - linear_hme_dnn_m1000
-    dependencies:
-      - SingleLep_DeepHME
-      - DNNParametric_SL_NoHME
-    n_cpus: 4
-    max_runtime: 2.0
-    cmssw_env: False
-    awkward_based: False
   DoubleLep_DeepHME:
     producers_module_name: Analysis.DeepHMEProducer
     producer_name: DeepHMEProducer
     channel: "DL"
-    model_name: predict_quantiles3D_DL_v8
+    model_name: predict_quantiles3D_DL_v9
     return_errors: True
     columns:
       - mass
@@ -348,7 +225,7 @@ payload_producers:
     producers_module_name: Analysis.DeepHMEProducer
     producer_name: DeepHMEProducer
     channel: "SL"
-    model_name: predict_quantiles3D_SL_v3
+    model_name: predict_quantiles3D_SL_v4
     return_errors: True
     columns:
       - mass
@@ -367,66 +244,6 @@ payload_producers:
     awkward_based: True
     uproot_stepsize: '50MB'
     dependencies:
-  HMEinDNNBins:
-    producers_module_name: Analysis.HMEinDNNBins
-    producer_name: HMEinDNNBins
-    dependencies:
-      - SingleLep_DeepHME
-      - DoubleLep_DeepHME
-      - DNNParametric_DL_NoHME  # If these change remember to change the branch name in the python script
-      - DNNParametric_SL_NoHME
-    n_cpus: 4
-    max_runtime: 2.0
-    cmssw_env: False
-    awkward_based: False
-    virtual_payload: True  # Add support to avoid running payload as a cache, rather just running it in RAM live (if quick enough)
-    masses:
-      - 300
-      - 600
-      - 800
-    bins:
-      - [ 0p0, 0p2 ]
-      - [ 0p2, 0p4 ]
-      - [ 0p4, 0p6 ]
-      - [ 0p6, 0p8 ]
-      - [ 0p8, 1p0 ]
-    columns:
-      - HME_mass_DL_DNN_M300_0p0_0p2
-      - HME_mass_DL_DNN_M300_0p2_0p4
-      - HME_mass_DL_DNN_M300_0p4_0p6
-      - HME_mass_DL_DNN_M300_0p6_0p8
-      - HME_mass_DL_DNN_M300_0p8_1p0
-
-      - HME_mass_DL_DNN_M600_0p0_0p2
-      - HME_mass_DL_DNN_M600_0p2_0p4
-      - HME_mass_DL_DNN_M600_0p4_0p6
-      - HME_mass_DL_DNN_M600_0p6_0p8
-      - HME_mass_DL_DNN_M600_0p8_1p0
-
-      - HME_mass_DL_DNN_M800_0p0_0p2
-      - HME_mass_DL_DNN_M800_0p2_0p4
-      - HME_mass_DL_DNN_M800_0p4_0p6
-      - HME_mass_DL_DNN_M800_0p6_0p8
-      - HME_mass_DL_DNN_M800_0p8_1p0
-
-
-      - HME_mass_SL_DNN_M300_0p0_0p2
-      - HME_mass_SL_DNN_M300_0p2_0p4
-      - HME_mass_SL_DNN_M300_0p4_0p6
-      - HME_mass_SL_DNN_M300_0p6_0p8
-      - HME_mass_SL_DNN_M300_0p8_1p0
-
-      - HME_mass_SL_DNN_M600_0p0_0p2
-      - HME_mass_SL_DNN_M600_0p2_0p4
-      - HME_mass_SL_DNN_M600_0p4_0p6
-      - HME_mass_SL_DNN_M600_0p6_0p8
-      - HME_mass_SL_DNN_M600_0p8_1p0
-
-      - HME_mass_SL_DNN_M800_0p0_0p2
-      - HME_mass_SL_DNN_M800_0p2_0p4
-      - HME_mass_SL_DNN_M800_0p4_0p6
-      - HME_mass_SL_DNN_M800_0p6_0p8
-      - HME_mass_SL_DNN_M800_0p8_1p0
 
 region: All
 region_default: SR
@@ -521,6 +338,10 @@ variables:
   - lep1_phi
   - lep1_mass
 
+  - name: lep1_pt_vs_eta
+    vars: [ lep1_pt, lep1_eta ]
+    plot_task: False
+
   - lep2_pt
   - lep2_eta
   - lep2_phi
@@ -572,63 +393,39 @@ variables:
   - mT_fix
 
   # # High Level Single Lepton
-  # - SingleLep_DeepHME_mass
-  # - SingleLep_DeepHME_mass_error
-
-  # - LinHMEDNN_SL_linear_hme_dnn_m300
-  # - LinHMEDNN_SL_linear_hme_dnn_m400
-  # - LinHMEDNN_SL_linear_hme_dnn_m500
-  # - LinHMEDNN_SL_linear_hme_dnn_m550
-  # - LinHMEDNN_SL_linear_hme_dnn_m600
-  # - LinHMEDNN_SL_linear_hme_dnn_m650
-  # - LinHMEDNN_SL_linear_hme_dnn_m700
-  # - LinHMEDNN_SL_linear_hme_dnn_m800
-  # - LinHMEDNN_SL_linear_hme_dnn_m900
-  # - LinHMEDNN_SL_linear_hme_dnn_m1000
+  - SingleLep_DeepHME_mass
+  - SingleLep_DeepHME_mass_error
 
   # # High Level Double Lepton
-  # - DoubleLep_DeepHME_mass
-  # - DoubleLep_DeepHME_mass_error
+  - DoubleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass_error
 
-  # - LinHMEDNN_DL_linear_hme_dnn_m300
-  # - LinHMEDNN_DL_linear_hme_dnn_m400
-  # - LinHMEDNN_DL_linear_hme_dnn_m500
-  # - LinHMEDNN_DL_linear_hme_dnn_m550
-  # - LinHMEDNN_DL_linear_hme_dnn_m600
-  # - LinHMEDNN_DL_linear_hme_dnn_m650
-  # - LinHMEDNN_DL_linear_hme_dnn_m700
-  # - LinHMEDNN_DL_linear_hme_dnn_m800
-  # - LinHMEDNN_DL_linear_hme_dnn_m900
-  # - LinHMEDNN_DL_linear_hme_dnn_m1000
+  - name: DL_DNN_m300_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
 
-  # # These can be done after HistTuple
-  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p0_0p2
-  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p2_0p4
-  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p4_0p6
-  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p6_0p8
-  # - HMEinDNNBins_HME_mass_DL_DNN_M350_0p8_1p0
+  - name: DL_DNN_m400_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
 
-  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p0_0p2
-  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p2_0p4
-  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p4_0p6
-  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p6_0p8
-  # - HMEinDNNBins_HME_mass_DL_DNN_M550_0p8_1p0
+  - name: DL_DNN_m500_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
 
-  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p0_0p2
-  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p2_0p4
-  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p4_0p6
-  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p6_0p8
-  # - HMEinDNNBins_HME_mass_DL_DNN_M300_0p8_1p0
+  - name: DL_DNN_m550_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
 
-  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p0_0p2
-  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p2_0p4
-  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p4_0p6
-  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p6_0p8
-  # - HMEinDNNBins_HME_mass_DL_DNN_M600_0p8_1p0
+  - name: DL_DNN_m600_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
 
+  - name: DL_DNN_m650_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
 
-  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p0_0p2
-  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p2_0p4
-  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p4_0p6
-  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p6_0p8
-  # - HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0
+  - name: DL_DNN_m700_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
+
+  - name: DL_DNN_m800_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
+
+  - name: DL_DNN_m900_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
+
+  - name: DL_DNN_m1000_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]

@@ -1,0 +1,234 @@
+features: &id001
+  - lep1_pt
+  - lep1_phi
+  - lep1_eta
+  - lep1_mass
+  - PuppiMET_pt
+  - PuppiMET_phi
+highlevelfeatures: &id002
+  - HT
+  - dR_dibjet
+  - dPhi_jet1_jet2
+  - dPhi_MET_dibjet
+  - MT
+  - CosTheta_bb
+hmefeatures: null
+listfeatures:
+  - - centralJet_pt
+    - 0
+  - - centralJet_phi
+    - 0
+  - - centralJet_eta
+    - 0
+  - - centralJet_mass
+    - 0
+  - - centralJet_btagPNetB
+    - 0
+  - - centralJet_pt
+    - 1
+  - - centralJet_phi
+    - 1
+  - - centralJet_eta
+    - 1
+  - - centralJet_mass
+    - 1
+  - - centralJet_btagPNetB
+    - 1
+  - - centralJet_pt
+    - 2
+  - - centralJet_phi
+    - 2
+  - - centralJet_eta
+    - 2
+  - - centralJet_mass
+    - 2
+  - - centralJet_btagPNetB
+    - 2
+  - - centralJet_pt
+    - 3
+  - - centralJet_phi
+    - 3
+  - - centralJet_eta
+    - 3
+  - - centralJet_mass
+    - 3
+  - - centralJet_btagPNetB
+    - 3
+  - - SelectedFatJet_pt
+    - 0
+  - - SelectedFatJet_phi
+    - 0
+  - - SelectedFatJet_eta
+    - 0
+  - - SelectedFatJet_mass
+    - 0
+  - - SelectedFatJet_SubJet1_btagDeepB
+    - 0
+  - - SelectedFatJet_SubJet1_eta
+    - 0
+  - - SelectedFatJet_SubJet1_mass
+    - 0
+  - - SelectedFatJet_SubJet1_phi
+    - 0
+  - - SelectedFatJet_SubJet1_pt
+    - 0
+  - - SelectedFatJet_SubJet2_btagDeepB
+    - 0
+  - - SelectedFatJet_SubJet2_eta
+    - 0
+  - - SelectedFatJet_SubJet2_mass
+    - 0
+  - - SelectedFatJet_SubJet2_phi
+    - 0
+  - - SelectedFatJet_SubJet2_pt
+    - 0
+model_setup:
+  UseParametric: true
+  adv_activation: relu
+  adv_grad_factor: 0.0
+  adv_learning_rate: 0.0001
+  adv_model: false
+  adv_submodule_steps: 0
+  adv_submodule_tracker: 0
+  adv_weight_decay: null
+  apply_common_gradients: true
+  batch_compression_factor: 1
+  batch_config: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batch_config_parity1.yaml
+  class_activation: tanh
+  class_grad_factor: 1.0
+  common_activation: tanh
+  continue_model: DNN_Models/default/default.keras
+  continue_training: false
+  disco_activation: relu
+  disco_lambda_factor: 0
+  do_step2: true
+  do_training: false
+  dropout: 0.3
+  features: *id001
+  highlevelfeatures: *id002
+  hme_friend_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile1_HME_Friend.root
+  hmefeatures: null
+  input_folder: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v3/Dataset_Run3_2022/
+  learning_rate: 1.0e-05
+  listfeatures:
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 0
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 1
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 2
+    - - - centralJet_pt
+        - centralJet_phi
+        - centralJet_eta
+        - centralJet_mass
+        - centralJet_btagPNetB
+      - 3
+    - - - SelectedFatJet_pt
+        - SelectedFatJet_phi
+        - SelectedFatJet_eta
+        - SelectedFatJet_mass
+        - SelectedFatJet_SubJet1_btagDeepB
+        - SelectedFatJet_SubJet1_eta
+        - SelectedFatJet_SubJet1_mass
+        - SelectedFatJet_SubJet1_phi
+        - SelectedFatJet_SubJet1_pt
+        - SelectedFatJet_SubJet2_btagDeepB
+        - SelectedFatJet_SubJet2_eta
+        - SelectedFatJet_SubJet2_mass
+        - SelectedFatJet_SubJet2_phi
+        - SelectedFatJet_SubJet2_pt
+      - 0
+  nClasses: 5
+  n_adv_layers: 5
+  n_adv_units: 128
+  n_class_layers: 5
+  n_class_units: 128
+  n_common_layers: 10
+  n_common_units: 256
+  n_disco_layers: 5
+  n_disco_units: 256
+  n_epochs: 100
+  parametric_list: &id003
+    # - 250
+    # - 260
+    # - 270
+    # - 280
+    # - 300
+    # - 350
+    # - 450
+    # - 550
+    # - 600
+    # - 650
+    # - 700
+    # - 800
+    # - 1000
+    # - 1200
+    # - 1400
+    # - 1600
+    # - 1800
+    # - 2000
+    # - 2500
+    # - 3000
+    # - 4000
+    # - 5000
+
+    # XtoYH has different mass points
+    - 300
+    - 400
+    - 500
+    - 550
+    - 600
+    - 650
+    - 700
+    - 800
+    - 900
+    - 1000
+  patience: 100
+  test_batch_config: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batch_config_parity2.yaml
+  test_hme_friend_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile2_HME_Friend.root
+  test_training_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile2.root
+  test_weight_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/weightfile2.root
+  training_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile1.root
+  training_name: DNN_SingleLep_Training1_par1
+  use_batch_norm: true
+  validation_batch_config: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batch_config_parity3.yaml
+  validation_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile3.root
+  validation_hme_friend_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile3_HME_Friend.root
+  validation_weight_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/weightfile3.root
+  weight_decay: null
+  weight_file: /eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/weightfile1.root
+modelname_parity:
+  - - ResHH_Classifier_parity0
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 0)
+  - - ResHH_Classifier_parity1
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 1)
+  - - ResHH_Classifier_parity2
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 2)
+  - - ResHH_Classifier_parity3
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 3)
+class_names:
+  - Signal
+  - TT
+  - DY
+  - ST
+  - WJets
+nClasses: 5
+nParity: 4
+parametric_list: *id003
+use_parametric: true
