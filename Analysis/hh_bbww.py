@@ -203,16 +203,32 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
         for var in bjet_vars:
-            self.df = self.df.Define(f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0")
-            self.df = self.df.Define(f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0")
+            self.df = self.df.Define(
+                f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0"
+            )
+            self.df = self.df.Define(
+                f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0"
+            )
 
         wjet_vars = ["pt", "phi", "eta", "mass"]
         for var in wjet_vars:
 
-            self.df = self.df.Define(f"wjet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0")
-            self.df = self.df.Define(f"wjet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0")
+            self.df = self.df.Define(
+                f"wjet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0"
+            )
+            self.df = self.df.Define(
+                f"wjet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0"
+            )
 
-        fatjet_vars = ["pt", "phi", "eta", "mass", "particleNet_XbbVsQCD", "particleNetWithMass_HbbvsQCD", "hadronFlavour"]
+        fatjet_vars = [
+            "pt",
+            "phi",
+            "eta",
+            "mass",
+            "particleNet_XbbVsQCD",
+            "particleNetWithMass_HbbvsQCD",
+            "hadronFlavour",
+        ]
         for var in fatjet_vars:
             self.df = self.df.Define(
                 f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
