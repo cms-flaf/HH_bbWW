@@ -24,3 +24,9 @@ TestModel:
   name: "Test model for CI"
   signals: # WARNING: for 2024 no signal sample available, using a file from bbtt signals..
     - custom_CI
+
+TestModel_Data:
+  name: "Test model for CI -- Data"
+  signals: []
+  data:
+    - TestData
