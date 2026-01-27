@@ -16,7 +16,7 @@ Current version `v2601`
 1. Define `config/user_custom.yaml` file as following:
    ```yaml
    fs_default: T3_CH_CERNBOX:/store/user/YOUR_CERN_USER_NAME/HH_bbWW/
-   fs_anaTuple: T3_US_FNALLPC:/store/group/cmsflaf/HH_bbWW/
+   fs_anaTuple: T3_US_FNALLPC:/store/group/lpcflaf/HH_bbWW/
 
    analysis_config_area: config
    compute_unc_variations: true
