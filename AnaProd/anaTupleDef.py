@@ -389,14 +389,10 @@ def addAllVariables(
             f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_isValid, SelectedFatJet_idxSorted)",
         )
         for subJetVar in subjet_obs:
-            if (
-                f"tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}"
-                in dfw.df.GetColumnNames()
-            ):
-                dfw.DefineAndAppend(
-                    f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}",
-                    f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}, SelectedFatJet_idxSorted)",
-                )
+            dfw.DefineAndAppend(
+                f"SelectedFatJet_SubJet{subJetIdx}_{subJetVar}",
+                f"Take(tmp_SelectedFatJet_SubJet{subJetIdx}_{subJetVar}, SelectedFatJet_idxSorted)",
+            )
 
     met_type = global_params["met_type"]
     dfw.DefineAndAppend(
