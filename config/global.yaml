@@ -17,6 +17,11 @@ corrections:
     stage: HistTuple
     mode: SF
   ele: { stage: HistTuple }
+  fatjet:
+    stage: HistTuple # AnaTuple
+    ana: bbWW
+    tagger: particleNetWithMass_HbbvsQCD
+    fatJetName: fatbjet # SelectedFatJet
   muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
   MC_Lumi_pu: { stage: AnaTuple }
@@ -362,11 +367,11 @@ variables:
   - bjet2_mass
   - bjet2_btagPNetB
 
-  - fatbjet1_pt
-  - fatbjet1_eta
-  - fatbjet1_phi
-  - fatbjet1_mass
-  - fatbjet1_XbbVsQCD
+  - fatbjet_pt
+  - fatbjet_eta
+  - fatbjet_phi
+  - fatbjet_mass
+  - fatbjet_XbbVsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
@@ -392,11 +397,11 @@ variables:
   - lep2_Electron_pfRelIso03_all
   - mT_fix
 
-  # # High Level Single Lepton
+  # High Level Single Lepton
   - SingleLep_DeepHME_mass
   - SingleLep_DeepHME_mass_error
 
-  # # High Level Double Lepton
+  # High Level Double Lepton
   - DoubleLep_DeepHME_mass
   - DoubleLep_DeepHME_mass_error
 
@@ -429,3 +434,33 @@ variables:
 
   - name: DL_DNN_m1000_vs_HME
     vars: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m300_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M300_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m400_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M400_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m500_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M500_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m550_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M550_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m600_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M600_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m650_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M650_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m700_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M700_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m800_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M800_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m900_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M900_Signal, SingleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m1000_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M1000_Signal, SingleLep_DeepHME_mass ]

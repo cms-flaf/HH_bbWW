@@ -186,11 +186,12 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )",
         )
 
-    def defineJetSelections(self):
+    def defineJetSelections(self, isData):
         self.df = self.df.Define("Njets", "centralJet_pt.size()")
         self.df = self.df.Define("jet1_isvalid", "Njets > 0")
         self.df = self.df.Define("jet2_isvalid", "Njets > 1")
         self.df = self.df.Define("fatjet_isvalid", "SelectedFatJet_pt.size() > 0")
+        self.df = self.df.Define("fatbjet_isValid", "fatjet_isvalid")
         self.df = self.df.Define(
             "fatsubjet1_isvalid",
             "(SelectedFatJet_SubJet1_isValid == 1  && SelectedFatJet_SubJet1_pt > 20 && abs(SelectedFatJet_SubJet1_eta) < 2.5)",
@@ -200,54 +201,44 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
         )
 
-        self.df = self.df.Define("bjet1_pt", "centralJet_pt[0]")
-        self.df = self.df.Define("bjet1_phi", "centralJet_phi[0]")
-        self.df = self.df.Define("bjet1_eta", "centralJet_eta[0]")
-        self.df = self.df.Define("bjet1_mass", "centralJet_mass[0]")
-        self.df = self.df.Define(
-            "bjet1_btagPNetB", "jet1_isvalid ? centralJet_btagPNetB[0] : -1.0"
-        )
-        self.df = self.df.Define(
-            "bjet1_idbtagPNetB", "jet1_isvalid ? centralJet_idbtagPNetB[0] : -1.0"
-        )
+        bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
+        for var in bjet_vars:
+            self.df = self.df.Define(
+                f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0"
+            )
+            self.df = self.df.Define(
+                f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0"
+            )
 
-        self.df = self.df.Define("bjet2_pt", "centralJet_pt[1]")
-        self.df = self.df.Define("bjet2_phi", "centralJet_phi[1]")
-        self.df = self.df.Define("bjet2_eta", "centralJet_eta[1]")
-        self.df = self.df.Define("bjet2_mass", "centralJet_mass[1]")
-        self.df = self.df.Define(
-            "bjet2_btagPNetB", "jet2_isvalid ? centralJet_btagPNetB[1] : -1.0"
-        )
-        self.df = self.df.Define(
-            "bjet2_idbtagPNetB", "jet2_isvalid ? centralJet_idbtagPNetB[1] : -1.0"
-        )
+        wjet_vars = ["pt", "phi", "eta", "mass"]
+        for var in wjet_vars:
 
-        self.df = self.df.Define("wjet1_pt", "Njets > 2 ? centralJet_pt[2] : -10.0")
-        self.df = self.df.Define("wjet1_phi", "Njets > 2 ? centralJet_phi[2] : -10.0")
-        self.df = self.df.Define("wjet1_eta", "Njets > 2 ? centralJet_eta[2] : -10.0")
-        self.df = self.df.Define("wjet1_mass", "Njets > 2 ? centralJet_mass[2] : -10.0")
+            self.df = self.df.Define(
+                f"wjet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0"
+            )
+            self.df = self.df.Define(
+                f"wjet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0"
+            )
 
-        self.df = self.df.Define("wjet2_pt", "Njets > 3 ? centralJet_pt[3] : -10.0")
-        self.df = self.df.Define("wjet2_phi", "Njets > 3 ? centralJet_phi[3] : -10.0")
-        self.df = self.df.Define("wjet2_eta", "Njets > 3 ? centralJet_eta[3] : -10.0")
-        self.df = self.df.Define("wjet2_mass", "Njets > 3 ? centralJet_mass[3] : -10.0")
-
-        self.df = self.df.Define(
-            "fatbjet1_pt", "fatjet_isvalid ? SelectedFatJet_pt[0] : -10.0"
-        )
-        self.df = self.df.Define(
-            "fatbjet1_phi", "fatjet_isvalid ? SelectedFatJet_phi[0] : -10.0"
-        )
-        self.df = self.df.Define(
-            "fatbjet1_eta", "fatjet_isvalid ? SelectedFatJet_eta[0] : -10.0"
-        )
-        self.df = self.df.Define(
-            "fatbjet1_mass", "fatjet_isvalid ? SelectedFatJet_mass[0] : -10.0"
-        )
-        self.df = self.df.Define(
-            "fatbjet1_XbbVsQCD",
-            "fatjet_isvalid ? SelectedFatJet_particleNet_XbbVsQCD[0] : -10.0",
-        )
+        fatjet_vars = [
+            "pt",
+            "phi",
+            "eta",
+            "mass",
+            "particleNet_XbbVsQCD",
+            "particleNetWithMass_HbbvsQCD",
+        ]
+        fatjet_mc_vars = ["hadronFlavour"]
+        for var in fatjet_vars:
+            self.df = self.df.Define(
+                f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
+            )
+        if not isData:
+            for var in fatjet_mc_vars:
+                self.df = self.df.Define(
+                    f"fatbjet_{var}",
+                    f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
+                )
 
         self.df = self.df.Define(
             "bsubjet1_btagDeepB",
@@ -525,12 +516,12 @@ def AddDNNVariables(df):
     return df
 
 
-def PrepareDfForHistograms(dfForHistograms):
+def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
-    dfForHistograms.defineJetSelections()
+    dfForHistograms.defineJetSelections(isData)
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
