@@ -489,6 +489,15 @@ custom_CI_Background:
   datasets:
     - TTto2L2Nu
 
+<<<<<<< HEAD
+=======
+custom_CI_Background:
+  name: "CI -- Background"
+  color: "kGreen-3"
+  datasets:
+    - TTto2L2Nu
+
+>>>>>>> 73681136db5af3cdc548076728b63660ae1c14ad
 custom_CI_Signal:
   name: "CI -- Signal"
   color: "kBlack"

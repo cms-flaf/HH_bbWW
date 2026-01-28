@@ -363,6 +363,7 @@ def addAllVariables(
             f"SelectedFatJet_{fatjetVar}",
             f"Take(tmp_SelectedFatJet_{fatjetVar}, SelectedFatJet_idxSorted)",
         )
+    dfw.Define("SelectedFatJet_isValid", "RVecB (SelectedFatJet_pt.size(), true)")
     subjet_obs = []
     subjet_obs.extend(SubJetObservables)
     if not isData:

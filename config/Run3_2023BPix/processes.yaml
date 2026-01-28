@@ -289,6 +289,11 @@ QCD_PT:
     - QCD_PT_2400to3200
     - QCD_PT_3200
 
+custom_CI_Background:
+  name: "CI -- Background"
+  color: "kGreen-3"
+  datasets:
+    - TTto2L2Nu
 
 custom_CI_Background:
   name: "CI -- Background"

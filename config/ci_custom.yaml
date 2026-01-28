@@ -6,6 +6,10 @@ compute_unc_variations: true
 compute_unc_histograms: true
 store_noncentral: true
 phys_model: TestModel
+
+QCDRegions:
+  - OS_Iso
+
 variables:
   - lep1_pt
   - SingleLep_DeepHME_mass
@@ -16,3 +20,9 @@ variables:
   - name: lep1_pt_vs_eta
     vars: [ lep1_pt, lep1_eta ]
     plot_task: False
+
+  - name: DL_DNN_m300_vs_HME
+    vars: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
+
+  - name: SL_DNN_m300_vs_HME
+    vars: [ DNNParametric_SL_NoHME_M300_Signal, SingleLep_DeepHME_mass ]
