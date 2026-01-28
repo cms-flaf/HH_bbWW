@@ -18,10 +18,10 @@ corrections:
     mode: SF
   ele: { stage: HistTuple }
   fatjet:
-    stage: HistTuple
+    stage: HistTuple # AnaTuple
     ana: bbWW
     tagger: particleNetWithMass_HbbvsQCD
-    fatJetName: fatbjet
+    fatJetName: fatbjet # SelectedFatJet
   muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
   MC_Lumi_pu: { stage: AnaTuple }
@@ -291,13 +291,13 @@ categories:
 
 QCDRegions:
   - OS_Iso
-  # - SS_Iso
-  # - OS_AntiIso
-  # - SS_AntiIso
-  # - ZVeto_OS_Iso
-  # - ZPeak_OS_Iso
-  # - mbbCR_Tight
-  # - mbbCR_AntiTight
+  - SS_Iso
+  - OS_AntiIso
+  - SS_AntiIso
+  - ZVeto_OS_Iso
+  - ZPeak_OS_Iso
+  - mbbCR_Tight
+  - mbbCR_AntiTight
 
 boosted_categories: [ ]
 
@@ -367,11 +367,11 @@ variables:
   - bjet2_mass
   - bjet2_btagPNetB
 
-  - fatbjet1_pt
-  - fatbjet1_eta
-  - fatbjet1_phi
-  - fatbjet1_mass
-  - fatbjet1_XbbVsQCD
+  - fatbjet_pt
+  - fatbjet_eta
+  - fatbjet_phi
+  - fatbjet_mass
+  - fatbjet_XbbVsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
