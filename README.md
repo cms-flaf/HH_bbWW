@@ -6,7 +6,7 @@ Current version `v2601`
 
 1. Clone repository
    ```bash
-   git clone -b v2601 --recursive git@github.com:cms-flaf/HH_bbWW.git
+   git clone -b v2601a --recursive git@github.com:cms-flaf/HH_bbWW.git
    cd HH_bbWW
    git lfs pull
    source $PWD/env.sh
@@ -15,8 +15,8 @@ Current version `v2601`
 
 1. Define `config/user_custom.yaml` file as following:
    ```yaml
-   fs_default: T3_CH_CERNBOX:/store/user/YOUR_CERN_USER_NAME/HH_bbWW/
-   fs_anaTuple: T3_US_FNALLPC:/store/group/lpcflaf/HH_bbWW/
+   fs_default: T3_CH_CERNBOX:/store/user/YOUR_USER_NAME/HH_bbWW/
+   fs_anaTuple: T3_US_FNALLPC:/store/user/lpcflaf/HH_bbWW/
 
    analysis_config_area: config
    compute_unc_variations: true
@@ -38,5 +38,5 @@ Current version `v2601`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2601 --period ERA
+   law run AnaTupleMergeTask --version v2601a --period ERA
    ```
