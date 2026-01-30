@@ -7,7 +7,7 @@ batch_dict:
 
 storage_folder: /eos/user/d/daebi/bbWW/anaTuples/shared/Run3_2022/
 
-selection_branches: [ 'lep1_type', 'lep2_type', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt' ]
+selection_branches: [ 'lep1_type', 'lep2_type', 'weight_base', 'event', 'centralJet_pt' ]
 
 # Cuts for uproot
 selection_cut: (tree['lep1_type'] > 0) & (tree['lep2_type'] > 0) & (ak.count(tree['centralJet_pt'], axis=1) > 1)

@@ -6,7 +6,7 @@ meta_data:
   selection_branches:
     - lep1_type
     - lep2_type
-    - weight_MC_Lumi_pu
+    - weight_base
     - event
   selection_cut: (tree['lep1_type'] >= 0) & (tree['lep2_type'] >= 0) & (tree['event']%4
     == 1)

@@ -18,7 +18,7 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
         "X_mass",
         "centralJet_hadronFlavour",
         "SelectedFatJet_hadronFlavour",
-        "weight_MC_Lumi_pu",
+        "weight_base",
         "centralJet_pt",
         "SelectedFatJet_pt",
     ]
@@ -52,9 +52,9 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
 
     # Initialize the two branches, class weight and adv weight
     # Starting from their genWeight (includes XS and such)
-    class_weight = branches["weight_MC_Lumi_pu"]
-    adv_weight = branches["weight_MC_Lumi_pu"]
-    flat_jetpt_weight = branches["weight_MC_Lumi_pu"]
+    class_weight = branches["weight_base"]
+    adv_weight = branches["weight_base"]
+    flat_jetpt_weight = branches["weight_base"]
 
     # Flatten jet1:jet2 pt spectrum for resolved jets, and flatten fatjet pt spectrum for boosted jets
     # Doing this to avoid the DNN learning mbb

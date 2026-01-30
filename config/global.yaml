@@ -24,8 +24,15 @@ corrections:
     fatJetName: fatbjet # SelectedFatJet
   muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
-  MC_Lumi_pu: { stage: AnaTuple }
-  pu: { stages: [ AnaCache, AnaTuple ] }
+  lumi: { stage: AnaTuple }
+  xs: { stage: AnaTuple }
+  gen: { stage: AnaTuple }
+  pu:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
+  base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
     stage: AnaTuple
