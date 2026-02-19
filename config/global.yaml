@@ -3,6 +3,18 @@ histTupleDef: Analysis/histTupleDef.py
 analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
+
+WLCGFileSystem:
+  remotePathCacheHost: cms-flaf.cern.ch
+  remotePathCachePort: 5000
+  localPathCacheValidity: 600
+  verbose: 0
+
+nEventsPerFile:
+  data: 1000000
+  signals: 100000
+  backgrounds: 100000
+
 corrections:
   mu:
     stage: HistTuple
@@ -58,7 +70,6 @@ muIsoWP: "Loose"
 treeName: "Events"
 
 nPbPerFile: 2_000  # 2fb-1 per split data file
-nEventsPerFile: 100_000  # 100k events per MC file
 
 payload_producers:
   SingleLepHME:
