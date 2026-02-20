@@ -317,6 +317,10 @@ QCDRegions:
   - mbbCR_Tight
   - mbbCR_AntiTight
 
+histTuple_selectors:
+  - QCDRegions
+  - categories
+
 boosted_categories: [ ]
 
 
