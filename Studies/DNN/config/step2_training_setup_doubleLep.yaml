@@ -32,7 +32,7 @@ highlevelfeatures:
   - MT2_blbl
   - ll_mass
   - CosTheta_bb
-hmefeatures: []
+hmefeatures: [ ]
 input_folder: /eos/user/d/daebi/DNN_Training_Datasets/DoubleLepton_v3/Dataset_Run3_2022/
 learning_rate: 0.001
 listfeatures:

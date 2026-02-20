@@ -37,9 +37,9 @@ background:
   TT:
     class_value: 1
     background_datasets: # If there is an extension, just add more to the list
-      TTto2L2Nu: []
-      TTto4Q: []
-      TTtoLNu2Q: []
+      TTto2L2Nu: [ ]
+      TTto4Q: [ ]
+      TTtoLNu2Q: [ ]
 
   W:
     class_value: 2
@@ -57,7 +57,7 @@ background:
 
       TWminusto2L2Nu: [ ]
       TWminustoLNu2Q: [ ]
-      TWminustoLNu2Q: [ ]
+      TWminusto4Q: [ ]
 
   Other:
     class_value: 4
