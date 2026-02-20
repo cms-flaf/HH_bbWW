@@ -210,7 +210,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0"
             )
 
-        wjet_vars = ["pt", "phi", "eta", "mass"]
+        wjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
         for var in wjet_vars:
 
             self.df = self.df.Define(
