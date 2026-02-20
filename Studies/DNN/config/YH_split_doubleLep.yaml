@@ -1,0 +1,79 @@
+batch_dict:
+  XtoYHto2B2W: 100 # It is important to put signal first since signal has extra branches
+  TT: 1200
+  DY: 250
+  ST: 200
+  Other: 250
+
+
+storage_folder: /eos/uscms/store/user/lpcflaf/HH_bbWW/anaTuples/v2601a/
+
+selection_branches: [ 'lep1_legType', 'lep2_legType', 'weight_MC_Lumi_pu', 'event', 'centralJet_pt', 'SelectedFatJet_pt' ]
+
+# Cuts for uproot
+selection_cut: (tree['lep1_legType'] > 0) & (tree['lep2_legType'] > 0) & ( (ak.count(tree['centralJet_pt'], axis=1) > 1) | (ak.count(tree['SelectedFatJet_pt'], axis=1) > 0) )
+parity_func: (tree['event']%{nParity} == {parity_scan})
+
+nParity: 4
+
+# Cuts for RDF in creating the training file
+iterate_cut: (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size() > 0) ) && (event%{nParity} == {parity_scan})
+
+
+signal:
+  XtoYHto2B2W:
+    class_value: 0
+    spin: 0
+    mass_points: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 3500, 4000 ]
+    dataset_name_format:
+      XtoYHto2B2Wto2B2L2Nu_MX_{}_MY_125
+    combined_name:
+      XtoYHto2B2Wto2B2L2Nu_Combined
+    use_combined:
+      True
+
+
+background:
+  TT:
+    class_value: 1
+    background_datasets: # If there is an extension, just add more to the list
+      TTto2L2Nu: [ ]
+      # TTto4Q: [ ]
+      TTtoLNu2Q: [ ]
+  DY:
+    class_value: 2
+    background_datasets:
+      DYto2E_M_10to50_amcatnloFXFX: [ ]
+      # DYto2E_M_50_0J_amcatnloFXFX: [ ]
+      DYto2E_M_50_1J_amcatnloFXFX: [ ]
+      DYto2E_M_50_2J_amcatnloFXFX: [ ]
+
+      DYto2Mu_M_10to50_amcatnloFXFX: [ ]
+      # DYto2Mu_M_50_0J_amcatnloFXFX: [ ]
+      DYto2Mu_M_50_1J_amcatnloFXFX: [ ]
+      DYto2Mu_M_50_2J_amcatnloFXFX: [ ]
+
+      # DYto2Tau_M_50_0J_amcatnloFXFX: [ ]
+      DYto2Tau_M_50_1J_amcatnloFXFX: [ ]
+      DYto2Tau_M_50_2J_amcatnloFXFX: [ ]
+
+  ST:
+    class_value: 3
+    background_datasets:
+      TbarWplusto2L2Nu: [ ]
+      TbarWplustoLNu2Q: [ ]
+      TbarWplusto4Q: [ ]
+
+      TWminusto2L2Nu: [ ]
+      TWminustoLNu2Q: [ ]
+      TWminusto4Q: [ ]
+
+  Other:
+    class_value: 4
+    background_datasets:
+      WW: [ ]
+      WZ: [ ]
+
+      # WtoLNu_0J_amcatnloFXFX: [ ]
+      # WtoLNu_1J_amcatnloFXFX: [ ]
+      # WtoLNu_2J_amcatnloFXFX: [ ]

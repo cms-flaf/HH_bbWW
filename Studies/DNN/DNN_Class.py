@@ -2516,3 +2516,231 @@ def validate_disco_dnn(
         # canvas.Paint()
 
         canvas.Close()
+
+
+def train_step2(
+    setup,
+    training_file,
+    weight_file,
+    config_dict,
+    test_training_file,
+    test_weight_file,
+    test_config_dict,
+    output_folder,
+    hme_friend_file=None,
+    test_hme_friend_file=None,
+):
+    batch_size = config_dict["meta_data"]["batch_dict"]["batch_size"]
+    test_batch_size = test_config_dict["meta_data"]["batch_dict"]["batch_size"]
+
+    output_dnn_name = output_folder
+
+    dw = DataWrapper()
+    dw.AddInputFeatures(setup["features"])
+    if setup["listfeatures"] != None:
+        for list_feature in setup["listfeatures"]:
+            dw.AddInputFeaturesList(*list_feature)
+    if setup["highlevelfeatures"] != None:
+        dw.AddHighLevelFeatures(setup["highlevelfeatures"])
+    if setup["hmefeatures"] != None:
+        dw.AddHMEFeatures(setup["hmefeatures"])
+
+    dw.UseParametric(setup["UseParametric"])
+    dw.SetParamList(setup["parametric_list"])
+
+    dw.SetMbbName("bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino")
+
+    # Prep a test dw
+    # Must copy before reading file so we can read the test file instead
+    test_dw = copy.deepcopy(dw)
+
+    entry_start = 0
+    # entry_stop = batch_size * 500 # Only load 500 batches for debuging now
+
+    # Do you want to make a larger batch? May increase speed
+    entry_stop = None
+
+    dw.ReadFile(
+        training_file,
+        entry_start=entry_start,
+        entry_stop=entry_stop,
+        hme_friend_file=hme_friend_file,
+    )
+    dw.ReadWeightFile(weight_file, entry_start=entry_start, entry_stop=entry_stop)
+    print(config_dict)
+    # dw.DefineTrainTestSet(batch_size, 0.0)
+
+    test_dw.ReadFile(
+        test_training_file,
+        entry_start=entry_start,
+        entry_stop=entry_stop,
+        hme_friend_file=test_hme_friend_file,
+    )
+    test_dw.ReadWeightFile(
+        test_weight_file, entry_start=entry_start, entry_stop=entry_stop
+    )
+    # dw_val.DefineTrainTestSet(val_batch_size, 0.0)
+
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+    os.environ["TF_DETERMINISTIC_OPS"] = "1"
+    tf.random.set_seed(42)
+
+    # Disco Dataset
+    nClasses = setup["nClasses"]
+    # For step 2, force a binary class target, replace anything >= 1 with 1
+    train_tf_dataset = tf.data.Dataset.from_tensor_slices(
+        (
+            dw.features,
+            (
+                tf.one_hot(tf.where(dw.class_target >= 1, 1, 0), nClasses),
+                dw.mbb,
+                dw.class_weight,
+            ),
+        )
+    ).batch(batch_size, drop_remainder=True)
+    train_tf_dataset = train_tf_dataset.shuffle(
+        len(train_tf_dataset), reshuffle_each_iteration=True
+    )
+
+    test_tf_dataset = tf.data.Dataset.from_tensor_slices(
+        (
+            test_dw.features,
+            (
+                tf.one_hot(tf.where(test_dw.class_target >= 1, 1, 0), nClasses),
+                test_dw.mbb,
+                test_dw.class_weight,
+            ),
+        )
+    ).batch(test_batch_size, drop_remainder=True)
+    test_tf_dataset = test_tf_dataset.shuffle(
+        len(test_tf_dataset), reshuffle_each_iteration=True
+    )
+
+    @tf.function
+    def new_param_map(*x):
+        dataset = x
+        features = dataset[0]
+
+        # Need to randomize the features parametric mass
+        parametric_mass_probability = (
+            np.ones(len(dw.param_list)) * 1.0 / len(dw.param_list)
+        )
+        random_param_mass = tf.random.categorical(
+            tf.math.log([list(parametric_mass_probability)]),
+            tf.shape(features)[0],
+            dtype=tf.int64,
+        )
+
+        mass_values = tf.constant(dw.param_list)
+        mass_keys = tf.constant(np.arange(len(dw.param_list)))
+        table = tf.lookup.StaticHashTable(
+            tf.lookup.KeyValueTensorInitializer(mass_keys, mass_values),
+            default_value=-1,
+        )
+
+        actual_new_mass = table.lookup(random_param_mass)
+        actual_new_mass = tf.cast(actual_new_mass, tf.float32)
+
+        # Lastly we need to keep the signal events the correct mass
+        class_targets = dataset[1][0]
+        old_mass_mask = tf.cast(class_targets[:, 0], tf.float32)
+        new_mass_mask = tf.cast((class_targets[:, 0] == 0), tf.float32)
+
+        actual_mass = old_mass_mask * features[:, -1] + new_mass_mask * actual_new_mass
+        actual_mass = tf.transpose(actual_mass)
+
+        features = tf.concat([features[:, :-1], actual_mass], axis=-1)
+        new_dataset = (features, dataset[1])
+        return new_dataset
+
+    if setup["UseParametric"]:
+        train_tf_dataset = train_tf_dataset.map(new_param_map)
+        test_tf_dataset = test_tf_dataset.map(new_param_map)
+
+    input_shape = [None, dw.features.shape[1]]
+    input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
+
+    # DiscoModel
+    model = DiscoModel(setup)
+    model.compile(
+        loss=None,
+        optimizer=tf.keras.optimizers.Nadam(
+            learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"]
+        ),
+    )
+    model(dw.features)
+    model.summary()
+
+    callbacks = [
+        ModelCheckpoint(
+            output_dnn_name,
+            verbose=1,
+            monitor="val_class_loss",
+            mode="min",
+            min_rel_delta=1e-3,
+            patience=100,
+            save_callback=None,
+            input_signature=input_signature,
+        ),
+    ]
+
+    verbose = setup["verbose"] if "verbose" in setup else 0
+    print("Fit model")
+    history = model.fit(
+        train_tf_dataset,
+        validation_data=test_tf_dataset,
+        verbose=verbose,
+        epochs=setup["n_epochs"],
+        shuffle=False,
+        callbacks=callbacks,
+    )
+
+    def PlotMetric(history, metric, output_folder):
+        if metric not in history.history:
+            print(f"Metric {metric} not found in history")
+            return
+        plt.plot(history.history[metric], label=f"train_{metric}")
+        plt.plot(history.history[f"val_{metric}"], label=f"val_{metric}")
+        plt.title(f"{metric}")
+        plt.ylabel(metric)
+        plt.xlabel("Epoch")
+        plt.legend(loc="upper right")
+        plt.grid(True)
+        plt.savefig(os.path.join(output_folder, f"{metric}.pdf"), bbox_inches="tight")
+        plt.clf()
+
+    PlotMetric(history, "class_loss", output_folder)
+
+    PlotMetric(history, "class_min", output_folder)
+
+    PlotMetric(history, "class_max", output_folder)
+
+    PlotMetric(history, "disco_loss", output_folder)
+
+    PlotMetric(history, "combined_loss", output_folder)
+
+    # model.save(f"{output_dnn_name}.keras") # Don't save all keras, its a waste of space
+
+    input_shape = [None, dw.features.shape[1]]
+    input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
+    onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=13)
+    onnx.save(onnx_model, f"{output_dnn_name}.onnx")
+
+    modelname_parity = [output_dnn_name, config_dict["meta_data"]["iterate_cut"]]
+    features_config = {
+        "features": dw.feature_names,
+        "listfeatures": dw.listfeature_names,
+        "highlevelfeatures": dw.highlevelfeatures_names,
+        "hmefeatures": dw.hmefriendfeatures_names,
+        "use_parametric": dw.use_parametric,
+        "modelname_parity": modelname_parity,
+        "parametric_list": dw.param_list,
+        "model_setup": setup,
+        "nClasses": setup["nClasses"],
+        "nParity": 4,
+    }
+
+    with open(os.path.join(output_folder, "dnn_config.yaml"), "w") as file:
+        yaml.dump(features_config, file)
+
+    return
