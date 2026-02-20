@@ -369,28 +369,28 @@ histTuple_fullResolution_variables:
   - lep2_phi
   - lep2_mass
 
-  - bjet1_pt 
+  - bjet1_pt
   - bjet1_phi
-  - bjet1_eta 
-  - bjet1_mass 
+  - bjet1_eta
+  - bjet1_mass
   - bjet1_btagPNetB
 
-  - bjet2_pt 
+  - bjet2_pt
   - bjet2_phi
-  - bjet2_eta 
-  - bjet2_mass 
+  - bjet2_eta
+  - bjet2_mass
   - bjet2_btagPNetB
 
-  - wjet1_pt 
+  - wjet1_pt
   - wjet1_phi
-  - wjet1_eta 
-  - wjet1_mass 
+  - wjet1_eta
+  - wjet1_mass
   - wjet1_btagPNetB
 
   - wjet2_pt
   - wjet2_phi
-  - wjet2_eta 
-  - wjet2_mass 
+  - wjet2_eta
+  - wjet2_mass
   - wjet2_btagPNetB
 
   - fatbjet_pt
