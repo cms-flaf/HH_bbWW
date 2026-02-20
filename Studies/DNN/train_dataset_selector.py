@@ -138,7 +138,7 @@ def create_dict(config_dict, output_folder):
                     process_dict[signal_name][dataset_name]["total_cut"] += int(
                         np.sum(eval(total_cut))
                     )
-                    eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                    eval_string = f"float(np.sum(tree[{total_cut}].weight_base))"
                     process_dict[signal_name][dataset_name]["weight_cut"] += eval(
                         eval_string
                     )
@@ -187,7 +187,7 @@ def create_dict(config_dict, output_folder):
                                 np.sum(eval(total_cut))
                             )
                             eval_string = (
-                                f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                                f"float(np.sum(tree[{total_cut}].weight_base))"
                             )
                             process_dict[signal_name][dataset_name][
                                 "weight_cut"
@@ -245,7 +245,7 @@ def create_dict(config_dict, output_folder):
                                 "total_cut"
                             ] += int(np.sum(eval(total_cut)))
                             eval_string = (
-                                f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                                f"float(np.sum(tree[{total_cut}].weight_base))"
                             )
                             process_dict[background_name][dataset_name][
                                 "weight_cut"

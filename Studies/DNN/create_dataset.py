@@ -172,7 +172,7 @@ def create_dict(config_dict, output_folder, era):
                     process_dict[signal_name][dataset_name]["total_cut"] += int(
                         np.sum(eval(total_cut))
                     )
-                    eval_string = f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                    eval_string = f"float(np.sum(tree[{total_cut}].weight_base))"
                     process_dict[signal_name][dataset_name]["weight_cut"] += eval(
                         eval_string
                     )
@@ -221,7 +221,7 @@ def create_dict(config_dict, output_folder, era):
                                 np.sum(eval(total_cut))
                             )
                             eval_string = (
-                                f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                                f"float(np.sum(tree[{total_cut}].weight_base))"
                             )
                             process_dict[signal_name][dataset_name][
                                 "weight_cut"
@@ -279,7 +279,7 @@ def create_dict(config_dict, output_folder, era):
                                 "total_cut"
                             ] += int(np.sum(eval(total_cut)))
                             eval_string = (
-                                f"float(np.sum(tree[{total_cut}].weight_MC_Lumi_pu))"
+                                f"float(np.sum(tree[{total_cut}].weight_base))"
                             )
                             process_dict[background_name][dataset_name][
                                 "weight_cut"
@@ -514,7 +514,7 @@ def create_file(config_dict, output_folder, out_filename):
             for name in df_in.GetColumnNames():
                 if name.startswith("gen"):
                     continue
-                if name.startswith("weight_") and not name == "weight_MC_Lumi_pu":
+                if name.startswith("weight_") and not name == "weight_base":
                     continue
                 master_column_names_vec.push_back(name)
             master_column_types = [
@@ -527,7 +527,7 @@ def create_file(config_dict, output_folder, out_filename):
         for name in df_in.GetColumnNames():
             if name.startswith("gen"):
                 continue
-            if name.startswith("weight_") and not name == "weight_MC_Lumi_pu":
+            if name.startswith("weight_") and not name == "weight_base":
                 continue
             local_column_names_vec.push_back(name)
         local_column_types = [
@@ -720,7 +720,7 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
         "centralJet_hadronFlavour",
         "centralJet_pt",
         "SelectedFatJet_hadronFlavour",
-        "weight_MC_Lumi_pu",
+        "weight_base",
     ]
     branches = tree.arrays(branches_to_load)
 
@@ -757,8 +757,8 @@ def create_weight_file(inName, outName, bb_low=70, bb_high=150, bb_min=70, bb_ma
 
     # Initialize the two branches, class weight and adv weight
     # Starting from their genWeight (includes XS and such)
-    class_weight = branches["weight_MC_Lumi_pu"]
-    adv_weight = branches["weight_MC_Lumi_pu"]
+    class_weight = branches["weight_base"]
+    adv_weight = branches["weight_base"]
 
     # Lets just flatten the weight by bb_mass first for each sample
     for this_name in np.unique(sample_name):

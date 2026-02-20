@@ -3,6 +3,18 @@ histTupleDef: Analysis/histTupleDef.py
 analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
+
+WLCGFileSystem:
+  remotePathCacheHost: cms-flaf.cern.ch
+  remotePathCachePort: 5000
+  localPathCacheValidity: 600
+  verbose: 0
+
+nEventsPerFile:
+  data: 1000000
+  signals: 100000
+  backgrounds: 100000
+
 corrections:
   mu:
     stage: HistTuple
@@ -18,14 +30,21 @@ corrections:
     mode: SF
   ele: { stage: HistTuple }
   fatjet:
-    stage: HistTuple
+    stage: HistTuple # AnaTuple
     ana: bbWW
     tagger: particleNetWithMass_HbbvsQCD
-    fatJetName: fatbjet
+    fatJetName: fatbjet # SelectedFatJet
   muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
   eleES: { stage: AnaTuple }
-  MC_Lumi_pu: { stage: AnaTuple }
-  pu: { stages: [ AnaCache, AnaTuple ] }
+  lumi: { stage: AnaTuple }
+  xs: { stage: AnaTuple }
+  gen: { stage: AnaTuple }
+  pu:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
+  base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
     stage: AnaTuple
@@ -51,7 +70,6 @@ muIsoWP: "Loose"
 treeName: "Events"
 
 nPbPerFile: 2_000  # 2fb-1 per split data file
-nEventsPerFile: 100_000  # 100k events per MC file
 
 payload_producers:
   SingleLepHME:
@@ -367,11 +385,11 @@ variables:
   - bjet2_mass
   - bjet2_btagPNetB
 
-  - fatbjet1_pt
-  - fatbjet1_eta
-  - fatbjet1_phi
-  - fatbjet1_mass
-  - fatbjet1_XbbVsQCD
+  - fatbjet_pt
+  - fatbjet_eta
+  - fatbjet_phi
+  - fatbjet_mass
+  - fatbjet_XbbVsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
