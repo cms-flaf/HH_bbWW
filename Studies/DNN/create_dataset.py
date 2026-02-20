@@ -104,11 +104,8 @@ def create_signal_files(config_dict, output_folder, era):
             out_file.close()
 
 
-
-
 def create_signal_files_gfal(config_dict, output_folder, era):
     storage_folder = os.path.join(config_dict["storage_folder"], era)
-
 
     for signal_name in config_dict["signal"]:
         signal_dict = config_dict["signal"][signal_name]
@@ -136,20 +133,24 @@ def create_signal_files_gfal(config_dict, output_folder, era):
                 dataset_name = dataset_name_format.format(mass_point)
                 extension_list = [
                     fn.name
-                    for fn in grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{storage_folder}")
+                    for fn in grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{storage_folder}"
+                    )
                     if fn.name.startswith(f"{dataset_name}_ext")
                 ]
 
                 for ext_name in [dataset_name] + extension_list:
                     process_dir = os.path.join(storage_folder, ext_name)
-                    gfal_listdir = grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{process_dir}")
+                    gfal_listdir = grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{process_dir}"
+                    )
                     for nano_file in [
                         x.name for x in gfal_listdir if x.name.endswith(".root")
                     ]:
-                        tmp_file = os.path.join(f"root://cmseos.fnal.gov/{process_dir}", nano_file)
-                        with uproot.open(
-                            f"{tmp_file}:Events"
-                        ) as h:
+                        tmp_file = os.path.join(
+                            f"root://cmseos.fnal.gov/{process_dir}", nano_file
+                        )
+                        with uproot.open(f"{tmp_file}:Events") as h:
                             tree = h.arrays()
                             nEvents += h.num_entries
 
@@ -170,7 +171,6 @@ def create_signal_files_gfal(config_dict, output_folder, era):
 
             out_file["Events"] = new_array
             out_file.close()
-
 
 
 def create_dict(config_dict, output_folder, era):
@@ -535,8 +535,6 @@ def create_dict(config_dict, output_folder, era):
             yaml.dump(machine_yaml, outfile)
 
 
-
-
 def create_dict_gfal(config_dict, output_folder, era):
     batch_dict = config_dict["batch_dict"]
     storage_folder = os.path.join(config_dict["storage_folder"], era)
@@ -631,7 +629,9 @@ def create_dict_gfal(config_dict, output_folder, era):
 
                 extension_list = [
                     fn.name
-                    for fn in grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{storage_folder}")
+                    for fn in grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{storage_folder}"
+                    )
                     if fn.name.startswith(f"{dataset_name}_ext")
                 ]
 
@@ -643,14 +643,16 @@ def create_dict_gfal(config_dict, output_folder, era):
                     "all_extensions"
                 ]:
                     process_dir = os.path.join(storage_folder, ext_name)
-                    gfal_listdir = grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{process_dir}")
+                    gfal_listdir = grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{process_dir}"
+                    )
                     for nano_file in [
                         x.name for x in gfal_listdir if x.name.endswith(".root")
                     ]:
-                        tmp_file = os.path.join(f"root://cmseos.fnal.gov/{process_dir}", nano_file)
-                        with uproot.open(
-                            f"{tmp_file}:Events"
-                        ) as h:
+                        tmp_file = os.path.join(
+                            f"root://cmseos.fnal.gov/{process_dir}", nano_file
+                        )
+                        with uproot.open(f"{tmp_file}:Events") as h:
                             tree = h.arrays(selection_branches)
                             process_dict[signal_name][dataset_name]["total"] += int(
                                 h.num_entries
@@ -692,7 +694,9 @@ def create_dict_gfal(config_dict, output_folder, era):
 
                 extension_list = [
                     fn.name
-                    for fn in grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{storage_folder}")
+                    for fn in grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{storage_folder}"
+                    )
                     if fn.name.startswith(f"{dataset_name}_ext")
                 ]
 
@@ -704,14 +708,16 @@ def create_dict_gfal(config_dict, output_folder, era):
                     "all_extensions"
                 ]:
                     process_dir = os.path.join(storage_folder, ext_name)
-                    gfal_listdir = grid_tools.gfal_ls(f"davs://cmseos.fnal.gov:9000/{process_dir}")
+                    gfal_listdir = grid_tools.gfal_ls(
+                        f"davs://cmseos.fnal.gov:9000/{process_dir}"
+                    )
                     for nano_file in [
                         x.name for x in gfal_listdir if x.name.endswith(".root")
                     ]:
-                        tmp_file = os.path.join(f"root://cmseos.fnal.gov/{process_dir}", nano_file)
-                        with uproot.open(
-                            f"{tmp_file}:Events"
-                        ) as h:
+                        tmp_file = os.path.join(
+                            f"root://cmseos.fnal.gov/{process_dir}", nano_file
+                        )
+                        with uproot.open(f"{tmp_file}:Events") as h:
                             tree = h.arrays(selection_branches)
                             process_dict[background_name][dataset_name]["total"] += int(
                                 h.num_entries
@@ -905,8 +911,6 @@ def create_dict_gfal(config_dict, output_folder, era):
             yaml.dump(machine_yaml, outfile)
 
 
-
-
 def create_file(config_dict, output_folder, out_filename):
     print(
         f"Starting create file. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
@@ -1034,7 +1038,9 @@ def create_file(config_dict, output_folder, out_filename):
         # snapshotOptions.fOverwriteIfExists=False
         # snapshotOptions.fLazy=True
         snapshotOptions.fMode = "RECREATE"
-        snapshotOptions.fCompressionAlgorithm = getattr(ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB")
+        snapshotOptions.fCompressionAlgorithm = getattr(
+            ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB"
+        )
         snapshotOptions.fCompressionLevel = 4
         ROOT.RDF.Experimental.AddProgressBar(df_out)
         print("Going to snapshot")
@@ -1061,7 +1067,9 @@ def create_file(config_dict, output_folder, out_filename):
     # snapshotOptions.fOverwriteIfExists=False
     # snapshotOptions.fLazy=True
     snapshotOptions.fMode = "RECREATE"
-    snapshotOptions.fCompressionAlgorithm = getattr(ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB")
+    snapshotOptions.fCompressionAlgorithm = getattr(
+        ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB"
+    )
     snapshotOptions.fCompressionLevel = 4
     ROOT.RDF.Experimental.AddProgressBar(df_out)
     print("Going to snapshot")
@@ -1102,9 +1110,6 @@ def create_file(config_dict, output_folder, out_filename):
     os.system(f"rm {tmp_filename}")
 
 
-
-
-
 def create_file_gfal(config_dict, output_folder, out_filename):
     print(
         f"Starting create file. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
@@ -1128,7 +1133,14 @@ def create_file_gfal(config_dict, output_folder, out_filename):
     # Assume master(signal) is saved first and use idx==0 entry to fill
 
     for process in config_dict["processes"]:
-        process_filelist = [f"root://cmseos.fnal.gov/{x}/*.root" if x.startswith("/eos/") else f"{x}/*.root" for x in process["datasets"]]
+        process_filelist = [
+            (
+                f"root://cmseos.fnal.gov/{x}/*.root"
+                if x.startswith("/eos/")
+                else f"{x}/*.root"
+            )
+            for x in process["datasets"]
+        ]
         print("Process filelist is ", process_filelist)
 
         tmp_filename = os.path.join(output_folder, f"tmp{step_idx}.root")
@@ -1233,7 +1245,9 @@ def create_file_gfal(config_dict, output_folder, out_filename):
         # snapshotOptions.fOverwriteIfExists=False
         # snapshotOptions.fLazy=True
         snapshotOptions.fMode = "RECREATE"
-        snapshotOptions.fCompressionAlgorithm = getattr(ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB")
+        snapshotOptions.fCompressionAlgorithm = getattr(
+            ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB"
+        )
         snapshotOptions.fCompressionLevel = 4
         ROOT.RDF.Experimental.AddProgressBar(df_out)
         print("Going to snapshot")
@@ -1260,7 +1274,9 @@ def create_file_gfal(config_dict, output_folder, out_filename):
     # snapshotOptions.fOverwriteIfExists=False
     # snapshotOptions.fLazy=True
     snapshotOptions.fMode = "RECREATE"
-    snapshotOptions.fCompressionAlgorithm = getattr(ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB")
+    snapshotOptions.fCompressionAlgorithm = getattr(
+        ROOT.ROOT.RCompressionSetting.EAlgorithm, "k" + "ZLIB"
+    )
     snapshotOptions.fCompressionLevel = 4
     ROOT.RDF.Experimental.AddProgressBar(df_out)
     print("Going to snapshot")
@@ -1299,8 +1315,6 @@ def create_file_gfal(config_dict, output_folder, out_filename):
 
     os.system(f"mv {tmpnext_filename} {out_filename}")
     os.system(f"rm {tmp_filename}")
-
-
 
 
 def add_HME(config_dict, output_folder, input_filename, out_filename):
@@ -1355,19 +1369,27 @@ def add_DNN(config_dict, output_folder, input_filename, out_filename):
     with open(os.path.join(ana_path, "config/global.yaml")) as f:
         global_cfg_dict = yaml.safe_load(f)
 
-    Single_producer_config = global_cfg_dict["payload_producers"]["DNNParametric_SL_NoHME"]
+    Single_producer_config = global_cfg_dict["payload_producers"][
+        "DNNParametric_SL_NoHME"
+    ]
     Single_producers_module_name = Single_producer_config["producers_module_name"]
     Single_producer_name = Single_producer_config["producer_name"]
     Single_producers_module = importlib.import_module(Single_producers_module_name)
     Single_producer_class = getattr(Single_producers_module, Single_producer_name)
-    Single_producer = Single_producer_class(Single_producer_config, "DNNParametric_SL_NoHME")
+    Single_producer = Single_producer_class(
+        Single_producer_config, "DNNParametric_SL_NoHME"
+    )
 
-    Double_producer_config = global_cfg_dict["payload_producers"]["DNNParametric_DL_NoHME"]
+    Double_producer_config = global_cfg_dict["payload_producers"][
+        "DNNParametric_DL_NoHME"
+    ]
     Double_producers_module_name = Double_producer_config["producers_module_name"]
     Double_producer_name = Double_producer_config["producer_name"]
     Double_producers_module = importlib.import_module(Double_producers_module_name)
     Double_producer_class = getattr(Double_producers_module, Double_producer_name)
-    Double_producer = Double_producer_class(Double_producer_config, "DNNParametric_DL_NoHME")
+    Double_producer = Double_producer_class(
+        Double_producer_config, "DNNParametric_DL_NoHME"
+    )
 
     final_array = None
     uproot_stepsize = Single_producer_config.get("uproot_stepsize", "100MB")
@@ -1395,29 +1417,33 @@ def add_DNN(config_dict, output_folder, input_filename, out_filename):
     print(f"Finished add payloads to {out_filename}")
 
 
-
-
-
-
 def add_DNN(config_dict, output_folder, input_filename, out_filename):
     print(f"Starting add HME to {out_filename}")
 
     with open(os.path.join(ana_path, "config/global.yaml")) as f:
         global_cfg_dict = yaml.safe_load(f)
 
-    Single_producer_config = global_cfg_dict["payload_producers"]["DNNParametric_SL_NoHME"]
+    Single_producer_config = global_cfg_dict["payload_producers"][
+        "DNNParametric_SL_NoHME"
+    ]
     Single_producers_module_name = Single_producer_config["producers_module_name"]
     Single_producer_name = Single_producer_config["producer_name"]
     Single_producers_module = importlib.import_module(Single_producers_module_name)
     Single_producer_class = getattr(Single_producers_module, Single_producer_name)
-    Single_producer = Single_producer_class(Single_producer_config, "DNNParametric_SL_NoHME")
+    Single_producer = Single_producer_class(
+        Single_producer_config, "DNNParametric_SL_NoHME"
+    )
 
-    Double_producer_config = global_cfg_dict["payload_producers"]["DNNParametric_DL_NoHME"]
+    Double_producer_config = global_cfg_dict["payload_producers"][
+        "DNNParametric_DL_NoHME"
+    ]
     Double_producers_module_name = Double_producer_config["producers_module_name"]
     Double_producer_name = Double_producer_config["producer_name"]
     Double_producers_module = importlib.import_module(Double_producers_module_name)
     Double_producer_class = getattr(Double_producers_module, Double_producer_name)
-    Double_producer = Double_producer_class(Double_producer_config, "DNNParametric_DL_NoHME")
+    Double_producer = Double_producer_class(
+        Double_producer_config, "DNNParametric_DL_NoHME"
+    )
 
     final_array = None
     uproot_stepsize = Single_producer_config.get("uproot_stepsize", "100MB")

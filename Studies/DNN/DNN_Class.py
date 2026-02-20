@@ -2518,20 +2518,6 @@ def validate_disco_dnn(
         canvas.Close()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
 def train_step2(
     setup,
     training_file,
@@ -2605,7 +2591,11 @@ def train_step2(
     train_tf_dataset = tf.data.Dataset.from_tensor_slices(
         (
             dw.features,
-            (tf.one_hot(tf.where(dw.class_target >= 1, 1, 0), nClasses), dw.mbb, dw.class_weight),
+            (
+                tf.one_hot(tf.where(dw.class_target >= 1, 1, 0), nClasses),
+                dw.mbb,
+                dw.class_weight,
+            ),
         )
     ).batch(batch_size, drop_remainder=True)
     train_tf_dataset = train_tf_dataset.shuffle(
@@ -2754,4 +2744,3 @@ def train_step2(
         yaml.dump(features_config, file)
 
     return
-
