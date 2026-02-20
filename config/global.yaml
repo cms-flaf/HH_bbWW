@@ -358,6 +358,68 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
+histTuple_fullResolution_variables:
+  - lep1_pt
+  - lep1_eta
+  - lep1_phi
+  - lep1_mass
+
+  - lep2_pt
+  - lep2_eta
+  - lep2_phi
+  - lep2_mass
+
+  - bjet1_pt 
+  - bjet1_phi
+  - bjet1_eta 
+  - bjet1_mass 
+  - bjet1_btagPNetB
+
+  - bjet2_pt 
+  - bjet2_phi
+  - bjet2_eta 
+  - bjet2_mass 
+  - bjet2_btagPNetB
+
+  - wjet1_pt 
+  - wjet1_phi
+  - wjet1_eta 
+  - wjet1_mass 
+  - wjet1_btagPNetB
+
+  - wjet2_pt
+  - wjet2_phi
+  - wjet2_eta 
+  - wjet2_mass 
+  - wjet2_btagPNetB
+
+  - fatbjet_pt
+  - fatbjet_phi
+  - fatbjet_eta
+  - fatbjet_mass
+  - fatbjet_particleNetWithMass_HbbvsQCD
+
+  - PuppiMET_pt
+  - PuppiMET_phi
+
+  - HT
+  - dR_dilep
+  - dR_dibjet
+  - dR_dilep_dibjet
+  - dR_dilep_dijet
+  - dPhi_lep1_lep2
+  - dPhi_jet1_jet2
+  - dPhi_MET_dilep
+  - dPhi_MET_dibjet
+  - MT
+  - MT2_ll
+  - MT2_bb
+  - MT2_blbl
+  - ll_mass
+  - CosTheta_bb
+
+  - event
+
 # DNN Inputs
 variables:
   - lep1_pt
