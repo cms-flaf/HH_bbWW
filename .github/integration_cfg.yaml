@@ -20,6 +20,12 @@ variables:
   HH_bbWW_args: "--branches 0 --test 1000"
   HH_bbWW_eras: "Run3_2022 Run3_2022EE Run3_2023 Run3_2023BPix"
   TEST_TIMEOUT: "4h"
+  HH_bbWW_extra_commands:
+    "
+      cmsEnv python3 StatInference/dc_make/create_datacards.py --input /builds/cms-flaf/flaf_integration/output/HH_bbWW/CI/Hists_merged/Run3_2023BPix/ --output CI_datacard --config config/Datacards/CI_card.yaml --hist-bins config/CI_binning.json --param_values 300 &&
+      law run MergeResonantLimits --version dev --datacards 'CI_datacard/*.txt' --remove-output 3,a,y
+    "
+
 
 gitlab_url: "https://gitlab.cern.ch/api/v4/projects/210600/trigger/pipeline"
 gitlab_branch: "master"
