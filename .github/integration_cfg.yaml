@@ -22,7 +22,7 @@ variables:
   TEST_TIMEOUT: "4h"
   HH_bbWW_extra_commands:
     "
-      cmsEnv python3 StatInference/dc_make/create_datacards.py --input /builds/cms-flaf/flaf_integration/output/HH_bbWW/CI/Hists_merged/Run3_2023BPix/ --output CI_datacard --config config/Datacards/CI_card.yaml --hist-bins config/CI_binning.json --param_values 300 &&
+      cmsEnv python3 StatInference/dc_make/create_datacards.py --input /builds/cms-flaf/flaf_integration/output/HH_bbWW/CI/Hists_merged/Run3_2023BPix/ --output CI_datacard --config config/Datacards/CI_card.yaml --hist-bins config/Datacards/CI_binning.json --param_values 300 &&
       law run MergeResonantLimits --version dev --datacards 'CI_datacard/*.txt' --remove-output 3,a,y
     "
 
