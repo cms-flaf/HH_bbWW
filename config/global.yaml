@@ -383,17 +383,17 @@ histTuple_flavors:
       - bjet2_mass
       - bjet2_btagPNetB
 
-      - wjet1_pt
-      - wjet1_phi
-      - wjet1_eta
-      - wjet1_mass
-      - wjet1_btagPNetB
+      - other_jet1_pt
+      - other_jet1_phi
+      - other_jet1_eta
+      - other_jet1_mass
+      - other_jet1_btagPNetB
 
-      - wjet2_pt
-      - wjet2_phi
-      - wjet2_eta
-      - wjet2_mass
-      - wjet2_btagPNetB
+      - other_jet2_pt
+      - other_jet2_phi
+      - other_jet2_eta
+      - other_jet2_mass
+      - other_jet2_btagPNetB
 
       - fatbjet_pt
       - fatbjet_phi
@@ -429,8 +429,10 @@ histTuple_flavors:
       - DoubleLep_DeepHME_mass_error
 
       - event
-      
-    variables: []
+
+    variables:
+      - SingleLep_DeepHME_mass
+      - DoubleLep_DeepHME_mass
 
 histTuple_fullResolution_variables: []
 
