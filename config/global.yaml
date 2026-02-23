@@ -418,6 +418,14 @@ histTuple_fullResolution_variables:
   - ll_mass
   - CosTheta_bb
 
+  - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
+
+  - SingleLep_DeepHME_mass
+  - SingleLep_DeepHME_mass_error
+
+  - DoubleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass_error
+
   - event
 
 # DNN Inputs
