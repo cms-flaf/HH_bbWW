@@ -55,7 +55,7 @@ corrections:
     modes:
       AnaTuple: none # just load to define WP ID branches
       AnalysisCache: shape
-      HistTuple: shape
+      HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
 extraFormat_for_triggerMatchingAndSF:
