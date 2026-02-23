@@ -435,7 +435,7 @@ histTuple_flavors:
       - SingleLep_DeepHME_mass
       - DoubleLep_DeepHME_mass
 
-histTuple_fullResolution_variables: []
+histTuple_fullResolution_variables: [ ]
 
 # DNN Inputs
 variables:
