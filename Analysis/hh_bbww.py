@@ -132,7 +132,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.DefineAndAppend(
             "nSelBtag_fatjets",
-            f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )"
+            f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )",
         )
 
         # Test res2b -> boosted -> recovery
