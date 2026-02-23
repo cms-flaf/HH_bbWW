@@ -131,7 +131,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             f"int(bjet1_idbtagPNetB >= 1) + int(bjet2_idbtagPNetB >= 1)",  # ID 1 is loose
         )
         self.DefineAndAppend(
-            "nSelBtag_fatjets", f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )"
+            "nSelBtag_fatjets",
+            f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )"
         )
 
         # Test res2b -> boosted -> recovery
@@ -165,7 +166,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             f"resolved && nSelBtag_jets == 1",
         )
 
-
         self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
 
@@ -198,7 +198,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             """
             (HLT_singleIsoMu && lep1_legType == 2 && lep1_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep1_legType == 1 && lep1_HasMatching_singleEleWpTight) ||
             (HLT_singleIsoMu && lep2_legType == 2 && lep2_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep2_legType == 1 && lep2_HasMatching_singleEleWpTight),
-            """
+            """,
         )
         self.df = self.df.Define(
             "event_selection",
@@ -271,7 +271,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.df = self.df.Define(
             f"fatbjet_mass_PNetCorr",
-            "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100."
+            "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
         )
 
         self.df = self.df.Define(
