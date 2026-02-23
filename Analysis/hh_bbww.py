@@ -128,27 +128,43 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend(
             "nSelBtag_jets",
-            # f"int(bjet1_btagPNetB >= {self.bTagWP}) + int(bjet2_btagPNetB >= {self.bTagWP})",
-            # f"int(bjet1_btagPNetB >= {self.bTagWP_Loose}) + int(bjet2_btagPNetB >= {self.bTagWP_Loose})",
             f"int(bjet1_idbtagPNetB >= 1) + int(bjet2_idbtagPNetB >= 1)",  # ID 1 is loose
         )
         self.DefineAndAppend(
-            "nSelBtag_fatjets", f"int( SelectedFatJet_particleNet_XbbVsQCD[0] >= 0.8 )"
+            "nSelBtag_fatjets",
+            f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )",
         )
+
+        # Test res2b -> boosted -> recovery
+        # self.DefineAndAppend(
+        #     "resolved",
+        #     f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+        # )
+        # self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
+        # self.DefineAndAppend(
+        #     "boosted",
+        #     f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
+        # )  # Greater than zero, but logic should only allow 0 or 1
+        # self.DefineAndAppend(
+        #     "recovery",
+        #     f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1",
+        # )
+        # We are throwing away events with a FatJet that are not b-tagged in this method
+
+        # Test boosted -> res2b -> recovery
+        self.DefineAndAppend(
+            "boosted",
+            f"nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
+        )  # Greater than zero, but logic should only allow 0 or 1
         self.DefineAndAppend(
             "resolved",
-            f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+            f"!boosted && (DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
         )
         self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
         self.DefineAndAppend(
-            "boosted",
-            f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        )  # Greater than zero, but logic should only allow 0 or 1
-        self.DefineAndAppend(
             "recovery",
-            f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1",
+            f"resolved && nSelBtag_jets == 1",
         )
-        # We are throwing away events with a FatJet that are not b-tagged in this method
 
         self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
@@ -179,7 +195,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             "Single_lep_trg",
-            "(HLT_singleIsoMu && lep1_legType == 2 && lep1_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep1_legType == 1 && lep1_HasMatching_singleEleWpTight) ",
+            """
+            (HLT_singleIsoMu && lep1_legType == 2 && lep1_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep1_legType == 1 && lep1_HasMatching_singleEleWpTight) ||
+            (HLT_singleIsoMu && lep2_legType == 2 && lep2_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep2_legType == 1 && lep2_HasMatching_singleEleWpTight)
+            """,
         )
         self.df = self.df.Define(
             "event_selection",
@@ -227,6 +246,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "mass",
             "particleNet_XbbVsQCD",
             "particleNetWithMass_HbbvsQCD",
+            "msoftdrop",
+            "muEF",
+            "nConstituents",
+            "neEmEF",
+            "neHEF",
+            "neMultiplicity",
+            "tau1",
+            "tau2",
+            "tau3",
+            "tau4",
         ]
         fatjet_mc_vars = ["hadronFlavour"]
         for var in fatjet_vars:
@@ -239,6 +268,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                     f"fatbjet_{var}",
                     f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
                 )
+
+        self.df = self.df.Define(
+            f"fatbjet_mass_PNetCorr",
+            "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
+        )
 
         self.df = self.df.Define(
             "bsubjet1_btagDeepB",
