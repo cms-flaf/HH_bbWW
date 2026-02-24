@@ -6,7 +6,7 @@
 #include <typeinfo>
 #include <variant>
 
-#include "EntryQueue.h"
+#include "DNNEntryQueue.h"
 
 using RVecF = ROOT::VecOps::RVec<float>;
 using RVecI = ROOT::VecOps::RVec<int>;
@@ -26,12 +26,12 @@ namespace analysis {
                          RVecF,
                          RVecUC,
                          RVecShort>
-        MultiType;
+        DNNMultiType;
 
-    struct Entry {
-        std::vector<MultiType> var_values;
+    struct DNNEntry {
+        std::vector<DNNMultiType> var_values;
 
-        explicit Entry(size_t size) : var_values(size) {}
+        explicit DNNEntry(size_t size) : var_values(size) {}
 
         template <typename T>
         void Add(int index, const T& value) {
@@ -47,11 +47,11 @@ namespace analysis {
     };
 
     namespace detail {
-        inline void putEntry(std::shared_ptr<Entry>& entry, int index) {}
+        inline void putEntry(std::shared_ptr<DNNEntry>& entry, int index) {}
 
         template <typename T, typename... Args>
         //void putEntry(std::vector<Entry>& entries, int var_index, const T& value, Args&& ...args){
-        void putEntry(std::shared_ptr<Entry>& entry, int var_index, const T& value, Args&&... args) {
+        void putEntry(std::shared_ptr<DNNEntry>& entry, int var_index, const T& value, Args&&... args) {
             // std::cout << "Var index is " << var_index << std::endl;
             // std::cout << "And value is " << value << std::endl;
             entry->Add(var_index, value);
@@ -72,7 +72,7 @@ namespace analysis {
 
     }  // namespace detail
 
-    struct StopLoop {};
+    struct DNNStopLoop {};
 
     template <typename... Args>  //Using a template will allow us to pass the column types as a 'variable'! Trop Cool!
     struct TupleMaker {
@@ -105,7 +105,7 @@ namespace analysis {
                 "_entry",
                 [=](const Args&... args) {
                     // auto entry = std::make_shared<Entry>(local_column_names.size());
-                    auto entry = std::make_shared<Entry>(master_size);
+                    auto entry = std::make_shared<DNNEntry>(master_size);
                     int index = 0;
                     (void)std::initializer_list<int>{(entry->Add(local_to_master_map.at(index++), args), 0)...};
 
@@ -129,14 +129,14 @@ namespace analysis {
                     // }, column_names);
 
                     df.Foreach(
-                        [&](const std::shared_ptr<Entry>& entry) {
+                        [&](const std::shared_ptr<DNNEntry>& entry) {
                             if (!queue.Push(entry)) {
                                 std::cout << "Hey the push returned false" << std::endl;
-                                throw StopLoop();
+                                throw DNNStopLoop();
                             }
                         },
                         {"_entry"});
-                } catch (StopLoop) {
+                } catch (DNNStopLoop) {
                 }
 
                 std::cout << "Finished foreach" << std::endl;
@@ -147,7 +147,7 @@ namespace analysis {
             new_df = new_df.Define("_entry",
                                    [=](ULong64_t rdfentry) {
                                        // Entry entry(column_names.size());
-                                       std::shared_ptr<Entry> entry;
+                                       std::shared_ptr<DNNEntry> entry;
                                        //int batch_size = 100;
                                        int start_idx = nBatchStart;
                                        int end_idx = nBatchEnd;
@@ -168,7 +168,7 @@ namespace analysis {
             }
         }
 
-        EntryQueue<std::shared_ptr<Entry>> queue;
+        DNNEntryQueue<std::shared_ptr<DNNEntry>> queue;
         std::unique_ptr<std::thread> thread;
         std::condition_variable cond_var;
     };

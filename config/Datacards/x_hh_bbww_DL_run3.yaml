@@ -6,16 +6,16 @@ model:
   # input_file_pattern: dnn_M${MX}_Signal/dnn_M${MX}_Signal.root
   # input_file_pattern: dnn_M0_Signal/dnn_M0_Signal.root
   # input_file_pattern: LinHMEDNN_DL_linear_hme_dnn_m${MX}/LinHMEDNN_DL_linear_hme_dnn_m${MX}.root
-  input_file_pattern: DL_DNN_m${MX}_HME_Linear/DL_DNN_m${MX}_HME_Linear.root
+  input_file_pattern: DL_DNN_m${MX}_vs_HME/DL_DNN_m${MX}_vs_HME.root
 # hist_bins: [ 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1 ]
 # hist_bins: [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2.0, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8, 2.85, 2.9, 2.95, 3.0, 3.05, 3.1, 3.15, 3.2, 3.25, 3.3, 3.35, 3.4, 3.45, 3.5, 3.55, 3.6, 3.65, 3.7, 3.75, 3.8, 3.85, 3.9, 3.95, 4.0, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35, 4.4, 4.45, 4.5, 4.55, 4.6, 4.65, 4.7, 4.75, 4.8, 4.85, 4.9, 4.95, 5.0]
 # hist_bins: [ -10.0, 241.0, 266.1, 316.3, 391.6, 441.8, 492.0, 542.2, 617.5, 667.7, 743.0, 868.5, 994.0, 2500.0 ] # HME Bins
 signalFractionForRelevantBins: 0.2
 eras:
   # - Run3_2022
-  # - Run3_2022EE
+  - Run3_2022EE
   # - Run3_2023
-  - Run3_2023BPix
+  # - Run3_2023BPix
 channels:
   - muMu
   - eMu
@@ -32,7 +32,7 @@ processes:
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
     # param_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
     # param_values: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000 ]
-    param_values: [ 600 ]
+    # param_values: [ 600 ]
     is_signal: true
     # 125.0 H->bb BR 5.824e-01 https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
     # 125.0 H->WW BR 2.137e-01
@@ -49,10 +49,12 @@ processes:
     channels:
       - eE
       - muMu
-    categories:
-      - ZVeto_OS_Iso/res2b
-      - ZVeto_OS_Iso/recovery
-  # - VV
+    # categories:
+    #   - ZVeto_OS_Iso/res2b
+    #   - ZVeto_OS_Iso/recovery
+  - process: VV
+    allow_negative_bins_within_error: true
+    allow_zero_integral: true
   - ST
   # - W
   # - Other
@@ -62,9 +64,11 @@ uncertainties:
     value: 0.014 # https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun3
 
 
-  - name: MuonID_TightID
+  # - name: MuonID_TightID
+  - name: CMS_eff_m_id
     type: shape
-  - name: MuonID_TightIDIso
+  # - name: MuonID_TightIDIso
+  - name: CMS_eff_m_id_iso
     type: shape
   - name: EleID_TightIDIso
     type: shape
@@ -94,20 +98,13 @@ uncertainties:
   - name: CMS_pileup
     type: shape
 
-
-  # - name: JER
-  #   type: shape
-  # - name: JES_total
-  #   type: shape
-  # - name: EleES
-  #   type: shape
-
   - name: CMS_scale_j
     type: shape
   - name: CMS_res_j
     type: shape
   - name: CMS_scale_e
     type: shape
+
 
   # For multiple values, Konstantin says do [ down, up ]
   - name: QCD_scale_TT

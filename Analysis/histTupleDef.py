@@ -38,6 +38,21 @@ def GetDfw(df, setup, dataset_name):
     period = global_params["era"]
     dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period)
     new_dfw = analysis.PrepareDfForHistograms(dfw, isData)
+
+    full_res_vars = []
+    flavor = global_params.get("histTuple_flavor", "default")
+    if flavor == "default":
+        full_res_vars = global_params.get("histTuple_fullResolution_variables", [])
+    else:
+        flavor_entry = global_params["histTuple_flavors"][flavor]
+        full_res_vars = flavor_entry.get("fullResolution_variables", [])
+        variables = flavor_entry.get("variables", [])
+        global_params["variables"] = variables
+        global_params["histTuple_fullResolution_variables"] = full_res_vars
+
+    for var in full_res_vars:
+        new_dfw.colToSave.append(var)
+
     return new_dfw
 
 

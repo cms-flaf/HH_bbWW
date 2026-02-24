@@ -9,7 +9,7 @@
 namespace analysis {
 
     template <typename Entry>
-    class EntryQueue {
+    class DNNEntryQueue {
       public:
         using Queue = std::queue<Entry>;
         using Mutex = std::mutex;
@@ -17,7 +17,7 @@ namespace analysis {
         using CondVar = std::condition_variable;
 
       public:
-        explicit EntryQueue(size_t max_size, size_t max_entries = std::numeric_limits<size_t>::max())
+        explicit DNNEntryQueue(size_t max_size, size_t max_entries = std::numeric_limits<size_t>::max())
             : max_size_(max_size),
               max_entries_(max_entries),
               n_entries_(0),
