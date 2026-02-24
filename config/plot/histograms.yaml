@@ -1854,4 +1854,3 @@ SL_DNN_m1000_vs_HME:
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_SL_NoHME_M1000_Signal, SingleLep_DeepHME_mass ]
-
