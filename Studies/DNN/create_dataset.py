@@ -96,14 +96,14 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
                 rdf_tmp.Snapshot(treeName, output_file)
 
-    print("Looping background datasets")
     for background_name in background_list:
         background_dict = config_dict["background"][background_name]
         dataset_names = background_dict["background_datasets"]
         class_value = background_dict["class_value"]
         X_mass = 0
 
-        for dataset_name in dataset_names:
+        print(f"Looping background {background_name}")
+        for dataset_name in tqdm(dataset_names):
             process_dir = os.path.join(storage_folder, dataset_name)
 
             if remote:
@@ -138,6 +138,11 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
         out_yaml = f"dataset_distritubution_parity{nParity}.yaml"
         with open(os.path.join(output_folder, out_yaml), "w") as outfile:
             yaml.dump(process_dict[nParity_string], outfile)
+
+        # hadd the files together to make a final merged.root
+        hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
+        hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
+        os.system(f"hadd {hadd_out} {hadd_in}")
 
 
 def add_weight_file(output_folder):
