@@ -8,14 +8,14 @@ import onnx
 import copy
 import psutil
 import matplotlib.pyplot as plt
-
+import onnxruntime as ort
+import ROOT
 
 class DataWrapper:
     def __init__(self):
         print("Init data wrapper")
 
         self.feature_names = None
-        self.label_name = None
 
         self.features_no_param = None
         self.features = None
@@ -80,11 +80,6 @@ class DataWrapper:
 
         print(f"Added features {features}")
         print(f"New feature list {self.feature_names}")
-
-    def AddInputLabel(self, labels_name):
-        if self.label_name != None:
-            print("What are you doing? You already defined the input label branch")
-        self.label_name = labels_name
 
     def ReadFile(
         self, file_name, entry_start=None, entry_stop=None, hme_friend_file=None
@@ -318,7 +313,7 @@ def train_dnn(
     test_weight_file,
     output_folder,
 ):
-    output_dnn_name = output_folder
+    output_dnn_name = os.path.join(output_folder, f"best.onnx")
 
     dw = DataWrapper()
     dw.AddInputFeatures(setup["features"])
@@ -450,6 +445,8 @@ def train_dnn(
         callbacks=callbacks,
     )
 
+    os.makedirs(output_folder, exist_ok=True)
+
     def PlotMetric(history, metric, output_folder):
         if metric not in history.history:
             print(f"Metric {metric} not found in history")
@@ -473,7 +470,7 @@ def train_dnn(
     input_shape = [None, dw.features.shape[1]]
     input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
     onnx_model, _ = tf2onnx.convert.from_keras(model, input_signature, opset=13)
-    onnx.save(onnx_model, f"{output_dnn_name}.onnx")
+    onnx.save(onnx_model, output_dnn_name)
 
     features_config = {
         "features": dw.feature_names,
@@ -488,3 +485,193 @@ def train_dnn(
         yaml.dump(features_config, file)
 
     return
+
+
+
+
+
+
+def validate_dnn(
+    setup,
+    validation_file,
+    validation_weight_file,
+    output_file,
+    model_name,
+    model_config,
+):
+    print(f"Model load {model_name}")
+    sess = ort.InferenceSession(model_name)
+
+    dnnConfig = {}
+    with open(model_config, "r") as file:
+        dnnConfig = yaml.safe_load(file)
+
+    dw = DataWrapper()
+    dw.AddInputFeatures(setup["features"])
+
+    dw.UseParametric(setup["UseParametric"])
+    dw.SetParamList(setup["parametric_list"])
+
+    # Prep a test dw
+    # Must copy before reading file so we can read the test file instead
+    test_dw = copy.deepcopy(dw)
+
+    entry_start = 0
+    # entry_stop = batch_size * 500 # Only load 500 batches for debuging now
+
+    # Do you want to make a larger batch? May increase speed
+    entry_stop = None
+
+    dw.ReadFile(
+        validation_file,
+        entry_start=entry_start,
+        entry_stop=entry_stop,
+    )
+    dw.ReadWeightFile(validation_weight_file, entry_start=entry_start, entry_stop=entry_stop)
+
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+    os.environ["TF_DETERMINISTIC_OPS"] = "1"
+    tf.random.set_seed(42)
+
+
+    nClasses = setup["nClasses"]
+    batch_size = setup["batch_size"]
+    train_tf_dataset = tf.data.Dataset.from_tensor_slices(
+        (
+            dw.features,
+            (tf.one_hot(dw.class_target, nClasses), dw.class_weight),
+        )
+    ).batch(batch_size, drop_remainder=True)
+    train_tf_dataset = train_tf_dataset.shuffle(
+        len(train_tf_dataset), reshuffle_each_iteration=True
+    )
+
+
+    para_masspoint_list = [300, 450, 550, 700, 800, 1000, 3000, 5000]  # [300, 450, 800]
+    canvases = []
+    for para_masspoint in para_masspoint_list:
+        if dw.use_parametric:
+            dw.SetPredictParamValue(para_masspoint)
+        features = dw.features_paramSet if dw.use_parametric else dw.features_no_param
+
+        pred = sess.run(None, {"x": features})
+        pred_class = pred[0]
+        pred_signal = pred_class[:, 0]
+
+        class_weight = dw.class_weight
+
+        # Class Plots
+        # Lets build Masks
+        Sig_This_Mass = dw.X_mass == para_masspoint
+        Sig_mask = (Sig_This_Mass) & (dw.class_target == 0)
+
+        TT_mask = (dw.class_target == 1)
+
+        DY_mask = (dw.class_target == 2)
+
+        Other_mask = (dw.class_target == 3)
+
+        # Set class quantiles based on signal
+        nQuantBins = 10
+        quant_binning_class = np.zeros(
+            nQuantBins + 1
+        )  # Need +1 because 10 bins actually have 11 edges
+        quant_binning_class[1:nQuantBins] = np.quantile(
+            pred_signal[Sig_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        )  # Change list to something dynamic with nQuantBins
+        quant_binning_class[-1] = 1.0
+        print("We found quant binning class")
+        print(quant_binning_class)
+        print("From the signal prediction")
+        print(pred_signal[Sig_mask])
+
+        mask_dict = {
+            "Signal": Sig_mask,
+            "TT": TT_mask,
+            "DY": DY_mask,
+            "Other": Other_mask,
+        }
+
+        canvases.append(ROOT.TCanvas("c1", "c1", 1200, 600 * len(mask_dict.keys())))
+        canvas = canvases[-1]
+        canvas.Divide(1, len(mask_dict.keys()))
+        Class_list = []
+        legend_list = []
+        ratio_list = []
+        pavetext_list = []
+        for i, process_name in enumerate(mask_dict.keys()):
+            canvas.cd(i + 1)
+            mask = mask_dict[process_name]
+
+            class_out_hist, bins = np.histogram(
+                pred_signal[mask],
+                bins=quant_binning_class,
+                range=(0.0, 1.0),
+                weights=class_weight[mask],
+            )
+            class_out_hist_w2, bins = np.histogram(
+                pred_signal[mask],
+                bins=quant_binning_class,
+                range=(0.0, 1.0),
+                weights=class_weight[mask] ** 2,
+            )
+
+            Class_list.append(
+                ROOT.TH1D(
+                    f"ClassOutput_{process_name}",
+                    f"ClassOutput_{process_name}",
+                    nQuantBins,
+                    0.0,
+                    1.0,
+                )
+            )
+
+            ROOT_ClassOutput = Class_list[-1]
+
+            for binnum in range(nQuantBins):
+                ROOT_ClassOutput.SetBinContent(binnum + 1, class_out_hist[binnum])
+                ROOT_ClassOutput.SetBinError(
+                    binnum + 1, class_out_hist_w2[binnum] ** (0.5)
+                )
+
+            if ROOT_ClassOutput.Integral() == 0:
+                print(
+                    f"Process {process_name} has no class entries, maybe the background doesn't exist?"
+                )
+                continue
+
+            ROOT_ClassOutput.Scale(1.0 / ROOT_ClassOutput.Integral())
+
+            plotlabel = f"Class Output for {process_name} ParaMass {para_masspoint} GeV"
+            ROOT_ClassOutput.Draw()
+            ROOT_ClassOutput.SetTitle(plotlabel)
+            ROOT_ClassOutput.SetStats(0)
+            min_val = max(
+                0.0001,
+                ROOT_ClassOutput.GetMinimum(),
+            )
+            max_val = ROOT_ClassOutput.GetMaximum()
+
+            ROOT_ClassOutput.GetYaxis().SetRangeUser(0.0001, 20)  # 1000*max_val)
+
+            legend_list.append(ROOT.TLegend(0.5, 0.8, 0.9, 0.9))
+            legend = legend_list[-1]
+            legend.AddEntry(ROOT_ClassOutput, f"{process_name}")
+            legend.Draw()
+
+            print(f"Setting canvas to log scale with range {min_val}, {max_val}")
+            canvas.SetLogy()
+            canvas.SetGrid()
+
+        if para_masspoint == para_masspoint_list[0]:
+            canvas.Print(f"{output_file}(", f"Title:Mass {para_masspoint} GeV")
+            print("Saved [")
+        elif para_masspoint == para_masspoint_list[-1]:
+            canvas.Print(f"{output_file})", f"Title:Mass {para_masspoint} GeV")
+            print("Saved ]")
+        else:
+            canvas.Print(f"{output_file}", f"Title:Mass {para_masspoint} GeV")
+        print(f"Saved mass {para_masspoint}")
+
+        canvas.Close()
+

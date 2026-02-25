@@ -1,5 +1,5 @@
 import argparse
-import Studies.DNN.DNN_Class as DNNClass
+import Studies.DNN.DNN_Class_HistTuples as DNNClass
 import threading
 import yaml
 from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
@@ -11,16 +11,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--validation_weight_file", required=True, type=str, help="Weight file"
-    )
-    parser.add_argument(
-        "--validation_hme_friend_file",
-        required=False,
-        type=str,
-        default=None,
-        help="Validation HME friend file",
-    )
-    parser.add_argument(
-        "--validation_batch_config", required=True, type=str, help="Batch config file"
     )
     parser.add_argument("--output_file", required=True, type=str, help="Output Pdf")
     parser.add_argument(
@@ -46,20 +36,13 @@ if __name__ == "__main__":
         thread = threading.Thread(target=update_kinit_thread)
         thread.start()
 
-        config_dict = {}
-        with open(args.validation_batch_config, "r") as file:
-            config_dict = yaml.safe_load(file)
-
-        # model = DNNClass.validate_dnn(setup, args.validation_file, args.validation_weight_file, config_dict, args.output_file, args.model_name, args.model_config)
-        model = DNNClass.validate_disco_dnn(
+        model = DNNClass.validate_dnn(
             setup,
             args.validation_file,
             args.validation_weight_file,
-            config_dict,
             args.output_file,
             args.model_name,
             args.model_config,
-            args.validation_hme_friend_file,
         )
 
     finally:

@@ -33,14 +33,7 @@ if __name__ == "__main__":
 
         thread = threading.Thread(target=update_kinit_thread)
         thread.start()
-
-        config_dict = {}
-        with open(args.batch_config, "r") as file:
-            config_dict = yaml.safe_load(file)
-        test_config_dict = {}
-        with open(args.test_batch_config, "r") as file:
-            test_config_dict = yaml.safe_load(file)
-
+        
         model = DNNClass.train_dnn(
             setup,
             args.training_file,
