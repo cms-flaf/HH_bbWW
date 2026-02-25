@@ -50,8 +50,8 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             os.path.basename(config_name),
         )
         return [
-            self.remote_target(output_path, fs=self.fs_anaTuple),
-            self.remote_target(config_path, fs=self.fs_anaTuple),
+            self.remote_target(output_path, fs=self.fs_histograms),
+            self.remote_target(config_path, fs=self.fs_histograms),
         ]
 
     def run(self):
@@ -138,7 +138,7 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         output_path = os.path.join(
             "DNNTraining", self.version, self.period, training_name, outFileName
         )
-        return [self.remote_target(output_path, fs=self.fs_anaTuple)]
+        return [self.remote_target(output_path, fs=self.fs_histograms)]
 
     def run(self):
         config, config_name, n_branch = self.branch_data
@@ -153,13 +153,11 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         validation_file = config["validation_file"]
         valitation_weight_file = config["validation_weight_file"]
-        valitation_batch_config = config["validation_batch_config"]
 
-        validation_hme_friend_file = config["validation_hme_friend_file"]
 
         tmp_local = os.path.join(self.input()[0].path, "best.onnx")
-        # with self.input()[0].localize("r") as model_file, self.input()[1].localize("r") as model_config:
-        with self.remote_target(tmp_local, fs=self.fs_anaTuple).localize(
+
+        with self.remote_target(tmp_local, fs=self.fs_histograms).localize(
             "r"
         ) as model_file, self.input()[1].localize("r") as model_config:
             print(os.listdir())
@@ -171,8 +169,6 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 validation_file,
                 "--validation_weight_file",
                 valitation_weight_file,
-                "--validation_batch_config",
-                valitation_batch_config,
                 "--output_file",
                 tmpFile,
                 "--setup-config",
@@ -181,8 +177,6 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 model_file.path,
                 "--model-config",
                 model_config.path,
-                "--validation_hme_friend_file",
-                validation_hme_friend_file,
             ]
             ps_call(dnn_validator_cmd, verbose=1)
 
