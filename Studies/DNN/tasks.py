@@ -67,15 +67,9 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         training_file = config["training_file"]
         weight_file = config["weight_file"]
-        batch_config = config["batch_config"]
         test_training_file = config["test_training_file"]
         test_weight_file = config["test_weight_file"]
-        test_batch_config = config["test_batch_config"]
 
-        hme_friend_file = config["hme_friend_file"]
-        test_hme_friend_file = config["test_hme_friend_file"]
-
-        # with config["training_file"].localize("r") as training_file, config["weight_file"].localize("r") as weight_file, config["batch_config"].localize("r") as batch_config, config["test_training_file"].localize("r") as test_training_file, config["test_weight_file"].localize("r") as test_weight_file, config["test_batch_config"].localize("r") as test_batch_config:
         dnn_trainer_cmd = [
             "python3",
             "-u",
@@ -84,22 +78,14 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             training_file,
             "--weight_file",
             weight_file,
-            "--batch_config",
-            batch_config,
             "--test_training_file",
             test_training_file,
             "--test_weight_file",
             test_weight_file,
-            "--test_batch_config",
-            test_batch_config,
             "--output_folder",
             tmpFolder,
             "--setup-config",
             config_name,
-            "--hme_friend_file",
-            hme_friend_file,
-            "--test_hme_friend_file",
-            test_hme_friend_file,
         ]
         ps_call(dnn_trainer_cmd, verbose=1)
 
