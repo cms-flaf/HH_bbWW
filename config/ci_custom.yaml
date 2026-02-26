@@ -15,6 +15,7 @@ StatInference:
   hist_bins: config/Datacards/CI_binning.json
   param_values: [ 300 ]
 
+# Do not remove DNN variables, they are needed for the datacard creation.
 variables:
   - lep1_pt
   - SingleLep_DeepHME_mass
