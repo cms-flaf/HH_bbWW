@@ -10,6 +10,11 @@ phys_model: TestModel
 QCDRegions:
   - OS_Iso
 
+StatInference:
+  config: config/Datacards/CI_card.yaml
+  hist_bins: config/Datacards/CI_binning.json
+  param_values: [ 300 ]
+
 variables:
   - lep1_pt
   - SingleLep_DeepHME_mass
