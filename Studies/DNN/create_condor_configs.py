@@ -2,7 +2,6 @@ import os
 import yaml
 import awkward as ak
 
-
 # Resolved
 # template = "config/training_setup_doubleLep_resolved.yaml"
 # output_folder = "CondorConfigs_25Feb_DoubleLepton_Resolved_Full_HME"
@@ -22,9 +21,9 @@ input_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/
 weight_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/BoostedDataset_Feb25/Dataset/nParity{}_Merged_weight.root"
 training_name = "DNN_DoubleLepton_Boosted_Training{i}_par{j}"
 var_parse_dict = {
-    'learning_rate': [ 0.00001 ],
-    'n_epochs': [ 100 ],
-    'dropout': [ 0.3 ],
+    "learning_rate": [0.00001],
+    "n_epochs": [100],
+    "dropout": [0.3],
 }
 
 os.makedirs(output_folder, exist_ok=True)

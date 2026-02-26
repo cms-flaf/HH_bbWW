@@ -24,7 +24,6 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
     background_list = config_dict["background"]
 
-
     for nParity in range(config_dict["nParity"]):
         output_nParity = os.path.join(output_folder, f"nParity{nParity}_Merged")
         os.makedirs(output_nParity, exist_ok=True)
@@ -80,18 +79,23 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
             for nParity in range(config_dict["nParity"]):
                 nParity_string = f"nParity_{nParity}"
-                parity_cut = parity_cut.format(nParity=config_dict["nParity"], parity_scan=nParity)
+                parity_cut = parity_cut.format(
+                    nParity=config_dict["nParity"], parity_scan=nParity
+                )
                 output_nParity = os.path.join(output_folder, f"nParity{nParity}_Merged")
                 output_file = os.path.join(output_nParity, f"{dataset_name}_merge.root")
-
 
                 rdf_tmp = rdf.Filter(parity_cut)
                 cut = rdf_tmp.Count().GetValue()
                 weighted_cut = rdf_tmp.Sum("weight_Central").GetValue()
 
                 process_dict[nParity_string][signal_name][mass_point]["total"] += total
-                process_dict[nParity_string][signal_name][mass_point]["total_cut"] += cut
-                process_dict[nParity_string][signal_name][mass_point]["total_cut_weighted"] += weighted_cut
+                process_dict[nParity_string][signal_name][mass_point][
+                    "total_cut"
+                ] += cut
+                process_dict[nParity_string][signal_name][mass_point][
+                    "total_cut_weighted"
+                ] += weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
                 rdf_tmp.Snapshot(treeName, output_file)
@@ -118,7 +122,9 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
             for nParity in range(config_dict["nParity"]):
                 nParity_string = f"nParity_{nParity}"
-                parity_cut = parity_cut.format(nParity=config_dict["nParity"], parity_scan=nParity)
+                parity_cut = parity_cut.format(
+                    nParity=config_dict["nParity"], parity_scan=nParity
+                )
                 output_nParity = os.path.join(output_folder, f"nParity{nParity}_Merged")
                 output_file = os.path.join(output_nParity, f"{dataset_name}_merge.root")
 
@@ -126,9 +132,15 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 cut = rdf_tmp.Count().GetValue()
                 weighted_cut = rdf_tmp.Sum("weight_Central").GetValue()
 
-                process_dict[nParity_string][background_name][dataset_name]["total"] += total
-                process_dict[nParity_string][background_name][dataset_name]["total_cut"] += cut
-                process_dict[nParity_string][background_name][dataset_name]["total_cut_weighted"] += weighted_cut
+                process_dict[nParity_string][background_name][dataset_name][
+                    "total"
+                ] += total
+                process_dict[nParity_string][background_name][dataset_name][
+                    "total_cut"
+                ] += cut
+                process_dict[nParity_string][background_name][dataset_name][
+                    "total_cut_weighted"
+                ] += weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
                 rdf_tmp.Snapshot(treeName, output_file)
@@ -146,9 +158,14 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
 
 def add_weight_file(output_folder):
-    inNames = [os.path.join(output_folder, x) for x in os.listdir(output_folder) if x.endswith(".root") ]
+    inNames = [
+        os.path.join(output_folder, x)
+        for x in os.listdir(output_folder)
+        if x.endswith(".root")
+    ]
     for inName in inNames:
-        if "weight" in inName: continue
+        if "weight" in inName:
+            continue
         print(f"On file {inName}")
         in_file = uproot.open(inName)
         outName = f"{inName[:-5]}_weight.root"
@@ -162,8 +179,8 @@ def add_weight_file(output_folder):
         ]
         branches = tree.arrays(branches_to_load)
 
-        class_targets = branches['class_value']
-        class_weight = branches['weight_Central']
+        class_targets = branches["class_value"]
+        class_weight = branches["weight_Central"]
 
         # Set to binary for now actually
         class_targets = np.where(class_targets > 0, 1, class_targets)
@@ -182,8 +199,12 @@ def add_weight_file(output_folder):
             class_targets == 0, class_weight, class_weight * norm_factor
         )
         print(f"After reweight")
-        print(f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}")
-        print(f"Total background: {np.sum(np.where(class_targets != 0, class_weight, 0.0))}")
+        print(
+            f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}"
+        )
+        print(
+            f"Total background: {np.sum(np.where(class_targets != 0, class_weight, 0.0))}"
+        )
 
         # Total_Background1 == Total_Background2 == Total_Background3
         # Scale each background to total, then reduce all to total
@@ -204,9 +225,12 @@ def add_weight_file(output_folder):
         # )
 
         print(f"Final reweight")
-        print(f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}")
-        print(f"Total background: {np.sum(np.where(class_targets != 0, class_weight, 0.0))}")
-
+        print(
+            f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}"
+        )
+        print(
+            f"Total background: {np.sum(np.where(class_targets != 0, class_weight, 0.0))}"
+        )
 
         out_dict = {
             "class_weight": class_weight,

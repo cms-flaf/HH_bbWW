@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import onnxruntime as ort
 import ROOT
 
+
 class DataWrapper:
     def __init__(self):
         print("Init data wrapper")
@@ -114,7 +115,11 @@ class DataWrapper:
             )
 
             self.features = np.array(
-                [getattr(branches, feature_name) for feature_name in self.feature_names], dtype="float32"
+                [
+                    getattr(branches, feature_name)
+                    for feature_name in self.feature_names
+                ],
+                dtype="float32",
             ).transpose()
 
             print(
@@ -134,11 +139,9 @@ class DataWrapper:
         if self.use_parametric:
             self.features = np.append(self.features, self.param_values, axis=1)
 
-
         print(
             f"End read. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
         )
-
 
     def ReadWeightFile(self, weight_name, entry_start=None, entry_stop=None):
         print(f"Reading weight file {weight_name}")
@@ -154,16 +157,12 @@ class DataWrapper:
             file.close()
 
 
-
-
-
 class Model(tf.keras.Model):
     def __init__(self, setup, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setup = setup
 
         self.nClasses = setup["nClasses"]
-
 
         self.class_loss = tf.keras.losses.categorical_crossentropy
         self.class_accuracy = tf.keras.metrics.categorical_accuracy
@@ -248,13 +247,9 @@ class Model(tf.keras.Model):
 
         if training:
             with tf.GradientTape() as class_tape:
-                y_pred_class, class_loss_vec, class_loss = (
-                    compute_losses()
-                )
+                y_pred_class, class_loss_vec, class_loss = compute_losses()
         else:
-            y_pred_class, class_loss_vec, class_loss = (
-                compute_losses()
-            )
+            y_pred_class, class_loss_vec, class_loss = compute_losses()
 
         self.class_min_tracker.update_state(tf.reduce_min(y_pred_class[:, 0]))
         self.class_max_tracker.update_state(tf.reduce_max(y_pred_class[:, 0]))
@@ -275,7 +270,6 @@ class Model(tf.keras.Model):
         self.class_accuracy_tracker.update_state(
             class_accuracy_vec, sample_weight=class_weight
         )
-
 
         if training:
             grad = class_tape.gradient(class_loss, self.trainable_variables)
@@ -304,8 +298,6 @@ class Model(tf.keras.Model):
         )
 
         return metric_list
-
-
 
 
 def train_dnn(
@@ -353,7 +345,6 @@ def train_dnn(
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     tf.random.set_seed(42)
-
 
     nClasses = setup["nClasses"]
     batch_size = setup["batch_size"]
@@ -434,7 +425,7 @@ def train_dnn(
     model(dw.features)
     model.summary()
 
-    callbacks = [ ]
+    callbacks = []
 
     verbose = setup["verbose"] if "verbose" in setup else 0
     verbose = 1
@@ -490,10 +481,6 @@ def train_dnn(
     return
 
 
-
-
-
-
 def validate_dnn(
     setup,
     validation_file,
@@ -530,12 +517,13 @@ def validate_dnn(
         entry_start=entry_start,
         entry_stop=entry_stop,
     )
-    dw.ReadWeightFile(validation_weight_file, entry_start=entry_start, entry_stop=entry_stop)
+    dw.ReadWeightFile(
+        validation_weight_file, entry_start=entry_start, entry_stop=entry_stop
+    )
 
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
     tf.random.set_seed(42)
-
 
     nClasses = setup["nClasses"]
     batch_size = setup["batch_size"]
@@ -548,7 +536,6 @@ def validate_dnn(
     train_tf_dataset = train_tf_dataset.shuffle(
         len(train_tf_dataset), reshuffle_each_iteration=True
     )
-
 
     para_masspoint_list = [300, 400, 600, 800, 1000, 3000, 4000]  # [300, 450, 800]
     canvases = []
@@ -570,13 +557,13 @@ def validate_dnn(
         Sig_This_Mass = dw.X_mass == para_masspoint
         Sig_mask = (Sig_This_Mass) & (dw.class_target == 0)
 
-        Background_mask = (dw.class_target == 1)
+        Background_mask = dw.class_target == 1
 
-        TT_mask = (dw.class_target == 1)
+        TT_mask = dw.class_target == 1
 
-        DY_mask = (dw.class_target == 2)
+        DY_mask = dw.class_target == 2
 
-        Other_mask = (dw.class_target == 3)
+        Other_mask = dw.class_target == 3
 
         # Set class quantiles based on signal
         nQuantBins = 10
@@ -656,7 +643,6 @@ def validate_dnn(
 
             # ROOT_ClassOutput.Scale(1.0 / ROOT_ClassOutput.Integral())
 
-
             pads_list.append(ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0))
             p1 = pads_list[-1]
             p1.SetTopMargin(0)
@@ -674,7 +660,7 @@ def validate_dnn(
             )
             max_val = ROOT_ClassOutput.GetMaximum()
 
-            ROOT_ClassOutput.GetYaxis().SetRangeUser(0.001*min_val, 1000*max_val)
+            ROOT_ClassOutput.GetYaxis().SetRangeUser(0.001 * min_val, 1000 * max_val)
 
             legend_list.append(ROOT.TLegend(0.5, 0.8, 0.9, 0.9))
             legend = legend_list[-1]
@@ -696,4 +682,3 @@ def validate_dnn(
         print(f"Saved mass {para_masspoint}")
 
         canvas.Close()
-

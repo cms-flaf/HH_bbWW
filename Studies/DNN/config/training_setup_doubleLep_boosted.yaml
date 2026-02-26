@@ -93,7 +93,7 @@ parametric_list:
   - 2500
   - 3000
   - 3500
-  - 4000 
+  - 4000
 patience: 100
 use_batch_norm: true
 weight_decay: 0.004

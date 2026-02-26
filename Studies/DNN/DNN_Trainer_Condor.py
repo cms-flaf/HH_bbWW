@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
         thread = threading.Thread(target=update_kinit_thread)
         thread.start()
-        
+
         model = DNNClass.train_dnn(
             setup,
             args.training_file,
