@@ -94,6 +94,7 @@ class DataWrapper:
         features_to_load = features_to_load + self.feature_names
 
         features_to_load.append("X_mass")
+        features_to_load.append("weight_Central")
 
         print(f"Only loading these features {features_to_load}")
 
@@ -123,6 +124,7 @@ class DataWrapper:
             # Add parametric variable
             # self.param_values = np.array([[x if (x > 0) else np.random.choice(self.param_list) for x in getattr(branches, 'X_mass') ]]).transpose()
             self.X_mass = getattr(branches, "X_mass")
+            self.physics_weight = getattr(branches, "weight_Central")
             self.param_values = np.array(
                 [getattr(branches, "X_mass")], dtype="float32"
             ).transpose()  # Init wrong parametric, later we will fill with random sample
@@ -131,6 +133,7 @@ class DataWrapper:
         self.features_no_param = self.features
         if self.use_parametric:
             self.features = np.append(self.features, self.param_values, axis=1)
+
 
         print(
             f"End read. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
@@ -547,9 +550,10 @@ def validate_dnn(
     )
 
 
-    para_masspoint_list = [300, 450, 550, 700, 800, 1000, 3000, 5000]  # [300, 450, 800]
+    para_masspoint_list = [300, 400, 600, 800, 1000, 3000, 4000]  # [300, 450, 800]
     canvases = []
     for para_masspoint in para_masspoint_list:
+        print(f"Validating mass {para_masspoint}")
         if dw.use_parametric:
             dw.SetPredictParamValue(para_masspoint)
         features = dw.features_paramSet if dw.use_parametric else dw.features_no_param
@@ -559,11 +563,14 @@ def validate_dnn(
         pred_signal = pred_class[:, 0]
 
         class_weight = dw.class_weight
+        physics_weight = dw.physics_weight
 
         # Class Plots
         # Lets build Masks
         Sig_This_Mass = dw.X_mass == para_masspoint
         Sig_mask = (Sig_This_Mass) & (dw.class_target == 0)
+
+        Background_mask = (dw.class_target == 1)
 
         TT_mask = (dw.class_target == 1)
 
@@ -576,6 +583,9 @@ def validate_dnn(
         quant_binning_class = np.zeros(
             nQuantBins + 1
         )  # Need +1 because 10 bins actually have 11 edges
+        if len(pred_signal[Sig_mask]) == 0:
+            print("No signal events in this mass point! Skip!")
+            continue
         quant_binning_class[1:nQuantBins] = np.quantile(
             pred_signal[Sig_mask], [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         )  # Change list to something dynamic with nQuantBins
@@ -592,13 +602,17 @@ def validate_dnn(
             "Other": Other_mask,
         }
 
+        mask_dict = {
+            "Signal": Sig_mask,
+            "Background": Background_mask,
+        }
+
         canvases.append(ROOT.TCanvas("c1", "c1", 1200, 600 * len(mask_dict.keys())))
         canvas = canvases[-1]
         canvas.Divide(1, len(mask_dict.keys()))
         Class_list = []
         legend_list = []
-        ratio_list = []
-        pavetext_list = []
+        pads_list = []
         for i, process_name in enumerate(mask_dict.keys()):
             canvas.cd(i + 1)
             mask = mask_dict[process_name]
@@ -607,13 +621,13 @@ def validate_dnn(
                 pred_signal[mask],
                 bins=quant_binning_class,
                 range=(0.0, 1.0),
-                weights=class_weight[mask],
+                weights=physics_weight[mask],
             )
             class_out_hist_w2, bins = np.histogram(
                 pred_signal[mask],
                 bins=quant_binning_class,
                 range=(0.0, 1.0),
-                weights=class_weight[mask] ** 2,
+                weights=physics_weight[mask] ** 2,
             )
 
             Class_list.append(
@@ -640,7 +654,15 @@ def validate_dnn(
                 )
                 continue
 
-            ROOT_ClassOutput.Scale(1.0 / ROOT_ClassOutput.Integral())
+            # ROOT_ClassOutput.Scale(1.0 / ROOT_ClassOutput.Integral())
+
+
+            pads_list.append(ROOT.TPad("p1", "p1", 0.0, 0.3, 1.0, 0.9, 0, 0, 0))
+            p1 = pads_list[-1]
+            p1.SetTopMargin(0)
+            p1.Draw()
+
+            p1.cd()
 
             plotlabel = f"Class Output for {process_name} ParaMass {para_masspoint} GeV"
             ROOT_ClassOutput.Draw()
@@ -652,7 +674,7 @@ def validate_dnn(
             )
             max_val = ROOT_ClassOutput.GetMaximum()
 
-            ROOT_ClassOutput.GetYaxis().SetRangeUser(0.0001, 20)  # 1000*max_val)
+            ROOT_ClassOutput.GetYaxis().SetRangeUser(0.001*min_val, 1000*max_val)
 
             legend_list.append(ROOT.TLegend(0.5, 0.8, 0.9, 0.9))
             legend = legend_list[-1]
@@ -660,8 +682,8 @@ def validate_dnn(
             legend.Draw()
 
             print(f"Setting canvas to log scale with range {min_val}, {max_val}")
-            canvas.SetLogy()
-            canvas.SetGrid()
+            p1.SetLogy()
+            p1.SetGrid()
 
         if para_masspoint == para_masspoint_list[0]:
             canvas.Print(f"{output_file}(", f"Title:Mass {para_masspoint} GeV")
