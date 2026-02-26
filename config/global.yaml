@@ -17,7 +17,7 @@ nEventsPerFile:
 
 corrections:
   mu:
-    stage: HistTuple
+    stages: [ HistTuple, AnalysisCache ]
     columns:
       pfRelIso04_all: Muon_pfRelIso04_all
       tightId: Muon_tightId
@@ -26,16 +26,16 @@ corrections:
       mediumId: Muon_mediumId
       looseId: Muon_looseId
   trigger:
-    stage: HistTuple
+    stages: [ HistTuple, AnalysisCache ]
     mode: SF
-  ele: { stage: HistTuple }
+  ele: { stages: [ HistTuple, AnalysisCache ] }
   fatjet:
-    stage: HistTuple # AnaTuple
+    stages: [ HistTuple, AnalysisCache ] # AnaTuple
     ana: bbWW
     tagger: particleNetWithMass_HbbvsQCD
     fatJetName: fatbjet # SelectedFatJet
   muScaRe: { stage: AnaTuple, mu_pt_for_ScaReApplication: "nano" }
-  eleES: { stage: AnaTuple }
+  eleES: { stages: [ AnaTuple, AnalysisCache ] }
   lumi: { stage: AnaTuple }
   xs: { stage: AnaTuple }
   gen: { stage: AnaTuple }
@@ -50,10 +50,12 @@ corrections:
     stage: AnaTuple
     apply_jet_horns_fix: true
   btag:
-    stages: [ AnaTuple, HistTuple ]
+    normFilePattern: data/{version}/AnalysisCacheAggregationTask/{period}/{dataset_name}/BtagShape/aggregatedCache.json
+    stages: [ AnaTuple, HistTuple, AnalysisCache ]
     modes:
       AnaTuple: none # just load to define WP ID branches
-      HistTuple: shape
+      AnalysisCache: shape
+      HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
 extraFormat_for_triggerMatchingAndSF:
@@ -261,6 +263,57 @@ payload_producers:
       - HVV_py
       - HVV_pz
       - HVV_E
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '50MB'
+    dependencies:
+  BtagShape:
+    producers_module_name: BtagShapeProducer
+    producer_name: BtagShapeProducer
+    weight_module: Analysis.hh_bbww
+    save_as: json
+    needs_aggregation: True
+    target_groups: [ "signals", "backgrounds" ]
+    is_global: True
+    columns: [ ]
+    bins:
+      e_2: "channelId == static_cast<int>(Channel::e) && ncentralJet == 2"
+      e_3: "channelId == static_cast<int>(Channel::e) && ncentralJet == 3"
+      e_4: "channelId == static_cast<int>(Channel::e) && ncentralJet == 4"
+      e_5: "channelId == static_cast<int>(Channel::e) && ncentralJet == 5"
+      e_6: "channelId == static_cast<int>(Channel::e) && ncentralJet == 6"
+      e_7: "channelId == static_cast<int>(Channel::e) && ncentralJet == 7"
+      e_8: "channelId == static_cast<int>(Channel::e) && ncentralJet >= 8"
+      mu_2: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 2"
+      mu_3: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 3"
+      mu_4: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 4"
+      mu_5: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 5"
+      mu_6: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 6"
+      mu_7: "channelId == static_cast<int>(Channel::mu) && ncentralJet == 7"
+      mu_8: "channelId == static_cast<int>(Channel::mu) && ncentralJet >= 8"
+      eE_2: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 2"
+      eE_3: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 3"
+      eE_4: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 4"
+      eE_5: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 5"
+      eE_6: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 6"
+      eE_7: "channelId == static_cast<int>(Channel::eE) && ncentralJet == 7"
+      eE_8: "channelId == static_cast<int>(Channel::eE) && ncentralJet >= 8"
+      eMu_2: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 2"
+      eMu_3: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 3"
+      eMu_4: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 4"
+      eMu_5: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 5"
+      eMu_6: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 6"
+      eMu_7: "channelId == static_cast<int>(Channel::eMu) && ncentralJet == 7"
+      eMu_8: "channelId == static_cast<int>(Channel::eMu) && ncentralJet >= 8"
+      muMu_2: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 2"
+      muMu_3: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 3"
+      muMu_4: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 4"
+      muMu_5: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 5"
+      muMu_6: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 6"
+      muMu_7: "channelId == static_cast<int>(Channel::muMu) && ncentralJet == 7"
+      muMu_8: "channelId == static_cast<int>(Channel::muMu) && ncentralJet >= 8"
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
