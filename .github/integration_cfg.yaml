@@ -15,6 +15,7 @@ variables:
   HH_bbWW_version: "main"
   FLAF_version: "default"
   Corrections_version: "default"
+  StatInference_version: "default"
   HH_bbWW_active: "1"
   HH_bbWW_task: "StatInference.law.tasks.ResonantLimitsAndHistPlotTask"
   HH_bbWW_args: "--test 1000"
