@@ -131,17 +131,14 @@ SingleH:
   datasets:
     - ZH_Hto2B_Zto2L
     - ZH_Hto2B_Zto2Q
-    - ZHto2Tau_UncorrelatedDecay_Filtered
     - ZHto2Tau_UncorrelatedDecay_UnFiltered
 
     - WminusH_Hto2B_Wto2Q
     - WminusH_Hto2B_WtoLNu
-    - WminusHto2Tau_UncorrelatedDecay_Filtered
     - WminusHto2Tau_UncorrelatedDecay_UnFiltered
 
     - WplusH_Hto2B_Wto2Q
     - WplusH_Hto2B_WtoLNu
-    - WplusHto2Tau_UncorrelatedDecay_Filtered
     - WplusHto2Tau_UncorrelatedDatay_UnFiltered
 
     - GluGluHto2Wto2L2Nu_M125
