@@ -7,9 +7,12 @@ Run3_Model:
     - VV
     - W
     - QCD_PT
+    - SingleH
+    - TTH
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
+    - XtoHHto2B2Tau
   data:
     - Data_Full
 
