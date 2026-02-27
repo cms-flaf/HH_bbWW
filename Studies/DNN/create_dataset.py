@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 import ROOT
 import FLAF.RunKit.grid_tools as grid_tools
+from FLAF.RunKit.run_tools import ps_call
 
 ROOT.gROOT.SetBatch(True)
 ROOT.EnableThreadSafety()
@@ -152,7 +153,7 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
         # hadd the files together to make a final merged.root
         hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
         hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
-        os.system(f"hadd {hadd_out} {hadd_in}")
+        ps_call(f"hadd {hadd_out} {hadd_in}", verbose=1)
 
 
 def add_weight_file(output_folder):
