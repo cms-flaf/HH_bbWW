@@ -90,9 +90,7 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 weighted_cut = rdf_tmp.Sum("weight_Central").GetValue()
 
                 process_dict[nParity_string][signal_name][mass_point]["total"] = total
-                process_dict[nParity_string][signal_name][mass_point][
-                    "total_cut"
-                ] = cut
+                process_dict[nParity_string][signal_name][mass_point]["total_cut"] = cut
                 process_dict[nParity_string][signal_name][mass_point][
                     "total_cut_weighted"
                 ] = weighted_cut

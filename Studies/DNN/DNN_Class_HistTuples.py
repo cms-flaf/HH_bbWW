@@ -82,8 +82,7 @@ class DataWrapper:
         print(f"Added features {features}")
         print(f"New feature list {self.feature_names}")
 
-    def ReadFile(
-        self, file_name, entry_start=None, entry_stop=None):
+    def ReadFile(self, file_name, entry_start=None, entry_stop=None):
         if self.feature_names == None:
             print("Unknown branches to read! DefineInputFeatures first!")
             return
