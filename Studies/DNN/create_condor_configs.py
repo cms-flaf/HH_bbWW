@@ -2,53 +2,29 @@ import os
 import yaml
 import awkward as ak
 
+# Resolved
+# template = "config/training_setup_doubleLep_resolved.yaml"
+# output_folder = "CondorConfigs_25Feb_DoubleLepton_Resolved_Full_HME"
+# input_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/ResolvedDataset_Feb25/Dataset/nParity{}_Merged.root"
+# weight_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/ResolvedDataset_Feb25/Dataset/nParity{}_Merged_weight.root"
+# training_name = "DNN_DoubleLepton_Resolved_Training{i}_par{j}"
+# var_parse_dict = {
+#     'learning_rate': [ 0.00001 ],
+#     'n_epochs': [ 500 ],
+#     'dropout': [ 0.3 ],
+# }
 
-template = "config/default_training_setup_singleLep.yaml"
-output_folder = "CondorConfigs_Oct12_SingleLepton"
-input_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile{}.root"
-weight_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/weightfile{}.root"
-hme_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batchfile{}_HME_Friend.root"
-batch_config_template = "/eos/user/d/daebi/DNN_Training_Datasets/SingleLepton_v4/Dataset_Run3_2022/batch_config_parity{}.yaml"
-training_name = "DNN_SingleLep_Training{i}_par{j}"
+# Boosted
+template = "config/training_setup_doubleLep_boosted.yaml"
+output_folder = "CondorConfigs_25Feb_DoubleLepton_Boosted_Full_HME"
+input_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/BoostedDataset_Feb25/Dataset/nParity{}_Merged.root"
+weight_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/BoostedDataset_Feb25/Dataset/nParity{}_Merged_weight.root"
+training_name = "DNN_DoubleLepton_Boosted_Training{i}_par{j}"
 var_parse_dict = {
-    "adv_grad_factor": [0.0],
-    "adv_learning_rate": [0.0001],
-    "adv_submodule_steps": [0],
-    "class_grad_factor": [1.0],
     "learning_rate": [0.00001],
     "n_epochs": [100],
     "dropout": [0.3],
-    "weight_decay": [None],
-    "adv_weight_decay": [None],
-    "disco_lambda_factor": [0],
-    "n_disco_layers": [5],
-    "n_disco_units": [256],
-    "disco_activation": ["relu"],
-    "hmefeatures": [["SingleLep_DeepHME_mass", "SingleLep_DeepHME_mass_error"], None],
 }
-
-
-# template = "config/default_training_setup_doubleLep.yaml"
-# output_folder = "CondorConfigs_Oct10_DoubleLepton"
-# input_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/DoubleLepton_v5/Dataset_Run3_2022/batchfile{}.root"
-# weight_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/DoubleLepton_v5/Dataset_Run3_2022/weightfile{}.root"
-# hme_file_template = "/eos/user/d/daebi/DNN_Training_Datasets/DoubleLepton_v5/Dataset_Run3_2022/batchfile{}_HME_Friend.root"
-# batch_config_template = "/eos/user/d/daebi/DNN_Training_Datasets/DoubleLepton_v5/Dataset_Run3_2022/batch_config_parity{}.yaml"
-# training_name = "DNN_DoubleLep_Training{i}_par{j}"
-# var_parse_dict = {
-#     'adv_grad_factor': [ 0.0 ],
-#     'adv_learning_rate': [ 0.0001 ],
-#     'adv_submodule_steps': [ 0,],
-#     'class_grad_factor': [ 1.0 ],
-#     'learning_rate': [ 0.00001 ],
-#     'n_epochs': [ 50 ],
-#     'dropout': [ 0.1 ],
-#     'weight_decay': [ None ],
-#     'adv_weight_decay': [ None ],
-#     'disco_lambda_factor': [ 0 ],
-#     'n_disco_layers': [ 10 ],
-#     'hmefeatures': [ ['DoubleLep_DeepHME_mass', 'DoubleLep_DeepHME_mass_error'], None ]
-# }
 
 os.makedirs(output_folder, exist_ok=True)
 
@@ -64,20 +40,14 @@ for i, varset in enumerate(var_combinations):
     config = default_config.copy()
     for name, var in zip(var_names, varset.tolist()):
         config[name] = var
-    for j in range(1):
+    for j in range(4):
         # Set up each parity
         config["training_file"] = input_file_template.format(j)
         config["weight_file"] = weight_file_template.format(j)
-        config["hme_friend_file"] = hme_file_template.format(j)
-        config["batch_config"] = batch_config_template.format(j)
         config["test_training_file"] = input_file_template.format((j + 1) % 4)
         config["test_weight_file"] = weight_file_template.format((j + 1) % 4)
-        config["test_hme_friend_file"] = hme_file_template.format((j + 1) % 4)
-        config["test_batch_config"] = batch_config_template.format((j + 1) % 4)
         config["validation_file"] = input_file_template.format((j + 2) % 4)
         config["validation_weight_file"] = weight_file_template.format((j + 2) % 4)
-        config["validation_hme_friend_file"] = hme_file_template.format((j + 2) % 4)
-        config["validation_batch_config"] = batch_config_template.format((j + 2) % 4)
 
         config["training_name"] = training_name.format(i=i, j=j)
 

@@ -1,0 +1,99 @@
+UseParametric: true
+nClasses: 2
+activation: tanh
+batch_size: 1000
+dropout: 0.5
+features:
+  - lep1_pt
+  - lep1_phi
+  - lep1_eta
+  - lep1_mass
+  - lep2_pt
+  - lep2_phi
+  - lep2_eta
+  - lep2_mass
+  - PuppiMET_pt
+  - PuppiMET_phi
+  - HT
+  - dR_dilep
+  - dR_dibjet
+  - dR_dilep_dibjet
+  - dR_dilep_dijet
+  - dPhi_lep1_lep2
+  - dPhi_jet1_jet2
+  - dPhi_MET_dilep
+  - dPhi_MET_dibjet
+  - MT
+  - MT2_ll
+  - MT2_bb
+  - MT2_blbl
+  - MT2_blbl2
+  - ll_mass
+  - CosTheta_bb
+  - bjet1_pt
+  - bjet1_phi
+  - bjet1_eta
+  - bjet1_mass
+  - bjet1_btagPNetB
+  - bjet2_pt
+  - bjet2_phi
+  - bjet2_eta
+  - bjet2_mass
+  - bjet2_btagPNetB
+  - other_jet1_pt
+  - other_jet1_phi
+  - other_jet1_eta
+  - other_jet1_mass
+  - other_jet1_btagPNetB
+  - other_jet2_pt
+  - other_jet2_phi
+  - other_jet2_eta
+  - other_jet2_mass
+  - other_jet2_btagPNetB
+  - fatbjet_pt
+  - fatbjet_phi
+  - fatbjet_eta
+  - fatbjet_mass
+  - fatbjet_mass_PNetCorr
+  - fatbjet_particleNetWithMass_HbbvsQCD
+  - fatbjet_tau1
+  - fatbjet_tau2
+  - fatbjet_tau3
+  - fatbjet_tau4
+  - fatbjet_msoftdrop
+  - fatbjet_neMultiplicity
+  - fatbjet_neHEF
+  - fatbjet_nConstituents
+  - fatbjet_muEF
+  - fatbjet_neEmEF
+
+  - DoubleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass_error
+
+learning_rate: 0.00001
+n_layers: 5
+n_units: 512
+n_epochs: 100
+parametric_list:
+  - 300
+  - 400
+  - 500
+  - 550
+  - 600
+  - 650
+  - 700
+  - 800
+  - 900
+  - 1000
+  - 1200
+  - 1400
+  - 1600
+  - 1800
+  - 2000
+  - 2500
+  - 3000
+  - 3500
+  - 4000
+patience: 100
+use_batch_norm: true
+weight_decay: 0.004
