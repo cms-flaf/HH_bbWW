@@ -8,7 +8,6 @@ Run3_Model:
     - W
     - QCD_PT
     - SingleH
-    - TTH
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
