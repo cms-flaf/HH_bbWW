@@ -79,23 +79,23 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
             for nParity in range(config_dict["nParity"]):
                 nParity_string = f"nParity_{nParity}"
-                parity_cut = parity_cut.format(
+                parity_cut_formatted = parity_cut.format(
                     nParity=config_dict["nParity"], parity_scan=nParity
                 )
                 output_nParity = os.path.join(output_folder, f"nParity{nParity}_Merged")
                 output_file = os.path.join(output_nParity, f"{dataset_name}_merge.root")
 
-                rdf_tmp = rdf.Filter(parity_cut)
+                rdf_tmp = rdf.Filter(parity_cut_formatted)
                 cut = rdf_tmp.Count().GetValue()
                 weighted_cut = rdf_tmp.Sum("weight_Central").GetValue()
 
-                process_dict[nParity_string][signal_name][mass_point]["total"] += total
+                process_dict[nParity_string][signal_name][mass_point]["total"] = total
                 process_dict[nParity_string][signal_name][mass_point][
                     "total_cut"
-                ] += cut
+                ] = cut
                 process_dict[nParity_string][signal_name][mass_point][
                     "total_cut_weighted"
-                ] += weighted_cut
+                ] = weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
                 rdf_tmp.Snapshot(treeName, output_file)
@@ -122,32 +122,32 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
 
             for nParity in range(config_dict["nParity"]):
                 nParity_string = f"nParity_{nParity}"
-                parity_cut = parity_cut.format(
+                parity_cut_formatted = parity_cut.format(
                     nParity=config_dict["nParity"], parity_scan=nParity
                 )
                 output_nParity = os.path.join(output_folder, f"nParity{nParity}_Merged")
                 output_file = os.path.join(output_nParity, f"{dataset_name}_merge.root")
 
-                rdf_tmp = rdf.Filter(parity_cut)
+                rdf_tmp = rdf.Filter(parity_cut_formatted)
                 cut = rdf_tmp.Count().GetValue()
                 weighted_cut = rdf_tmp.Sum("weight_Central").GetValue()
 
                 process_dict[nParity_string][background_name][dataset_name][
                     "total"
-                ] += total
+                ] = total
                 process_dict[nParity_string][background_name][dataset_name][
                     "total_cut"
-                ] += cut
+                ] = cut
                 process_dict[nParity_string][background_name][dataset_name][
                     "total_cut_weighted"
-                ] += weighted_cut
+                ] = weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
                 rdf_tmp.Snapshot(treeName, output_file)
 
     for nParity in range(config_dict["nParity"]):
         nParity_string = f"nParity_{nParity}"
-        out_yaml = f"dataset_distritubution_parity{nParity}.yaml"
+        out_yaml = f"dataset_distribution_parity{nParity}.yaml"
         with open(os.path.join(output_folder, out_yaml), "w") as outfile:
             yaml.dump(process_dict[nParity_string], outfile)
 

@@ -83,16 +83,14 @@ class DataWrapper:
         print(f"New feature list {self.feature_names}")
 
     def ReadFile(
-        self, file_name, entry_start=None, entry_stop=None, hme_friend_file=None
-    ):
+        self, file_name, entry_start=None, entry_stop=None):
         if self.feature_names == None:
-            print("Uknown branches to read! DefineInputFeatures first!")
+            print("Unknown branches to read! DefineInputFeatures first!")
             return
 
         print(f"Reading file {file_name}")
 
         features_to_load = self.feature_names
-        features_to_load = features_to_load + self.feature_names
 
         features_to_load.append("X_mass")
         features_to_load.append("weight_Central")
