@@ -3,7 +3,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: DL_DNN_m${MX}_vs_HME/DL_DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DL_DNN_m${MX}_vs_HME/DL_DNN_m${MX}_vs_HME.root
 signalFractionForRelevantBins: 0.2
 eras:
   - Run3_2022

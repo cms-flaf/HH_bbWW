@@ -630,3 +630,8 @@ variables:
 
   - name: SL_DNN_m1000_vs_HME
     vars: [ DNNParametric_SL_NoHME_M1000_Signal, SingleLep_DeepHME_mass ]
+
+StatInference:
+  config: config/Datacards/x_hh_bbww_DL_run3.yaml
+  hist_bins: config/Datacards/CI_binning.json
+  # param_values: [ 300 ]
