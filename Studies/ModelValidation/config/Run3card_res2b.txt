@@ -1,0 +1,16 @@
+imax    1 number of bins
+jmax    3 number of processes minus 1
+kmax    0 number of nuisance parameters
+--------------------------------------------------------------------------------
+shapes data_obs res2b run3_res2b.root $PROCESS
+shapes * res2b run3_res2b.root m$MASS_$PROCESS
+--------------------------------------------------------------------------------
+bin             res2b           
+observation     -1              
+bin             res2b           res2b           res2b           res2b           
+process         Signal          TT              DY              Other
+process         0               1               2               3  
+rate            -1              -1              -1              -1
+--------------------------------------------------------------------------------
+
+res2b autoMCStats 20 1 1
