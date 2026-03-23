@@ -12,6 +12,7 @@ import onnxruntime as ort
 import ROOT
 import sklearn.metrics
 
+
 class DataWrapper:
     def __init__(self):
         print("Init data wrapper")
@@ -148,8 +149,6 @@ class DataWrapper:
         if self.use_parametric:
             self.features = np.append(self.features, self.param_values, axis=1)
 
-
-
         print(
             f"End read. Memory usage in MB is {psutil.Process(os.getpid()).memory_info()[0] / float(2 ** 20)}"
         )
@@ -166,8 +165,6 @@ class DataWrapper:
                 getattr(branches, "class_target"), dtype="float32"
             )
             file.close()
-
-
 
 
 class ModelCheckpoint(tf.keras.callbacks.Callback):
@@ -249,7 +246,9 @@ class ModelCheckpoint(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         self.epochs_since_last_save += 1
         current = logs.get(self.monitor)
-        if self.monitor_op(current, self.best) and (self.predicate is None or self.predicate(self.model, logs)):
+        if self.monitor_op(current, self.best) and (
+            self.predicate is None or self.predicate(self.model, logs)
+        ):
             # if self.predicate is None or self.predicate(self.model, logs):
             os.makedirs(self.filepath, exist_ok=True)
             path_best = os.path.join(self.filepath, f"{self.monitor}.onnx")
@@ -278,19 +277,32 @@ class ModelCheckpoint(tf.keras.callbacks.Callback):
                 self.msg = f"Epoch {epoch+1}: early stopping after {self.epochs_since_last_save} epochs."
 
 
-
-
 class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
-    def __init__(self, threshold_yield, max_events=100000, nParity=4, name="weighted_bkg_at_sig_yield", dtype=tf.float32):
+    def __init__(
+        self,
+        threshold_yield,
+        max_events=100000,
+        nParity=4,
+        name="weighted_bkg_at_sig_yield",
+        dtype=tf.float32,
+    ):
         super().__init__(name=name, dtype=dtype)
         self.threshold_yield = tf.constant(threshold_yield, dtype=dtype)
         self.max_events = max_events
         self.nParity = nParity
 
-        self.scores = self.add_weight(name="scores", shape=(max_events,), dtype=dtype, initializer="zeros")
-        self.labels = self.add_weight(name="labels", shape=(max_events,), dtype=dtype, initializer="zeros")
-        self.weights_var = self.add_weight(name="weights", shape=(max_events,), dtype=dtype, initializer="zeros")
-        self.count = self.add_weight(name="count", shape=(), dtype=tf.int32, initializer="zeros")
+        self.scores = self.add_weight(
+            name="scores", shape=(max_events,), dtype=dtype, initializer="zeros"
+        )
+        self.labels = self.add_weight(
+            name="labels", shape=(max_events,), dtype=dtype, initializer="zeros"
+        )
+        self.weights_var = self.add_weight(
+            name="weights", shape=(max_events,), dtype=dtype, initializer="zeros"
+        )
+        self.count = self.add_weight(
+            name="count", shape=(), dtype=tf.int32, initializer="zeros"
+        )
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         y_true = tf.cast(tf.reshape(y_true, [-1]), tf.float32)
@@ -314,7 +326,9 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
 
         self.scores.assign(tf.tensor_scatter_nd_update(self.scores, indices_2d, y_pred))
         self.labels.assign(tf.tensor_scatter_nd_update(self.labels, indices_2d, y_true))
-        self.weights_var.assign(tf.tensor_scatter_nd_update(self.weights_var, indices_2d, sample_weight))
+        self.weights_var.assign(
+            tf.tensor_scatter_nd_update(self.weights_var, indices_2d, sample_weight)
+        )
 
         self.count.assign(end)
 
@@ -322,7 +336,11 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
         n = tf.cast(self.count, tf.int32)  # ensure int32 for indexing
 
         def no_samples():
-            return tf.constant(-2.0, dtype=self.dtype), tf.constant(-2.0, dtype=self.dtype), tf.constant(-2.0, dtype=self.dtype)
+            return (
+                tf.constant(-2.0, dtype=self.dtype),
+                tf.constant(-2.0, dtype=self.dtype),
+                tf.constant(-2.0, dtype=self.dtype),
+            )
 
         def compute():
             # Safe slicing useing tf.gather instead of tf.slice
@@ -346,7 +364,9 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
             cum_bkg_w2 = tf.cumsum(bkg_weights * bkg_weights)
 
             # Scale by nParity to 'fake' realistic values
-            cum_sig = self.nParity * 0.0264215349425664 * cum_sig # Scale signal to BR too
+            cum_sig = (
+                self.nParity * 0.0264215349425664 * cum_sig
+            )  # Scale signal to BR too
             cum_bkg = self.nParity * cum_bkg
             cum_bkg_w2 = self.nParity * self.nParity * cum_bkg_w2
 
@@ -354,7 +374,11 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
             threshold = tf.minimum(self.threshold_yield, total_sig)
 
             def no_signal():
-                return tf.constant(-1.0, dtype=self.dtype), tf.constant(-1.0, dtype=self.dtype), tf.constant(-1.0, dtype=self.dtype)
+                return (
+                    tf.constant(-1.0, dtype=self.dtype),
+                    tf.constant(-1.0, dtype=self.dtype),
+                    tf.constant(-1.0, dtype=self.dtype),
+                )
 
             def with_signal():
                 mask = cum_sig >= threshold
@@ -363,11 +387,17 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
                 # tf.print("Cum bkg ", cum_bkg[idx])
                 # tf.print("Cum bkg w2 ", cum_bkg_w2[idx])
                 # tf.print("Cum sig ", cum_sig[idx])
-                return tf.cast(cum_bkg[idx], self.dtype), tf.keras.ops.power(tf.cast(cum_bkg_w2[idx], self.dtype), 0.5), tf.cast(scores[idx], self.dtype)
+                return (
+                    tf.cast(cum_bkg[idx], self.dtype),
+                    tf.keras.ops.power(tf.cast(cum_bkg_w2[idx], self.dtype), 0.5),
+                    tf.cast(scores[idx], self.dtype),
+                )
 
-            return tf.cond(tf.logical_or(tf.equal(total_sig, 0.0), tf.equal(threshold, 0.0)),
-                           no_signal,
-                           with_signal)
+            return tf.cond(
+                tf.logical_or(tf.equal(total_sig, 0.0), tf.equal(threshold, 0.0)),
+                no_signal,
+                with_signal,
+            )
 
         value, error, score = tf.cond(tf.equal(n, 0), no_samples, compute)
 
@@ -384,7 +414,9 @@ class WeightedBackgroundAtSignalYield(tf.keras.metrics.Metric):
 
 
 class WeightedBackgroundAtSignalYieldValue(tf.keras.metrics.Metric):
-    def __init__(self, parent_metric, name="weighted_bkg_at_sig_yield_value", dtype=tf.float32):
+    def __init__(
+        self, parent_metric, name="weighted_bkg_at_sig_yield_value", dtype=tf.float32
+    ):
         super().__init__(name=name, dtype=dtype)
         self.parent = parent_metric
 
@@ -400,9 +432,10 @@ class WeightedBackgroundAtSignalYieldValue(tf.keras.metrics.Metric):
         self.parent.reset_state()
 
 
-
 class WeightedBackgroundAtSignalYieldError(tf.keras.metrics.Metric):
-    def __init__(self, parent_metric, name="weighted_bkg_at_sig_yield_error", dtype=tf.float32):
+    def __init__(
+        self, parent_metric, name="weighted_bkg_at_sig_yield_error", dtype=tf.float32
+    ):
         super().__init__(name=name, dtype=dtype)
         self.parent = parent_metric
 
@@ -419,7 +452,9 @@ class WeightedBackgroundAtSignalYieldError(tf.keras.metrics.Metric):
 
 
 class WeightedBackgroundAtSignalYieldScore(tf.keras.metrics.Metric):
-    def __init__(self, parent_metric, name="weighted_bkg_at_sig_yield_score", dtype=tf.float32):
+    def __init__(
+        self, parent_metric, name="weighted_bkg_at_sig_yield_score", dtype=tf.float32
+    ):
         super().__init__(name=name, dtype=dtype)
         self.parent = parent_metric
 
@@ -453,12 +488,12 @@ def binary_focal_crossentropy(target, output, gamma1=2, gamma2=0.5):
     bce = binary_entropy(y_true, y_pred)
 
     # Custom focal
-    gamma_signal = 0 # DO NOT TOUCH
+    gamma_signal = 0  # DO NOT TOUCH
     gamma_bkg = gamma1
     # Target y_pred -> 1
     p_t = tf.clip_by_value(y_pred, epsilon, 1 - epsilon)
     # Split into a 'signal' gamma and a 'bkg' gamma
-    gamma = y_true * gamma_signal + (1-y_true) * gamma_bkg
+    gamma = y_true * gamma_signal + (1 - y_true) * gamma_bkg
     # Calc factor of pT^gamma
     focal_factor = tf.keras.ops.power(p_t, gamma)
 
@@ -466,14 +501,13 @@ def binary_focal_crossentropy(target, output, gamma1=2, gamma2=0.5):
     # focal_bce = focal_factor * bce
 
     gamma2_signal = gamma2
-    gamma2_bkg = 1 # DO NOT TOUCH
+    gamma2_bkg = 1  # DO NOT TOUCH
 
-    gamma2 = y_true * gamma2_signal + (1-y_true) * gamma2_bkg
+    gamma2 = y_true * gamma2_signal + (1 - y_true) * gamma2_bkg
 
     focal_bce = focal_factor * tf.keras.ops.power(bce, gamma2)
 
     return focal_bce
-
 
 
 class Model(tf.keras.Model):
@@ -489,7 +523,7 @@ class Model(tf.keras.Model):
         # self.class_loss = tf.keras.losses.categorical_focal_crossentropy
         # self.class_loss = tf.keras.losses.CategoricalFocalCrossentropy(gamma=5.0, reduction=None)
         self.class_loss = binary_focal_crossentropy
-        
+
         self.class_accuracy = tf.keras.metrics.categorical_accuracy
 
         self.class_loss_tracker = tf.keras.metrics.Mean(name="class_loss")
@@ -497,7 +531,9 @@ class Model(tf.keras.Model):
 
         self.l2_loss_tracker = tf.keras.metrics.Mean(name="l2_loss")
 
-        self.bkgAtSignal = WeightedBackgroundAtSignalYield(threshold_yield=5.0, max_events=max_events)
+        self.bkgAtSignal = WeightedBackgroundAtSignalYield(
+            threshold_yield=5.0, max_events=max_events
+        )
         self.bkgAtSignal_value = WeightedBackgroundAtSignalYieldValue(self.bkgAtSignal)
         self.bkgAtSignal_error = WeightedBackgroundAtSignalYieldError(self.bkgAtSignal)
         self.bkgAtSignal_score = WeightedBackgroundAtSignalYieldScore(self.bkgAtSignal)
@@ -576,7 +612,9 @@ class Model(tf.keras.Model):
         def compute_losses():
             y_pred_class = self(x, training=training)
 
-            class_loss_vec = self.class_loss(y_class, y_pred_class, self.gamma1, self.gamma2)
+            class_loss_vec = self.class_loss(
+                y_class, y_pred_class, self.gamma1, self.gamma2
+            )
 
             class_loss = tf.reduce_mean(class_loss_vec * class_weight)
 
@@ -588,14 +626,20 @@ class Model(tf.keras.Model):
 
         if training:
             with tf.GradientTape() as class_tape:
-                y_pred_class, class_loss_vec, class_loss, l2_loss, combined_loss = compute_losses()
+                y_pred_class, class_loss_vec, class_loss, l2_loss, combined_loss = (
+                    compute_losses()
+                )
         else:
-            y_pred_class, class_loss_vec, class_loss, l2_loss, combined_loss = compute_losses()
+            y_pred_class, class_loss_vec, class_loss, l2_loss, combined_loss = (
+                compute_losses()
+            )
 
         self.class_min_tracker.update_state(tf.reduce_min(y_pred_class[:, 0]))
         self.class_max_tracker.update_state(tf.reduce_max(y_pred_class[:, 0]))
 
-        self.bkgAtSignal.update_state(y_class[:,0], y_pred_class[:,0], sample_weight=physics_weight)
+        self.bkgAtSignal.update_state(
+            y_class[:, 0], y_pred_class[:, 0], sample_weight=physics_weight
+        )
 
         for n in range(self.nClasses):
             if n == 0:
@@ -695,8 +739,14 @@ def train_dnn(
         test_weight_file, entry_start=entry_start, entry_stop=entry_stop
     )
 
-    dw.physics_weight = np.where((dw.class_target == 0) & (dw.X_mass != 600), 0.0, dw.physics_weight)
-    test_dw.physics_weight = np.where((test_dw.class_target == 0) & (test_dw.X_mass != 600), 0.0, test_dw.physics_weight)
+    dw.physics_weight = np.where(
+        (dw.class_target == 0) & (dw.X_mass != 600), 0.0, dw.physics_weight
+    )
+    test_dw.physics_weight = np.where(
+        (test_dw.class_target == 0) & (test_dw.X_mass != 600),
+        0.0,
+        test_dw.physics_weight,
+    )
 
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
@@ -708,10 +758,10 @@ def train_dnn(
         (
             dw.features,
             (
-                tf.one_hot(dw.class_target, nClasses), 
-                dw.class_weight, 
+                tf.one_hot(dw.class_target, nClasses),
+                dw.class_weight,
                 dw.physics_weight,
-            )
+            ),
         )
     )
     train_tf_dataset = train_tf_dataset.shuffle(
@@ -780,22 +830,28 @@ def train_dnn(
     input_shape = [None, dw.features.shape[1]]
     input_signature = [tf.TensorSpec(input_shape, tf.double, name="x")]
 
-
-    nBatches = max(train_tf_dataset.cardinality().numpy(), test_tf_dataset.cardinality().numpy())
+    nBatches = max(
+        train_tf_dataset.cardinality().numpy(), test_tf_dataset.cardinality().numpy()
+    )
     max_events = nBatches * batch_size
     model = Model(setup, max_events)
     model.compile(
         loss=None,
         optimizer=tf.keras.optimizers.AdamW(
-            learning_rate=setup["learning_rate"], weight_decay=setup["weight_decay"], clipnorm=1.0,
+            learning_rate=setup["learning_rate"],
+            weight_decay=setup["weight_decay"],
+            clipnorm=1.0,
         ),
     )
     model(dw.features)
     model.summary()
 
-    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_class_loss', factor=setup['lr_decay'],
-                                patience=setup['lr_patience'], min_lr=0.0000000001)
-
+    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_class_loss",
+        factor=setup["lr_decay"],
+        patience=setup["lr_patience"],
+        min_lr=0.0000000001,
+    )
 
     callbacks = [
         ModelCheckpoint(
@@ -818,9 +874,8 @@ def train_dnn(
             save_callback=None,
             input_signature=input_signature,
         ),
-        reduce_lr
+        reduce_lr,
     ]
-
 
     verbose = setup["verbose"] if "verbose" in setup else 0
     # verbose = 1
@@ -847,7 +902,7 @@ def train_dnn(
         plt.xlabel("Epoch")
         plt.legend(loc="upper right")
         plt.grid(True)
-        plt.yscale('log')
+        plt.yscale("log")
         plt.ylim(bottom=0.0001)
         plt.savefig(os.path.join(output_folder, f"{metric}.pdf"), bbox_inches="tight")
         plt.clf()
@@ -932,19 +987,36 @@ def validate_dnn(
 
     os.makedirs(output_folder, exist_ok=True)
 
-    for cat in [ "res2b", "boosted", "res1b" ]:
-        ROOTOut = ROOT.TFile(os.path.join(output_folder, f"validation_{cat}.root"), "RECREATE")
+    for cat in ["res2b", "boosted", "res1b"]:
+        ROOTOut = ROOT.TFile(
+            os.path.join(output_folder, f"validation_{cat}.root"), "RECREATE"
+        )
         output_file = os.path.join(output_folder, f"validation_{cat}.pdf")
         fig, ax = plt.subplots()
 
-        para_masspoint_list = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 2000, 3000]  # [300, 450, 800]
+        para_masspoint_list = [
+            300,
+            400,
+            500,
+            550,
+            600,
+            650,
+            700,
+            800,
+            900,
+            1000,
+            2000,
+            3000,
+        ]  # [300, 450, 800]
         para_masspoint_list = [300, 600, 1000]
         canvases = []
         for para_masspoint in para_masspoint_list:
             print(f"Validating mass {para_masspoint}")
             if dw.use_parametric:
                 dw.SetPredictParamValue(para_masspoint)
-            features = dw.features_paramSet if dw.use_parametric else dw.features_no_param
+            features = (
+                dw.features_paramSet if dw.use_parametric else dw.features_no_param
+            )
 
             # print("Predicting")
             # print("Using features")
@@ -957,7 +1029,11 @@ def validate_dnn(
             physics_weight = dw.physics_weight
 
             # Scale signal to BR
-            physics_weight = np.where(dw.class_target == 0, dw.physics_weight * 0.0264215349425664, dw.physics_weight)
+            physics_weight = np.where(
+                dw.class_target == 0,
+                dw.physics_weight * 0.0264215349425664,
+                dw.physics_weight,
+            )
 
             # Only keep res2b for now and scale by 4 for parity
             # physics_weight = np.where(dw.res2b == 1, 4*physics_weight, 0.0)
@@ -969,7 +1045,6 @@ def validate_dnn(
                 physics_weight = np.where(dw.boosted == 1, physics_weight, 0.0)
             if cat == "res1b":
                 physics_weight = np.where(dw.recovery == 1, physics_weight, 0.0)
-
 
             # Class Plots
             # Lets build Masks
@@ -991,10 +1066,10 @@ def validate_dnn(
             )  # Need +1 because 10 bins actually have 11 edges
             if len(pred_signal[Sig_mask]) == 0:
                 print("No signal events in this mass point! Fake Quant Bins!")
-                quant_binning_class = np.linspace(0, 1, nQuantBins+1)
+                quant_binning_class = np.linspace(0, 1, nQuantBins + 1)
             else:
                 quant_binning_class = np.quantile(
-                    pred_signal[Sig_mask], np.linspace(0, 1, nQuantBins+1)
+                    pred_signal[Sig_mask], np.linspace(0, 1, nQuantBins + 1)
                 )
             quant_binning_class[0] = 0.0
             quant_binning_class[-1] = 1.0
@@ -1009,7 +1084,6 @@ def validate_dnn(
                 "DY": DY_mask,
                 "Other": Other_mask,
             }
-
 
             canvases.append(ROOT.TCanvas("c1", "c1", 1200, 600 * len(mask_dict.keys())))
             canvas = canvases[-1]
@@ -1052,8 +1126,9 @@ def validate_dnn(
                         binnum + 1, class_out_hist_w2[binnum] ** (0.5)
                     )
 
-                ROOTOut.WriteObject(ROOT_ClassOutput, f"m{para_masspoint}_{process_name}")
-
+                ROOTOut.WriteObject(
+                    ROOT_ClassOutput, f"m{para_masspoint}_{process_name}"
+                )
 
                 if ROOT_ClassOutput.Integral() == 0:
                     print(
@@ -1080,7 +1155,9 @@ def validate_dnn(
                 )
                 max_val = ROOT_ClassOutput.GetMaximum()
 
-                ROOT_ClassOutput.GetYaxis().SetRangeUser(0.001 * min_val, 1000 * max_val)
+                ROOT_ClassOutput.GetYaxis().SetRangeUser(
+                    0.001 * min_val, 1000 * max_val
+                )
 
                 legend_list.append(ROOT.TLegend(0.5, 0.8, 0.9, 0.9))
                 legend = legend_list[-1]
@@ -1102,8 +1179,6 @@ def validate_dnn(
             # print(f"Saved mass {para_masspoint}")
 
             canvas.Close()
-
-
 
             canvas = ROOT.TCanvas("c1", "c1", 800, 600)
             legend = ROOT.TLegend(0.5, 0.8, 0.9, 0.9)
@@ -1155,9 +1230,13 @@ def validate_dnn(
             pad_soverb.SetGrid()
 
             if para_masspoint == para_masspoint_list[0]:
-                canvas.Print(f"{output_file}(", f"Title:Mass {para_masspoint} {cat} GeV")
+                canvas.Print(
+                    f"{output_file}(", f"Title:Mass {para_masspoint} {cat} GeV"
+                )
             elif para_masspoint == para_masspoint_list[-1]:
-                canvas.Print(f"{output_file})", f"Title:Mass {para_masspoint} {cat} GeV")
+                canvas.Print(
+                    f"{output_file})", f"Title:Mass {para_masspoint} {cat} GeV"
+                )
             else:
                 canvas.Print(f"{output_file}", f"Title:Mass {para_masspoint} {cat} GeV")
             canvas.Close()
@@ -1179,19 +1258,16 @@ def validate_dnn(
                     title="Signal-vs-Background ROC curves",
                 )
 
-        ax.plot([0, 1], [0, 1], linestyle='--')
+        ax.plot([0, 1], [0, 1], linestyle="--")
         ax.set_title(f"ROC Curves {cat}")
         ax.grid()
-        plt.savefig(os.path.join(output_folder, f'ROC_{cat}.pdf'))
-
+        plt.savefig(os.path.join(output_folder, f"ROC_{cat}.pdf"))
 
         data_obs = ROOT.TH1D(
-                    f"data_obs",
-                    f"data_obs",
-                    nQuantBins,
-                    0.0,
-                    1.0,
-                )
+            f"data_obs",
+            f"data_obs",
+            nQuantBins,
+            0.0,
+            1.0,
+        )
         ROOTOut.WriteObject(data_obs, f"data_obs")
-
-

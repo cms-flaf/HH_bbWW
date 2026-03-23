@@ -25,39 +25,58 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         unique_trainings = {}
         branches = {}
         DNNValidation_Resolved_map = DNNValidationTask.req(
-            self, branch=-1, branches=(), training_configuration_dir=self.training_configuration_dir_resolved
+            self,
+            branch=-1,
+            branches=(),
+            training_configuration_dir=self.training_configuration_dir_resolved,
         ).create_branch_map()
-        for n_branch, (config, config_name, n_branch) in DNNValidation_Resolved_map.items():
-            training_id = re.search(r'Training\d+', config_name).group(0)
+        for n_branch, (
+            config,
+            config_name,
+            n_branch,
+        ) in DNNValidation_Resolved_map.items():
+            training_id = re.search(r"Training\d+", config_name).group(0)
             if training_id not in unique_trainings.keys():
                 unique_trainings[training_id] = {
-                    'config_names_resolved': [],
-                    'branches_resolved': [],
-                    'config_names_boosted': [],
-                    'branches_boosted': [],
+                    "config_names_resolved": [],
+                    "branches_resolved": [],
+                    "config_names_boosted": [],
+                    "branches_boosted": [],
                 }
-            unique_trainings[training_id]['config_names_resolved'].append(config_name)
-            unique_trainings[training_id]['branches_resolved'].append(n_branch)
-
+            unique_trainings[training_id]["config_names_resolved"].append(config_name)
+            unique_trainings[training_id]["branches_resolved"].append(n_branch)
 
         DNNValidation_Boosted_map = DNNValidationTask.req(
-            self, branch=-1, branches=(), training_configuration_dir=self.training_configuration_dir_boosted
+            self,
+            branch=-1,
+            branches=(),
+            training_configuration_dir=self.training_configuration_dir_boosted,
         ).create_branch_map()
-        for n_branch, (config, config_name, n_branch) in DNNValidation_Boosted_map.items():
-            training_id = re.search(r'Training\d+', config_name).group(0)
+        for n_branch, (
+            config,
+            config_name,
+            n_branch,
+        ) in DNNValidation_Boosted_map.items():
+            training_id = re.search(r"Training\d+", config_name).group(0)
             if training_id not in unique_trainings.keys():
                 unique_trainings[training_id] = {
-                    'config_names_resolved': [],
-                    'branches_resolved': [],
-                    'config_names_boosted': [],
-                    'branches_boosted': [],
+                    "config_names_resolved": [],
+                    "branches_resolved": [],
+                    "config_names_boosted": [],
+                    "branches_boosted": [],
                 }
-            unique_trainings[training_id]['config_names_boosted'].append(config_name)
-            unique_trainings[training_id]['branches_boosted'].append(n_branch)
+            unique_trainings[training_id]["config_names_boosted"].append(config_name)
+            unique_trainings[training_id]["branches_boosted"].append(n_branch)
 
         k = 0
         for training_id in unique_trainings.keys():
-            branches[k] = (training_id, unique_trainings[training_id]['config_names_resolved'], unique_trainings[training_id]['config_names_boosted'], unique_trainings[training_id]['branches_resolved'], unique_trainings[training_id]['branches_boosted'])
+            branches[k] = (
+                training_id,
+                unique_trainings[training_id]["config_names_resolved"],
+                unique_trainings[training_id]["config_names_boosted"],
+                unique_trainings[training_id]["branches_resolved"],
+                unique_trainings[training_id]["branches_boosted"],
+            )
             k += 1
         return branches
 
@@ -98,7 +117,13 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         return reqs
 
     def requires(self):
-        training_id, config_names_resolved, config_names_boosted, branches_resolved, branches_boosted = self.branch_data
+        (
+            training_id,
+            config_names_resolved,
+            config_names_boosted,
+            branches_resolved,
+            branches_boosted,
+        ) = self.branch_data
         return [
             [
                 DNNValidationTask.req(
@@ -107,31 +132,46 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                     branch=br,
                     max_runtime=DNNValidationTask.max_runtime._default,
                     branches=(br,),
-            ) for br in branches_resolved
-            ], [
+                )
+                for br in branches_resolved
+            ],
+            [
                 DNNValidationTask.req(
                     self,
                     training_configuration_dir=self.training_configuration_dir_boosted,
                     branch=br,
                     max_runtime=DNNValidationTask.max_runtime._default,
                     branches=(br,),
-            ) for br in branches_boosted
-            ]
+                )
+                for br in branches_boosted
+            ],
         ]
 
     def output(self):
-        training_id, config_names_resolved, config_names_boosted, branches_resolved, branches_boosted = self.branch_data
+        (
+            training_id,
+            config_names_resolved,
+            config_names_boosted,
+            branches_resolved,
+            branches_boosted,
+        ) = self.branch_data
         training_name = training_id
         outFileName = f"limits"
         output_path = os.path.join(
             "DNNLimits", self.version, self.period, training_name, outFileName
         )
         return [
-            self.remote_target(output_path, fs=self.fs_histograms),         
+            self.remote_target(output_path, fs=self.fs_histograms),
         ]
 
     def run(self):
-        training_id, config_names_resolved, config_names_boosted, branches_resolved, branches_boosted = self.branch_data
+        (
+            training_id,
+            config_names_resolved,
+            config_names_boosted,
+            branches_resolved,
+            branches_boosted,
+        ) = self.branch_data
         training_name = training_id
         dnn_limits = os.path.join(
             self.ana_path(), "Studies", "ModelValidation", "DNN_Limit_Condor.py"
@@ -154,7 +194,6 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 for inp in combined_inputs
             ]
 
-
             dnn_limits_cmd = [
                 "python3",
                 "-u",
@@ -166,7 +205,7 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             ]
             ps_call(dnn_limits_cmd, verbose=1, cwd=job_home)
 
-        for fname in (config_names_resolved + config_names_boosted):
+        for fname in config_names_resolved + config_names_boosted:
             shutil.copy(fname, tmpFolder)
 
         limit_outputs = self.output()
@@ -176,12 +215,6 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         if remove_job_home:
             shutil.rmtree(job_home)
-
-
-
-
-
-
 
 
 class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
@@ -197,11 +230,23 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         unique_trainings = {}
         branches = {}
         DNNLimit_map = DNNLimitTask.req(
-            self, branch=-1, branches=(),
+            self,
+            branch=-1,
+            branches=(),
         ).create_branch_map()
         branch_list = []
-        for n_branch, (training_id, config_names_resolved, config_names_boosted, branches_resolved, branches_boosted) in DNNLimit_map.items():
-            unique_trainings[training_id] = (n_branch, config_names_resolved, config_names_boosted)
+        for n_branch, (
+            training_id,
+            config_names_resolved,
+            config_names_boosted,
+            branches_resolved,
+            branches_boosted,
+        ) in DNNLimit_map.items():
+            unique_trainings[training_id] = (
+                n_branch,
+                config_names_resolved,
+                config_names_boosted,
+            )
             branch_list.append(n_branch)
 
         k = 0
@@ -227,7 +272,8 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 branch=(br),
                 max_runtime=DNNLimitTask.max_runtime._default,
                 branches=(br,),
-            ) for br in branch_list
+            )
+            for br in branch_list
         ]
 
     def output(self):
@@ -237,7 +283,7 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             "DNNComparison", self.version, self.period, outFileName
         )
         return [
-            self.remote_target(output_path, fs=self.fs_histograms),         
+            self.remote_target(output_path, fs=self.fs_histograms),
         ]
 
     def run(self):
@@ -268,7 +314,6 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             ]
             ps_call(dnn_comparison_cmd, verbose=1, cwd=job_home)
 
-
         comparison_outputs = self.output()
         with comparison_outputs[0].localize("w") as tmp_local_folder:
             out_local_path = tmp_local_folder.path
@@ -277,23 +322,15 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         if remove_job_home:
             shutil.rmtree(job_home)
 
-
             # eval(my_str, env={"gamma1": point["gamma1"]})
 
             # Here we have localized the limit folders, now we need code to look over the configs to build a dict of training params and their limits
 
-
-
             # Make a dict of just a list of all limits for a given variable point (gamma = 0.5, all limits)
             # ALSO other part that finds and returns training with best limit for fun
 
-
             # Then we would make plots of that dict with error bars for up/down to show impact
-
 
             # Then copy that final output folder to the transferred law output
 
-
-
             # And given the best training point, do the inverse -- freeze one value and scan the other vars
-

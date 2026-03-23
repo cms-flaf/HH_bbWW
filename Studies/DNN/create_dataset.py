@@ -150,6 +150,7 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
         with open(os.path.join(output_folder, out_yaml), "w") as outfile:
             yaml.dump(process_dict[nParity_string], outfile)
 
+
 def hadd_files(config_dict, output_folder):
     for nParity in range(config_dict["nParity"]):
         # hadd the files together to make a final merged.root
@@ -196,10 +197,14 @@ def add_weight_file(output_folder):
         mean_weight = np.mean(np.abs(class_weight))
         std = np.std(np.abs(class_weight))
         print(f"Normalizing from {mean_weight} +- {std}")
-        class_weight = np.clip(class_weight, - (mean_weight + (3 * std)), (mean_weight + (3 * std)))
+        class_weight = np.clip(
+            class_weight, -(mean_weight + (3 * std)), (mean_weight + (3 * std))
+        )
 
         # Set specific masses if you want
-        class_weight = np.where((class_targets == 0) & (X_mass != 600), 0.0, class_weight)
+        class_weight = np.where(
+            (class_targets == 0) & (X_mass != 600), 0.0, class_weight
+        )
 
         # Total_Signal == Total_Background
         total_signal = np.sum(np.where(class_targets == 0, class_weight, 0.0))

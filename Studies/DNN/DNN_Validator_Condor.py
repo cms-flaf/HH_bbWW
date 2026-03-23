@@ -12,7 +12,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--validation_weight_file", required=True, type=str, help="Weight file"
     )
-    parser.add_argument("--output_folder", required=True, type=str, help="Output Folder")
+    parser.add_argument(
+        "--output_folder", required=True, type=str, help="Output Folder"
+    )
     parser.add_argument(
         "--setup-config", required=True, type=str, help="Setup config for training"
     )

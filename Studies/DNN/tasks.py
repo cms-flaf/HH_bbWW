@@ -139,7 +139,7 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             "DNNTraining", self.version, self.period, training_name, outFileName
         )
         return [
-            self.remote_target(output_path, fs=self.fs_histograms),         
+            self.remote_target(output_path, fs=self.fs_histograms),
         ]
 
     def run(self):

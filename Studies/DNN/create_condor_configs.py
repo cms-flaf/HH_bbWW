@@ -9,13 +9,13 @@ input_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/
 weight_file_template = "/afs/cern.ch/work/d/daebi/diHiggs/HH_bbWW_v2601a/Studies/DNN/ResolvedDataset_Mar14/Dataset/nParity{}_Merged_weight_m600.root"
 training_name = "DNN_DoubleLepton_Resolved_Training{i}_par{j}"
 var_parse_dict = {
-    'learning_rate': [ 0.0005 ],
-    'n_epochs': [ 100, 200 ],
-    'dropout': [ 0.2, 0.5 ],
-    'parametric_list': [ [ 600 ] ],
-    'l2_rate': [ 0.001, 0.0001, 0.01 ],
-    'gamma1': [ 2.0, 1.5, 2.5 ],
-    'gamma2': [ 0.5, 0.2, 0.7 ],
+    "learning_rate": [0.0005],
+    "n_epochs": [100, 200],
+    "dropout": [0.2, 0.5],
+    "parametric_list": [[600]],
+    "l2_rate": [0.001, 0.0001, 0.01],
+    "gamma1": [2.0, 1.5, 2.5],
+    "gamma2": [0.5, 0.2, 0.7],
 }
 
 # Boosted
