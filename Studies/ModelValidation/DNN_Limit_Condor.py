@@ -9,7 +9,6 @@ from FLAF.RunKit.envToJson import get_cmsenv
 import uproot
 import json
 
-
 cmssw_env = get_cmsenv(cmssw_path=os.getenv("FLAF_CMSSW_BASE"))
 
 
