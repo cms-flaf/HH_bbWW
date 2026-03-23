@@ -85,6 +85,7 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     for lep_index in [1, 2]:
         total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
     total_weight = f"{total_weight} * {GetTriggerWeight()}"
+    total_weight = f"{total_weight} * weight_bTagShape_Central"
     return total_weight
 
 
