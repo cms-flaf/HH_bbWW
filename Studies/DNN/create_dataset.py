@@ -156,7 +156,8 @@ def hadd_files(config_dict, output_folder):
         # hadd the files together to make a final merged.root
         hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
         hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
-        os.system(f"hadd {hadd_out} {hadd_in}")
+        ps_call("hadd", hadd_out, hadd_in)
+        # os.system(f"hadd {hadd_out} {hadd_in}")
 
 
 def add_weight_file(output_folder):
