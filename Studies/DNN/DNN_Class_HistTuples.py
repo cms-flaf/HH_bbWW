@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import onnxruntime as ort
 import ROOT
 import sklearn.metrics
-
+import shutil
 
 class DataWrapper:
     def __init__(self):
@@ -767,8 +767,8 @@ def train_dnn(
     train_tf_dataset = train_tf_dataset.shuffle(
         len(train_tf_dataset), reshuffle_each_iteration=True
     )
-    batch_size = min(batch_size, train_tf_dataset.cardinality().numpy())
-    train_tf_dataset = train_tf_dataset.batch(batch_size, drop_remainder=True)
+    batch_size_train = min(batch_size, train_tf_dataset.cardinality().numpy())
+    train_tf_dataset = train_tf_dataset.batch(batch_size_train, drop_remainder=True)
 
     test_tf_dataset = tf.data.Dataset.from_tensor_slices(
         (
@@ -783,8 +783,8 @@ def train_dnn(
     test_tf_dataset = test_tf_dataset.shuffle(
         len(test_tf_dataset), reshuffle_each_iteration=True
     )
-    batch_size = min(batch_size, test_tf_dataset.cardinality().numpy())
-    test_tf_dataset = test_tf_dataset.batch(batch_size, drop_remainder=True)
+    batch_size_test = min(batch_size, test_tf_dataset.cardinality().numpy())
+    test_tf_dataset = test_tf_dataset.batch(batch_size_test, drop_remainder=True)
 
     @tf.function
     def new_param_map(*x):
@@ -833,7 +833,7 @@ def train_dnn(
     nBatches = max(
         train_tf_dataset.cardinality().numpy(), test_tf_dataset.cardinality().numpy()
     )
-    max_events = nBatches * batch_size
+    max_events = nBatches * max(batch_size_train, batch_size_test)
     model = Model(setup, max_events)
     model.compile(
         loss=None,
@@ -1271,3 +1271,4 @@ def validate_dnn(
             1.0,
         )
         ROOTOut.WriteObject(data_obs, f"data_obs")
+        ROOTOut.Close()

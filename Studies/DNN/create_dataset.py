@@ -156,8 +156,8 @@ def hadd_files(config_dict, output_folder):
         # hadd the files together to make a final merged.root
         hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
         hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
-        ps_call("hadd", hadd_out, hadd_in)
-        # os.system(f"hadd {hadd_out} {hadd_in}")
+        # ps_call("hadd", hadd_out, hadd_in)
+        os.system(f"hadd {hadd_out} {hadd_in}")
 
 
 def add_weight_file(output_folder):
@@ -192,7 +192,6 @@ def add_weight_file(output_folder):
 
         # Set any negative weight events to 0
         # class_weight = np.where(class_weight <= 0, 0.0, class_weight)
-        # jk
 
         # Clip weights to be within +- 3 std of mean
         mean_weight = np.mean(np.abs(class_weight))
