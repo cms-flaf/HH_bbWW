@@ -150,10 +150,14 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
         with open(os.path.join(output_folder, out_yaml), "w") as outfile:
             yaml.dump(process_dict[nParity_string], outfile)
 
+
+def hadd_files(config_dict, output_folder):
+    for nParity in range(config_dict["nParity"]):
         # hadd the files together to make a final merged.root
         hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
         hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
-        ps_call(f"hadd {hadd_out} {hadd_in}", verbose=1)
+        # ps_call("hadd", hadd_out, hadd_in)
+        os.system(f"hadd {hadd_out} {hadd_in}")
 
 
 def add_weight_file(output_folder):
@@ -167,7 +171,8 @@ def add_weight_file(output_folder):
             continue
         print(f"On file {inName}")
         in_file = uproot.open(inName)
-        outName = f"{inName[:-5]}_weight.root"
+        # outName = f"{inName[:-5]}_weight.root"
+        outName = f"{inName[:-5]}_weight_m600.root"
         out_file = uproot.recreate(outName)
 
         tree = in_file["Events"]
@@ -178,6 +183,7 @@ def add_weight_file(output_folder):
         ]
         branches = tree.arrays(branches_to_load)
 
+        X_mass = branches["X_mass"]
         class_targets = branches["class_value"]
         class_weight = branches["weight_Central"]
 
@@ -185,7 +191,20 @@ def add_weight_file(output_folder):
         class_targets = np.where(class_targets > 0, 1, class_targets)
 
         # Set any negative weight events to 0
-        class_weight = np.where(class_weight <= 0, 0.0, class_weight)
+        # class_weight = np.where(class_weight <= 0, 0.0, class_weight)
+
+        # Clip weights to be within +- 3 std of mean
+        mean_weight = np.mean(np.abs(class_weight))
+        std = np.std(np.abs(class_weight))
+        print(f"Normalizing from {mean_weight} +- {std}")
+        class_weight = np.clip(
+            class_weight, -(mean_weight + (3 * std)), (mean_weight + (3 * std))
+        )
+
+        # Set specific masses if you want
+        class_weight = np.where(
+            (class_targets == 0) & (X_mass != 600), 0.0, class_weight
+        )
 
         # Total_Signal == Total_Background
         total_signal = np.sum(np.where(class_targets == 0, class_weight, 0.0))
@@ -193,10 +212,15 @@ def add_weight_file(output_folder):
 
         print(f"Total signal: {total_signal}")
         print(f"Total background: {total_background}")
-        norm_factor = total_signal / total_background
+        norm_factor = total_background / total_signal
         class_weight = np.where(
-            class_targets == 0, class_weight, class_weight * norm_factor
+            class_targets != 0, class_weight, class_weight * norm_factor
         )
+
+        # norm_factor = total_signal / total_background
+        # class_weight = np.where(
+        #     class_targets == 0, class_weight, class_weight * norm_factor
+        # )
         print(f"After reweight")
         print(
             f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}"
@@ -276,4 +300,5 @@ if __name__ == "__main__":
     os.system(f"cp {config_file} {output_folder}/.")
 
     measure_cut_datasets(config_dict, output_folder)
+    hadd_files(config_dict, output_folder)
     add_weight_file(output_folder)

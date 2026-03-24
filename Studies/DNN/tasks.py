@@ -14,7 +14,7 @@ from FLAF.RunKit.run_tools import ps_call
 class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     training_configuration_dir = luigi.Parameter()
     max_runtime = copy_param(HTCondorWorkflow.max_runtime, 48.0)
-    n_cpus = copy_param(HTCondorWorkflow.n_cpus, 4)
+    n_cpus = copy_param(HTCondorWorkflow.n_cpus, 8)
 
     def __init__(self, *args, **kwargs):
         super(DNNTrainingTask, self).__init__(*args, **kwargs)
@@ -134,11 +134,13 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     def output(self):
         config, config_name, n_branch = self.branch_data
         training_name = config["training_name"]
-        outFileName = f"validation.pdf"
+        outFileName = f"validation"
         output_path = os.path.join(
             "DNNTraining", self.version, self.period, training_name, outFileName
         )
-        return [self.remote_target(output_path, fs=self.fs_histograms)]
+        return [
+            self.remote_target(output_path, fs=self.fs_histograms),
+        ]
 
     def run(self):
         config, config_name, n_branch = self.branch_data
@@ -149,7 +151,7 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         job_home, remove_job_home = self.law_job_home()
         print(f"At job_home {job_home}")
 
-        tmpFile = os.path.join(job_home, f"{training_name}.pdf")
+        tmpFolder = os.path.join(job_home, f"{training_name}")
 
         validation_file = config["validation_file"]
         valitation_weight_file = config["validation_weight_file"]
@@ -168,8 +170,8 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 validation_file,
                 "--validation_weight_file",
                 valitation_weight_file,
-                "--output_file",
-                tmpFile,
+                "--output_folder",
+                tmpFolder,
                 "--setup-config",
                 config_name,
                 "--model-name",
@@ -179,10 +181,10 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             ]
             ps_call(dnn_validator_cmd, verbose=1)
 
-        validation_output = self.output()[0]
-        with validation_output.localize("w") as tmp_local_file:
-            out_local_path = tmp_local_file.path
-            shutil.move(tmpFile, out_local_path)
+        validation_outputs = self.output()
+        with validation_outputs[0].localize("w") as tmp_local_folder:
+            out_local_path = tmp_local_folder.path
+            shutil.move(tmpFolder, out_local_path)
 
         if remove_job_home:
             shutil.rmtree(job_home)

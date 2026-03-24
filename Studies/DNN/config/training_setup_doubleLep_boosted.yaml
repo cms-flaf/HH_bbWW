@@ -2,7 +2,7 @@ UseParametric: true
 nClasses: 2
 activation: tanh
 batch_size: 1000
-dropout: 0.5
+dropout: 0.2
 features:
   - lep1_pt
   - lep1_phi
@@ -70,7 +70,13 @@ features:
   - DoubleLep_DeepHME_mass
   - DoubleLep_DeepHME_mass_error
 
-learning_rate: 0.00001
+  - channelId
+gamma1: 2
+gamma2: 0.5
+learning_rate: 0.0005
+lr_decay: 0.8
+lr_patience: 3
+l2_rate: 0.001
 n_layers: 5
 n_units: 512
 n_epochs: 100
