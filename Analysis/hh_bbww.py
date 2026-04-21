@@ -80,12 +80,12 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
 
 def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     # weights_to_apply = ["weight_base", "ExtraDYWeight"]
-    weights_to_apply = ["weight_base"]
+    # weights_to_apply = ["weight_base"]
+    weights_to_apply = ["weight_MC_Lumi_pu"]
     total_weight = "*".join(weights_to_apply)
     for lep_index in [1, 2]:
         total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
     total_weight = f"{total_weight} * {GetTriggerWeight()}"
-    total_weight = f"{total_weight} * weight_bTagShape_Central"
     return total_weight
 
 
@@ -318,7 +318,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.DefineAndAppend(
             "Zveto",
-            f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
+            # f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
+            f"(lep1_legType == lep2_legType ) && (diLep_mass < 70)",
         )
 
         self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
@@ -338,10 +339,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.DefineAndAppend(
             "Lep1Lep2Jet1Jet2_mass",
-            f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
+            f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
         )
         self.DefineAndAppend(
-            "Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0"
+            "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
     def addDYReweighting(self):
@@ -498,7 +499,11 @@ def AddDNNVariables(df):
     )
     df = df.Define(
         "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[1], PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[0], lep2_p4 + centralJet_p4[1], PuppiMET_p4, 0.0, 0.0)) : -100.",
+    )
+    df = df.Define(
+        "MT2_blbl2",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[0], PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
 
     df = df.Define(
@@ -551,12 +556,85 @@ def AddDNNVariables(df):
     return df
 
 
+def defineJetSelections(df, isData):
+    df = df.Define("Njets", "centralJet_pt.size()")
+    df = df.Define("jet1_isvalid", "Njets > 0")
+    df = df.Define("jet2_isvalid", "Njets > 1")
+    df = df.Define("fatjet_isvalid", "SelectedFatJet_pt.size() > 0")
+    df = df.Define("fatbjet_isValid", "fatjet_isvalid")
+    df = df.Define(
+        "fatsubjet1_isvalid",
+        "(SelectedFatJet_SubJet1_isValid == 1  && SelectedFatJet_SubJet1_pt > 20 && abs(SelectedFatJet_SubJet1_eta) < 2.5)",
+    )
+    df = df.Define(
+        "fatsubjet2_isvalid",
+        "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
+    )
+
+    bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
+    for var in bjet_vars:
+        df = df.Define(f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0")
+        df = df.Define(f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0")
+
+    other_jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
+    for var in other_jet_vars:
+
+        df = df.Define(f"other_jet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0")
+        df = df.Define(f"other_jet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0")
+
+    fatjet_vars = [
+        "pt",
+        "phi",
+        "eta",
+        "mass",
+        "particleNet_XbbVsQCD",
+        "particleNetWithMass_HbbvsQCD",
+        "msoftdrop",
+        "muEF",
+        "nConstituents",
+        "neEmEF",
+        "neHEF",
+        "neMultiplicity",
+        "tau1",
+        "tau2",
+        "tau3",
+        "tau4",
+    ]
+    fatjet_mc_vars = ["hadronFlavour"]
+    for var in fatjet_vars:
+        df = df.Define(
+            f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
+        )
+    if not isData:
+        for var in fatjet_mc_vars:
+            df = df.Define(
+                f"fatbjet_{var}",
+                f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
+            )
+
+    df = df.Define(
+        f"fatbjet_mass_PNetCorr",
+        "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
+    )
+
+    df = df.Define(
+        "bsubjet1_btagDeepB",
+        "fatjet_isvalid ? SelectedFatJet_SubJet1_btagDeepB[0] : -1.0",
+    )  # needs to be updated for ak8 PNet
+    df = df.Define(
+        "bsubjet2_btagDeepB",
+        "fatjet_isvalid ? SelectedFatJet_SubJet2_btagDeepB[0] : -1.0",
+    )  # needs to be updated for ak8 PNet
+
+    return df
+
+
 def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
+    dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
-    dfForHistograms.defineJetSelections(isData)
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()

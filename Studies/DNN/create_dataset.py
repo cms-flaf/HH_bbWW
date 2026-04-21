@@ -13,6 +13,31 @@ ROOT.EnableThreadSafety()
 ROOT.EnableImplicitMT(4)
 
 
+log_variables = [
+    "lep1_pt",
+    "lep2_pt",
+    "PuppiMET_pt",
+    "HT",
+    "MT",
+    "MT2_ll",
+    "MT2_bb",
+    "MT2_blbl",
+    "MT2_blbl2",
+    "ll_mass",
+    "bjet1_pt",
+    "bjet1_mass",
+    "bjet2_pt",
+    "bjet2_mass",
+    "other_jet1_pt",
+    "other_jet1_mass",
+    "other_jet2_pt",
+    "other_jet2_mass",
+    "fatbjet_pt",
+    "fatbjet_mass_PNetCorr",
+    "DoubleLep_DeepHME_mass",
+]
+
+
 def measure_cut_datasets(config_dict, output_folder, remote=False):
     storage_folder = os.path.join(config_dict["storage_folder"])
 
@@ -97,6 +122,16 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 ] = weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
+                rdf_tmp = rdf_tmp.Define("lep1_legType", "int(channelId/10.0)")
+                rdf_tmp = rdf_tmp.Define("lep2_legType", "int(channelId%10)")
+                rdf_tmp = rdf_tmp.Define(
+                    "DoubleLep_DeepHME_mass_error_rel",
+                    "float(DoubleLep_DeepHME_mass_error)/float(DoubleLep_DeepHME_mass)",
+                )
+                for var in log_variables:
+                    rdf_tmp = rdf_tmp.Define(
+                        f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
+                    )
                 rdf_tmp.Snapshot(treeName, output_file)
 
     for background_name in background_list:
@@ -142,6 +177,16 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 ] = weighted_cut
                 rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
                 rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
+                rdf_tmp = rdf_tmp.Define("lep1_legType", "int(channelId/10.0)")
+                rdf_tmp = rdf_tmp.Define("lep2_legType", "int(channelId%10)")
+                rdf_tmp = rdf_tmp.Define(
+                    "DoubleLep_DeepHME_mass_error_rel",
+                    "float(DoubleLep_DeepHME_mass_error)/float(DoubleLep_DeepHME_mass)",
+                )
+                for var in log_variables:
+                    rdf_tmp = rdf_tmp.Define(
+                        f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
+                    )
                 rdf_tmp.Snapshot(treeName, output_file)
 
     for nParity in range(config_dict["nParity"]):
@@ -156,11 +201,10 @@ def hadd_files(config_dict, output_folder):
         # hadd the files together to make a final merged.root
         hadd_out = os.path.join(output_folder, f"nParity{nParity}_Merged.root")
         hadd_in = os.path.join(output_folder, f"nParity{nParity}_Merged/*.root")
-        # ps_call("hadd", hadd_out, hadd_in)
         os.system(f"hadd {hadd_out} {hadd_in}")
 
 
-def add_weight_file(output_folder):
+def add_weight_file(output_folder, mass=None):
     inNames = [
         os.path.join(output_folder, x)
         for x in os.listdir(output_folder)
@@ -171,8 +215,20 @@ def add_weight_file(output_folder):
             continue
         print(f"On file {inName}")
         in_file = uproot.open(inName)
-        # outName = f"{inName[:-5]}_weight.root"
-        outName = f"{inName[:-5]}_weight_m600.root"
+        outName = f"{inName[:-5]}_weight.root"
+        if mass != None:
+            outName = f"{inName[:-5]}_weight_m{mass}.root"
+        # outName = f"{inName[:-5]}_weight_m800.root"
+        # outName = f"{inName[:-5]}_weight_m1000.root"
+
+        # outName = f"{inName[:-5]}_weight_m600_multiclass.root"
+        # outName = f"{inName[:-5]}_weight_m400_600_800_multiclass_rescale.root"
+        # outName = f"{inName[:-5]}_weight_m600_800_multiclass.root"
+        # outName = f"{inName[:-5]}_weight_m800_multiclass.root"
+        # outName = f"{inName[:-5]}_weight_m400_multiclass.root"
+        # outName = f"{inName[:-5]}_weight_m800_multiclass_normalized_bkgs.root"
+        # outName = f"{inName[:-5]}_weight_parametric_multiclass_normalized_bkgs.root"
+        # outName = f"{inName[:-5]}_weight_parametric_multiclass_normalized_bkgs_midmass.root"
         out_file = uproot.recreate(outName)
 
         tree = in_file["Events"]
@@ -192,6 +248,7 @@ def add_weight_file(output_folder):
 
         # Set any negative weight events to 0
         # class_weight = np.where(class_weight <= 0, 0.0, class_weight)
+        # jk
 
         # Clip weights to be within +- 3 std of mean
         mean_weight = np.mean(np.abs(class_weight))
@@ -202,11 +259,14 @@ def add_weight_file(output_folder):
         )
 
         # Set specific masses if you want
-        class_weight = np.where(
-            (class_targets == 0) & (X_mass != 600), 0.0, class_weight
-        )
+        # class_weight = np.where((class_targets == 0) & ( (X_mass < 600) | (X_mass > 1000) ), 0.0, class_weight)
+        if mass != None:
+            class_weight = np.where(
+                (class_targets == 0) & ((X_mass != mass)), 0.0, class_weight
+            )
 
         # Total_Signal == Total_Background
+        # Scale total signal up to total background
         total_signal = np.sum(np.where(class_targets == 0, class_weight, 0.0))
         total_background = np.sum(np.where(class_targets != 0, class_weight, 0.0))
 
@@ -217,10 +277,6 @@ def add_weight_file(output_folder):
             class_targets != 0, class_weight, class_weight * norm_factor
         )
 
-        # norm_factor = total_signal / total_background
-        # class_weight = np.where(
-        #     class_targets == 0, class_weight, class_weight * norm_factor
-        # )
         print(f"After reweight")
         print(
             f"Total signal: {np.sum(np.where(class_targets == 0, class_weight, 0.0))}"
@@ -243,6 +299,15 @@ def add_weight_file(output_folder):
         #     )
         # current_total = np.sum(np.where(class_targets != 0, class_weight, 0.0))
         # rescale_factor = total_background / current_total
+        # class_weight = np.where(
+        #     class_targets != 0, class_weight*rescale_factor, class_weight
+        # )
+
+        # Scale background to nMasses being used
+        # mass_cut = (class_targets == 0) * (class_weight > 0.0)
+        # nMasses = len(np.unique(X_mass[mass_cut]))
+        # print(f"We have {len(np.unique(X_mass[mass_cut]))} unique masses {np.unique(X_mass[mass_cut])}")
+        # rescale_factor = nMasses
         # class_weight = np.where(
         #     class_targets != 0, class_weight*rescale_factor, class_weight
         # )
@@ -301,4 +366,6 @@ if __name__ == "__main__":
 
     measure_cut_datasets(config_dict, output_folder)
     hadd_files(config_dict, output_folder)
-    add_weight_file(output_folder)
+    # add_weight_file(output_folder) # Option for all masses
+    for mass in config_dict["signal"]["XtoYHto2B2W"]["mass_points"]:
+        add_weight_file(output_folder, mass=mass)

@@ -104,6 +104,7 @@ class DNNTrainingTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
 class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     training_configuration_dir = luigi.Parameter()
+    n_cpus = copy_param(HTCondorWorkflow.n_cpus, 4)
 
     def __init__(self, *args, **kwargs):
         super(DNNValidationTask, self).__init__(*args, **kwargs)
