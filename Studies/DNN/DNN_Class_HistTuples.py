@@ -165,48 +165,6 @@ class DataWrapper:
             )
         return hme_mass
 
-    def GetBTag1(self, file_name, entry_start=None, entry_stop=None):
-        print(f"Reading BTag1 from file {file_name}")
-        btag1 = None
-        with uproot.open(file_name) as file:
-            tree = file["Events"]
-            branches = tree.arrays(
-                ["bjet1_btagPNetB"],
-                entry_start=entry_start,
-                entry_stop=entry_stop,
-            )
-            btag1 = np.array(getattr(branches, "bjet1_btagPNetB"), dtype="float32")
-        return btag1
-
-    def GetBTag2(self, file_name, entry_start=None, entry_stop=None):
-        print(f"Reading BTag2 from file {file_name}")
-        btag2 = None
-        with uproot.open(file_name) as file:
-            tree = file["Events"]
-            branches = tree.arrays(
-                ["bjet2_btagPNetB"],
-                entry_start=entry_start,
-                entry_stop=entry_stop,
-            )
-            btag2 = np.array(getattr(branches, "bjet2_btagPNetB"), dtype="float32")
-        return btag2
-
-    def GetFatBTag(self, file_name, entry_start=None, entry_stop=None):
-        print(f"Reading FatBTag from file {file_name}")
-        fatbtag = None
-        with uproot.open(file_name) as file:
-            tree = file["Events"]
-            branches = tree.arrays(
-                ["fatbjet_particleNetWithMass_HbbvsQCD"],
-                entry_start=entry_start,
-                entry_stop=entry_stop,
-            )
-            fatbtag = np.array(
-                getattr(branches, "fatbjet_particleNetWithMass_HbbvsQCD"),
-                dtype="float32",
-            )
-        return fatbtag
-
 
 class ModelCheckpoint(tf.keras.callbacks.Callback):
     def __init__(
@@ -552,43 +510,6 @@ def binary_focal_crossentropy(target, output, gamma1=2, gamma2=0.5):
     return focal_bce
 
 
-class FiLMLayer(tf.keras.layers.Layer):
-    def __init__(self, units, name=None):
-        super().__init__(name=name)
-        self.units = units
-
-        # Small network to produce gamma, beta from mass
-        self.dense1 = tf.keras.layers.Dense(units, activation="relu")
-
-        self.gamma = tf.keras.layers.Dense(
-            units, kernel_initializer="zeros", bias_initializer="ones"
-        )
-
-        self.beta = tf.keras.layers.Dense(
-            units, kernel_initializer="zeros", bias_initializer="zeros"
-        )
-
-    def call(self, x, mass):
-        # mass shape: (batch, 1)
-        h = self.dense1(mass)
-
-        gamma = self.gamma(h)
-        beta = self.beta(h)
-
-        return gamma * x + beta
-
-
-class Standardization(tf.keras.layers.Layer):
-    def __init__(self, mean, std):
-        super().__init__()
-        self.mean = tf.constant(mean, dtype=tf.float32)
-        self.std = tf.constant(std, dtype=tf.float32)
-
-    def call(self, x):
-        clipped_values = tf.clip_by_value((x - self.mean) / self.std, -5.0, 5.0)
-        return clipped_values
-
-
 class Model(tf.keras.Model):
     def __init__(self, setup, max_events, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -651,16 +572,12 @@ class Model(tf.keras.Model):
                 kernel_initializer="random_normal",
                 bias_initializer="random_normal",
                 kernel_regularizer=tf.keras.regularizers.l2(setup["l2_rate"]),
-                # kernel_regularizer=tf.keras.regularizers.L1L2(l1=0.00000001, l2=0.00000001)
             )
 
             if setup["use_batch_norm"]:
                 block["bn"] = tf.keras.layers.BatchNormalization(
                     name=name + "_batch_norm"
                 )
-
-            if setup["use_film"]:
-                block["film"] = FiLMLayer(n_units, name=name + "_film")
 
             if setup["dropout"] > 0:
                 block["dropout"] = tf.keras.layers.Dropout(
@@ -672,40 +589,16 @@ class Model(tf.keras.Model):
         self.class_output = tf.keras.layers.Dense(
             setup["nClasses"], activation="softmax", name="class_output"
         )
-        # self.class_output = tf.keras.layers.Dense(
-        #     setup["nClasses"], activation=activation, name="class_output"
-        # )
 
         self.output_names = ["class_output"]
 
-        tf.print("Going to normalize the features with args")
-        tf.print(setup["feature_mean"])
-        tf.print(setup["feature_std"])
-        self.norm = Standardization(setup["feature_mean"], setup["feature_std"])
-
     def call(self, x):
-        if self.setup["use_film"]:
-            # Split features and mass
-            features = x[:, :-1]
-            mass = tf.expand_dims(x[:, -1], axis=-1)
-
-            # features = self.norm(features)
-            features = features
-
-            mass = mass / 1000.0  # Scale mass to order 1 for better FiLM performance
-        else:
-            # features = self.norm(x)
-            features = x
-
-        h = features
+        h = x
         for i, block in enumerate(self.blocks):
-            # if self.setup["use_batch_norm"]:
-            #     h = block["bn"](h)
+            if self.setup["use_batch_norm"]:
+                h = block["bn"](h)
 
             h = block["dense"](h)
-
-            if self.setup["use_film"] and i >= 1:
-                h = block["film"](h, mass)
 
             if self.setup["dropout"] > 0:
                 h = block["dropout"](h)
@@ -1052,6 +945,7 @@ def train_dnn(
         if metric not in history.history:
             print(f"Metric {metric} not found in history")
             return
+        os.makedirs(os.path.join(output_folder, "metrics"), exist_ok=True)
         plt.plot(history.history[metric], label=f"train_{metric}")
         plt.plot(history.history[f"val_{metric}"], label=f"val_{metric}")
         plt.title(f"{metric}")
@@ -1060,18 +954,16 @@ def train_dnn(
         plt.legend(loc="upper right")
         plt.grid(True)
         plt.yscale("log")
-        plt.ylim(bottom=0.0001)
-        plt.savefig(os.path.join(output_folder, f"{metric}.pdf"), bbox_inches="tight")
+        plt.ylim(bottom=0.0001, top=10.0)
+        plt.savefig(
+            os.path.join(output_folder, "metrics", f"{metric}.pdf"), bbox_inches="tight"
+        )
         plt.clf()
 
     PlotMetric(history, "class_loss", output_folder)
-
     PlotMetric(history, "learning_rate", output_folder)
-
     PlotMetric(history, "l2_loss", output_folder)
-
     PlotMetric(history, "class_min", output_folder)
-
     PlotMetric(history, "class_max", output_folder)
 
     for i in range(1, nClasses):
@@ -1143,9 +1035,6 @@ def validate_dnn(
     )
 
     hme_values = dw.GetHME(file_name=validation_file)
-    btag1_values = dw.GetBTag1(file_name=validation_file)
-    btag2_values = dw.GetBTag2(file_name=validation_file)
-    fatbtag_values = dw.GetFatBTag(file_name=validation_file)
 
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
     os.environ["TF_DETERMINISTIC_OPS"] = "1"
@@ -1160,30 +1049,8 @@ def validate_dnn(
             os.path.join(output_folder, f"validation_{cat}.root"), "RECREATE"
         )
 
-        # para_masspoint_list = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 2000, 3000]  # [300, 450, 800]
-        # para_masspoint_list = [ 600, 650, 700, 800, 900, 1000 ]
+        # para_masspoint_list = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 2000, 3000]
         para_masspoint_list = dnnConfig["parametric_list"]
-        para_masspoint_list = [
-            300,
-            400,
-            500,
-            550,
-            600,
-            650,
-            700,
-            800,
-            900,
-            1000,
-            1200,
-            1400,
-            1600,
-            1800,
-            2000,
-            2500,
-            3000,
-            3500,
-            4000,
-        ]
         canvases = []
         for para_masspoint in para_masspoint_list:
             print(f"Validating mass {para_masspoint}")
@@ -1373,72 +1240,6 @@ def validate_dnn(
                         DNN_vs_HME,
                         f"DNN_vs_HME_m{para_masspoint}_{process_name}_class{nClass}",
                     )
-
-                    # # Make a ROOT.TH2D of the DNN prediction vs BTagging
-                    # DNN_vs_BTag1_list.append(
-                    #     ROOT.TH2D(
-                    #         f"DNN_vs_BTag1_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         f"DNN_vs_BTag1_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         100,
-                    #         0.0,
-                    #         1.0,
-                    #         100,
-                    #         0.0,
-                    #         1.0,
-                    #     )
-                    # )
-                    # DNN_vs_BTag1 = DNN_vs_BTag1_list[-1]
-                    # this_dnn_values = pred_signal[mask]
-                    # this_btag1_values = btag1_values[mask]
-                    # for dnn_val, btag1_val in zip(this_dnn_values, this_btag1_values):
-                    #     # DNN_vs_BTag1.Fill(dnn_val, np.log(btag1_val))
-                    #     DNN_vs_BTag1.Fill(dnn_val, btag1_val)
-
-                    # ROOTOut.WriteObject(DNN_vs_BTag1, f"DNN_vs_BTag1_m{para_masspoint}_{process_name}_class{nClass}")
-
-                    # # Make a ROOT.TH2D of the DNN prediction vs BTagging
-                    # DNN_vs_BTag2_list.append(
-                    #     ROOT.TH2D(
-                    #         f"DNN_vs_BTag2_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         f"DNN_vs_BTag2_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         100,
-                    #         0.0,
-                    #         1.0,
-                    #         100,
-                    #         0.0,
-                    #         1.0,
-                    #     )
-                    # )
-                    # DNN_vs_BTag2 = DNN_vs_BTag2_list[-1]
-                    # this_dnn_values = pred_signal[mask]
-                    # this_btag2_values = btag2_values[mask]
-                    # for dnn_val, btag2_val in zip(this_dnn_values, this_btag2_values):
-                    #     # DNN_vs_BTag1.Fill(dnn_val, np.log(btag1_val))
-                    #     DNN_vs_BTag2.Fill(dnn_val, btag1_val)
-
-                    # ROOTOut.WriteObject(DNN_vs_BTag2, f"DNN_vs_BTag2_m{para_masspoint}_{process_name}_class{nClass}")
-
-                    # # Make a ROOT.TH2D of the DNN prediction vs BTagging
-                    # DNN_vs_FatBTag_list.append(
-                    #     ROOT.TH2D(
-                    #         f"DNN_vs_FatBTag_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         f"DNN_vs_FatBTag_m{para_masspoint}_{process_name}_class{nClass}",
-                    #         100,
-                    #         0.0,
-                    #         1.0,
-                    #         100,
-                    #         0.9,
-                    #         1.0,
-                    #     )
-                    # )
-                    # DNN_vs_FatBTag = DNN_vs_FatBTag_list[-1]
-                    # this_dnn_values = pred_signal[mask]
-                    # this_fatbtag_values = fatbtag_values[mask]
-                    # for dnn_val, fatbtag_val in zip(this_dnn_values, this_fatbtag_values):
-                    #     # DNN_vs_FatBTag.Fill(dnn_val, np.log(fatbtag_val))
-                    #     DNN_vs_FatBTag.Fill(dnn_val, fatbtag_val)
-
-                    # ROOTOut.WriteObject(DNN_vs_FatBTag, f"DNN_vs_FatBTag_m{para_masspoint}_{process_name}_class{nClass}")
 
                     if ROOT_ClassOutput.Integral() == 0:
                         print(

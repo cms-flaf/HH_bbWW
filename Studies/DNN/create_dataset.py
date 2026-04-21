@@ -218,17 +218,6 @@ def add_weight_file(output_folder, mass=None):
         outName = f"{inName[:-5]}_weight.root"
         if mass != None:
             outName = f"{inName[:-5]}_weight_m{mass}.root"
-        # outName = f"{inName[:-5]}_weight_m800.root"
-        # outName = f"{inName[:-5]}_weight_m1000.root"
-
-        # outName = f"{inName[:-5]}_weight_m600_multiclass.root"
-        # outName = f"{inName[:-5]}_weight_m400_600_800_multiclass_rescale.root"
-        # outName = f"{inName[:-5]}_weight_m600_800_multiclass.root"
-        # outName = f"{inName[:-5]}_weight_m800_multiclass.root"
-        # outName = f"{inName[:-5]}_weight_m400_multiclass.root"
-        # outName = f"{inName[:-5]}_weight_m800_multiclass_normalized_bkgs.root"
-        # outName = f"{inName[:-5]}_weight_parametric_multiclass_normalized_bkgs.root"
-        # outName = f"{inName[:-5]}_weight_parametric_multiclass_normalized_bkgs_midmass.root"
         out_file = uproot.recreate(outName)
 
         tree = in_file["Events"]
