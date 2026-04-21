@@ -70,7 +70,6 @@ features: # Log everything in GeV, then later we will divide by 4-body mass (m_b
   # - DoubleLep_DeepHME_mass_error_rel # Relative error (error/mass)
 
 
-
   - lep1_pt
   - lep1_phi
   - lep1_eta
