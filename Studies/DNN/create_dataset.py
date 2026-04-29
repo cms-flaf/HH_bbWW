@@ -3,6 +3,7 @@ import uproot
 import numpy as np
 import yaml
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 import ROOT
 import FLAF.RunKit.grid_tools as grid_tools
@@ -14,28 +15,151 @@ ROOT.EnableImplicitMT(4)
 
 
 log_variables = [
-    "lep1_pt",
-    "lep2_pt",
-    "PuppiMET_pt",
-    "HT",
-    "MT",
-    "MT2_ll",
-    "MT2_bb",
-    "MT2_blbl",
-    "MT2_blbl2",
-    "ll_mass",
-    "bjet1_pt",
-    "bjet1_mass",
-    "bjet2_pt",
-    "bjet2_mass",
-    "other_jet1_pt",
-    "other_jet1_mass",
-    "other_jet2_pt",
-    "other_jet2_mass",
-    "fatbjet_pt",
-    "fatbjet_mass_PNetCorr",
-    "DoubleLep_DeepHME_mass",
+    # "lep1_pt",
+    # "lep2_pt",
+    # "PuppiMET_pt",
+    # "HT",
+    # "MT",
+    # "MT2_ll",
+    # "MT2_bb",
+    # "MT2_blbl",
+    # "MT2_blbl2",
+    # "ll_mass",
+    # "bjet1_pt",
+    # "bjet1_mass",
+    # "bjet2_pt",
+    # "bjet2_mass",
+    # "other_jet1_pt",
+    # "other_jet1_mass",
+    # "other_jet2_pt",
+    # "other_jet2_mass",
+    # "fatbjet_pt",
+    # "fatbjet_mass_PNetCorr",
+    # "DoubleLep_DeepHME_mass",
 ]
+
+
+def add_extra_vars(rdf_tmp, class_value, X_mass):
+    rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
+    rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
+    rdf_tmp = rdf_tmp.Define("lep1_legType", "int(channelId/10.0)")
+    rdf_tmp = rdf_tmp.Define("lep2_legType", "int(channelId%10)")
+    rdf_tmp = rdf_tmp.Define(
+        "DoubleLep_DeepHME_mass_error_rel",
+        "float(DoubleLep_DeepHME_mass_error)/float(DoubleLep_DeepHME_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "b1_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet1_pt, bjet1_eta, bjet1_phi, bjet1_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "b2_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet2_pt, bjet2_eta, bjet2_phi, bjet2_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "j1_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(other_jet1_pt, other_jet1_eta, other_jet1_phi, other_jet1_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "j2_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(other_jet2_pt, other_jet2_eta, other_jet2_phi, other_jet2_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "fatjet_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(fatbjet_pt, fatbjet_eta, fatbjet_phi, fatbjet_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "lep1_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(lep1_pt, lep1_eta, lep1_phi, lep1_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "lep2_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(lep2_pt, lep2_eta, lep2_phi, lep2_mass)",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "met_p4",
+        f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(PuppiMET_pt, 0, PuppiMET_phi, 0)",
+    )
+
+    rdf_tmp = rdf_tmp.Define(
+        "dR_b1leps",
+        "TMath::Min(ROOT::Math::VectorUtil::DeltaR(b1_p4, lep1_p4), ROOT::Math::VectorUtil::DeltaR(b1_p4, lep2_p4))",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "dR_b2leps",
+        "TMath::Min(ROOT::Math::VectorUtil::DeltaR(b2_p4, lep1_p4), ROOT::Math::VectorUtil::DeltaR(b2_p4, lep2_p4))",
+    )
+
+    rdf_tmp = rdf_tmp.Define(
+        "m_b1leps",
+        "ROOT::Math::VectorUtil::DeltaR(b1_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(b1_p4, lep2_p4) ? (b1_p4 + lep1_p4).M() : (b1_p4 + lep2_p4).M()",
+    )
+    rdf_tmp = rdf_tmp.Define(
+        "m_b2leps",
+        "ROOT::Math::VectorUtil::DeltaR(b2_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(b2_p4, lep2_p4) ? (b2_p4 + lep1_p4).M() : (b2_p4 + lep2_p4).M()",
+    )
+
+    # rdf_tmp = rdf_tmp.Define("m_b1l1", "(b1_p4 + lep1_p4).M()")
+    # rdf_tmp = rdf_tmp.Define("m_b1l2", "(b1_p4 + lep2_p4).M()")
+    # rdf_tmp = rdf_tmp.Define("m_b2l1", "(b2_p4 + lep1_p4).M()")
+    # rdf_tmp = rdf_tmp.Define("m_b2l2", "(b2_p4 + lep2_p4).M()")
+
+    # rdf_tmp = rdf_tmp.Define("dR_b1l1", "ROOT::Math::VectorUtil::DeltaR(b1_p4, lep1_p4)")
+    # rdf_tmp = rdf_tmp.Define("dR_b1l2", "ROOT::Math::VectorUtil::DeltaR(b1_p4, lep2_p4)")
+    # rdf_tmp = rdf_tmp.Define("dR_b2l1", "ROOT::Math::VectorUtil::DeltaR(b2_p4, lep1_p4)")
+    # rdf_tmp = rdf_tmp.Define("dR_b2l2", "ROOT::Math::VectorUtil::DeltaR(b2_p4, lep2_p4)")
+
+    rdf_tmp = rdf_tmp.Define("pt_ll", "(lep1_p4 + lep2_p4).Pt()")
+    rdf_tmp = rdf_tmp.Define("pt_bb", "(b1_p4 + b2_p4).Pt()")
+    rdf_tmp = rdf_tmp.Define("m_llmet", "(lep1_p4 + lep2_p4 + met_p4).M()")
+
+    # Begin Run2 block
+    rdf_tmp = rdf_tmp.Define("lep1_E", "(lep1_p4).E()")
+    rdf_tmp = rdf_tmp.Define("lep1_px", "(lep1_p4).px()")
+    rdf_tmp = rdf_tmp.Define("lep1_py", "(lep1_p4).py()")
+    rdf_tmp = rdf_tmp.Define("lep1_pz", "(lep1_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("lep2_E", "(lep2_p4).E()")
+    rdf_tmp = rdf_tmp.Define("lep2_px", "(lep2_p4).px()")
+    rdf_tmp = rdf_tmp.Define("lep2_py", "(lep2_p4).py()")
+    rdf_tmp = rdf_tmp.Define("lep2_pz", "(lep2_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("bjet1_E", "(b1_p4).E()")
+    rdf_tmp = rdf_tmp.Define("bjet1_px", "(b1_p4).px()")
+    rdf_tmp = rdf_tmp.Define("bjet1_py", "(b1_p4).py()")
+    rdf_tmp = rdf_tmp.Define("bjet1_pz", "(b1_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("bjet2_E", "(b2_p4).E()")
+    rdf_tmp = rdf_tmp.Define("bjet2_px", "(b2_p4).px()")
+    rdf_tmp = rdf_tmp.Define("bjet2_py", "(b2_p4).py()")
+    rdf_tmp = rdf_tmp.Define("bjet2_pz", "(b2_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("jet3_E", "(j1_p4).E()")
+    rdf_tmp = rdf_tmp.Define("jet3_px", "(j1_p4).px()")
+    rdf_tmp = rdf_tmp.Define("jet3_py", "(j1_p4).py()")
+    rdf_tmp = rdf_tmp.Define("jet3_pz", "(j1_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("jet4_E", "(j2_p4).E()")
+    rdf_tmp = rdf_tmp.Define("jet4_px", "(j2_p4).px()")
+    rdf_tmp = rdf_tmp.Define("jet4_py", "(j2_p4).py()")
+    rdf_tmp = rdf_tmp.Define("jet4_pz", "(j2_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("fatjet_E", "(fatjet_p4).E()")
+    rdf_tmp = rdf_tmp.Define("fatjet_px", "(fatjet_p4).px()")
+    rdf_tmp = rdf_tmp.Define("fatjet_py", "(fatjet_p4).py()")
+    rdf_tmp = rdf_tmp.Define("fatjet_pz", "(fatjet_p4).pz()")
+
+    rdf_tmp = rdf_tmp.Define("met_E", "(met_p4).E()")
+    rdf_tmp = rdf_tmp.Define("met_px", "(met_p4).px()")
+    rdf_tmp = rdf_tmp.Define("met_py", "(met_p4).py()")
+    rdf_tmp = rdf_tmp.Define("met_pz", "(met_p4).pz()")
+
+    for var in log_variables:
+        rdf_tmp = rdf_tmp.Define(
+            f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
+        )
+
+    return rdf_tmp
 
 
 def measure_cut_datasets(config_dict, output_folder, remote=False):
@@ -120,18 +244,9 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 process_dict[nParity_string][signal_name][mass_point][
                     "total_cut_weighted"
                 ] = weighted_cut
-                rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
-                rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
-                rdf_tmp = rdf_tmp.Define("lep1_legType", "int(channelId/10.0)")
-                rdf_tmp = rdf_tmp.Define("lep2_legType", "int(channelId%10)")
-                rdf_tmp = rdf_tmp.Define(
-                    "DoubleLep_DeepHME_mass_error_rel",
-                    "float(DoubleLep_DeepHME_mass_error)/float(DoubleLep_DeepHME_mass)",
-                )
-                for var in log_variables:
-                    rdf_tmp = rdf_tmp.Define(
-                        f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
-                    )
+
+                rdf_tmp = add_extra_vars(rdf_tmp, class_value, X_mass)
+
                 rdf_tmp.Snapshot(treeName, output_file)
 
     for background_name in background_list:
@@ -175,18 +290,9 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                 process_dict[nParity_string][background_name][dataset_name][
                     "total_cut_weighted"
                 ] = weighted_cut
-                rdf_tmp = rdf_tmp.Define("class_value", f"{class_value}")
-                rdf_tmp = rdf_tmp.Define("X_mass", f"{X_mass}")
-                rdf_tmp = rdf_tmp.Define("lep1_legType", "int(channelId/10.0)")
-                rdf_tmp = rdf_tmp.Define("lep2_legType", "int(channelId%10)")
-                rdf_tmp = rdf_tmp.Define(
-                    "DoubleLep_DeepHME_mass_error_rel",
-                    "float(DoubleLep_DeepHME_mass_error)/float(DoubleLep_DeepHME_mass)",
-                )
-                for var in log_variables:
-                    rdf_tmp = rdf_tmp.Define(
-                        f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
-                    )
+
+                rdf_tmp = add_extra_vars(rdf_tmp, class_value, X_mass)
+
                 rdf_tmp.Snapshot(treeName, output_file)
 
     for nParity in range(config_dict["nParity"]):
@@ -233,10 +339,10 @@ def add_weight_file(output_folder, mass=None):
         class_weight = branches["weight_Central"]
 
         # Set to binary for now actually
-        class_targets = np.where(class_targets > 0, 1, class_targets)
+        # class_targets = np.where(class_targets > 0, 1, class_targets)
 
         # Set any negative weight events to 0
-        # class_weight = np.where(class_weight <= 0, 0.0, class_weight)
+        class_weight = np.where(class_weight <= 0, 0.0, class_weight)
         # jk
 
         # Clip weights to be within +- 3 std of mean
@@ -277,19 +383,24 @@ def add_weight_file(output_folder, mass=None):
         # Total_Background1 == Total_Background2 == Total_Background3
         # Scale each background to total, then reduce all to total
         ### Do not scale backgrounds to each other in binary classifier ###
-        # total_background = np.sum(np.where(class_targets != 0, class_weight, 0.0))
-        # for class_value in np.unique(class_targets):
-        #     if class_value == 0:
-        #         continue # Don't do anything with signal here
-        #     this_total = np.sum(np.where(class_targets == class_value, class_weight, 0.0))
-        #     rescale_factor = total_background / this_total
-        #     class_weight = np.where(
-        #         class_targets == class_value, class_weight*rescale_factor, class_weight
-        #     )
-        # current_total = np.sum(np.where(class_targets != 0, class_weight, 0.0))
+        total_background = np.sum(np.where(class_targets != 0, class_weight, 0.0))
+        multiclass_weight = np.copy(class_weight)
+        for class_value in np.unique(class_targets):
+            if class_value == 0:
+                continue  # Don't do anything with signal here
+            this_total = np.sum(
+                np.where(class_targets == class_value, class_weight, 0.0)
+            )
+            rescale_factor = total_background / this_total
+            multiclass_weight = np.where(
+                class_targets == class_value,
+                multiclass_weight * rescale_factor,
+                multiclass_weight,
+            )
+        # current_total = np.sum(np.where(class_targets != 0, multiclass_weight, 0.0))
         # rescale_factor = total_background / current_total
-        # class_weight = np.where(
-        #     class_targets != 0, class_weight*rescale_factor, class_weight
+        # multiclass_weight = np.where(
+        #     class_targets != 0, multiclass_weight*rescale_factor, multiclass_weight
         # )
 
         # Scale background to nMasses being used
@@ -308,10 +419,18 @@ def add_weight_file(output_folder, mass=None):
         print(
             f"Total background: {np.sum(np.where(class_targets != 0, class_weight, 0.0))}"
         )
+        print(f"And multiclass reweight")
+        print(
+            f"Total signal: {np.sum(np.where(class_targets == 0, multiclass_weight, 0.0))}"
+        )
+        print(
+            f"Total background: {np.sum(np.where(class_targets != 0, multiclass_weight, 0.0))}"
+        )
 
         out_dict = {
             "class_weight": class_weight,
             "class_target": class_targets,
+            "multiclass_weight": multiclass_weight,
         }
 
         print("Finished with dict")
@@ -319,6 +438,170 @@ def add_weight_file(output_folder, mass=None):
 
         out_file["weight_tree"] = out_dict
         out_file.close()
+
+
+def input_feature_plots(output_folder):
+    inNames = [
+        os.path.join(output_folder, x)
+        for x in os.listdir(output_folder)
+        if x.endswith(".root")
+    ]
+    color_map = plt.get_cmap("tab10").colors[:10]
+
+    input_features = set(
+        [
+            "lep1_pt",
+            "lep2_pt",
+            "PuppiMET_pt",
+            "HT",
+            "MT",
+            "MT2_ll",
+            "MT2_bb",
+            "MT2_blbl",
+            "MT2_blbl2",
+            "ll_mass",
+            "bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino",
+            "pt_ll",
+            "pt_bb",
+            "m_llmet",
+            "bjet1_pt",
+            "bjet1_mass",
+            "bjet2_pt",
+            "bjet2_mass",
+            # "m_b1l1", "m_b1l2", "m_b2l1", "m_b2l2",
+            # "dR_b1l1", "dR_b1l2", "dR_b2l1", "dR_b2l2",
+            "other_jet1_pt",
+            "other_jet1_mass",
+            "other_jet2_pt",
+            "other_jet2_mass",
+            "fatbjet_pt",
+            "fatbjet_mass_PNetCorr",
+            "fatbjet_particleNetWithMass_HbbvsQCD",
+            "dR_dilep",
+            "dR_dibjet",
+            "dR_dilep_dibjet",
+            "dPhi_MET_dilep",
+            "dPhi_MET_dibjet",
+            "DoubleLep_DeepHME_mass",
+            "dR_b1leps",
+            "dR_b2leps",
+            "m_b1leps",
+            "m_b2leps",
+            "lep1_E",
+            "lep1_px",
+            "lep1_py",
+            "lep1_pz",
+            "lep2_E",
+            "lep2_px",
+            "lep2_py",
+            "lep2_pz",
+            "bjet1_E",
+            "bjet1_px",
+            "bjet1_py",
+            "bjet1_pz",
+            "bjet2_E",
+            "bjet2_px",
+            "bjet2_py",
+            "bjet2_pz",
+            "jet3_E",
+            "jet3_px",
+            "jet3_py",
+            "jet3_pz",
+            "jet4_E",
+            "jet4_px",
+            "jet4_py",
+            "jet4_pz",
+            "fatjet_E",
+            "fatjet_px",
+            "fatjet_py",
+            "fatjet_pz",
+            "met_E",
+            "met_px",
+            "met_py",
+            "met_pz",
+            "bjet1_btagPNetB",
+            "bjet2_btagPNetB",
+            "fatbjet_tau1",
+            "fatbjet_tau2",
+            "fatbjet_tau3",
+            "fatbjet_tau4",
+            "CosTheta_bb",
+            "dR_dilep_dijet",
+            "fatbjet_msoftdrop",
+            "dPhi_jet1_jet2",
+            "dPhi_lep1_lep2",
+        ]
+    )
+    base_branches = set(["class_value", "X_mass", "weight_Central"])
+    branches_to_load = list(input_features | base_branches)
+
+    class_names = ["Signal", "TT", "DY", "Other"]
+
+    for inName in inNames:
+        if "weight" in inName:
+            continue
+        print(f"On file {inName}")
+        in_file = uproot.open(inName)
+
+        subfolder_name = f"{inName[:-5]}_input_features"
+        os.makedirs(subfolder_name, exist_ok=True)
+
+        tree = in_file["Events"]
+
+        branches = tree.arrays(branches_to_load)
+
+        X_mass = branches["X_mass"]
+        class_targets = branches["class_value"]
+        class_weight = branches["weight_Central"]
+
+        for inp_feature in input_features:
+            color_map_idx = 0
+            # Make a plot of input features with different colors for each class_target
+            for class_value in np.unique(class_targets):
+                feature_values = branches[inp_feature][class_targets == class_value]
+                weights = class_weight[class_targets == class_value]
+                mass = X_mass[class_targets == class_value]
+                feature_quants = np.quantile(feature_values, [0.01, 0.99])
+                mask = (feature_values >= feature_quants[0]) & (
+                    feature_values <= feature_quants[1]
+                )
+                class_plot_name = class_names[class_value]
+                if class_value == 0:
+                    for x_mass in [300, 600, 800]:
+                        sig_mask = (mask) & (mass == x_mass)
+                        plt.hist(
+                            feature_values[sig_mask],
+                            bins=50,
+                            # weights=weights[mask],
+                            alpha=0.5,
+                            label=f"{class_plot_name} m{x_mass}",
+                            # Normalize to 1 for better comparison of shapes
+                            density=True,
+                            histtype="step",
+                            linewidth="1.5",
+                            color=color_map[color_map_idx],
+                        )
+                        color_map_idx += 1
+                else:
+                    plt.hist(
+                        feature_values[mask],
+                        bins=50,
+                        # weights=weights[mask],
+                        alpha=0.5,
+                        label=f"{class_plot_name}",
+                        # Normalize to 1 for better comparison of shapes
+                        density=True,
+                        histtype="step",
+                        linewidth="1.5",
+                        color=color_map[color_map_idx],
+                    )
+                    color_map_idx += 1
+            plt.xlabel(inp_feature)
+            plt.ylabel("Weighted Events")
+            plt.title(f"Distribution of {inp_feature}")
+            plt.legend()
+            plt.savefig(os.path.join(subfolder_name, f"{inp_feature}_distribution.png"))
+            plt.clf()
 
 
 if __name__ == "__main__":
@@ -353,8 +636,10 @@ if __name__ == "__main__":
     os.makedirs(output_folder, exist_ok=True)
     os.system(f"cp {config_file} {output_folder}/.")
 
-    measure_cut_datasets(config_dict, output_folder)
-    hadd_files(config_dict, output_folder)
+    # measure_cut_datasets(config_dict, output_folder)
+    # hadd_files(config_dict, output_folder)
     # add_weight_file(output_folder) # Option for all masses
     for mass in config_dict["signal"]["XtoYHto2B2W"]["mass_points"]:
-        add_weight_file(output_folder, mass=mass)
+        print(f"Starting mass {mass}")
+        # add_weight_file(output_folder, mass=mass)
+    input_feature_plots(output_folder)
