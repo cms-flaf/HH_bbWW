@@ -71,6 +71,10 @@ muIsoWP: "Loose"
 
 treeName: "Events"
 
+anaTupleSelection:
+  min_n_effective_jets_SL: 3
+  min_n_effective_jets_DL: 2
+
 nPbPerFile: 2_000  # 2fb-1 per split data file
 
 payload_producers:

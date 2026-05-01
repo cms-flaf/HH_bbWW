@@ -6,7 +6,7 @@ Run3_Model:
     - ST
     - VV
     - W
-    - QCD_PT
+    # - QCD_PT
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
@@ -28,3 +28,21 @@ TestModel:
     - custom_CI_Signal
   data:
     - custom_CI_Data
+
+Production_Model:
+  name: "Model for anatuple production"
+  backgrounds:
+    - TT
+    - DY
+    - ST
+    - VV
+    - W
+  signals:
+    - XtoHHto2B2W_SingleLepton
+    - XtoHHto2B2W_DoubleLepton
+    - GluGluToRadion_DoubleLepton
+    - GluGluToRadion_SingleLepton
+    - GluGluToBulkGraviton_DoubleLepton
+    - GluGluToBulkGraviton_SingleLepton
+  data:
+    - Data_Full
