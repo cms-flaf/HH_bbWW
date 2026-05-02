@@ -18,6 +18,7 @@ Current version `v2605`
    fs_default: T3_CH_CERNBOX:/store/user/YOUR_USER_NAME/HH_bbWW/
    fs_anaTuple: T3_US_FNALLPC:/store/user/lpcflaf/HH_bbWW/
 
+   phys_model: Production_Model
    analysis_config_area: config
    compute_unc_variations: true
    compute_unc_histograms: true
