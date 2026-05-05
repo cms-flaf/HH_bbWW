@@ -4,46 +4,67 @@ import os
 
 
 def main():
-    year = 2018
+    # year = 2018
+    year = "run3"
 
-    masspoints = [300, 400, 500, 550, 600, 650, 700, 750, 800, 850, 900]
-    backgrounds = [
-        "TT",
-        "DY",
-        "ST",
-        "Fakes",
-        "ttW",
-        "Other_bbWW",
-        "ttZ",
-        "VH_hww",
-        "tHW_hww",
-        "tHq_hww",
-        "ZH_hww",
-        "ZH_htt",
-        "ZH_hbb",
-        "WH_hbb",
-        "ttH_hww",
-        "ttH_hbb",
-        "qqH_hzz",
-        "qqH_hww",
-        "qqH_htt",
-        "qqH_hmm",
-        "qqH_hgg",
-        "qqH_hbb",
-        "ggH_hzz",
-        "ggH_hww",
-        "ggH_htt",
-        "ggH_hmm",
-        "ggH_hgg",
-        "ggH_hbb",
-        "VVV",
-        "VV",
-        "WJets",
-    ]
-    print_bkgs = ["TT", "DY", "ST", "Fakes"]
+    if year == "run3":
+        backgrounds = ["m{mp}_TT_class0", "m{mp}_DY_class0", "m{mp}_Other_class0"]
+        print_bkgs = ["TT", "DY", "Other"]
 
-    # signals = [ "signal_ggf_spin0_{mp}_hbbhtt", "signal_ggf_spin0_{mp}_hbbhww" ]
-    signals = ["signal_ggf_spin0_{mp}_hbbhww"]
+        signals = ["m{mp}_Signal_class0"]
+
+        categories = ["res2b", "res1b", "boosted"]
+
+        file_name_format = os.path.join(
+            "{year}_shapes", "{mp}", "run3_{category}_m{mp}.root"
+        )
+
+    else:
+        masspoints = [300, 400, 500, 550, 600, 650, 700, 800, 900]
+        backgrounds = [
+            "TT",
+            "DY",
+            "ST",
+            "Fakes",
+            "ttW",
+            "Other_bbWW",
+            "ttZ",
+            "VH_hww",
+            "tHW_hww",
+            "tHq_hww",
+            "ZH_hww",
+            "ZH_htt",
+            "ZH_hbb",
+            "WH_hbb",
+            "ttH_hww",
+            "ttH_hbb",
+            "qqH_hzz",
+            "qqH_hww",
+            "qqH_htt",
+            "qqH_hmm",
+            "qqH_hgg",
+            "qqH_hbb",
+            "ggH_hzz",
+            "ggH_hww",
+            "ggH_htt",
+            "ggH_hmm",
+            "ggH_hgg",
+            "ggH_hbb",
+            "VVV",
+            "VV",
+            "WJets",
+        ]
+        print_bkgs = ["TT", "DY", "ST", "Fakes"]
+
+        # signals = [ "signal_ggf_spin0_{mp}_hbbhtt", "signal_ggf_spin0_{mp}_hbbhww" ]
+        signals = ["signal_ggf_spin0_{mp}_hbbhww"]
+
+        categories = ["resolved2b", "resolved1b", "boosted"]
+
+        file_name_format = os.path.join(
+            "{year}_shapes", "{mp}", "HH_DL_{mp}_{category}_GGF_{year}.root"
+        )
+
     # percentage
     signif_inc_thresh = 1.03
 
@@ -57,15 +78,14 @@ def main():
         bkg_counts_dict = {}
         bkg_errors_dict = {}
         for bkg in backgrounds:
+            bkg = bkg.format(mp=mp)
             bkg_counts_dict[bkg] = np.empty(0)
             bkg_errors_dict[bkg] = np.empty(0)
 
         # Loop all categories in catlist and concatenate them into single arrays for signal and each background
-        for category in ["resolved2b", "resolved1b", "boosted"]:
+        for category in categories:
 
-            file_name = os.path.join(
-                f"{year}_shapes", f"{mp}", f"HH_DL_{mp}_{category}_GGF_{year}.root"
-            )
+            file_name = file_name_format.format(year=year, mp=mp, category=category)
 
             f = uproot.open(file_name)
 
@@ -94,7 +114,7 @@ def main():
 
             this_total_bkg_counts = 0
             for bkg in backgrounds:
-                bkg = bkg.format(masspoint=mp)
+                bkg = bkg.format(mp=mp)
 
                 bkg_hist = f[bkg]
                 bkg_counts, _ = bkg_hist.to_numpy()
@@ -129,7 +149,7 @@ def main():
         bkg_error_sorted = np.sqrt(
             np.sum(
                 [
-                    np.power(bkg_errors_dict[bkg][sorted_bin_indices], 2)
+                    np.power(bkg_errors_dict[bkg.format(mp=mp)][sorted_bin_indices], 2)
                     for bkg in backgrounds
                 ],
                 axis=0,
@@ -138,6 +158,7 @@ def main():
         bkg_sorted_dict = {}
         bkg_error_sorted_dict = {}
         for bkg in backgrounds:
+            bkg = bkg.format(mp=mp)
             bkg_sorted_dict[bkg] = bkg_counts_dict[bkg][sorted_bin_indices]
             bkg_error_sorted_dict[bkg] = bkg_errors_dict[bkg][sorted_bin_indices]
 
@@ -148,6 +169,7 @@ def main():
         bkg_sorted_integrated_dict = {}
         bkg_error_sorted_integrated_dict = {}
         for bkg in backgrounds:
+            bkg = bkg.format(mp=mp)
             bkg_sorted_integrated_dict[bkg] = np.zeros(n_bins)
             bkg_error_sorted_integrated_dict[bkg] = np.zeros(n_bins)
         signif_sorted_merged_integrated = np.zeros(n_bins)
@@ -164,6 +186,7 @@ def main():
                 np.sum(np.power(bkg_error_sorted[: bin_num + 1], 2))
             )
             for bkg in backgrounds:
+                bkg = bkg.format(mp=mp)
                 bkg_sorted_integrated_dict[bkg][bin_num] = np.sum(
                     bkg_sorted_dict[bkg][: bin_num + 1]
                 )
@@ -204,8 +227,8 @@ def main():
             f"Error % on background: {100 * bkg_error_sorted_integrated / bkg_sorted_integrated}"
         )
         for bkg, bkg_counts in bkg_sorted_integrated_dict.items():
-            if bkg not in print_bkgs:
-                continue
+            # if bkg not in print_bkgs:
+            #     continue
             print(f"{bkg} integrated: {bkg_counts}")
             print(f"{bkg} errors integrated: {bkg_error_sorted_integrated_dict[bkg]}")
         print(f"Integrated Significance: {signif_sorted_merged_integrated}")
