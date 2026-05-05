@@ -273,7 +273,7 @@ class DNNValidation2Task(Task, HTCondorWorkflow, law.LocalWorkflow):
                 tmpFolder,
                 "--setup-config",
                 config_name,
-                "--model-name-stage1",
+                "--model-name",
                 model_file1.path,
                 "--model-name-stage2",
                 model_file2.path,
