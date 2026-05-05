@@ -112,6 +112,9 @@ def add_extra_vars(rdf_tmp, class_value, X_mass):
     rdf_tmp = rdf_tmp.Define("pt_ll", "(lep1_p4 + lep2_p4).Pt()")
     rdf_tmp = rdf_tmp.Define("pt_bb", "(b1_p4 + b2_p4).Pt()")
     rdf_tmp = rdf_tmp.Define("m_llmet", "(lep1_p4 + lep2_p4 + met_p4).M()")
+    rdf_tmp = rdf_tmp.Define(
+        "m_bbllmet", "(b1_p4 + b2_p4 + lep1_p4 + lep2_p4 + met_p4).M()"
+    )
 
     # Begin Run2 block
     rdf_tmp = rdf_tmp.Define("lep1_E", "(lep1_p4).E()")
@@ -159,7 +162,9 @@ def add_extra_vars(rdf_tmp, class_value, X_mass):
             f"{var}_log", f"TMath::Log(({var} > 0 ? {var} : 0) + 1.0)"
         )
 
-    return rdf_tmp
+    cols_to_save = [col for col in rdf_tmp.GetColumnNames() if not col.endswith("_p4")]
+
+    return rdf_tmp, cols_to_save
 
 
 def measure_cut_datasets(config_dict, output_folder, remote=False):
@@ -245,9 +250,8 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                     "total_cut_weighted"
                 ] = weighted_cut
 
-                rdf_tmp = add_extra_vars(rdf_tmp, class_value, X_mass)
-
-                rdf_tmp.Snapshot(treeName, output_file)
+                rdf_tmp, cols_to_save = add_extra_vars(rdf_tmp, class_value, X_mass)
+                rdf_tmp.Snapshot(treeName, output_file, cols_to_save)
 
     for background_name in background_list:
         background_dict = config_dict["background"][background_name]
@@ -291,9 +295,8 @@ def measure_cut_datasets(config_dict, output_folder, remote=False):
                     "total_cut_weighted"
                 ] = weighted_cut
 
-                rdf_tmp = add_extra_vars(rdf_tmp, class_value, X_mass)
-
-                rdf_tmp.Snapshot(treeName, output_file)
+                rdf_tmp, cols_to_save = add_extra_vars(rdf_tmp, class_value, X_mass)
+                rdf_tmp.Snapshot(treeName, output_file, cols_to_save)
 
     for nParity in range(config_dict["nParity"]):
         nParity_string = f"nParity_{nParity}"
@@ -464,6 +467,7 @@ def input_feature_plots(output_folder):
             "pt_ll",
             "pt_bb",
             "m_llmet",
+            "m_bbllmet",
             "bjet1_pt",
             "bjet1_mass",
             "bjet2_pt",
@@ -636,10 +640,10 @@ if __name__ == "__main__":
     os.makedirs(output_folder, exist_ok=True)
     os.system(f"cp {config_file} {output_folder}/.")
 
-    # measure_cut_datasets(config_dict, output_folder)
-    # hadd_files(config_dict, output_folder)
+    measure_cut_datasets(config_dict, output_folder)
+    hadd_files(config_dict, output_folder)
     # add_weight_file(output_folder) # Option for all masses
     for mass in config_dict["signal"]["XtoYHto2B2W"]["mass_points"]:
         print(f"Starting mass {mass}")
-        # add_weight_file(output_folder, mass=mass)
+        add_weight_file(output_folder, mass=mass)
     input_feature_plots(output_folder)
