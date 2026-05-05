@@ -314,7 +314,7 @@ def defineLeptonVariables(dfw, leg_name, leg_idx, isData):
         LegVar(
             f"gen_mother_p4",
             f"(*genLeptons.at({leg_name}_gen_idx).mothers().begin())->p4",
-            var_cond=f"{leg_name}_gen_idx >= 0",
+            var_cond=f"{leg_name}_gen_idx >= 0 && !genLeptons.at({leg_name}_gen_idx).mothers().empty()",
             default="LorentzVectorM()",
             append=False,
         )
@@ -329,7 +329,7 @@ def defineLeptonVariables(dfw, leg_name, leg_idx, isData):
         LegVar(
             f"gen_motherPdgId",
             f"(*genLeptons.at({leg_name}_gen_idx).mothers().begin())->pdgId",
-            var_cond=f"{leg_name}_gen_idx >= 0",
+            var_cond=f"{leg_name}_gen_idx >= 0 && !genLeptons.at({leg_name}_gen_idx).mothers().empty()",
             var_type="int",
             default="0",
         )
