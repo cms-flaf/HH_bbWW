@@ -3,7 +3,7 @@ jmax    3 number of processes minus 1
 kmax    0 number of nuisance parameters
 --------------------------------------------------------------------------------
 shapes data_obs res2b run3_res2b.root $PROCESS
-shapes * res2b run3_res2b.root m$MASS_$PROCESS
+shapes * res2b run3_res2b.root m$MASS_$PROCESS_class0
 --------------------------------------------------------------------------------
 bin             res2b           
 observation     -1              
