@@ -554,6 +554,7 @@ def defineSignalVariables(dfw):
                 f"static_cast<float>(H_to_bb.leg_vis_p4[{b_quark - 1}].{var}())",
             )
 
+
 def defineOtherMCObservables(dfw):
     for var in MCObservables:
         if isinstance(var, tuple):
