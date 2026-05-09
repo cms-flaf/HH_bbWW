@@ -182,14 +182,30 @@ defaultColToSave = [
 
 # Add this functionality eventually
 MCObservables = [
-    "LHEPdfWeight",
-    "LHEReweightingWeight",
-    "nLHEPdfWeight",
-    "nLHEReweightingWeight",
-    "LHEScaleWeight",
-    "nLHEScaleWeight",
-    "PSWeight",
-    "nPSWeight",
+    ("LHEPdfWeight", "LHEPdf_Weight"),
+    ("LHEReweightingWeight", "LHEReweighting_Weight"),
+    ("LHEScaleWeight", "LHEScale_Weight"),
+    ("PSWeight", "PS_Weight"),
+    "LHEPart_eta",
+    "LHEPart_incomingpz",
+    "LHEPart_mass",
+    "LHEPart_pdgId",
+    "LHEPart_phi",
+    "LHEPart_pt",
+    "LHEPart_spin",
+    "LHEPart_status",
+    "nLHEPart",
+    "LHE_AlphaS",
+    "LHE_HT",
+    "LHE_HTIncoming",
+    "LHE_Nb",
+    "LHE_Nc",
+    "LHE_Nglu",
+    "LHE_Njets",
+    "LHE_NpLO",
+    "LHE_NpNLO",
+    "LHE_Nuds",
+    "LHE_Vpt",
 ]
 
 PtEtaPhiM = ["pt", "eta", "phi", "mass"]
@@ -538,6 +554,14 @@ def defineSignalVariables(dfw):
                 f"static_cast<float>(H_to_bb.leg_vis_p4[{b_quark - 1}].{var}())",
             )
 
+def defineOtherMCObservables(dfw):
+    for var in MCObservables:
+        if isinstance(var, tuple):
+            var_orig_name, var_new_name = var
+            dfw.DefineAndAppend(var_new_name, var_orig_name)
+        else:
+            dfw.colToSave.append(var)
+
 
 def addAllVariables(
     dfw,
@@ -587,6 +611,8 @@ def addAllVariables(
     defineFatJetVariables(dfw, isData)
     defineForwardJetVariables(dfw, isData)
     defineMETVariables(dfw, global_params["met_type"])
+    if not isData:
+        defineMCObservables(dfw)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
