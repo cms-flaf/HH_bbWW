@@ -407,9 +407,9 @@ Data_Full:
     - Muon_Run2022E
     - Muon_Run2022F
     - Muon_Run2022G
-    - MuonEG_Run2022E
-    - MuonEG_Run2022F
-    - MuonEG_Run2022G
+    # - MuonEG_Run2022E
+    # - MuonEG_Run2022F
+    # - MuonEG_Run2022G
 
 Data_EGamma:
   name: "Data EGamma"
