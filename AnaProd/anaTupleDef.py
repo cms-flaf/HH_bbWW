@@ -555,7 +555,7 @@ def defineSignalVariables(dfw):
             )
 
 
-def defineOtherMCObservables(dfw):
+def defineMCSpecificObservables(dfw):
     for var in MCObservables:
         if isinstance(var, tuple):
             var_orig_name, var_new_name = var
@@ -613,7 +613,7 @@ def addAllVariables(
     defineForwardJetVariables(dfw, isData)
     defineMETVariables(dfw, global_params["met_type"])
     if not isData:
-        defineMCObservables(dfw)
+        defineMCSpecificObservables(dfw)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
