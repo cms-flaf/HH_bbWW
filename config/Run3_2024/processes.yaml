@@ -82,6 +82,12 @@ DYto2Tau_M_50:
     - DYto2Tau_M_50_1J_amcatnloFXFX
     - DYto2Tau_M_50_2J_amcatnloFXFX
 
+DY_LO:
+  datasets:
+    - DYto2E_MLL_10to50_madgraphMLM
+    - DYto2Mu_MLL_10to50_madgraphMLM
+    - DYto2Tau_MLL_10to50_madgraphMLM
+
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml

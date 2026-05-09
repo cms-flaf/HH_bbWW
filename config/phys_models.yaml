@@ -37,6 +37,7 @@ Production_Model:
     - ST
     - VV
     - W
+    - DY_LO
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
