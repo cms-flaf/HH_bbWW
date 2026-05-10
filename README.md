@@ -2,11 +2,11 @@
 
 ## How to run anaTuple production
 
-Current version `v2605`
+Current version `v2605a`
 
 1. Clone repository
    ```bash
-   git clone -b v2605 --recursive git@github.com:cms-flaf/HH_bbWW.git
+   git clone -b v2605a --recursive git@github.com:cms-flaf/HH_bbWW.git
    cd HH_bbWW
    git lfs pull
    source $PWD/env.sh
@@ -40,5 +40,5 @@ Current version `v2605`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2605 --period ERA --parallel-jobs 1000 --AnaTupleFileTask-tasks-per-job 10
+   law run AnaTupleMergeTask --version v2605a --period ERA --parallel-jobs 1000 --AnaTupleFileTask-tasks-per-job 10
    ```
