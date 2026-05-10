@@ -84,6 +84,10 @@ DYto2Tau_M_50:
     - DYto2Tau_M_50_1J_amcatnloFXFX
     - DYto2Tau_M_50_2J_amcatnloFXFX
 
+DY_LO:
+  datasets:
+    - DYto2L_MLL_10to50_madgraphMLM
+
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
@@ -403,9 +407,9 @@ Data_Full:
     - Muon_Run2022E
     - Muon_Run2022F
     - Muon_Run2022G
-    - MuonEG_Run2022E
-    - MuonEG_Run2022F
-    - MuonEG_Run2022G
+    # - MuonEG_Run2022E
+    # - MuonEG_Run2022F
+    # - MuonEG_Run2022G
 
 Data_EGamma:
   name: "Data EGamma"

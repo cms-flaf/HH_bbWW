@@ -82,6 +82,10 @@ DYto2Tau_M_50:
     - DYto2Tau_M_50_1J_amcatnloFXFX
     - DYto2Tau_M_50_2J_amcatnloFXFX
 
+DY_LO:
+  datasets:
+    - DYto2L_MLL_10to50_madgraphMLM
+
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
@@ -322,10 +326,10 @@ Data_Full:
     - Muon1_Run2023C_v3
     - Muon1_Run2023C_v4
 
-    - MuonEG_Run2023C_v1
-    - MuonEG_Run2023C_v2
-    - MuonEG_Run2023C_v3
-    - MuonEG_Run2023C_v4
+    # - MuonEG_Run2023C_v1
+    # - MuonEG_Run2023C_v2
+    # - MuonEG_Run2023C_v3
+    # - MuonEG_Run2023C_v4
 
 QCD_PT_Mu:
   name: "QCD MC PT binned MuEnrich"
