@@ -106,17 +106,10 @@ ST:
   name: "ST"
   color: "kPink+1"
   datasets:
-    # - ST_s_channel_antitop_4f_leptonDecays
-    # - ST_s_channel_top_4f_leptonDecays
-    # - ST_t_channel_antitop_4f_InclusiveDecays
-    # - ST_t_channel_top_4f_InclusiveDecays
-    # - ST_tW_antitop_2L2Nu
-    # - ST_tW_antitop_4Q
-    # - ST_tW_antitop_LNu2Q
-    # - ST_tW_top_2L2Nu
-    # - ST_tW_top_4Q
-    # - ST_tW_top_LNu2Q
-
+    - TbarBtoLminusNuB_s_channel_4FS
+    - TBbartoLplusNuBbar_s_channel_4FS
+    - TbarBQ_t_channel_4FS
+    - TBbarQ_t_channel_4FS
     - TbarWplusto2L2Nu
     - TbarWplusto4Q
     - TbarWplustoLNu2Q
@@ -150,13 +143,49 @@ W:
     - WtoLNu_1J_amcatnloFXFX
     - WtoLNu_2J_amcatnloFXFX
 
-VV:
+VV_inclusive:
   name: "VV"
-  color: "kGreen"  # eliminates need for inputs.yaml
+  color: "kGreen"
   datasets:
     - WW
     - WZ
     - ZZ
+
+VV:
+  name: "VV"
+  color: "kGreen"
+  datasets:
+    - WWto2L2Nu_powheg
+    - WWto4Q_powheg
+    - WWtoLNu2Q_powheg
+    - WZto3LNu_powheg
+    - WZto2L2Q_powheg
+    - WZtoLNu2Q_powheg
+    - ZZto2L2Nu_powheg
+    - ZZto2L2Q_powheg
+    - ZZto2Nu2Q_powheg
+    - ZZto4L_powheg
+
+SingleHiggs:
+  name: "Single Higgs"
+  color: "kRed"
+  datasets:
+    - GluGluHto2Tau_UncorrelatedDecay_UnFiltered
+    - GluGluHto2B_M125
+    - GluGluHto2Wto2L2Nu_M125
+    - VBFHto2Tau_UncorrelatedDecay_UnFiltered
+    - VBFHto2B_M125
+    - ggZH_Hto2B_Zto2L
+    - ggZH_Hto2B_Zto2Q
+    - WminusH_Hto2B_WtoLNu
+    - WminusH_Hto2B_Wto2Q
+    - WminusHto2Tau_UncorrelatedDecay_UnFiltered
+    - WplusH_Hto2B_WtoLNu
+    - WplusH_Hto2B_Wto2Q
+    - WplusHto2Tau_UncorrelatedDecay_UnFiltered
+    - TTHtoNon2B_M125
+    - TTHto2B_M125
+
 
 GluGluToRadion_DoubleLepton:
   name: "GluGluToRadion_DoubleLepton"

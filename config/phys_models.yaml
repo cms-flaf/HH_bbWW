@@ -6,6 +6,7 @@ Run3_Model:
     - ST
     - VV
     - W
+    - SingleHiggs
     # - QCD_PT
   signals:
     - XtoHHto2B2W_SingleLepton
@@ -36,8 +37,10 @@ Production_Model:
     - DY
     - ST
     - VV
+    - VV_inclusive
     - W
     - DY_LO
+    - SingleHiggs
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
