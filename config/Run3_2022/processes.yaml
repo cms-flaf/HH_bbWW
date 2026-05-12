@@ -3,17 +3,41 @@ DY:
   color: "kAzure+7"
   sub_processes:
     - DY_M_10to50
-    - DYto2E_M_50
-    - DYto2Mu_M_50
-    - DYto2Tau_M_50
+    # - DYto2E_M_50
+    # - DYto2Mu_M_50
+    # - DYto2Tau_M_50
+    - DYto2L_InclusivePlusBinned
+
+DYto2L_InclusivePlusBinned:
+  processors: *DY_processors_allFlavors
+  corrections:
+    Vpt:
+      type: DY
+      stages: [ 'AnalysisCache', 'HistTuple' ]
+  datasets:
+    - DYto2L_M_50_amcatnloFXFX
+    - DYto2L_M_50_0J_amcatnloFXFX
+    - DYto2L_M_50_1J_amcatnloFXFX
+    - DYto2L_M_50_2J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_40to100_1J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_100to200_1J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_200to400_1J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_400to600_1J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_600_1J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_40to100_2J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_100to200_2J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_200to400_2J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_400to600_2J_amcatnloFXFX
+    - DYto2L_M_50_PTLL_600_2J_amcatnloFXFX
 
 DY_M_10to50:
   name: "DY M10to50"
   color: "kAzure+10"
   datasets:
-    - DYto2E_M_10to50_amcatnloFXFX
-    - DYto2Mu_M_10to50_amcatnloFXFX
-    - DYto2Tau_M_10to50_amcatnloFXFX
+    - DYto2L_M_10to50_amcatnloFXFX
+    # - DYto2E_M_10to50_amcatnloFXFX
+    # - DYto2Mu_M_10to50_amcatnloFXFX
+    # - DYto2Tau_M_10to50_amcatnloFXFX
 
 DYto2E_M_50:
   processors: *DY_processors
@@ -60,6 +84,10 @@ DYto2Tau_M_50:
     - DYto2Tau_M_50_1J_amcatnloFXFX
     - DYto2Tau_M_50_2J_amcatnloFXFX
 
+DY_LO:
+  datasets:
+    - DYto2L_MLL_10to50_madgraphMLM
+
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
@@ -78,17 +106,10 @@ ST:
   name: "ST"
   color: "kPink+1"
   datasets:
-    # - ST_s_channel_antitop_4f_leptonDecays
-    # - ST_s_channel_top_4f_leptonDecays
-    # - ST_t_channel_antitop_4f_InclusiveDecays
-    # - ST_t_channel_top_4f_InclusiveDecays
-    # - ST_tW_antitop_2L2Nu
-    # - ST_tW_antitop_4Q
-    # - ST_tW_antitop_LNu2Q
-    # - ST_tW_top_2L2Nu
-    # - ST_tW_top_4Q
-    # - ST_tW_top_LNu2Q
-
+    - TbarBtoLminusNuB_s_channel_4FS
+    - TBbartoLplusNuBbar_s_channel_4FS
+    - TbarBQ_t_channel_4FS
+    - TBbarQ_t_channel_4FS
     - TbarWplusto2L2Nu
     - TbarWplusto4Q
     - TbarWplustoLNu2Q
@@ -122,13 +143,49 @@ W:
     - WtoLNu_1J_amcatnloFXFX
     - WtoLNu_2J_amcatnloFXFX
 
-VV:
+VV_inclusive:
   name: "VV"
-  color: "kGreen"  # eliminates need for inputs.yaml
+  color: "kGreen"
   datasets:
     - WW
     - WZ
     - ZZ
+
+VV:
+  name: "VV"
+  color: "kGreen"
+  datasets:
+    - WWto2L2Nu_powheg
+    - WWto4Q_powheg
+    - WWtoLNu2Q_powheg
+    - WZto3LNu_powheg
+    - WZto2L2Q_powheg
+    - WZtoLNu2Q_powheg
+    - ZZto2L2Nu_powheg
+    - ZZto2L2Q_powheg
+    - ZZto2Nu2Q_powheg
+    - ZZto4L_powheg
+
+SingleHiggs:
+  name: "Single Higgs"
+  color: "kRed"
+  datasets:
+    - GluGluHto2Tau_UncorrelatedDecay_UnFiltered
+    - GluGluHto2B_M125
+    - GluGluHto2Wto2L2Nu_M125
+    - VBFHto2Tau_UncorrelatedDecay_UnFiltered
+    - VBFHto2B_M125
+    - ggZH_Hto2B_Zto2L
+    - ggZH_Hto2B_Zto2Q
+    - WminusH_Hto2B_WtoLNu
+    - WminusH_Hto2B_Wto2Q
+    - WminusHto2Tau_UncorrelatedDecay_UnFiltered
+    - WplusH_Hto2B_WtoLNu
+    - WplusH_Hto2B_Wto2Q
+    - WplusHto2Tau_UncorrelatedDecay_UnFiltered
+    - TTHtoNon2B_M125
+    - TTHto2B_M125
+
 
 GluGluToRadion_DoubleLepton:
   name: "GluGluToRadion_DoubleLepton"
@@ -372,9 +429,9 @@ Data_Full:
     - Muon_Run2022C
     - Muon_Run2022D
     - SingleMuon_Run2022C
-    - DoubleMuon_Run2022C
-    - MuonEG_Run2022C
-    - MuonEG_Run2022D
+    # - DoubleMuon_Run2022C
+    # - MuonEG_Run2022C
+    # - MuonEG_Run2022D
 
 Data_EGamma:
   name: "Data EGamma"

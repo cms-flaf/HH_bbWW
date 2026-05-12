@@ -10,6 +10,10 @@ WLCGFileSystem:
   localPathCacheValidity: 600
   verbose: 0
 
+runTokenServer:
+  host: cms-flaf.cern.ch
+  port: 5007
+
 nEventsPerFile:
   data: 1000000
   signals: 100000
@@ -70,6 +74,10 @@ muIDWP: "Tight"
 muIsoWP: "Loose"
 
 treeName: "Events"
+
+anaTupleSelection:
+  min_n_effective_jets_SL: 3
+  min_n_effective_jets_DL: 2
 
 nPbPerFile: 2_000  # 2fb-1 per split data file
 

@@ -7,3 +7,14 @@
     dependency_level:
       AnaCache: dataset
       AnaTuple: process
+
+.DY_processors_allFlavors: &DY_processors_allFlavors
+  - name: Stitcher
+    module: FLAF.Processors.MCStitching
+    class: MCStitcher
+    config: FLAF/config/Processors/stitching_DY_amcatnlo_Vpt_NpNLO_allFlavors.yaml
+    stages: [ AnaTuple, AnaTupleMerge ]
+    verbose: 1
+    dependency_level:
+      AnaTuple: file
+      AnaTupleMerge: process
