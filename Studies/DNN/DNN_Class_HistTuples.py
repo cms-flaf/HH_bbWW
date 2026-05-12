@@ -1362,12 +1362,36 @@ def validate_dnn(
                 hme_high = hme_mean + (1 * hme_std)
                 # fatjet_btag_mask = fatjet_btag_values > 0.99
                 fatjet_btag_mask = True
+
+                # Do a quick significance scan for HME bounds
+                # Take the mean of signal's HME, then scan an asymmetric window around it to maximize significance s/sqrt(s+b)
+                best_significance = 0.0
+                best_hme_low = hme_low
+                best_hme_high = hme_high
+                for hme_low_scan in np.linspace(hme_mean - 5 * hme_std, hme_mean, 10):
+                    for hme_high_scan in np.linspace(
+                        hme_mean, hme_mean + 5 * hme_std, 10
+                    ):
+                        hme_mask_scan = (
+                            (hme_values > hme_low_scan)
+                            & (hme_values < hme_high_scan)
+                            & (fatjet_btag_mask)
+                        )
+                        s = np.sum(physics_weight[Sig_mask & hme_mask_scan])
+                        b = np.sum(physics_weight[Background_mask & hme_mask_scan])
+                        significance = s / np.sqrt(s + b + 1e-6)
+                        if significance > best_significance:
+                            best_significance = significance
+                            best_hme_low = hme_low_scan
+                            best_hme_high = hme_high_scan
+
                 print(
-                    f"For mass {para_masspoint} we have HME bounds [{hme_low}, {hme_high}]"
+                    f"For mass {para_masspoint} we have HME bounds [{best_hme_low}, {best_hme_high}]"
                 )
+                print(f"This had a significance of {best_significance}")
                 hme_mask = (
-                    (hme_values > hme_low)
-                    & (hme_values < hme_high)
+                    (hme_values > best_hme_low)
+                    & (hme_values < best_hme_high)
                     & (fatjet_btag_mask)
                 )
                 # hme_mask = True  # TEMPORARY, REMOVE THIS TO ENABLE HME CUT
@@ -1835,12 +1859,13 @@ def get_scores(sess, X, stage="multi"):
 # =========================================================
 # 4. EVENT MASKING
 # =========================================================
-def build_event_masks(dw, hme_values, cat, para_masspoint):
+def build_event_masks(dw, hme_values, cat, para_masspoint, hme_cut=False):
 
     signal_mask = (dw.X_mass == para_masspoint) & (dw.class_target == 0)
     TT_mask = dw.class_value == 1
     DY_mask = dw.class_value == 2
     Other_mask = dw.class_value == 3
+    Background_mask = dw.class_target == 1
 
     physics_weight = np.copy(dw.physics_weight)
     physics_weight = np.where(
@@ -1853,11 +1878,40 @@ def build_event_masks(dw, hme_values, cat, para_masspoint):
     cat_mask = getattr(dw, cat_name) == 1
     physics_weight = np.where(cat_mask, physics_weight, 0)
 
-    hme_mean = np.mean(hme_values[signal_mask])
-    hme_std = np.std(hme_values[signal_mask])
+    if hme_cut:
+        hme_mean = np.mean(hme_values[signal_mask])
+        hme_std = np.std(hme_values[signal_mask])
+        hme_mask = (hme_values > hme_mean - hme_std) & (hme_values < hme_mean + hme_std)
 
-    hme_mask = (hme_values > hme_mean - hme_std) & (hme_values < hme_mean + hme_std)
-    hme_mask = True  # Skip hme filtering for now
+        # Do a quick significance scan for HME bounds
+        # Take the mean of signal's HME, then scan an asymmetric window around it to maximize significance s/sqrt(s+b)
+        best_significance = 0.0
+        best_hme_low = 0
+        best_hme_high = 0
+        for hme_low_scan in np.linspace(hme_mean - 5 * hme_std, hme_mean, 10):
+            for hme_high_scan in np.linspace(hme_mean, hme_mean + 5 * hme_std, 10):
+                hme_mask_scan = (hme_values > hme_low_scan) & (
+                    hme_values < hme_high_scan
+                )
+                s = np.sum(physics_weight[signal_mask & hme_mask_scan])
+                b = np.sum(physics_weight[Background_mask & hme_mask_scan])
+                significance = s / np.sqrt(s + b + 1e-6)
+                if significance > best_significance:
+                    best_significance = significance
+                    best_hme_low = hme_low_scan
+                    best_hme_high = hme_high_scan
+
+        print(
+            f"For mass {para_masspoint} we have HME bounds [{best_hme_low}, {best_hme_high}]"
+        )
+        print(f"This had a significance of {best_significance}")
+        print(
+            f"Original mean, low, high was: {hme_mean}, {hme_mean - hme_std}, {hme_mean + hme_std}"
+        )
+        hme_mask = (hme_values > best_hme_low) & (hme_values < best_hme_high)
+
+    else:
+        hme_mask = True  # Skip hme filtering for now
 
     mask_dict = {
         "Signal": signal_mask & hme_mask,
@@ -1917,36 +1971,62 @@ def write_root_outputs(
 
     bins = np.linspace(0, 1, 51)  # Default to uniform bins
     if bin_format == "quantile":
-        bins = get_quantile_bins(pred, class_idx_mask, n_bins=50)
+        nBins = 50
+        bin_low = 0
+        bin_high = 1
+        pred_plot = pred
+        bins = get_quantile_bins(pred, class_idx_mask, n_bins=nBins)
         bins[0] = 0.0
         bins[-1] = 1.0
     elif bin_format == "raw":
-        bins = np.linspace(0, 1, 51)
+        nBins = 50
+        bin_low = 0
+        bin_high = 1
+        pred_plot = pred
+        bins = np.linspace(0, 1, nBins + 1)
     elif bin_format == "logit":
-        bins = np.linspace(-10, 10, 41)  # Adjust range as needed for logits
-        pred = np.log(pred / (1 - pred))  # Convert to logit space
+        nBins = 150
+        bin_low = -15
+        bin_high = 15
+        pred_plot = np.clip(pred, 1e-7, 1 - 1e-7)  # Prevent log(0) or log(1)
+        pred_plot = np.log(pred_plot / (1 - pred_plot))  # Convert to logit space
+        bins = np.linspace(
+            bin_low, bin_high, nBins + 1
+        )  # Adjust range as needed for logits
 
     print(f"Starting root output for class {class_idx} on process {process_tag}")
     print(f"Using binning {bins}")
+
+    ROOTOut.cd()
+    if not ROOTOut.GetDirectory("2D_plots"):
+        ROOTOut.mkdir("2D_plots")  # Always try, returns None or pointer
+
+    dir2d = ROOTOut.GetDirectory("2D_plots")
+    if not dir2d:  # null-pointer check, not 'is None'
+        # Try alternative: sometimes in ROOT, directories are not attached until written
+        raise RuntimeError("Failed to create or access ROOT directory '2D_plots'.")
 
     for pname, mask in mask_dict.items():
 
         # -----------------------
         # 1D DNN histogram
         # -----------------------
-        h = ROOT.TH1D(f"DNN_{pname}_m{para_masspoint}_c{class_idx}", "", 50, 0, 1)
+        h = ROOT.TH1D(
+            f"DNN_{pname}_m{para_masspoint}_c{class_idx}", "", nBins, bin_low, bin_high
+        )
 
-        hist, err = make_hist(pred, mask, physics_weight, bins)
+        hist, err = make_hist(pred_plot, mask, physics_weight, bins)
 
-        for i in range(50):
+        for i in range(nBins):
             h.SetBinContent(i + 1, hist[i])
             h.SetBinError(i + 1, err[i])
 
-        ROOTOut.WriteObject(h, f"h1_DNN_{process_tag}_{pname}_c{class_idx}")
+        ROOTOut.WriteObject(h, f"m{para_masspoint}_{pname}_class{class_idx}")
 
         # -----------------------
         # 2D DNN vs HME
         # -----------------------
+        dir2d.cd()
         h2 = ROOT.TH2D(
             f"DNN_vs_HME_{pname}_m{para_masspoint}_c{class_idx}",
             "",
@@ -1961,7 +2041,10 @@ def write_root_outputs(
         for dnn, hme in zip(pred[mask], feature_values["hme"][mask]):
             h2.Fill(dnn, hme)
 
-        ROOTOut.WriteObject(h2, f"DNN_vs_HME_{process_tag}_{pname}_c{class_idx}")
+        dir2d.WriteObject(
+            h2,
+            f"DNN_vs_HME_m{para_masspoint}_{pname}_class{class_idx}",
+        )
 
         # -----------------------
         # 2D DNN vs features
@@ -1984,8 +2067,9 @@ def write_root_outputs(
             for dnn, val in zip(pred[mask], x):
                 h2f.Fill(dnn, val)
 
-            ROOTOut.WriteObject(
-                h2f, f"DNN_vs_{feat}_{process_tag}_{pname}_c{class_idx}"
+            dir2d.WriteObject(
+                h2f,
+                f"DNN_vs_{feat}_m{para_masspoint}_{pname}_class{class_idx}",
             )
 
         # -----------------------
@@ -2009,9 +2093,12 @@ def write_root_outputs(
                     stage1 = stage1[0]
                 h2.Fill(dnn, stage1)
 
-            ROOTOut.WriteObject(
-                h2, f"DNN_vs_Stage1_Score_{process_tag}_{pname}_c{class_idx}"
+            dir2d.WriteObject(
+                h2,
+                f"DNN_vs_Stage1_Score_{pname}_m{para_masspoint}_class{class_idx}",
             )
+
+        ROOTOut.cd()
 
 
 # =========================================================
@@ -2131,204 +2218,219 @@ def validate_dnn_pipeline(
 
     for cat in ["res2b", "boosted", "res1b"]:
 
-        ROOTOut = ROOT.TFile(
-            os.path.join(output_folder, f"validation_{cat}.root"), "RECREATE"
-        )
+        for hme_cut in [True, False]:
+            hme_cut_string = "_hme_cut" if hme_cut else ""
 
-        ROOTOut2 = (
-            ROOT.TFile(
-                os.path.join(output_folder, f"validation_{cat}_stage2.root"), "RECREATE"
-            )
-            if sess2
-            else None
-        )
-
-        ROOTOut_raw = ROOT.TFile(
-            os.path.join(output_folder, f"validation_raw_{cat}.root"), "RECREATE"
-        )
-
-        ROOTOut2_raw = (
-            ROOT.TFile(
-                os.path.join(output_folder, f"validation_raw_{cat}_stage2.root"),
+            ROOTOut = ROOT.TFile(
+                os.path.join(output_folder, f"validation_{cat}{hme_cut_string}.root"),
                 "RECREATE",
             )
-            if sess2
-            else None
-        )
 
-        ROOTOut_logit = ROOT.TFile(
-            os.path.join(output_folder, f"validation_logit_{cat}.root"), "RECREATE"
-        )
+            ROOTOut2 = (
+                ROOT.TFile(
+                    os.path.join(output_folder, f"validation_{cat}_stage2.root"),
+                    "RECREATE",
+                )
+                if sess2
+                else None
+            )
 
-        ROOTOut2_logit = (
-            ROOT.TFile(
-                os.path.join(output_folder, f"validation_logit_{cat}_stage2.root"),
+            ROOTOut_raw = ROOT.TFile(
+                os.path.join(
+                    output_folder, f"validation_raw_{cat}{hme_cut_string}.root"
+                ),
                 "RECREATE",
             )
-            if sess2
-            else None
-        )
 
-        for mass in config["parametric_list"]:
-
-            print(f"{cat} mass {mass}")
-
-            if dw.use_parametric:
-                dw.SetPredictParamValue(mass)
-
-            X = dw.features_paramSet if dw.use_parametric else dw.features_no_param
-
-            preds1 = get_scores(sess1, X)
-            mask_dict, w = build_event_masks(dw, hme_values, cat, mass)
-
-            if np.sum(w) == 0:
-                print(f"No events in cat {cat}, continue.")
-                continue
-
-            feature_values = {
-                "hme": hme_values,
-                "features": dw.features,
-            }
-
-            # =================================================
-            # STAGE 1 OUTPUTS (multi-class)
-            # =================================================
-            for c in range(nClasses):
-                write_root_outputs(
-                    ROOTOut,
-                    preds1[:, c],
-                    dw,
-                    mask_dict,
-                    w,
-                    feature_values,
-                    setup,
-                    mass,
-                    cat,
-                    class_idx=c,
-                    bin_format="quantile",
+            ROOTOut2_raw = (
+                ROOT.TFile(
+                    os.path.join(output_folder, f"validation_raw_{cat}_stage2.root"),
+                    "RECREATE",
                 )
-
-                write_root_outputs(
-                    ROOTOut_raw,
-                    preds1[:, c],
-                    dw,
-                    mask_dict,
-                    w,
-                    feature_values,
-                    setup,
-                    mass,
-                    cat,
-                    class_idx=c,
-                    bin_format="raw",
-                )
-
-                write_root_outputs(
-                    ROOTOut_logit,
-                    preds1[:, c],
-                    dw,
-                    mask_dict,
-                    w,
-                    feature_values,
-                    setup,
-                    mass,
-                    cat,
-                    class_idx=c,
-                    bin_format="logit",
-                )
-
-            # =================================================
-            # ROC (stage 1)
-            # =================================================
-            y = (dw.class_target == 0).astype(int)
-
-            fig, ax = plt.subplots()
-            plot_roc(ax, y, preds1[:, 0], np.clip(w, 0, None), f"{cat} m{mass}")
-
-            ax.plot([0, 1], [0, 1], "--")
-            plt.savefig(os.path.join(output_folder, f"ROC_{cat}_{mass}.pdf"))
-            plt.close()
-
-            # =========================================================
-            # FEATURE IMPORTANCE (STAGE-1 BASELINE)
-            # =========================================================
-
-            print(f"[INFO] Running stage-1 feature importance for {cat} mass {mass}")
-
-            y_true = (dw.class_target == 0).astype(int)
-
-            feature_names = (setup["features"]).copy()
-            feature_importance_folder = os.path.join(
-                output_folder, "feature_importance"
-            )
-            feature_importance_scan(
-                sess1, X, y_true, w, cat, mass, feature_names, output_folder
+                if sess2
+                else None
             )
 
-            if getattr(setup, "train_stage_2", False):
+            ROOTOut_logit = ROOT.TFile(
+                os.path.join(
+                    output_folder, f"validation_logit_{cat}{hme_cut_string}.root"
+                ),
+                "RECREATE",
+            )
+
+            ROOTOut2_logit = (
+                ROOT.TFile(
+                    os.path.join(output_folder, f"validation_logit_{cat}_stage2.root"),
+                    "RECREATE",
+                )
+                if sess2
+                else None
+            )
+
+            for mass in config["parametric_list"]:
+
+                print(f"{cat} mass {mass}")
+
+                if dw.use_parametric:
+                    dw.SetPredictParamValue(mass)
+
+                X = dw.features_paramSet if dw.use_parametric else dw.features_no_param
+
+                preds1 = get_scores(sess1, X)
+                mask_dict, w = build_event_masks(
+                    dw, hme_values, cat, mass, hme_cut=hme_cut
+                )
+
+                if np.sum(w) == 0:
+                    print(f"No events in cat {cat}, continue.")
+                    continue
+
+                feature_values = {
+                    "hme": hme_values,
+                    "features": dw.features,
+                }
+
                 # =================================================
-                # STAGE 2 (binary refinement on signal-like events)
+                # STAGE 1 OUTPUTS (multi-class)
                 # =================================================
-                if sess2 is not None:
-
-                    signal_like = np.argmax(preds1, axis=1) == 0
-
-                    # preds1_nested = preds1[:,0].reshape(-1, 1)
-                    preds1_nested = preds1
-                    X2 = X[signal_like]
-                    # X2 = np.concatenate([X[signal_like], preds1_nested[signal_like]], axis=1)
-
-                    preds2 = get_scores(sess2, X2)
-                    preds2 = preds2[:, 0]  # Still a 2class technically
-
-                    mask_dict2 = {k: v[signal_like] for k, v in mask_dict.items()}
-
-                    feature_values2 = {
-                        "hme": hme_values[signal_like],
-                        "features": dw.features[signal_like],
-                        "stage1_score": preds1_nested[signal_like],
-                    }
-
+                for c in range(nClasses):
                     write_root_outputs(
-                        ROOTOut2,
-                        preds2,
+                        ROOTOut,
+                        preds1[:, c],
                         dw,
-                        mask_dict2,
-                        w[signal_like],
-                        feature_values2,
+                        mask_dict,
+                        w,
+                        feature_values,
                         setup,
                         mass,
                         cat,
-                        class_idx=0,
+                        class_idx=c,
+                        bin_format="quantile",
                     )
 
-                    # =========================================================
-                    # FEATURE IMPORTANCE (STAGE-2)
-                    # =========================================================
-
-                    print(
-                        f"[INFO] Running stage-2 feature importance for {cat} mass {mass}"
-                    )
-
-                    y_true = (dw.class_target == 0).astype(int)
-
-                    y_true_stage2 = y_true[signal_like]
-                    w_stage2 = w[signal_like]
-                    # feature_names.append("stage1_score_signal")
-                    # feature_names.append("stage1_score_TT")
-                    # feature_names.append("stage1_score_DY")
-                    # feature_names.append("stage1_score_Other")
-                    feature_importance_folder = os.path.join(
-                        output_folder, "feature_importance_stage2"
-                    )
-                    feature_importance_scan(
-                        sess2,
-                        X2,
-                        y_true_stage2,
-                        w_stage2,
-                        cat,
+                    write_root_outputs(
+                        ROOTOut_raw,
+                        preds1[:, c],
+                        dw,
+                        mask_dict,
+                        w,
+                        feature_values,
+                        setup,
                         mass,
-                        feature_names,
-                        feature_importance_folder,
+                        cat,
+                        class_idx=c,
+                        bin_format="raw",
                     )
+
+                    write_root_outputs(
+                        ROOTOut_logit,
+                        preds1[:, c],
+                        dw,
+                        mask_dict,
+                        w,
+                        feature_values,
+                        setup,
+                        mass,
+                        cat,
+                        class_idx=c,
+                        bin_format="logit",
+                    )
+
+                # =================================================
+                # ROC (stage 1)
+                # =================================================
+                y = (dw.class_target == 0).astype(int)
+
+                fig, ax = plt.subplots()
+                plot_roc(ax, y, preds1[:, 0], np.clip(w, 0, None), f"{cat} m{mass}")
+
+                ax.plot([0, 1], [0, 1], "--")
+                plt.savefig(os.path.join(output_folder, f"ROC_{cat}_{mass}.pdf"))
+                plt.close()
+
+                # =========================================================
+                # FEATURE IMPORTANCE (STAGE-1 BASELINE)
+                # =========================================================
+
+                print(
+                    f"[INFO] Running stage-1 feature importance for {cat} mass {mass}"
+                )
+
+                y_true = (dw.class_target == 0).astype(int)
+
+                feature_names = (setup["features"]).copy()
+                feature_importance_folder = os.path.join(
+                    output_folder, "feature_importance"
+                )
+                # feature_importance_scan(
+                #     sess1, X, y_true, w, cat, mass, feature_names, output_folder
+                # )
+
+                if getattr(setup, "train_stage_2", False):
+                    # =================================================
+                    # STAGE 2 (binary refinement on signal-like events)
+                    # =================================================
+                    if sess2 is not None:
+
+                        signal_like = np.argmax(preds1, axis=1) == 0
+
+                        # preds1_nested = preds1[:,0].reshape(-1, 1)
+                        preds1_nested = preds1
+                        X2 = X[signal_like]
+                        # X2 = np.concatenate([X[signal_like], preds1_nested[signal_like]], axis=1)
+
+                        preds2 = get_scores(sess2, X2)
+                        preds2 = preds2[:, 0]  # Still a 2class technically
+
+                        mask_dict2 = {k: v[signal_like] for k, v in mask_dict.items()}
+
+                        feature_values2 = {
+                            "hme": hme_values[signal_like],
+                            "features": dw.features[signal_like],
+                            "stage1_score": preds1_nested[signal_like],
+                        }
+
+                        write_root_outputs(
+                            ROOTOut2,
+                            preds2,
+                            dw,
+                            mask_dict2,
+                            w[signal_like],
+                            feature_values2,
+                            setup,
+                            mass,
+                            cat,
+                            class_idx=0,
+                        )
+
+                        # =========================================================
+                        # FEATURE IMPORTANCE (STAGE-2)
+                        # =========================================================
+
+                        print(
+                            f"[INFO] Running stage-2 feature importance for {cat} mass {mass}"
+                        )
+
+                        y_true = (dw.class_target == 0).astype(int)
+
+                        y_true_stage2 = y_true[signal_like]
+                        w_stage2 = w[signal_like]
+                        # feature_names.append("stage1_score_signal")
+                        # feature_names.append("stage1_score_TT")
+                        # feature_names.append("stage1_score_DY")
+                        # feature_names.append("stage1_score_Other")
+                        feature_importance_folder = os.path.join(
+                            output_folder, "feature_importance_stage2"
+                        )
+                        feature_importance_scan(
+                            sess2,
+                            X2,
+                            y_true_stage2,
+                            w_stage2,
+                            cat,
+                            mass,
+                            feature_names,
+                            feature_importance_folder,
+                        )
 
     print("Done.")
