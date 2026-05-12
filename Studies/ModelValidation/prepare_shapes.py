@@ -493,6 +493,7 @@ def rebin_shapes(
     output_dir,
     bkgs_to_consider_resolved,
     bkgs_to_consider_boosted,
+    nTotalBins=None,
 ):
     import array
 
@@ -514,7 +515,7 @@ def rebin_shapes(
     def integral_in_range(hist, lo_bin, hi_bin):
         return float(hist.Integral(lo_bin, hi_bin))
 
-    def build_rebin_edges(hist_dict, mass, cat):
+    def build_rebin_edges(hist_dict, mass, cat, nTotalBins=None):
         """
         Build variable-width bin edges from right to left.
 
@@ -534,6 +535,10 @@ def rebin_shapes(
         scores = []
 
         current_right_bin = nbins
+
+        total_signal = integral_in_range(signal_hist, 0, nbins)
+        if nTotalBins:
+            signal_per_bin = total_signal / nTotalBins
 
         while current_right_bin >= 1:
             best_left_bin = None
@@ -557,6 +562,9 @@ def rebin_shapes(
                     continue
 
                 sval = integral_in_range(signal_hist, left_bin, current_right_bin)
+
+                if nTotalBins and sval < signal_per_bin:
+                    continue
 
                 denom = sval + total_b
                 # denom = total_b
@@ -640,7 +648,7 @@ def rebin_shapes(
                 continue
 
             # build optimized variable binning
-            edges = build_rebin_edges(hist_dict, mass, cat)
+            edges = build_rebin_edges(hist_dict, mass, cat, nTotalBins)
             print(f"  New bin edges for m{mass}, {cat}: {edges}")
 
             edge_array = array.array("d", edges)
@@ -716,6 +724,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
             json.dump(limits, fp)
 
         os.system(f"rm {input_root}")
+        os.system(f"rm combine_logger.out")
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -735,7 +744,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
             "Studies",
             "ModelValidation",
             "config",
-            "Run3card_boosted_special.txt",
+            "Run3card_boosted_local.txt",
         ),
         os.path.join(output_dir, "."),
     )
@@ -745,7 +754,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
             "Studies",
             "ModelValidation",
             "config",
-            "Run3card_res2b_special.txt",
+            "Run3card_res2b_local.txt",
         ),
         os.path.join(output_dir, "."),
     )
@@ -755,7 +764,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
             "Studies",
             "ModelValidation",
             "config",
-            "Run3card_recovery_special.txt",
+            "Run3card_recovery_local.txt",
         ),
         os.path.join(output_dir, "."),
     )
@@ -765,7 +774,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
             "Studies",
             "ModelValidation",
             "config",
-            "Run3card_combined_special.txt",
+            "Run3card_combined_local.txt",
         ),
         os.path.join(output_dir, "."),
     )
@@ -791,7 +800,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
                     "combine",
                     "-M",
                     "AsymptoticLimits",
-                    os.path.join(output_dir, "Run3card_res2b_special.txt"),
+                    os.path.join(output_dir, "Run3card_res2b_local.txt"),
                     "--rMax",
                     "1",
                     "-t",
@@ -815,7 +824,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
                     "combine",
                     "-M",
                     "AsymptoticLimits",
-                    os.path.join(output_dir, "Run3card_recovery_special.txt"),
+                    os.path.join(output_dir, "Run3card_recovery_local.txt"),
                     "--rMax",
                     "1",
                     "-t",
@@ -839,7 +848,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
                     "combine",
                     "-M",
                     "AsymptoticLimits",
-                    os.path.join(output_dir, "Run3card_boosted_special.txt"),
+                    os.path.join(output_dir, "Run3card_boosted_local.txt"),
                     "--rMax",
                     "1",
                     "-t",
@@ -863,7 +872,7 @@ def calculate_limits(filepath, masslist, catlist, output_dir):
                     "combine",
                     "-M",
                     "AsymptoticLimits",
-                    os.path.join(output_dir, "Run3card_combined_special.txt"),
+                    os.path.join(output_dir, "Run3card_combined_local.txt"),
                     "--rMax",
                     "1",
                     "-t",
@@ -1108,14 +1117,12 @@ def plot_limits_from_json(json_dir, masslist, catlist, output_dir, draw_observed
 
 
 def prepare_shapes():
-    # training_dir = "/eos/user/d/daebi/HH_bbWW/DNNTraining/25Apr_Resolved_v1_Logits/Run3_2022EE/DNN_DoubleLepton_Resolved_Training0_par{par}_m{mass}"
-    # output_dir = "25Apr_Logits_FitShapes"
-
+    # training_dir_resolved = "/eos/user/d/daebi/HH_bbWW/DNNTraining/25Apr_Resolved_v1_Logits/Run3_2022EE/DNN_DoubleLepton_Resolved_Training0_par{par}_m{mass}"
     training_dir_resolved = "/eos/user/d/daebi/HH_bbWW/DNNTraining/5May_Resolved_v1/Run3_2022EE/DNN_DoubleLepton_Resolved_Training0_par{par}_m{mass}"
     training_dir_boosted = "/eos/user/d/daebi/HH_bbWW/DNNTraining/9May_Boosted_v1/Run3_2022EE/DNN_DoubleLepton_Boosted_Training0_par{par}_m{mass}"
 
     catlist = ["res2b", "res1b", "boosted"]
-    output_dir = "5May_Resolved_9May_Boosted_FitResults"
+    output_dir = "LocalLimits/5May_Resolved_9May_Boosted_FitResults_10Bins"
 
     # Step 1: hadd the separate parity files per mass point
     masslist = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000]
@@ -1162,6 +1169,7 @@ def prepare_shapes():
         output_dir_rebin,
         bkgs_to_consider_resolved,
         bkgs_to_consider_boosted,
+        10,  # nTotalBins, or none, or comment out
     )
 
     # Step 5: calculate limits of new shapes
