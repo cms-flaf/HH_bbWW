@@ -2,75 +2,90 @@ import os
 import yaml
 import awkward as ak
 
-# Resolved
-# template = "config/training_setup_doubleLep_resolved.yaml"
-# output_folder = "CondorConfigs_21Apr_LoggedVars/DoubleLepton_Resolved_v1"
+resolved = 1
+if resolved:
+    # Resolved
+    template = "config/training_setup_doubleLep_resolved.yaml"
+    output_folder = "CondorConfigs_26Apr/DoubleLepton_Resolved_v3"
 
-# input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr16/Dataset/nParity{j}_Merged.root"
+    input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr25/Dataset/nParity{j}_Merged.root"
+    # input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr16/Dataset/nParity{j}_Merged.root"
 
-# mass_specific = True
-# mass_list = [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000 ]
-# weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr16/Dataset/nParity{j}_Merged_weight_m{m}.root"
+    mass_specific = True
+    mass_list = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000]
+    weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr25/Dataset/nParity{j}_Merged_weight_m{m}.root"
+    # weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_Apr16/Dataset/nParity{j}_Merged_weight_m{m}.root"
 
-# training_name = "DNN_DoubleLepton_Resolved_Training{i}_par{j}_m{m}"
-# var_parse_dict = {
-#     'learning_rate': [ 0.00005 ],
-#     'n_epochs': [ 10000 ],
-#     'dropout': [ 0.2 ],
-#     # 'parametric_list': [ [ 600 ] ],
-#     'parametric_list': [ [ -1 ] ],
-#     'l2_rate': [ 0.001 ],
-#     'gamma1': [ 1.5 ],
-#     'gamma2': [ 0.9 ],
-#     'n_layers': [ 10 ],
-#     'n_units_reduction_factor': [ 0.8 ],
-#     'loss_scale': [ 0.5 ],
-#     'UseParametric': [ False ],
-#     'use_batch_norm': [ False ],
-# }
+    training_name = "DNN_DoubleLepton_Resolved_Training{i}_par{j}_m{m}"
+    var_parse_dict = {
+        "learning_rate": [0.0005],
+        "n_epochs": [100],
+        "dropout": [0.2],
+        # 'parametric_list': [ [ 600 ] ],
+        "parametric_list": [[-1]],
+        "l2_rate": [0.001],
+        "gamma1": [3.0],
+        "gamma2": [1.0],
+        "n_layers": [3],
+        "n_units_reduction_factor": [0.8],
+        "loss_scale": [1.0],
+        "UseParametric": [False],
+        "use_batch_norm": [True],
+        "nClasses": [4],
+        "patience": [50],
+        "lr_patience": [3],
+        "lr_decay": [0.8],
+    }
 
-# Boosted
-template = "config/training_setup_doubleLep_boosted.yaml"
-output_folder = "CondorConfigs_21Apr_LoggedVars/DoubleLepton_Boosted_v2"
+else:
+    # Boosted
+    template = "config/training_setup_doubleLep_boosted.yaml"
+    output_folder = "CondorConfigs_23Apr/DoubleLepton_Boosted_v3"
 
-input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr16_v4/Dataset/nParity{j}_Merged.root"
+    # input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr23/Dataset/nParity{j}_Merged.root"
+    input_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr16_v4/Dataset/nParity{j}_Merged.root"
 
-mass_specific = True
-mass_list = [
-    300,
-    400,
-    500,
-    550,
-    600,
-    650,
-    700,
-    800,
-    900,
-    1000,
-    1200,
-    1400,
-    1600,
-    1800,
-    2000,
-]
-weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr16_v4/Dataset/nParity{j}_Merged_weight_m{m}.root"
+    mass_specific = True
+    mass_list = [
+        300,
+        400,
+        500,
+        550,
+        600,
+        650,
+        700,
+        800,
+        900,
+        1000,
+        1200,
+        1400,
+        1600,
+        1800,
+        2000,
+    ]
+    # weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr23/Dataset/nParity{j}_Merged_weight_m{m}_multiclass_noNegatives.root"
+    weight_file_template = "/eos/user/d/daebi/HH_bbWW/DNNDatasets/BoostedDataset_Apr16_v4/Dataset/nParity{j}_Merged_weight_m{m}.root"
 
-training_name = "DNN_DoubleLepton_Boosted_Training{i}_par{j}_m{m}"
-var_parse_dict = {
-    "learning_rate": [0.00005],  # Frozen 0.005
-    "n_epochs": [10000],  # Frozen 100
-    "dropout": [0.5],  # Frozen 0.2
-    "parametric_list": [[-1]],
-    # 'parametric_list': [ [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 3500, 4000 ] ],
-    "l2_rate": [0.001],  # Frozen 0.001
-    "gamma1": [1.5],  # Frozen 1.5
-    "gamma2": [0.9],  # Frozen 0.9
-    "n_layers": [5],  # Frozen 3
-    "n_units_reduction_factor": [1.0],  # Frozen 1
-    "loss_scale": [0.5],  # Frozen 0.5
-    "UseParametric": [False],
-    "use_batch_norm": [True],
-}
+    training_name = "DNN_DoubleLepton_Boosted_Training{i}_par{j}_m{m}"
+    var_parse_dict = {
+        "learning_rate": [0.00005],  # Frozen 0.005
+        "n_epochs": [100],  # Frozen 100
+        "dropout": [0.2],  # Frozen 0.2
+        "parametric_list": [[-1]],
+        # 'parametric_list': [ [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 3500, 4000 ] ],
+        "l2_rate": [0.001],  # Frozen 0.001
+        "gamma1": [1.5],  # Frozen 1.5
+        "gamma2": [0.9],  # Frozen 0.9
+        "n_layers": [3],  # Frozen 3
+        "n_units_reduction_factor": [1.0],  # Frozen 1
+        "loss_scale": [0.8],  # Frozen 0.5
+        "UseParametric": [False],
+        "use_batch_norm": [True],
+        "nClasses": [2],
+        "patience": [50],
+        "lr_patience": [3],
+        "lr_decay": [0.8],
+    }
 
 os.makedirs(output_folder, exist_ok=True)
 
@@ -88,6 +103,9 @@ for i, varset in enumerate(var_combinations):
 
         config = default_config.copy()
         for name, var in zip(var_names, varset.tolist()):
+            if name == "parametric_list" and var == [-1]:
+                print(f"Parametric list is empty, set to special mass {m}")
+                var = [m]
             config[name] = var
         for j in range(4):
             # Set up each parity

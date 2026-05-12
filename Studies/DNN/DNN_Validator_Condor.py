@@ -22,6 +22,12 @@ if __name__ == "__main__":
         "--model-name", required=True, type=str, help="Model file for validation"
     )
     parser.add_argument(
+        "--model-name-stage2",
+        required=False,
+        type=str,
+        help="Model file for validation",
+    )
+    parser.add_argument(
         "--model-config", required=True, type=str, help="Config file for model"
     )
 
@@ -38,13 +44,15 @@ if __name__ == "__main__":
         thread = threading.Thread(target=update_kinit_thread)
         thread.start()
 
-        model = DNNClass.validate_dnn(
+        # model = DNNClass.validate_dnn(
+        model = DNNClass.validate_dnn_pipeline(
             setup,
             args.validation_file,
             args.validation_weight_file,
             args.output_folder,
             args.model_name,
-            args.model_config,
+            model_stage2=args.model_name_stage2,
+            model_config=args.model_config,
         )
 
     finally:
