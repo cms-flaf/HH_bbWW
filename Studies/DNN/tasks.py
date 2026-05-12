@@ -157,7 +157,8 @@ class DNNValidationTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         validation_file = config["validation_file"]
         valitation_weight_file = config["validation_weight_file"]
 
-        tmp_local = os.path.join(self.input()[0].path, "best.onnx")
+        # tmp_local = os.path.join(self.input()[0].path, "best.onnx")
+        tmp_local = os.path.join(self.input()[0].path, "stage1.onnx")
 
         with self.remote_target(tmp_local, fs=self.fs_histograms).localize(
             "r"
