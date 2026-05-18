@@ -27,15 +27,15 @@ if __name__ == "__main__":
         os.makedirs(args.output_folder, exist_ok=True)
 
         plot_vars = [
-            "dropout",
-            "l2_rate",
-            "learning_rate",
-            "n_epochs",
-            "gamma1",
-            "gamma2",
-            "n_units_reduction_factor",
-            "n_layers",
-            "loss_scale",
+            # "dropout",
+            # "l2_rate",
+            # "learning_rate",
+            # "n_epochs",
+            # "gamma1",
+            # "gamma2",
+            # "n_units_reduction_factor",
+            # "n_layers",
+            # "loss_scale",
         ]
         best_x = []
         best_y = []
@@ -57,13 +57,12 @@ if __name__ == "__main__":
             800,
             900,
             1000,
-            1200,
-            1400,
-            1600,
-            1800,
-            2000,
+            # 1200,
+            # 1400,
+            # 1600,
+            # 1800,
+            # 2000,
         ]
-        # masslist = [ 600, 650, 700, 800, 900, 1000 ]
 
         for mass in masslist:
 
@@ -136,7 +135,7 @@ if __name__ == "__main__":
                         )
                         res1b_dict[f"m{mass}"][var]["y"].append(res1b_limits)
 
-                    if res2b_limits < best_limits["res2b"]["value"]:
+                    if res2b_limits < best_limits[f"m{mass}"]["res2b"]["value"]:
                         best_limits[f"m{mass}"]["res2b"]["value"] = res2b_limits
                         best_limits[f"m{mass}"]["res2b"]["training"] = (
                             training_yamls_resolved[0]
@@ -180,7 +179,10 @@ if __name__ == "__main__":
         # Example data
         for mass in masslist:
             best_x.append(mass)
-            best_y.append(best_limits[f"m{mass}"]["boosted"]["value"])
+            if args.resolved:
+                best_y.append(best_limits[f"m{mass}"]["res2b"]["value"])
+            else:
+                best_y.append(best_limits[f"m{mass}"]["boosted"]["value"])
 
             for var in plot_vars:
                 x = res2b_dict[f"m{mass}"][var]["x"]
@@ -229,9 +231,9 @@ if __name__ == "__main__":
                 plt.close()
 
         # Create scatter plot
-        plt.scatter(best_x, best_y, label="Run3 Boosted", color="blue")
 
         if args.resolved:
+            plt.scatter(best_x, best_y, label="Run3 Res2b", color="blue")
             x_2018_res2b = [300, 400, 500, 550, 600, 650, 700, 800, 900]
             y_2018_res2b = [
                 5.4275,
@@ -259,6 +261,7 @@ if __name__ == "__main__":
             ]
             plt.scatter(x_2018_res1b, y_2018_res1b, label="2018 Res1b", color="green")
         else:
+            plt.scatter(best_x, best_y, label="Run3 Boosted", color="blue")
             x_2018 = [300, 400, 500, 550, 600, 650, 700, 800, 900]
             y_2018 = [62.7, 9.975, 2.125, 1.2969, 0.6844, 0.3422, 0.193, 0.1152, 0.0785]
             plt.scatter(x_2018, y_2018, label="2018 Boosted", color="red")

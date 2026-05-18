@@ -170,13 +170,22 @@ def hadd_parity_files(
 def fit_hadded_shapes(filepath, masslist, catlist, output_dir):
     # load the hadd_m{mass}_{cat}.root files, load the background distribution, and create a fit
 
+    # Set minimizer to MINUIT2
+    ROOT.Math.MinimizerOptions.SetDefaultMinimizer("Minuit2", "Migrad")
+
     # Configuration
     use_double_crystal_ball = (
-        True  # Set to False for single-sided crystal ball, True for double-sided
+        False  # Set to False for single-sided crystal ball, True for double-sided
     )
+    # fit_option = "crystal_ball"
+    # fit_option = "double_crystal_ball"
+    # fit_option = "crystal_ball_expo"
+    fit_option = "crystal_ball_gaus"
+
     hists_to_fit = ["background", "DY", "TT", "Other", "signal"]
 
     os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(os.path.join(output_dir, "plots"), exist_ok=True)
 
     output_filepath = os.path.join(output_dir, "fit_hist_m{mass}_{cat}.root")
 
@@ -278,12 +287,7 @@ def fit_hadded_shapes(filepath, masslist, catlist, output_dir):
                 alpha_right_init = 1.5
                 n_init = 2.0
 
-                if use_double_crystal_ball:
-
-                    # ...
-                    peak_bin = hist.GetMaximumBin()
-                    peak_center = hist.GetXaxis().GetBinCenter(peak_bin)
-
+                if fit_option == "double_crystal_ball":
                     mean = peak_center
                     rms = hist.GetRMS()
                     sigma_init = rms if rms > 0 else x_range * 0.1
@@ -340,6 +344,82 @@ def fit_hadded_shapes(filepath, masslist, catlist, output_dir):
                         hist.Delete()
                         continue
 
+                elif fit_option == "crystal_ball_expo":
+                    # Crystal Ball LEFT + Exponential RIGHT
+                    # Parameters: [0]=amplitude, [1]=mean, [2]=sigma, [3]=alphaL, [4]=nL, [5]=alphaR, [6]=betaR
+                    # Left: power-law tail (standard CB)
+                    # Right: exp(-betaR * (x-mu)/sigma) starting at alphaR*sigma from mean
+
+                    cb_exp_expr = (
+                        "[0] * ("
+                        "(((x-[1])/[2]) < -abs([3])) ? "
+                        # Left power-law tail
+                        "(pow(abs([4])/abs([3]), abs([4])) * exp(-0.5*[3]*[3]) * "
+                        "pow(abs([4])/abs([3]) - abs([3]) - (x-[1])/[2], -abs([4]))) : "
+                        # Right exponential tail
+                        "((((x-[1])/[2]) > abs([5])) ? "
+                        "(exp(-0.5*[5]*[5]) * exp(-abs([6]) * ((x-[1])/[2] - abs([5])))) : "
+                        # Gaussian core
+                        "exp(-0.5*((x-[1])/[2])*((x-[1])/[2])) ) )"
+                    )
+
+                    fit = ROOT.TF1(fit_name, cb_exp_expr, fit_lo, fit_hi)
+                    fit.SetNpx(1000)
+
+                    fit.SetParameters(
+                        hist.GetMaximum(),  # [0] amplitude
+                        peak_center,  # [1] mean
+                        rms * 0.7,  # [2] sigma (start narrower)
+                        1.5,  # [3] alphaL
+                        3.0,  # [4] nL
+                        1.2,  # [5] alphaR (transition point)
+                        2.0,  # [6] betaR (exponential slope)
+                    )
+
+                    fit.SetParLimits(0, 0, hist.GetMaximum() * 10)
+                    fit.SetParLimits(1, fit_lo, fit_hi)
+                    fit.SetParLimits(2, sigma_min, sigma_max)
+                    fit.SetParLimits(3, 0.1, 10.0)  # alphaL
+                    fit.SetParLimits(4, 1.01, 50.0)  # nL
+                    fit.SetParLimits(5, 0.1, 5.0)  # alphaR
+                    fit.SetParLimits(6, 0.1, 20.0)  # betaR (larger = faster falloff)
+
+                elif fit_option == "crystal_ball_gaus":
+                    # Narrow Gaussian + Wide left-sided Crystal Ball
+                    gauss_plus_cb_expr = (
+                        "[0] * exp(-0.5*((x-[1])/[2])^2) + "
+                        "[3] * ("
+                        "(((x-[4])/[5]) < -abs([6])) ? "
+                        "(pow(abs([7])/abs([6]), abs([7])) * exp(-0.5*[6]*[6]) * "
+                        "pow(abs([7])/abs([6]) - abs([6]) - (x-[4])/[5], -abs([7]))) : "
+                        "exp(-0.5*((x-[4])/[5])^2) )"
+                    )
+
+                    fit = ROOT.TF1(fit_name, gauss_plus_cb_expr, fit_lo, fit_hi)
+                    fit.SetNpx(1000)
+
+                    fit.SetParameters(
+                        hist.GetMaximum() * 0.5,  # [0] amp_gauss (narrow peak)
+                        peak_center,  # [1] mean_gauss
+                        0.5,  # [2] sigma_gauss  ← KEY: much narrower than RMS
+                        hist.GetMaximum() * 0.3,  # [3] amp_cb (wide + left tail)
+                        peak_center,  # [4] mean_cb
+                        1.5,  # [5] sigma_cb
+                        1.5,  # [6] alpha_cb
+                        3.0,  # [7] n_cb
+                    )
+
+                    fit.SetParLimits(0, 0, hist.GetMaximum() * 5)
+                    fit.SetParLimits(1, peak_center - 1, peak_center + 1)
+                    fit.SetParLimits(2, 0.2, 1.0)  # NARROW
+                    fit.SetParLimits(3, 0, hist.GetMaximum() * 5)
+                    fit.SetParLimits(4, peak_center - 2, peak_center + 2)
+                    fit.SetParLimits(5, 0.8, 4.0)  # WIDE
+                    fit.SetParLimits(6, 0.3, 5.0)
+                    fit.SetParLimits(7, 1.01, 30.0)
+
+                    fit_result = hist.Fit(fit, "RS")
+
                 else:
                     # Single-sided crystal ball: [0] amplitude, [1] mean, [2] sigma, [3] alpha, [4] n
                     fit = ROOT.TF1(fit_name, "crystalball", fit_lo, fit_hi)
@@ -353,7 +433,9 @@ def fit_hadded_shapes(filepath, masslist, catlist, output_dir):
                     # hist.Fit(fit, "R+")
 
                     # fit_result = hist.Fit(fit, "QRS")
+                    fit_result = hist.Fit(fit, "RQS")
                     fit_result = hist.Fit(fit, "RS")
+                    fit_result = hist.Fit(fit, "RMS")
                     print(
                         "status =",
                         int(fit_result),
@@ -392,7 +474,13 @@ def fit_hadded_shapes(filepath, masslist, catlist, output_dir):
                 # Save the fit plot to a filels
                 c = ROOT.TCanvas(f"c_{mass}_{cat}_{histname}", "c", 800, 600)
                 hist.Draw("E")
+                hist.SetName(f"{hist.GetName()} m{mass}")
                 fit.Draw("same")
+                c.SaveAs(
+                    os.path.join(
+                        output_dir, "plots", f"fit_{cat}_{histname}_m{mass}.pdf"
+                    )
+                )
                 c.Clear()
 
                 # Take this fit, create a new histogram with the same binning as the original histogram, and fill it with the fit function values. Then save this histogram to a new root file. Include the old histogram in the new root file as well for comparison.
@@ -1122,7 +1210,7 @@ def prepare_shapes():
     training_dir_boosted = "/eos/user/d/daebi/HH_bbWW/DNNTraining/9May_Boosted_v1/Run3_2022EE/DNN_DoubleLepton_Boosted_Training0_par{par}_m{mass}"
 
     catlist = ["res2b", "res1b", "boosted"]
-    output_dir = "LocalLimits/5May_Resolved_9May_Boosted_FitResults_10Bins"
+    output_dir = "LocalLimits/5May_Resolved_9May_Boosted_FitResults_20Bins"
 
     # Step 1: hadd the separate parity files per mass point
     masslist = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000]
@@ -1169,7 +1257,7 @@ def prepare_shapes():
         output_dir_rebin,
         bkgs_to_consider_resolved,
         bkgs_to_consider_boosted,
-        10,  # nTotalBins, or none, or comment out
+        20,  # nTotalBins, or none, or comment out
     )
 
     # Step 5: calculate limits of new shapes
