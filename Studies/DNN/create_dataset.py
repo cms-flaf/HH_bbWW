@@ -544,7 +544,7 @@ def input_feature_plots(output_folder):
     for inName in inNames:
         if "weight" in inName:
             continue
-        print(f"On file {inName}")
+        print(f"On file {inName} for plots")
         in_file = uproot.open(inName)
 
         subfolder_name = f"{inName[:-5]}_input_features"

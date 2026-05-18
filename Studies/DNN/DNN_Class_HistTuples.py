@@ -2006,6 +2006,14 @@ def write_root_outputs(
         # Try alternative: sometimes in ROOT, directories are not attached until written
         raise RuntimeError("Failed to create or access ROOT directory '2D_plots'.")
 
+    if not ROOTOut.GetDirectory("HME_plots"):
+        ROOTOut.mkdir("HME_plots")  # Always try, returns None or pointer
+
+    dirHME = ROOTOut.GetDirectory("HME_plots")
+    if not dirHME:  # null-pointer check, not 'is None'
+        # Try alternative: sometimes in ROOT, directories are not attached until written
+        raise RuntimeError("Failed to create or access ROOT directory 'HME_plots'.")
+
     for pname, mask in mask_dict.items():
 
         # -----------------------
@@ -2022,6 +2030,21 @@ def write_root_outputs(
             h.SetBinError(i + 1, err[i])
 
         ROOTOut.WriteObject(h, f"m{para_masspoint}_{pname}_class{class_idx}")
+
+        # -----------------------
+        # 1D HME histogram
+        # -----------------------
+        hme_bins = np.linspace(0.0, 2500.0, 251)
+        dirHME.cd()
+        h = ROOT.TH1D(f"HME_{pname}_m{para_masspoint}", "", 250, 0.0, 2500.0)
+
+        hist, err = make_hist(feature_values["hme"], mask, physics_weight, hme_bins)
+
+        for i in range(nBins):
+            h.SetBinContent(i + 1, hist[i])
+            h.SetBinError(i + 1, err[i])
+
+        dirHME.WriteObject(h, f"HME_m{para_masspoint}_{pname}")
 
         # -----------------------
         # 2D DNN vs HME
