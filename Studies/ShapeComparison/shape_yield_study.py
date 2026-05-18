@@ -5,9 +5,12 @@ import os
 
 def main():
     # year = 2018
-    year = "run3"
+    # year = "run3"
+    year = "run3_new"
 
     if year == "run3":
+        masspoints = [300, 400, 500, 550, 600, 650, 700, 800, 900]
+
         backgrounds = ["m{mp}_TT_class0", "m{mp}_DY_class0", "m{mp}_Other_class0"]
         print_bkgs = ["TT", "DY", "Other"]
 
@@ -17,6 +20,20 @@ def main():
 
         file_name_format = os.path.join(
             "{year}_shapes", "{mp}", "run3_{category}_m{mp}.root"
+        )
+
+    elif year == "run3_new":
+        masspoints = [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000]
+
+        backgrounds = ["m{mp}_TT", "m{mp}_DY", "m{mp}_Other", "m{mp}_fit_DY"]
+        print_bkgs = ["TT", "DY", "Other", "fit_DY"]
+
+        signals = ["m{mp}_signal"]
+
+        categories = ["res2b", "res1b", "boosted"]
+
+        file_name_format = os.path.join(
+            "{year}_shapes", "rebin_combined_shapes_{category}.root"
         )
 
     else:
@@ -125,6 +142,8 @@ def main():
                 bkg_errors_dict[bkg] = np.concatenate(
                     (bkg_errors_dict[bkg], bkg_errors)
                 )
+                if bkg == "m{mp}_DY".format(mp=mp):
+                    continue
                 this_total_bkg_counts += bkg_counts
             total_bkg_counts = np.concatenate((total_bkg_counts, this_total_bkg_counts))
 
