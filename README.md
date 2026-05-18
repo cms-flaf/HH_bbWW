@@ -2,11 +2,11 @@
 
 ## How to run anaTuple production
 
-Current version `v2601a`
+Current version `v2605a`
 
 1. Clone repository
    ```bash
-   git clone -b v2601a --recursive git@github.com:cms-flaf/HH_bbWW.git
+   git clone -b v2605a --recursive git@github.com:cms-flaf/HH_bbWW.git
    cd HH_bbWW
    git lfs pull
    source $PWD/env.sh
@@ -18,16 +18,18 @@ Current version `v2601a`
    fs_default: T3_CH_CERNBOX:/store/user/YOUR_USER_NAME/HH_bbWW/
    fs_anaTuple: T3_US_FNALLPC:/store/user/lpcflaf/HH_bbWW/
 
+   phys_model: Production_Model
    analysis_config_area: config
    compute_unc_variations: true
    compute_unc_histograms: true
    store_noncentral: true
    ```
-   If you don't have a FNAL account, you can use `T3_CH_CERNBOX` for both `fs_default` and `fs_anaTuple`.
 
-1. Enter screen session
+1. Login to cms-flaf.cern.ch, enter screen session, login to lxplus
    ```bash
+   ssh USER@cms-flaf.cern.ch
    screen -S HH_bbWW_production
+   ssh lxplus.cern.ch
    ```
 
 1. Load environment and setup grid certificate
@@ -38,5 +40,5 @@ Current version `v2601a`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2601a --period ERA
+   law run AnaTupleMergeTask --version v2605a --period ERA --parallel-jobs 1000 --AnaTupleFileTask-tasks-per-job 10
    ```
