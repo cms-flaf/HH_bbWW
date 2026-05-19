@@ -3,10 +3,9 @@ DY:
   color: "kAzure+7"
   sub_processes:
     - DY_M_10to50
-    # - DYto2E_M_50
-    # - DYto2Mu_M_50
-    # - DYto2Tau_M_50
-    - DYto2L_InclusivePlusBinned
+    - DYto2E_M_50
+    - DYto2Mu_M_50
+    - DYto2Tau_M_50
 
 DYto2L_InclusivePlusBinned:
   processors: *DY_processors_allFlavors
@@ -14,155 +13,62 @@ DYto2L_InclusivePlusBinned:
     Vpt:
       type: DY
       stages: [ 'AnalysisCache', 'HistTuple' ]
-  datasets:
-    - DYto2L_M_50_amcatnloFXFX
-    - DYto2L_M_50_0J_amcatnloFXFX
-    - DYto2L_M_50_1J_amcatnloFXFX
-    - DYto2L_M_50_2J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_40to100_1J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_100to200_1J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_200to400_1J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_400to600_1J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_600_1J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_40to100_2J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_100to200_2J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_200to400_2J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_400to600_2J_amcatnloFXFX
-    - DYto2L_M_50_PTLL_600_2J_amcatnloFXFX
+  datasets: [ ]
 
 DY_M_10to50:
   name: "DY M10to50"
   color: "kAzure+10"
-  datasets:
-    - DYto2L_M_10to50_amcatnloFXFX
-    # - DYto2E_M_10to50_amcatnloFXFX
-    # - DYto2Mu_M_10to50_amcatnloFXFX
-    # - DYto2Tau_M_10to50_amcatnloFXFX
+  datasets: [ ]
 
 DYto2E_M_50:
   processors: *DY_processors
-  datasets:
-    - DYto2E_M_50_amcatnloFXFX
-    - DYto2E_M_50_0J_amcatnloFXFX
-    - DYto2E_M_50_1J_amcatnloFXFX
-    - DYto2E_M_50_2J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_40to100_1J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_100to200_1J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_200to400_1J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_400to600_1J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_600_1J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_40to100_2J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_100to200_2J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_200to400_2J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_400to600_2J_amcatnloFXFX
-    - DYto2E_M_50_PTLL_600_2J_amcatnloFXFX
+  datasets: [ ]
 
 DYto2Mu_M_50:
   processors: *DY_processors
-  datasets:
-    - DYto2Mu_M_50_amcatnloFXFX
-    - DYto2Mu_M_50_0J_amcatnloFXFX
-    - DYto2Mu_M_50_1J_amcatnloFXFX
-    - DYto2Mu_M_50_2J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_40to100_1J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_100to200_1J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_200to400_1J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_400to600_1J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_600_1J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_40to100_2J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_100to200_2J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_200to400_2J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_400to600_2J_amcatnloFXFX
-    - DYto2Mu_M_50_PTLL_600_2J_amcatnloFXFX
+  datasets: [ ]
 
 DYto2Tau_M_50:
   processors: *DY_processors
-  datasets:
-    - DYto2Tau_M_50_0J_amcatnloFXFX
-    - DYto2Tau_M_50_1J_amcatnloFXFX
-    - DYto2Tau_M_50_2J_amcatnloFXFX
+  datasets: [ ]
 
 DY_LO:
-  datasets:
-    - DYto2E_MLL_10to50_madgraphMLM
-    - DYto2Mu_MLL_10to50_madgraphMLM
-    - DYto2Tau_MLL_10to50_madgraphMLM
+  datasets: [ ]
 
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
-  datasets:
-    - TTto2L2Nu
-    - TTtoLNu2Q
-    - TTto4Q
+  datasets: [ ]
 
-TT_Inclusive:
-  name: "t#bar{t} Inclusive"
-  color: "kGreen-3"
-  datasets:
-    - TT
-
-ST: # New 2025Skim have different ST names?
+ST:
   name: "ST"
   color: "kPink+1"
-  datasets:
-    # - ST_s_channel_antitop_4f_leptonDecays
-    # - ST_s_channel_top_4f_leptonDecays
-    # - ST_t_channel_antitop_4f_InclusiveDecays
-    # - ST_t_channel_top_4f_InclusiveDecays
-    # - ST_tW_antitop_2L2Nu
-    # - ST_tW_antitop_4Q
-    # - ST_tW_antitop_LNu2Q
-    # - ST_tW_top_2L2Nu
-    # - ST_tW_top_4Q
-    # - ST_tW_top_LNu2Q
-
-    - TbarWplusto2L2Nu
-    - TbarWplusto4Q
-    - TbarWplustoLNu2Q
-    - TWminusto2L2Nu
-    - TWminusto4Q
-    - TWminustoLNu2Q
+  datasets: [ ]
 
 DY_LowMass:
   name: "DY M10to50"
   color: "kAzure+10"
-  datasets:
-    - DYto2E_M_10to50_amcatnloFXFX
-    - DYto2Mu_M_10to50_amcatnloFXFX
+  datasets: [ ]
 
 DY_HighMass:
   name: "DY M50"
-  cross_section_correction: 12/ 11  # NLO -> NNLO
   color: "kAzure+7"
-  datasets:
-    - DYto2E_M_50_0J_amcatnloFXFX
-    - DYto2E_M_50_1J_amcatnloFXFX
-    - DYto2E_M_50_2J_amcatnloFXFX
-
-    - DYto2Mu_M_50_0J_amcatnloFXFX
-    - DYto2Mu_M_50_1J_amcatnloFXFX
-    - DYto2Mu_M_50_2J_amcatnloFXFX
-
-    - DYto2Tau_M_50_0J_amcatnloFXFX
-    - DYto2Tau_M_50_1J_amcatnloFXFX
-    - DYto2Tau_M_50_2J_amcatnloFXFX
+  datasets: [ ]
 
 W:
   name: "W"
   color: "kGreen"  # eliminates need for plot.yaml
-  datasets:
-    - WtoLNu_0J_amcatnloFXFX
-    - WtoLNu_1J_amcatnloFXFX
-    - WtoLNu_2J_amcatnloFXFX
+  datasets: [ ]
 
 VV:
   name: "VV"
   color: "kGreen+2"  # eliminates need for inputs.yaml
-  datasets:
-    - WW
-    - WZ
-    - ZZ
+  datasets: [ ]
+
+SingleHiggs:
+  name: "Single Higgs"
+  color: "kRed"
+  datasets: [ ]
 
 XtoHHto2B2W_DoubleLepton:
   name: "XtoHHto2B2W_DoubleLepton"
@@ -179,26 +85,7 @@ XtoHHto2B2W_DoubleLepton:
       - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "eE", "eMu", "muMu" ]
-  datasets:
-    - XtoYHto2B2Wto2B2L2Nu_MX_300_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_400_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_500_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_550_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_600_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_650_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_700_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_800_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_900_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_1000_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_1200_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_1400_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_1600_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_1800_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_2000_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_2500_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_3000_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_3500_MY_125
-    - XtoYHto2B2Wto2B2L2Nu_MX_4000_MY_125
+  datasets: [ ]
 
 
 XtoHHto2B2W_SingleLepton:
@@ -216,109 +103,11 @@ XtoHHto2B2W_SingleLepton:
       - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "e", "mu" ]
-  datasets:
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_125
-    - XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_125
+  datasets: [ ]
 
 Data_Full:
   name: "Data"
-  datasets:
-    - EGamma0_Run2023D_v1
-    - EGamma0_Run2023D_v2
-
-    - EGamma1_Run2023D_v1
-    - EGamma1_Run2023D_v2
-
-    - Muon0_Run2023D_v1
-    - Muon0_Run2023D_v2
-
-    - Muon1_Run2023D_v1
-    - Muon1_Run2023D_v2
-
-    - MuonEG_Run2023D_v1
-    - MuonEG_Run2023D_v2
-
-QCD_PT_Mu:
-  name: "QCD MC PT binned MuEnrich"
-  color: "kOrange"
-  datasets:
-    - QCD_PT_15to20_MuEnrichedPt5
-    - QCD_PT_20to30_MuEnrichedPt5
-    - QCD_PT_30to50_MuEnrichedPt5
-    - QCD_PT_50to80_MuEnrichedPt5
-    - QCD_PT_80to120_MuEnrichedPt5
-    - QCD_PT_120to170_MuEnrichedPt5
-    - QCD_PT_170to300_MuEnrichedPt5
-    - QCD_PT_300to470_MuEnrichedPt5
-    - QCD_PT_470to600_MuEnrichedPt5
-    - QCD_PT_600to800_MuEnrichedPt5
-    - QCD_PT_800to1000_MuEnrichedPt5
-    - QCD_PT_1000_MuEnrichedPt5
-
-QCD_PT_EM:
-  name: "QCD MC PT binned EMEnrich"
-  color: "kOrange"
-  datasets:
-    - QCD_PT_10to30_EMEnriched
-    - QCD_PT_30to50_EMEnriched
-    - QCD_PT_50to80_EMEnriched
-    - QCD_PT_80to120_EMEnriched
-    - QCD_PT_120to170_EMEnriched
-    - QCD_PT_170to300_EMEnriched
-    - QCD_PT_300toInf_EMEnriched
-
-QCD_HT:
-  name: "QCD MC HT binned"
-  color: "kOrange"
-  datasets:
-    - QCD_HT70to100_MLM
-    - QCD_HT100to200_MLM
-    - QCD_HT200to400_MLM
-    - QCD_HT400to600_MLM
-    - QCD_HT600to800_MLM
-    - QCD_HT800to1000_MLM
-    - QCD_HT1000to1200_MLM
-    - QCD_HT1200to1500_MLM
-    - QCD_HT1500to2000_MLM
-    - QCD_HT2000toInf_MLM
-
-QCD_PT:
-  name: "QCD MC PT binned  "
-  color: "kOrange"
-  datasets:
-    - QCD_PT_15to30
-    - QCD_PT_30to50
-    - QCD_PT_50to80
-    - QCD_PT_80to120
-    - QCD_PT_120to170
-    - QCD_PT_170to300
-    - QCD_PT_300to470
-    - QCD_PT_470to600
-    - QCD_PT_600to800
-    - QCD_PT_800to1000
-    - QCD_PT_1000to1400
-    - QCD_PT_1400to1800
-    - QCD_PT_1800to2400
-    - QCD_PT_2400to3200
-    - QCD_PT_3200
-
+  datasets: [ ]
 
 custom_CI:
   name: "custom for CI and test purposes"
