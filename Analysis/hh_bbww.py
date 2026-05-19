@@ -475,8 +475,8 @@ def defineJetSelections(df, isData):
     df = df.Define("Njets", "centralJet_pt.size()")
     df = df.Define("jet1_isvalid", "Njets > 0")
     df = df.Define("jet2_isvalid", "Njets > 1")
-    df = df.Define("bjet1_isvalid", "jet1_isvalid & centralJet_idbtagPNetB[0] >= 1")
-    df = df.Define("bjet2_isvalid", "jet2_isvalid & centralJet_idbtagPNetB[1] >= 1")
+    df = df.Define("bjet1_isvalid", "jet1_isvalid & (centralJet_idbtagPNetB[0] >= 1)")
+    df = df.Define("bjet2_isvalid", "jet2_isvalid & (centralJet_idbtagPNetB[1] >= 1)")
 
     fatjet_vars = [
         "pt",
