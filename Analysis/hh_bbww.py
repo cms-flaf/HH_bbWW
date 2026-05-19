@@ -206,84 +206,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )",
         )
 
-    def defineJetSelections(self, isData):
-        self.df = self.df.Define("Njets", "centralJet_pt.size()")
-        self.df = self.df.Define("jet1_isvalid", "Njets > 0")
-        self.df = self.df.Define("jet2_isvalid", "Njets > 1")
-        self.df = self.df.Define("fatjet_isvalid", "SelectedFatJet_pt.size() > 0")
-        self.df = self.df.Define("fatbjet_isValid", "fatjet_isvalid")
-        self.df = self.df.Define(
-            "fatsubjet1_isvalid",
-            "(SelectedFatJet_SubJet1_isValid == 1  && SelectedFatJet_SubJet1_pt > 20 && abs(SelectedFatJet_SubJet1_eta) < 2.5)",
-        )
-        self.df = self.df.Define(
-            "fatsubjet2_isvalid",
-            "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
-        )
-
-        bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-        for var in bjet_vars:
-            self.df = self.df.Define(
-                f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0"
-            )
-            self.df = self.df.Define(
-                f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0"
-            )
-
-        other_jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-        for var in other_jet_vars:
-
-            self.df = self.df.Define(
-                f"other_jet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0"
-            )
-            self.df = self.df.Define(
-                f"other_jet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0"
-            )
-
-        fatjet_vars = [
-            "pt",
-            "phi",
-            "eta",
-            "mass",
-            "particleNet_XbbVsQCD",
-            "particleNetWithMass_HbbvsQCD",
-            "msoftdrop",
-            # "muEF",
-            "nConstituents",
-            # "neEmEF",
-            # "neHEF",
-            # "neMultiplicity",
-            "tau1",
-            "tau2",
-            "tau3",
-            "tau4",
-        ]
-        fatjet_mc_vars = ["hadronFlavour"]
-        for var in fatjet_vars:
-            self.df = self.df.Define(
-                f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
-            )
-        if not isData:
-            for var in fatjet_mc_vars:
-                self.df = self.df.Define(
-                    f"fatbjet_{var}",
-                    f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
-                )
-
-        self.df = self.df.Define(
-            f"fatbjet_mass_PNetCorr",
-            "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
-        )
-
-        self.df = self.df.Define(
-            "bsubjet1_btagDeepB",
-            "fatjet_isvalid ? SelectedFatJet_SubJet1_btagDeepB[0] : -1.0",
-        )  # needs to be updated for ak8 PNet
-        self.df = self.df.Define(
-            "bsubjet2_btagDeepB",
-            "fatjet_isvalid ? SelectedFatJet_SubJet2_btagDeepB[0] : -1.0",
-        )  # needs to be updated for ak8 PNet
-
     def defineQCDRegions(self):
         self.DefineAndAppend(
             "OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)"
@@ -562,14 +484,6 @@ def defineJetSelections(df, isData):
     df = df.Define("jet2_isvalid", "Njets > 1")
     df = df.Define("fatjet_isvalid", "SelectedFatJet_pt.size() > 0")
     df = df.Define("fatbjet_isValid", "fatjet_isvalid")
-    df = df.Define(
-        "fatsubjet1_isvalid",
-        "(SelectedFatJet_SubJet1_isValid == 1  && SelectedFatJet_SubJet1_pt > 20 && abs(SelectedFatJet_SubJet1_eta) < 2.5)",
-    )
-    df = df.Define(
-        "fatsubjet2_isvalid",
-        "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
-    )
 
     bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
     for var in bjet_vars:
@@ -616,15 +530,6 @@ def defineJetSelections(df, isData):
         f"fatbjet_mass_PNetCorr",
         "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
     )
-
-    df = df.Define(
-        "bsubjet1_btagDeepB",
-        "fatjet_isvalid ? SelectedFatJet_SubJet1_btagDeepB[0] : -1.0",
-    )  # needs to be updated for ak8 PNet
-    df = df.Define(
-        "bsubjet2_btagDeepB",
-        "fatjet_isvalid ? SelectedFatJet_SubJet2_btagDeepB[0] : -1.0",
-    )  # needs to be updated for ak8 PNet
 
     return df
 
