@@ -144,19 +144,31 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         # We are throwing away events with a FatJet that are not b-tagged in this method
 
         # Test boosted -> res2b -> recovery
+        # self.DefineAndAppend(
+        #     "boosted",
+        #     f"nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
+        # )  # Greater than zero, but logic should only allow 0 or 1
+        # self.DefineAndAppend(
+        #     "resolved",
+        #     f"!boosted && (DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+        # )
+        # self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
+        # self.DefineAndAppend(
+        #     "recovery",
+        #     f"resolved && nSelBtag_jets == 1",
+        # )
+
+        # Test boosted -> res2b -> recovery
         self.DefineAndAppend(
             "boosted",
-            f"nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        )  # Greater than zero, but logic should only allow 0 or 1
+            f"fatbjet_isValid && (DL || (wjet1_isValid && wjet2_isValid) || (fatwjet_isValid) )",
+        )
         self.DefineAndAppend(
             "resolved",
-            f"!boosted && (DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+            "!boosted && (bjet1_isValid || bjet2_isValid) && (DL || (wjet1_isValid && wjet2_isValid) || (fatwjet_isValid) )",
         )
-        self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
-        self.DefineAndAppend(
-            "recovery",
-            f"resolved && nSelBtag_jets == 1",
-        )
+        self.DefineAndAppend("res2b", "resolved && bjet1_isValid && bjet2_isValid")
+        self.DefineAndAppend("recovery", "resolved && (bjet2_isValid == 0)")
 
         self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
@@ -330,12 +342,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
 
 def defineAllP4(df):
+    df = df.Define(f"SelectedFatJet_idx", f"CreateIndexes(SelectedFatJet_pt.size())")
     df = df.Define(
-        f"NewSelectedFatJet_idx", f"CreateIndexes(NewSelectedFatJet_pt.size())"
-    )
-    df = df.Define(
-        f"NewSelectedFatJet_p4",
-        f"GetP4(NewSelectedFatJet_pt, NewSelectedFatJet_eta, NewSelectedFatJet_phi, NewSelectedFatJet_mass, NewSelectedFatJet_idx)",
+        f"SelectedFatJet_p4",
+        f"GetP4(SelectedFatJet_pt, SelectedFatJet_eta, SelectedFatJet_phi, SelectedFatJet_mass, SelectedFatJet_idx)",
     )
     for idx in [0, 1]:
         df = Utilities.defineP4(df, f"lep{idx+1}")
@@ -472,25 +482,18 @@ def AddDNNVariables(df):
 
 
 def defineJetSelections(df, isData):
-    df = df.Define("Njets", "centralJet_pt.size()")
-    df = df.Define("jet1_isvalid", "Njets > 0")
-    df = df.Define("jet2_isvalid", "Njets > 1")
-    df = df.Define("bjet1_isvalid", "jet1_isvalid & (centralJet_idbtagPNetB[0] >= 1)")
-    df = df.Define("bjet2_isvalid", "jet2_isvalid & (centralJet_idbtagPNetB[1] >= 1)")
-
+    # Define vars to save
+    jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
     fatjet_vars = [
+        # "p4",
         "pt",
         "phi",
         "eta",
         "mass",
-        "particleNet_XbbVsQCD",
         "particleNetWithMass_HbbvsQCD",
+        "particleNet_massCorr",
         "msoftdrop",
-        # "muEF",
         "nConstituents",
-        # "neEmEF",
-        # "neHEF",
-        # "neMultiplicity",
         "tau1",
         "tau2",
         "tau3",
@@ -500,56 +503,174 @@ def defineJetSelections(df, isData):
     if not isData:
         fatjet_vars = fatjet_vars + fatjet_mc_vars
 
+    # First step is to decide Hbb boosted
+    # Take FatJets, mask by BTag and msoftdrop, sort by BTag Score
+    # If one exists, category is Hbb_Boosted
+
     df = df.Define(
-        "NewSelectedFatJet_Sel",
+        "FatBJet_Sel",
         "SelectedFatJet_particleNetWithMass_HbbvsQCD > 0.92 && SelectedFatJet_msoftdrop > 30",
     )
-    dfw.Define(
-        "NewSelectedFatJet_idx",
-        "CreateIndexes(Sum(NewSelectedFatJet_Sel))",
+    df = df.Define("FatBJet_idx", "CreateIndexes(Sum(FatBJet_Sel))")
+    df = df.Define(
+        "FatBJet_idxSorted",
+        "Take(ReorderObjects(SelectedFatJet_particleNetWithMass_HbbvsQCD[FatBJet_Sel], FatBJet_idx), min((int)FatBJet_idx.size(), 1))",
     )
-    dfw.Define(
-        "NewSelectedFatJet_idxSorted",
-        "ReorderObjects(SelectedFatJet_particleNetWithMass_HbbvsQCD[NewSelectedFatJet_Sel], NewSelectedFatJet_idx)",
-    )
-
-    for var in fatjet_vars:
-        dfw.DefineAndAppend(
-            f"NewSelectedFatJet_{var}",
-            f"Take(SelectedFatJet_{var}[NewSelectedFatJet_sel], NewSelectedFatJet_idxSorted)",
-        )
-
-    df = df.Define("fatbjet_isvalid", "NewSelectedFatJet_pt.size() > 0")
-
-    df = df.Define("nSelBtag_jets", "int(bjet1_isvalid) + int(bjet2_isvalid)")
-    df = df.Define("nSelBtag_fatjets", "int(fatbjet_isvalid)")
-
-    bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-    for var in bjet_vars:
-        df = df.Define(f"bjet1_{var}", f"bjet1_isvalid ? centralJet_{var}[0] : -1.0")
-        df = df.Define(f"bjet2_{var}", f"bjet2_isvalid ? centralJet_{var}[1] : -1.0")
-
-    other_jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-    for var in other_jet_vars:
-        df = df.Define(f"other_jet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0")
-        df = df.Define(f"other_jet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0")
-
     for var in fatjet_vars:
         df = df.Define(
-            f"fatbjet_{var}", f"fatbjet_isvalid ? NewSelectedFatJet_{var}[0] : -10.0"
+            f"FatBJet_{var}",
+            f"Take(SelectedFatJet_{var}[FatBJet_Sel], FatBJet_idxSorted)",
         )
+    df = df.Define(
+        f"FatBJet_p4",
+        f"Take(SelectedFatJet_p4[FatBJet_Sel], FatBJet_idxSorted)",
+    )
+
+    df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
+    df = df.Define("BJet_idx", "CreateIndexes(Sum(BJet_Sel))")
+    df = df.Define(
+        "BJet_idxSorted",
+        "Take(ReorderObjects(centralJet_btagPNetB[BJet_Sel], BJet_idx), min((int)BJet_idx.size(), 2))",
+    )
+    for var in jet_vars:
+        df = df.Define(
+            f"BJet_{var}", f"Take(centralJet_{var}[BJet_Sel], BJet_idxSorted)"
+        )
+    df = df.Define(f"BJet_p4", f"Take(centralJet_p4[BJet_Sel], BJet_idxSorted)")
+
+    df = df.Define("Nbjets", "BJet_pt.size()")
+    df = df.Define("bjet1_isValid", "(Nbjets > 0)")
+    df = df.Define("bjet2_isValid", "(Nbjets > 1)")
+
+    df = df.Define("Nfatbjets", "FatBJet_pt.size()")
+    df = df.Define("fatbjet_isValid", "(Nfatbjets > 0)")
+
+    df = df.Define("Hbb_Boosted", "fatbjet_isValid")
+
+    for var in jet_vars:
+        df = df.Define(f"bjet1_{var}", f"bjet1_isValid ? BJet_{var}[0] : -1.0")
+        df = df.Define(f"bjet2_{var}", f"bjet2_isValid ? BJet_{var}[1] : -1.0")
+
+    for var in fatjet_vars:
+        df = df.Define(f"fatbjet_{var}", f"fatbjet_isValid ? FatBJet_{var}[0] : -10.0")
 
     df = df.Define(
         f"fatbjet_mass_PNetCorr",
-        "fatbjet_isvalid ? NewSelectedFatJet_mass[0] * NewSelectedFatJet_particleNet_massCorr[0] : - 100.",
+        "fatbjet_isValid ? FatBJet_mass[0] * FatBJet_particleNet_massCorr[0] : - 100.",
     )
+
+    df = df.Define("Nfatjets", "SelectedFatJet_pt.size()")
+    df = df.Define("AllTrue_FatJet", "SelectedFatJet_pt > 0.0")
+    # Create a mask removing FatJets that are chosen as the FatBJet
+    df = df.Define(
+        "FatWJet_HbbBoostedSel",
+        "RemoveOverlaps(SelectedFatJet_p4, AllTrue_FatJet, FatBJet_p4, 0.1)",
+    )
+    # Create a mask removing FatJets that overlap within 0.8 dR of the Jets chosen as BJets
+    df = df.Define(
+        "FatWJet_HbbResolvedSel",
+        "RemoveOverlaps(SelectedFatJet_p4, AllTrue_FatJet, BJet_p4, 0.8)",
+    )
+
+    df = df.Define(
+        "FatWJet_Sel",
+        "Hbb_Boosted ? FatWJet_HbbBoostedSel : FatWJet_HbbResolvedSel",
+    )
+
+    df = df.Define(
+        "FatWJet_idx",
+        "CreateIndexes(Sum(FatWJet_Sel))",
+    )
+    df = df.Define(
+        "FatWJet_idxSorted",
+        "ReorderObjects(SelectedFatJet_pt[FatWJet_Sel], FatWJet_idx)",
+    )
+    for var in fatjet_vars:
+        df = df.Define(
+            f"FatWJet_{var}",
+            f"Take(SelectedFatJet_{var}[FatWJet_Sel], FatWJet_idxSorted)",
+        )
+    df = df.Define(
+        f"FatWJet_p4",
+        f"Take(SelectedFatJet_p4[FatWJet_Sel], FatWJet_idxSorted)",
+    )
+    df = df.Define("Nfatwjets", "FatWJet_pt.size()")
+    df = df.Define("fatwjet_isValid", "Nfatwjets > 0")
+    df = df.Define(
+        "fatwjet",
+        "fatwjet_isValid ? FatWJet_p4[0] : LorentzVectorM()",
+    )
+
+    df = df.Define("Njets", "centralJet_pt.size()")
+    df = df.Define("AllTrue_Jet", "centralJet_pt > 0.0")
+    # Create a mask removing Jets that are chosen as the BJets
+    df = df.Define(
+        "WJet_HbbResolvedSel",
+        "RemoveOverlaps(centralJet_p4, AllTrue_Jet, BJet_p4, 0.1)",
+    )
+
+    df = df.Define(
+        "WJet_HbbBoostedSel",
+        "RemoveOverlaps(centralJet_p4, AllTrue_Jet, FatBJet_p4, 0.8)",
+    )
+
+    df = df.Define(
+        "WJet_Sel",
+        "Hbb_Boosted ? WJet_HbbBoostedSel : WJet_HbbResolvedSel",
+    )
+
+    df = df.Define(
+        "WJet_idx",
+        "CreateIndexes(Sum(WJet_Sel))",
+    )
+    df = df.Define(
+        "WJet_idxSorted",
+        "ReorderObjects(centralJet_pt[WJet_Sel], WJet_idx)",
+    )
+    for var in jet_vars:
+        df = df.Define(
+            f"WJet_{var}",
+            f"Take(centralJet_{var}[WJet_Sel], WJet_idxSorted)",
+        )
+    df = df.Define(
+        "WJet_p4",
+        "Take(centralJet_p4[WJet_Sel], WJet_idxSorted)",
+    )
+    df = df.Define("wjet1_isValid", "WJet_p4.size() > 0")
+    df = df.Define("wjet2_isValid", "WJet_p4.size() > 1")
+    df = df.Define(
+        "wjet1",
+        "wjet1_isValid ? WJet_p4[0] : LorentzVectorM()",
+    )
+    df = df.Define(
+        "wjet2",
+        "wjet2_isValid ? WJet_p4[1] : LorentzVectorM()",
+    )
+    df = df.Define(
+        "resolvedW_pt",
+        "(wjet1_isValid && wjet2_isValid) ? (wjet1 + wjet2).Pt() : -1.0",
+    )
+    df = df.Define(
+        "WJets_Boosted",
+        "fatwjet_isValid && (resolvedW_pt < 0.0 || fatwjet.Pt() > resolvedW_pt)",
+    )
+
+    # Finally save the simple-name variables
+    # bjet1, bjet2, fatbjet, wjet1, wjet2, fatwjet
+
+    for var in jet_vars:
+        df = df.Define(f"wjet1_{var}", f"wjet1_isValid ? WJet_{var}[0] : -1.0")
+        df = df.Define(f"wjet2_{var}", f"wjet2_isValid ? WJet_{var}[1] : -1.0")
+
+    for var in fatjet_vars:
+        df = df.Define(f"fatwjet_{var}", f"fatwjet_isValid ? FatWJet_{var}[0] : -10.0")
 
     return df
 
 
 def PrepareDfForHistograms(dfForHistograms, isData):
-    dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+    dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
