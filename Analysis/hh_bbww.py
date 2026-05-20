@@ -167,8 +167,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "resolved",
             "!boosted && (bjet1_isValid || bjet2_isValid) && (DL || (wjet1_isValid && wjet2_isValid) || (fatwjet_isValid) )",
         )
-        self.DefineAndAppend("res2b", "resolved && bjet1_isValid && bjet2_isValid")
-        self.DefineAndAppend("recovery", "resolved && (bjet2_isValid == 0)")
+        self.DefineAndAppend("res2b", "resolved && bjet1_isBTagged && bjet2_isBTagged")
+        self.DefineAndAppend(
+            "recovery", "resolved && bjet1_isBTagged && (bjet2_isBTagged == 0)"
+        )
 
         self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
@@ -353,20 +355,11 @@ def defineAllP4(df):
         f"centralJet_p4",
         f"GetP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass)",
     )
-    df = df.Define(
-        f"centralJet_PNetRegPtRawCorr_p4",
-        f"GetP4(centralJet_pt*(1.0-centralJet_rawFactor)*centralJet_PNetRegPtRawCorr, centralJet_eta, centralJet_phi, centralJet_mass)",
-    )
-    df = df.Define(
-        f"centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4",
-        f"GetP4(centralJet_pt*(1.0-centralJet_rawFactor)*centralJet_PNetRegPtRawCorr*centralJet_PNetRegPtRawCorrNeutrino, centralJet_eta, centralJet_phi, centralJet_mass)",
-    )
     for met_var in ["PuppiMET"]:
         df = df.Define(
             f"{met_var}_p4",
             f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>({met_var}_pt,0.,{met_var}_phi,0.)",
         )
-
     return df
 
 
@@ -376,22 +369,22 @@ def AddDNNVariables(df):
     df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
     df = df.Define(
         "dR_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaR(centralJet_p4[0], centralJet_p4[1])",
+        f"ROOT::Math::VectorUtil::DeltaR(bjet1_p4, bjet2_p4)",
     )
     df = df.Define(
         "dR_dilep_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (centralJet_p4[0]+centralJet_p4[1]))",
+        f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (bjet1_p4+bjet2_p4))",
     )
     df = df.Define(
         "dR_dilep_dijet",
-        f"(centralJet_pt.size() >= 4) ? ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (centralJet_p4[2]+centralJet_p4[3])) : -100.",
+        f"(wjet1_isValid && wjet2_isValid) ? ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (wjet1_p4+wjet2_p4)) : -100.",
     )
     df = df.Define(
         "dPhi_lep1_lep2", f"ROOT::Math::VectorUtil::DeltaPhi(lep1_p4,lep2_p4)"
     )
     df = df.Define(
         "dPhi_jet1_jet2",
-        f"ROOT::Math::VectorUtil::DeltaPhi(centralJet_p4[0],centralJet_p4[1])",
+        f"ROOT::Math::VectorUtil::DeltaPhi(bjet1_p4,bjet2_p4)",
     )
     df = df.Define(
         "dPhi_MET_dilep",
@@ -399,7 +392,7 @@ def AddDNNVariables(df):
     )
     df = df.Define(
         "dPhi_MET_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(centralJet_p4[0]+centralJet_p4[1]))",
+        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(bjet1_p4+bjet2_p4))",
     )
     df = df.Define("min_dR_lep0_jets", f"MinDeltaR(lep1_p4, centralJet_p4)")
     df = df.Define("min_dR_lep1_jets", f"MinDeltaR(lep2_p4, centralJet_p4)")
@@ -410,42 +403,30 @@ def AddDNNVariables(df):
     )
     df = df.Define(
         "MT2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], PuppiMET_p4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",
     )
 
     # Functional form of MT2 claculation
     df = df.Define(
         "MT2_ll",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + PuppiMET_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.",
     )
     df = df.Define(
         "MT2_bb",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
     df = df.Define(
         "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[0], lep2_p4 + centralJet_p4[1], PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
     df = df.Define(
         "MT2_blbl2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[1], lep2_p4 + centralJet_p4[0], PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
 
     df = df.Define(
         "CosTheta_bb",
-        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(centralJet_p4[0], centralJet_p4[1]) : -100.",
-    )
-    df = df.Define(
-        f"bb_mass",
-        "centralJet_pt.size() > 1 ? (centralJet_p4[0]+centralJet_p4[1]).mass() : -100.",
-    )
-    df = df.Define(
-        f"bb_mass_PNetRegPtRawCorr",
-        "centralJet_pt.size() > 1 ? (centralJet_PNetRegPtRawCorr_p4[0]+centralJet_PNetRegPtRawCorr_p4[1]).mass() : -100.",
-    )
-    df = df.Define(
-        f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino",
-        "centralJet_pt.size() > 1 ? (centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4[0]+centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4[1]).mass() : -100.",
+        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(bjet1_p4, bjet2_p4) : -100.",
     )
 
     df = df.Define("diLep_p4", "(lep1_p4+lep2_p4)")
@@ -460,11 +441,11 @@ def AddDNNVariables(df):
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
-        "(centralJet_pt.size() >= 2) ? (lep1_p4+lep2_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()",
+        "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+lep2_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
     )
     df = df.Define(
         "Lep1Jet1Jet2_p4",
-        "(centralJet_pt.size() >= 2) ? (lep1_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()",
+        "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
     )
     # fixed PT values for mT_fix (decorrelated from lepton pt)
     # 35 GeV for muons, 30 GeV for electrons
@@ -483,9 +464,21 @@ def AddDNNVariables(df):
 
 def defineJetSelections(df, isData):
     # Define vars to save
-    jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
+    jet_vars = [
+        "p4",
+        "pt",
+        "phi",
+        "eta",
+        "mass",
+        "btagPNetB",
+        "idbtagPNetB",
+        "rawFactor",
+        "PNetRegPtRawCorr",
+        "PNetRegPtRawCorrNeutrino",
+    ]
+    jet_mc_vars = ["hadronFlavour", "partonFlavour"]
     fatjet_vars = [
-        # "p4",
+        "p4",
         "pt",
         "phi",
         "eta",
@@ -499,9 +492,10 @@ def defineJetSelections(df, isData):
         "tau3",
         "tau4",
     ]
-    fatjet_mc_vars = ["hadronFlavour"]
+    fatjet_mc_vars = ["hadronFlavour"]  # SelectedFatJet does not have partonFlavour
     if not isData:
         fatjet_vars = fatjet_vars + fatjet_mc_vars
+        jet_vars = jet_vars + jet_mc_vars
 
     # First step is to decide Hbb boosted
     # Take FatJets, mask by BTag and msoftdrop, sort by BTag Score
@@ -521,12 +515,10 @@ def defineJetSelections(df, isData):
             f"FatBJet_{var}",
             f"Take(SelectedFatJet_{var}[FatBJet_Sel], FatBJet_idxSorted)",
         )
-    df = df.Define(
-        f"FatBJet_p4",
-        f"Take(SelectedFatJet_p4[FatBJet_Sel], FatBJet_idxSorted)",
-    )
 
-    df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
+    # Do not need a selection, we should just take the top 2 score Jets whether they pass the cut
+    # df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
+    df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= -1")
     df = df.Define("BJet_idx", "CreateIndexes(Sum(BJet_Sel))")
     df = df.Define(
         "BJet_idxSorted",
@@ -536,11 +528,13 @@ def defineJetSelections(df, isData):
         df = df.Define(
             f"BJet_{var}", f"Take(centralJet_{var}[BJet_Sel], BJet_idxSorted)"
         )
-    df = df.Define(f"BJet_p4", f"Take(centralJet_p4[BJet_Sel], BJet_idxSorted)")
 
     df = df.Define("Nbjets", "BJet_pt.size()")
     df = df.Define("bjet1_isValid", "(Nbjets > 0)")
     df = df.Define("bjet2_isValid", "(Nbjets > 1)")
+
+    df = df.Define("bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0")
+    df = df.Define("bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0")
 
     df = df.Define("Nfatbjets", "FatBJet_pt.size()")
     df = df.Define("fatbjet_isValid", "(Nfatbjets > 0)")
@@ -548,15 +542,24 @@ def defineJetSelections(df, isData):
     df = df.Define("Hbb_Boosted", "fatbjet_isValid")
 
     for var in jet_vars:
-        df = df.Define(f"bjet1_{var}", f"bjet1_isValid ? BJet_{var}[0] : -1.0")
-        df = df.Define(f"bjet2_{var}", f"bjet2_isValid ? BJet_{var}[1] : -1.0")
+        df = df.Define(
+            f"bjet1_{var}",
+            f"bjet1_isValid ? BJet_{var}[0] : std::decay_t<decltype(BJet_{var})>::value_type()",
+        )
+        df = df.Define(
+            f"bjet2_{var}",
+            f"bjet2_isValid ? BJet_{var}[1] : std::decay_t<decltype(BJet_{var})>::value_type()",
+        )
 
     for var in fatjet_vars:
-        df = df.Define(f"fatbjet_{var}", f"fatbjet_isValid ? FatBJet_{var}[0] : -10.0")
+        df = df.Define(
+            f"fatbjet_{var}",
+            f"fatbjet_isValid ? FatBJet_{var}[0] : std::decay_t<decltype(FatBJet_{var})>::value_type()",
+        )
 
     df = df.Define(
         f"fatbjet_mass_PNetCorr",
-        "fatbjet_isValid ? FatBJet_mass[0] * FatBJet_particleNet_massCorr[0] : - 100.",
+        "fatbjet_isValid ? FatBJet_mass[0] * FatBJet_particleNet_massCorr[0] : std::decay_t<decltype(FatBJet_mass)>::value_type()",
     )
 
     df = df.Define("Nfatjets", "SelectedFatJet_pt.size()")
@@ -590,10 +593,7 @@ def defineJetSelections(df, isData):
             f"FatWJet_{var}",
             f"Take(SelectedFatJet_{var}[FatWJet_Sel], FatWJet_idxSorted)",
         )
-    df = df.Define(
-        f"FatWJet_p4",
-        f"Take(SelectedFatJet_p4[FatWJet_Sel], FatWJet_idxSorted)",
-    )
+
     df = df.Define("Nfatwjets", "FatWJet_pt.size()")
     df = df.Define("fatwjet_isValid", "Nfatwjets > 0")
     df = df.Define(
@@ -632,10 +632,7 @@ def defineJetSelections(df, isData):
             f"WJet_{var}",
             f"Take(centralJet_{var}[WJet_Sel], WJet_idxSorted)",
         )
-    df = df.Define(
-        "WJet_p4",
-        "Take(centralJet_p4[WJet_Sel], WJet_idxSorted)",
-    )
+
     df = df.Define("wjet1_isValid", "WJet_p4.size() > 0")
     df = df.Define("wjet2_isValid", "WJet_p4.size() > 1")
     df = df.Define(
@@ -659,11 +656,46 @@ def defineJetSelections(df, isData):
     # bjet1, bjet2, fatbjet, wjet1, wjet2, fatwjet
 
     for var in jet_vars:
-        df = df.Define(f"wjet1_{var}", f"wjet1_isValid ? WJet_{var}[0] : -1.0")
-        df = df.Define(f"wjet2_{var}", f"wjet2_isValid ? WJet_{var}[1] : -1.0")
+        df = df.Define(
+            f"wjet1_{var}",
+            f"wjet1_isValid ? WJet_{var}[0] : std::decay_t<decltype(WJet_{var})>::value_type()",
+        )
+        df = df.Define(
+            f"wjet2_{var}",
+            f"wjet2_isValid ? WJet_{var}[1] : std::decay_t<decltype(WJet_{var})>::value_type()",
+        )
 
     for var in fatjet_vars:
-        df = df.Define(f"fatwjet_{var}", f"fatwjet_isValid ? FatWJet_{var}[0] : -10.0")
+        df = df.Define(
+            f"fatwjet_{var}",
+            f"fatwjet_isValid ? FatWJet_{var}[0] : std::decay_t<decltype(FatWJet_{var})>::value_type()",
+        )
+
+    # Lastly set mbb
+    # PNet Corrections are currently incorrect
+    # Using 1.0-rawFactor doesn't work since Jet corrections are already applied
+    for bjet_idx in [1, 2]:
+        df = df.Define(
+            f"bjet{bjet_idx}_PNetRegPtRawCorr_p4",
+            f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet{bjet_idx}_pt*(1.0-bjet{bjet_idx}_rawFactor)*bjet{bjet_idx}_PNetRegPtRawCorr, bjet{bjet_idx}_eta, bjet{bjet_idx}_phi, bjet{bjet_idx}_mass)",
+        )
+        df = df.Define(
+            f"bjet{bjet_idx}_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4",
+            f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet{bjet_idx}_pt*(1.0-bjet{bjet_idx}_rawFactor)*bjet{bjet_idx}_PNetRegPtRawCorr*bjet{bjet_idx}_PNetRegPtRawCorrNeutrino, bjet{bjet_idx}_eta, bjet{bjet_idx}_phi, bjet{bjet_idx}_mass)",
+        )
+
+    df = df.Define(
+        f"bb_mass",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_p4+bjet2_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
+    df = df.Define(
+        f"bb_mass_PNetRegPtRawCorr",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_PNetRegPtRawCorr_p4+bjet2_PNetRegPtRawCorr_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
+    df = df.Define(
+        f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4+bjet2_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
 
     return df
 
