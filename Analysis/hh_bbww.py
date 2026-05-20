@@ -126,54 +126,22 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend(
             "DL", "channelId == 11 || channelId == 12 || channelId == 22"
         )
-
-        # Test res2b -> boosted -> recovery
-        # self.DefineAndAppend(
-        #     "resolved",
-        #     f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
-        # )
-        # self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
-        # self.DefineAndAppend(
-        #     "boosted",
-        #     f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        # )  # Greater than zero, but logic should only allow 0 or 1
-        # self.DefineAndAppend(
-        #     "recovery",
-        #     f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1",
-        # )
-        # We are throwing away events with a FatJet that are not b-tagged in this method
-
-        # Test boosted -> res2b -> recovery
-        # self.DefineAndAppend(
-        #     "boosted",
-        #     f"nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        # )  # Greater than zero, but logic should only allow 0 or 1
-        # self.DefineAndAppend(
-        #     "resolved",
-        #     f"!boosted && (DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
-        # )
-        # self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
-        # self.DefineAndAppend(
-        #     "recovery",
-        #     f"resolved && nSelBtag_jets == 1",
-        # )
-
-        # Test boosted -> res2b -> recovery
-        self.DefineAndAppend(
-            "boosted",
-            f"fatbjet_isValid && (DL || (wjet1_isValid && wjet2_isValid) || (fatwjet_isValid) )",
-        )
-        self.DefineAndAppend(
-            "resolved",
-            "!boosted && (bjet1_isValid || bjet2_isValid) && (DL || (wjet1_isValid && wjet2_isValid) || (fatwjet_isValid) )",
-        )
-        self.DefineAndAppend("res2b", "resolved && bjet1_isBTagged && bjet2_isBTagged")
-        self.DefineAndAppend(
-            "recovery", "resolved && bjet1_isBTagged && (bjet2_isBTagged == 0)"
-        )
-
-        self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
         self.DefineAndAppend("baseline", f"return true;")
+
+        # Test boosted -> res2b -> recovery
+        self.DefineAndAppend(
+            "HbbCand_isValid", "(bjet1_isValid && bjet2_isValid) || fatbjet_isValid"
+        )
+        self.DefineAndAppend(
+            "WhadCand_isValid", "(wjet1_isValid && wjet2_isValid) || fatwjet_isValid"
+        )
+        self.DefineAndAppend("inclusive", "HbbCand_isValid && (DL || WhadCand_isValid)")
+        self.DefineAndAppend(
+            "boosted", "inclusive && (fatbjet_isValid || fatwjet_isValid)"
+        )
+        self.DefineAndAppend("resolved", "inclusive && !boosted")
+        self.DefineAndAppend("res2b", "resolved && bjet1_isBTagged && bjet2_isBTagged")
+        self.DefineAndAppend("recovery", "resolved && !res2b && bjet1_isBTagged")
 
     def defineLeptonPreselection(self):
         self.df = self.df.Define(
