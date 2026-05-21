@@ -121,54 +121,29 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 "cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow"
             )
 
-    def defineCategories(self):
+    def defineLeptonChannel(self):
         self.DefineAndAppend("SL", "channelId == 1 || channelId == 2")
         self.DefineAndAppend(
             "DL", "channelId == 11 || channelId == 12 || channelId == 22"
         )
 
-        self.DefineAndAppend(
-            "nSelBtag_jets",
-            f"int(bjet1_idbtagPNetB >= 1) + int(bjet2_idbtagPNetB >= 1)",  # ID 1 is loose
-        )
-        self.DefineAndAppend(
-            "nSelBtag_fatjets",
-            f"int( SelectedFatJet_particleNetWithMass_HbbvsQCD[0] > 0.92 )",
-        )
-
-        # Test res2b -> boosted -> recovery
-        # self.DefineAndAppend(
-        #     "resolved",
-        #     f"(DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
-        # )
-        # self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
-        # self.DefineAndAppend(
-        #     "boosted",
-        #     f"!res2b && nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        # )  # Greater than zero, but logic should only allow 0 or 1
-        # self.DefineAndAppend(
-        #     "recovery",
-        #     f"SelectedFatJet_pt.size() == 0 && resolved && nSelBtag_jets == 1",
-        # )
-        # We are throwing away events with a FatJet that are not b-tagged in this method
+    def defineCategories(self):
+        self.DefineAndAppend("baseline", f"return true;")
 
         # Test boosted -> res2b -> recovery
         self.DefineAndAppend(
-            "boosted",
-            f"nSelBtag_fatjets > 0 && (DL || (SL && SelectedFatJet_pt.size() > 1) || (SL && centralJet_pt.size() >= 2) ) ",
-        )  # Greater than zero, but logic should only allow 0 or 1
-        self.DefineAndAppend(
-            "resolved",
-            f"!boosted && (DL && centralJet_pt.size() >= 2) || (SL && centralJet_pt.size() >= 4)",
+            "HbbCand_isValid", "(bjet1_isValid && bjet2_isValid) || fatbjet_isValid"
         )
-        self.DefineAndAppend("res2b", f"resolved && nSelBtag_jets >= 2")
         self.DefineAndAppend(
-            "recovery",
-            f"resolved && nSelBtag_jets == 1",
+            "WhadCand_isValid", "(wjet1_isValid && wjet2_isValid) || fatwjet_isValid"
         )
-
-        self.DefineAndAppend("inclusive", f"res2b || boosted || recovery")
-        self.DefineAndAppend("baseline", f"return true;")
+        self.DefineAndAppend("inclusive", "HbbCand_isValid && (DL || WhadCand_isValid)")
+        self.DefineAndAppend(
+            "boosted", "inclusive && (fatbjet_isValid || fatwjet_isValid)"
+        )
+        self.DefineAndAppend("resolved", "inclusive && !boosted")
+        self.DefineAndAppend("res2b", "resolved && bjet1_isBTagged && bjet2_isBTagged")
+        self.DefineAndAppend("recovery", "resolved && !res2b && bjet1_isBTagged")
 
     def defineLeptonPreselection(self):
         self.df = self.df.Define(
@@ -206,84 +181,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )",
         )
 
-    def defineJetSelections(self, isData):
-        self.df = self.df.Define("Njets", "centralJet_pt.size()")
-        self.df = self.df.Define("jet1_isvalid", "Njets > 0")
-        self.df = self.df.Define("jet2_isvalid", "Njets > 1")
-        self.df = self.df.Define("fatjet_isvalid", "SelectedFatJet_pt.size() > 0")
-        self.df = self.df.Define("fatbjet_isValid", "fatjet_isvalid")
-        self.df = self.df.Define(
-            "fatsubjet1_isvalid",
-            "(SelectedFatJet_SubJet1_isValid == 1  && SelectedFatJet_SubJet1_pt > 20 && abs(SelectedFatJet_SubJet1_eta) < 2.5)",
-        )
-        self.df = self.df.Define(
-            "fatsubjet2_isvalid",
-            "(SelectedFatJet_SubJet2_isValid == 1 && SelectedFatJet_SubJet2_pt > 20 && abs(SelectedFatJet_SubJet2_eta) < 2.5)",
-        )
-
-        bjet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-        for var in bjet_vars:
-            self.df = self.df.Define(
-                f"bjet1_{var}", f"jet1_isvalid ? centralJet_{var}[0] : -1.0"
-            )
-            self.df = self.df.Define(
-                f"bjet2_{var}", f"jet2_isvalid ? centralJet_{var}[1] : -1.0"
-            )
-
-        other_jet_vars = ["pt", "phi", "eta", "mass", "btagPNetB", "idbtagPNetB"]
-        for var in other_jet_vars:
-
-            self.df = self.df.Define(
-                f"other_jet1_{var}", f"Njets > 2 ? centralJet_{var}[2] : -10.0"
-            )
-            self.df = self.df.Define(
-                f"other_jet2_{var}", f"Njets > 3 ? centralJet_{var}[3] : -10.0"
-            )
-
-        fatjet_vars = [
-            "pt",
-            "phi",
-            "eta",
-            "mass",
-            "particleNet_XbbVsQCD",
-            "particleNetWithMass_HbbvsQCD",
-            "msoftdrop",
-            # "muEF",
-            "nConstituents",
-            # "neEmEF",
-            # "neHEF",
-            # "neMultiplicity",
-            "tau1",
-            "tau2",
-            "tau3",
-            "tau4",
-        ]
-        fatjet_mc_vars = ["hadronFlavour"]
-        for var in fatjet_vars:
-            self.df = self.df.Define(
-                f"fatbjet_{var}", f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0"
-            )
-        if not isData:
-            for var in fatjet_mc_vars:
-                self.df = self.df.Define(
-                    f"fatbjet_{var}",
-                    f"fatjet_isvalid ? SelectedFatJet_{var}[0] : -10.0",
-                )
-
-        self.df = self.df.Define(
-            f"fatbjet_mass_PNetCorr",
-            "fatjet_isvalid ? SelectedFatJet_mass[0] * SelectedFatJet_particleNet_massCorr[0] : - 100.",
-        )
-
-        self.df = self.df.Define(
-            "bsubjet1_btagDeepB",
-            "fatjet_isvalid ? SelectedFatJet_SubJet1_btagDeepB[0] : -1.0",
-        )  # needs to be updated for ak8 PNet
-        self.df = self.df.Define(
-            "bsubjet2_btagDeepB",
-            "fatjet_isvalid ? SelectedFatJet_SubJet2_btagDeepB[0] : -1.0",
-        )  # needs to be updated for ak8 PNet
-
     def defineQCDRegions(self):
         self.DefineAndAppend(
             "OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)"
@@ -318,7 +215,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.DefineAndAppend(
             "Zveto",
-            f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
+            # f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
+            f"(lep1_legType == lep2_legType ) && (diLep_mass < 70)",
         )
 
         self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
@@ -338,10 +236,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.DefineAndAppend(
             "Lep1Lep2Jet1Jet2_mass",
-            f"(lep1_legType == 2 && lep2_legType == 2) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
+            f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
         )
         self.DefineAndAppend(
-            "Lep1Jet1Jet2_mass", f"(lep1_legType == 2) ? Lep1Jet1Jet2_p4.mass() : 0.0"
+            "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
     def addDYReweighting(self):
@@ -427,20 +325,11 @@ def defineAllP4(df):
         f"centralJet_p4",
         f"GetP4(centralJet_pt, centralJet_eta, centralJet_phi, centralJet_mass)",
     )
-    df = df.Define(
-        f"centralJet_PNetRegPtRawCorr_p4",
-        f"GetP4(centralJet_pt*(1.0-centralJet_rawFactor)*centralJet_PNetRegPtRawCorr, centralJet_eta, centralJet_phi, centralJet_mass)",
-    )
-    df = df.Define(
-        f"centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4",
-        f"GetP4(centralJet_pt*(1.0-centralJet_rawFactor)*centralJet_PNetRegPtRawCorr*centralJet_PNetRegPtRawCorrNeutrino, centralJet_eta, centralJet_phi, centralJet_mass)",
-    )
     for met_var in ["PuppiMET"]:
         df = df.Define(
             f"{met_var}_p4",
             f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>({met_var}_pt,0.,{met_var}_phi,0.)",
         )
-
     return df
 
 
@@ -450,22 +339,22 @@ def AddDNNVariables(df):
     df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
     df = df.Define(
         "dR_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaR(centralJet_p4[0], centralJet_p4[1])",
+        f"ROOT::Math::VectorUtil::DeltaR(bjet1_p4, bjet2_p4)",
     )
     df = df.Define(
         "dR_dilep_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (centralJet_p4[0]+centralJet_p4[1]))",
+        f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (bjet1_p4+bjet2_p4))",
     )
     df = df.Define(
         "dR_dilep_dijet",
-        f"(centralJet_pt.size() >= 4) ? ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (centralJet_p4[2]+centralJet_p4[3])) : -100.",
+        f"(wjet1_isValid && wjet2_isValid) ? ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (wjet1_p4+wjet2_p4)) : -100.",
     )
     df = df.Define(
         "dPhi_lep1_lep2", f"ROOT::Math::VectorUtil::DeltaPhi(lep1_p4,lep2_p4)"
     )
     df = df.Define(
         "dPhi_jet1_jet2",
-        f"ROOT::Math::VectorUtil::DeltaPhi(centralJet_p4[0],centralJet_p4[1])",
+        f"ROOT::Math::VectorUtil::DeltaPhi(bjet1_p4,bjet2_p4)",
     )
     df = df.Define(
         "dPhi_MET_dilep",
@@ -473,7 +362,7 @@ def AddDNNVariables(df):
     )
     df = df.Define(
         "dPhi_MET_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(centralJet_p4[0]+centralJet_p4[1]))",
+        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(bjet1_p4+bjet2_p4))",
     )
     df = df.Define("min_dR_lep0_jets", f"MinDeltaR(lep1_p4, centralJet_p4)")
     df = df.Define("min_dR_lep1_jets", f"MinDeltaR(lep2_p4, centralJet_p4)")
@@ -484,38 +373,30 @@ def AddDNNVariables(df):
     )
     df = df.Define(
         "MT2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, centralJet_p4[0], centralJet_p4[1], PuppiMET_p4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",
     )
 
     # Functional form of MT2 claculation
     df = df.Define(
         "MT2_ll",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, centralJet_p4[0] + centralJet_p4[1] + PuppiMET_p4, centralJet_p4[0].mass(), centralJet_p4[1].mass())) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.",
     )
     df = df.Define(
         "MT2_bb",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(centralJet_p4[0], centralJet_p4[1], lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
     df = df.Define(
         "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + centralJet_p4[0], lep2_p4 + centralJet_p4[1], PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+    )
+    df = df.Define(
+        "MT2_blbl2",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
 
     df = df.Define(
         "CosTheta_bb",
-        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(centralJet_p4[0], centralJet_p4[1]) : -100.",
-    )
-    df = df.Define(
-        f"bb_mass",
-        "centralJet_pt.size() > 1 ? (centralJet_p4[0]+centralJet_p4[1]).mass() : -100.",
-    )
-    df = df.Define(
-        f"bb_mass_PNetRegPtRawCorr",
-        "centralJet_pt.size() > 1 ? (centralJet_PNetRegPtRawCorr_p4[0]+centralJet_PNetRegPtRawCorr_p4[1]).mass() : -100.",
-    )
-    df = df.Define(
-        f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino",
-        "centralJet_pt.size() > 1 ? (centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4[0]+centralJet_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4[1]).mass() : -100.",
+        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(bjet1_p4, bjet2_p4) : -100.",
     )
 
     df = df.Define("diLep_p4", "(lep1_p4+lep2_p4)")
@@ -530,11 +411,11 @@ def AddDNNVariables(df):
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
-        "(centralJet_pt.size() >= 2) ? (lep1_p4+lep2_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()",
+        "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+lep2_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
     )
     df = df.Define(
         "Lep1Jet1Jet2_p4",
-        "(centralJet_pt.size() >= 2) ? (lep1_p4+centralJet_p4[0]+centralJet_p4[1]) : LorentzVectorM()",
+        "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
     )
     # fixed PT values for mT_fix (decorrelated from lepton pt)
     # 35 GeV for muons, 30 GeV for electrons
@@ -551,12 +432,251 @@ def AddDNNVariables(df):
     return df
 
 
+def defineJetSelections(df, isData):
+    # Define vars to save
+    jet_vars = [
+        "p4",
+        "pt",
+        "phi",
+        "eta",
+        "mass",
+        "btagPNetB",
+        "idbtagPNetB",
+        "rawFactor",
+        "PNetRegPtRawCorr",
+        "PNetRegPtRawCorrNeutrino",
+    ]
+    jet_mc_vars = ["hadronFlavour", "partonFlavour"]
+    fatjet_vars = [
+        "p4",
+        "pt",
+        "phi",
+        "eta",
+        "mass",
+        "particleNetWithMass_HbbvsQCD",
+        "particleNet_massCorr",
+        "msoftdrop",
+        "nConstituents",
+        "tau1",
+        "tau2",
+        "tau3",
+        "tau4",
+    ]
+    fatjet_mc_vars = ["hadronFlavour"]  # SelectedFatJet does not have partonFlavour
+    if not isData:
+        fatjet_vars = fatjet_vars + fatjet_mc_vars
+        jet_vars = jet_vars + jet_mc_vars
+
+    # First step is to decide Hbb boosted
+    # Take FatJets, mask by BTag and msoftdrop, sort by BTag Score
+    # If one exists, category is Hbb_Boosted
+
+    df = df.Define(
+        "FatBJet_Sel",
+        "SelectedFatJet_particleNetWithMass_HbbvsQCD > 0.92 && SelectedFatJet_msoftdrop > 30",
+    )
+    df = df.Define("FatBJet_idx", "CreateIndexes(Sum(FatBJet_Sel))")
+    df = df.Define(
+        "FatBJet_idxSorted",
+        "Take(ReorderObjects(SelectedFatJet_particleNetWithMass_HbbvsQCD[FatBJet_Sel], FatBJet_idx), min((int)FatBJet_idx.size(), 1))",
+    )
+    for var in fatjet_vars:
+        df = df.Define(
+            f"FatBJet_{var}",
+            f"Take(SelectedFatJet_{var}[FatBJet_Sel], FatBJet_idxSorted)",
+        )
+
+    # Do not need a selection, we should just take the top 2 score Jets whether they pass the cut
+    # df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
+    df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= -1")
+    df = df.Define("BJet_idx", "CreateIndexes(Sum(BJet_Sel))")
+    df = df.Define(
+        "BJet_idxSorted",
+        "Take(ReorderObjects(centralJet_btagPNetB[BJet_Sel], BJet_idx), min((int)BJet_idx.size(), 2))",
+    )
+    for var in jet_vars:
+        df = df.Define(
+            f"BJet_{var}", f"Take(centralJet_{var}[BJet_Sel], BJet_idxSorted)"
+        )
+
+    df = df.Define("Nbjets", "BJet_pt.size()")
+    df = df.Define("bjet1_isValid", "(Nbjets > 0)")
+    df = df.Define("bjet2_isValid", "(Nbjets > 1)")
+
+    df = df.Define("bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0")
+    df = df.Define("bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0")
+
+    df = df.Define("Nfatbjets", "FatBJet_pt.size()")
+    df = df.Define("fatbjet_isValid", "(Nfatbjets > 0)")
+
+    df = df.Define("Hbb_Boosted", "fatbjet_isValid")
+
+    for var in jet_vars:
+        df = df.Define(
+            f"bjet1_{var}",
+            f"bjet1_isValid ? BJet_{var}[0] : std::decay_t<decltype(BJet_{var})>::value_type()",
+        )
+        df = df.Define(
+            f"bjet2_{var}",
+            f"bjet2_isValid ? BJet_{var}[1] : std::decay_t<decltype(BJet_{var})>::value_type()",
+        )
+
+    for var in fatjet_vars:
+        df = df.Define(
+            f"fatbjet_{var}",
+            f"fatbjet_isValid ? FatBJet_{var}[0] : std::decay_t<decltype(FatBJet_{var})>::value_type()",
+        )
+
+    df = df.Define(
+        f"fatbjet_mass_PNetCorr",
+        "fatbjet_isValid ? FatBJet_mass[0] * FatBJet_particleNet_massCorr[0] : std::decay_t<decltype(FatBJet_mass)>::value_type()",
+    )
+
+    df = df.Define("Nfatjets", "SelectedFatJet_pt.size()")
+    df = df.Define("AllTrue_FatJet", "SelectedFatJet_pt > 0.0")
+    # Create a mask removing FatJets that are chosen as the FatBJet
+    df = df.Define(
+        "FatWJet_HbbBoostedSel",
+        "RemoveOverlaps(SelectedFatJet_p4, AllTrue_FatJet, FatBJet_p4, 0.1)",
+    )
+    # Create a mask removing FatJets that overlap within 0.8 dR of the Jets chosen as BJets
+    df = df.Define(
+        "FatWJet_HbbResolvedSel",
+        "RemoveOverlaps(SelectedFatJet_p4, AllTrue_FatJet, BJet_p4, 0.8)",
+    )
+
+    df = df.Define(
+        "FatWJet_Sel",
+        "Hbb_Boosted ? FatWJet_HbbBoostedSel : FatWJet_HbbResolvedSel",
+    )
+
+    df = df.Define(
+        "FatWJet_idx",
+        "CreateIndexes(Sum(FatWJet_Sel))",
+    )
+    df = df.Define(
+        "FatWJet_idxSorted",
+        "ReorderObjects(SelectedFatJet_pt[FatWJet_Sel], FatWJet_idx)",
+    )
+    for var in fatjet_vars:
+        df = df.Define(
+            f"FatWJet_{var}",
+            f"Take(SelectedFatJet_{var}[FatWJet_Sel], FatWJet_idxSorted)",
+        )
+
+    df = df.Define("Nfatwjets", "FatWJet_pt.size()")
+    df = df.Define("fatwjet_isValid", "(Nfatwjets > 0) && !DL")
+    df = df.Define(
+        "fatwjet",
+        "fatwjet_isValid ? FatWJet_p4[0] : LorentzVectorM()",
+    )
+
+    df = df.Define("Njets", "centralJet_pt.size()")
+    df = df.Define("AllTrue_Jet", "centralJet_pt > 0.0")
+    # Create a mask removing Jets that are chosen as the BJets
+    df = df.Define(
+        "WJet_HbbResolvedSel",
+        "RemoveOverlaps(centralJet_p4, AllTrue_Jet, BJet_p4, 0.1)",
+    )
+
+    df = df.Define(
+        "WJet_HbbBoostedSel",
+        "RemoveOverlaps(centralJet_p4, AllTrue_Jet, FatBJet_p4, 0.8)",
+    )
+
+    df = df.Define(
+        "WJet_Sel",
+        "Hbb_Boosted ? WJet_HbbBoostedSel : WJet_HbbResolvedSel",
+    )
+
+    df = df.Define(
+        "WJet_idx",
+        "CreateIndexes(Sum(WJet_Sel))",
+    )
+    df = df.Define(
+        "WJet_idxSorted",
+        "ReorderObjects(centralJet_pt[WJet_Sel], WJet_idx)",
+    )
+    for var in jet_vars:
+        df = df.Define(
+            f"WJet_{var}",
+            f"Take(centralJet_{var}[WJet_Sel], WJet_idxSorted)",
+        )
+
+    df = df.Define("wjet1_isValid", "(WJet_p4.size() > 0) && !DL")
+    df = df.Define("wjet2_isValid", "(WJet_p4.size() > 1) && !DL")
+    df = df.Define(
+        "wjet1",
+        "wjet1_isValid ? WJet_p4[0] : LorentzVectorM()",
+    )
+    df = df.Define(
+        "wjet2",
+        "wjet2_isValid ? WJet_p4[1] : LorentzVectorM()",
+    )
+    df = df.Define(
+        "resolvedW_pt",
+        "(wjet1_isValid && wjet2_isValid) ? (wjet1 + wjet2).Pt() : -1.0",
+    )
+    df = df.Define(
+        "WJets_Boosted",
+        "fatwjet_isValid && (resolvedW_pt < 0.0 || fatwjet.Pt() > resolvedW_pt)",
+    )
+
+    # Finally save the simple-name variables
+    # bjet1, bjet2, fatbjet, wjet1, wjet2, fatwjet
+
+    for var in jet_vars:
+        df = df.Define(
+            f"wjet1_{var}",
+            f"wjet1_isValid ? WJet_{var}[0] : std::decay_t<decltype(WJet_{var})>::value_type()",
+        )
+        df = df.Define(
+            f"wjet2_{var}",
+            f"wjet2_isValid ? WJet_{var}[1] : std::decay_t<decltype(WJet_{var})>::value_type()",
+        )
+
+    for var in fatjet_vars:
+        df = df.Define(
+            f"fatwjet_{var}",
+            f"fatwjet_isValid ? FatWJet_{var}[0] : std::decay_t<decltype(FatWJet_{var})>::value_type()",
+        )
+
+    # Lastly set mbb
+    # PNet Corrections are currently incorrect
+    # Using 1.0-rawFactor doesn't work since Jet corrections are already applied
+    for bjet_idx in [1, 2]:
+        df = df.Define(
+            f"bjet{bjet_idx}_PNetRegPtRawCorr_p4",
+            f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet{bjet_idx}_pt*(1.0-bjet{bjet_idx}_rawFactor)*bjet{bjet_idx}_PNetRegPtRawCorr, bjet{bjet_idx}_eta, bjet{bjet_idx}_phi, bjet{bjet_idx}_mass)",
+        )
+        df = df.Define(
+            f"bjet{bjet_idx}_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4",
+            f"ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>>(bjet{bjet_idx}_pt*(1.0-bjet{bjet_idx}_rawFactor)*bjet{bjet_idx}_PNetRegPtRawCorr*bjet{bjet_idx}_PNetRegPtRawCorrNeutrino, bjet{bjet_idx}_eta, bjet{bjet_idx}_phi, bjet{bjet_idx}_mass)",
+        )
+
+    df = df.Define(
+        f"bb_mass",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_p4+bjet2_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
+    df = df.Define(
+        f"bb_mass_PNetRegPtRawCorr",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_PNetRegPtRawCorr_p4+bjet2_PNetRegPtRawCorr_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
+    df = df.Define(
+        f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino",
+        "bjet1_isValid && bjet2_isValid ? (bjet1_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4+bjet2_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino_p4).mass() : std::decay_t<decltype(BJet_mass)>::value_type()",
+    )
+
+    return df
+
+
 def PrepareDfForHistograms(dfForHistograms, isData):
+    dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+    dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
-    dfForHistograms.defineJetSelections(isData)
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()

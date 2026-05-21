@@ -15,8 +15,8 @@ import contextlib
 
 
 class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
-    training_configuration_dir_resolved = luigi.Parameter()
-    training_configuration_dir_boosted = luigi.Parameter()
+    training_configuration_dir = luigi.Parameter()
+    resolved = luigi.Parameter()
 
     def __init__(self, *args, **kwargs):
         super(DNNLimitTask, self).__init__(*args, **kwargs)
@@ -24,91 +24,49 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
     def create_branch_map(self):
         unique_trainings = {}
         branches = {}
-        DNNValidation_Resolved_map = DNNValidationTask.req(
+        DNNValidation_map = DNNValidationTask.req(
             self,
             branch=-1,
             branches=(),
-            training_configuration_dir=self.training_configuration_dir_resolved,
+            training_configuration_dir=self.training_configuration_dir,
         ).create_branch_map()
-        for n_branch, (
-            config,
-            config_name,
-            n_branch,
-        ) in DNNValidation_Resolved_map.items():
+        for n_branch, (config, config_name, n_branch) in DNNValidation_map.items():
             training_id = re.search(r"Training\d+", config_name).group(0)
             if training_id not in unique_trainings.keys():
                 unique_trainings[training_id] = {
-                    "config_names_resolved": [],
-                    "branches_resolved": [],
-                    "config_names_boosted": [],
-                    "branches_boosted": [],
+                    "config_names": [],
+                    "branches": [],
                 }
-            unique_trainings[training_id]["config_names_resolved"].append(config_name)
-            unique_trainings[training_id]["branches_resolved"].append(n_branch)
-
-        DNNValidation_Boosted_map = DNNValidationTask.req(
-            self,
-            branch=-1,
-            branches=(),
-            training_configuration_dir=self.training_configuration_dir_boosted,
-        ).create_branch_map()
-        for n_branch, (
-            config,
-            config_name,
-            n_branch,
-        ) in DNNValidation_Boosted_map.items():
-            training_id = re.search(r"Training\d+", config_name).group(0)
-            if training_id not in unique_trainings.keys():
-                unique_trainings[training_id] = {
-                    "config_names_resolved": [],
-                    "branches_resolved": [],
-                    "config_names_boosted": [],
-                    "branches_boosted": [],
-                }
-            unique_trainings[training_id]["config_names_boosted"].append(config_name)
-            unique_trainings[training_id]["branches_boosted"].append(n_branch)
+            unique_trainings[training_id]["config_names"].append(config_name)
+            unique_trainings[training_id]["branches"].append(n_branch)
 
         k = 0
         for training_id in unique_trainings.keys():
             branches[k] = (
                 training_id,
-                unique_trainings[training_id]["config_names_resolved"],
-                unique_trainings[training_id]["config_names_boosted"],
-                unique_trainings[training_id]["branches_resolved"],
-                unique_trainings[training_id]["branches_boosted"],
+                unique_trainings[training_id]["config_names"],
+                unique_trainings[training_id]["branches"],
+                self.resolved,
             )
             k += 1
         return branches
 
     def workflow_requires(self):
-        branch_set_resolved = set()
-        branch_set_boosted = set()
+        branch_set = set()
         for idx, (
             training_id,
-            config_names_resolved,
-            config_names_boosted,
-            branches_resolved,
-            branches_boosted,
+            config_names,
+            branches,
+            resolved,
         ) in self.branch_map.items():
-            branch_set_resolved.update(branches_resolved)
-            branch_set_boosted.update(branches_boosted)
+            branch_set.update(branches)
         reqs = {}
 
-        if len(branch_set_resolved) > 0:
-            reqs["DNNValidation_Resolved"] = DNNValidationTask.req(
+        if len(branch_set) > 0:
+            reqs["DNNValidation"] = DNNValidationTask.req(
                 self,
-                training_configuration_dir=self.training_configuration_dir_resolved,
-                branches=tuple(branch_set_resolved),
-                customisations=self.customisations,
-                max_runtime=DNNValidationTask.max_runtime._default,
-                n_cpus=DNNValidationTask.n_cpus._default,
-            )
-
-        if len(branch_set_boosted) > 0:
-            reqs["DNNValidation_Boosted"] = DNNValidationTask.req(
-                self,
-                training_configuration_dir=self.training_configuration_dir_boosted,
-                branches=tuple(branch_set_boosted),
+                training_configuration_dir=self.training_configuration_dir,
+                branches=tuple(branch_set),
                 customisations=self.customisations,
                 max_runtime=DNNValidationTask.max_runtime._default,
                 n_cpus=DNNValidationTask.n_cpus._default,
@@ -117,61 +75,37 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         return reqs
 
     def requires(self):
-        (
-            training_id,
-            config_names_resolved,
-            config_names_boosted,
-            branches_resolved,
-            branches_boosted,
-        ) = self.branch_data
+        training_id, config_names, branches, resolved = self.branch_data
         return [
-            [
-                DNNValidationTask.req(
-                    self,
-                    training_configuration_dir=self.training_configuration_dir_resolved,
-                    branch=br,
-                    max_runtime=DNNValidationTask.max_runtime._default,
-                    branches=(br,),
-                )
-                for br in branches_resolved
-            ],
-            [
-                DNNValidationTask.req(
-                    self,
-                    training_configuration_dir=self.training_configuration_dir_boosted,
-                    branch=br,
-                    max_runtime=DNNValidationTask.max_runtime._default,
-                    branches=(br,),
-                )
-                for br in branches_boosted
-            ],
+            DNNValidationTask.req(
+                self,
+                training_configuration_dir=self.training_configuration_dir,
+                branch=br,
+                max_runtime=DNNValidationTask.max_runtime._default,
+                branches=(br,),
+            )
+            for br in branches
         ]
 
     def output(self):
-        (
-            training_id,
-            config_names_resolved,
-            config_names_boosted,
-            branches_resolved,
-            branches_boosted,
-        ) = self.branch_data
+        training_id, config_names, branches, resolved = self.branch_data
         training_name = training_id
         outFileName = f"limits"
+        resolved_or_boosted = "resolved" if int(resolved) else "boosted"
         output_path = os.path.join(
-            "DNNLimits", self.version, self.period, training_name, outFileName
+            "DNNLimits",
+            self.version,
+            self.period,
+            training_name,
+            resolved_or_boosted,
+            outFileName,
         )
         return [
             self.remote_target(output_path, fs=self.fs_histograms),
         ]
 
     def run(self):
-        (
-            training_id,
-            config_names_resolved,
-            config_names_boosted,
-            branches_resolved,
-            branches_boosted,
-        ) = self.branch_data
+        training_id, config_names, branches, resolved = self.branch_data
         training_name = training_id
         dnn_limits = os.path.join(
             self.ana_path(), "Studies", "ModelValidation", "DNN_Limit_Condor.py"
@@ -181,31 +115,42 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
         tmpFolder = os.path.join(job_home, f"{training_name}")
 
-        print("Inputs?")
-        print(self.input())
+        mass_input_dict = {}
+
+        for inp in self.input():
+            mass = ((inp[0].path).split("_m")[1]).split("/")[0]
+            if mass not in mass_input_dict.keys():
+                mass_input_dict[mass] = []
+            mass_input_dict[mass].append(inp)
+
+        print("We have mass-input dict")
+        print(mass_input_dict)
 
         with contextlib.ExitStack() as stack:
-            resolved_inputs = self.input()[0]
-            boosted_inputs = self.input()[1]
-            combined_inputs = resolved_inputs + boosted_inputs
-            print(f"Starting localize of {len(combined_inputs)} inputs")
-            local_inputs = [
-                stack.enter_context(inp[0].localize("r")).path
-                for inp in combined_inputs
-            ]
+            for mass in mass_input_dict.keys():
+                inputs = mass_input_dict[mass]
+                # inputs = self.input()
+                print(f"Starting localize of {len(inputs)} inputs")
+                local_inputs = [
+                    stack.enter_context(inp[0].localize("r")).path for inp in inputs
+                ]
 
-            dnn_limits_cmd = [
-                "python3",
-                "-u",
-                dnn_limits,
-                "--output_folder",
-                training_name,
-                "--validation_paths",
-                *local_inputs,
-            ]
-            ps_call(dnn_limits_cmd, verbose=1, cwd=job_home)
+                dnn_limits_cmd = [
+                    "python3",
+                    "-u",
+                    dnn_limits,
+                    "--output_folder",
+                    training_name,
+                    "--resolved",
+                    resolved,
+                    "--mass",
+                    mass,
+                    "--validation_paths",
+                    *local_inputs,
+                ]
+                ps_call(dnn_limits_cmd, verbose=1, cwd=job_home)
 
-        for fname in config_names_resolved + config_names_boosted:
+        for fname in config_names:
             shutil.copy(fname, tmpFolder)
 
         limit_outputs = self.output()
@@ -218,8 +163,8 @@ class DNNLimitTask(Task, HTCondorWorkflow, law.LocalWorkflow):
 
 
 class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
-    training_configuration_dir_resolved = luigi.Parameter()
-    training_configuration_dir_boosted = luigi.Parameter()
+    training_configuration_dir = luigi.Parameter()
+    resolved = luigi.Parameter()
 
     # fancy_string = "gamma1<5 && gamma2>3"
 
@@ -235,22 +180,12 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
             branches=(),
         ).create_branch_map()
         branch_list = []
-        for n_branch, (
-            training_id,
-            config_names_resolved,
-            config_names_boosted,
-            branches_resolved,
-            branches_boosted,
-        ) in DNNLimit_map.items():
-            unique_trainings[training_id] = (
-                n_branch,
-                config_names_resolved,
-                config_names_boosted,
-            )
+        for n_branch, (training_id, config_names, _, resolved) in DNNLimit_map.items():
+            unique_trainings[training_id] = (n_branch, config_names, resolved)
             branch_list.append(n_branch)
 
         k = 0
-        branches[0] = (unique_trainings, branch_list)
+        branches[0] = (unique_trainings, branch_list, self.resolved)
         return branches
 
     def workflow_requires(self):
@@ -265,7 +200,7 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         return reqs
 
     def requires(self):
-        unique_trainings, branch_list = self.branch_data
+        unique_trainings, branch_list, resolved = self.branch_data
         return [
             DNNLimitTask.req(
                 self,
@@ -277,17 +212,18 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
         ]
 
     def output(self):
-        unique_trainings, branch_list = self.branch_data
+        unique_trainings, branch_list, resolved = self.branch_data
         outFileName = f"DNNComparisonPlots"
+        resolved_or_boosted = "resolved" if int(resolved) else "boosted"
         output_path = os.path.join(
-            "DNNComparison", self.version, self.period, outFileName
+            "DNNComparison", self.version, self.period, resolved_or_boosted, outFileName
         )
         return [
             self.remote_target(output_path, fs=self.fs_histograms),
         ]
 
     def run(self):
-        unique_trainings, branch_list = self.branch_data
+        unique_trainings, branch_list, resolved = self.branch_data
 
         job_home, remove_job_home = self.law_job_home()
         print(f"At job_home {job_home}")
@@ -309,6 +245,8 @@ class DNNComparisonTask(Task, HTCondorWorkflow, law.LocalWorkflow):
                 dnn_comparison,
                 "--output_folder",
                 tmpFolder,
+                "--resolved",
+                resolved,
                 "--limit_paths",
                 *local_inputs,
             ]

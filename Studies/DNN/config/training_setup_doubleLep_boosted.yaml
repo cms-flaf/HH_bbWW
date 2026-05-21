@@ -3,18 +3,22 @@ nClasses: 2
 activation: tanh
 batch_size: 1000
 dropout: 0.2
-features:
+features: # Log everything in GeV, then later we will divide by 4-body mass (m_bbll)
   - lep1_pt
+  # - lep1_pt_log
   - lep1_phi
   - lep1_eta
-  - lep1_mass
+  - lep1_legType # Change to type
   - lep2_pt
+  # - lep2_pt_log
   - lep2_phi
   - lep2_eta
-  - lep2_mass
+  - lep2_legType
   - PuppiMET_pt
+  # - PuppiMET_pt_log
   - PuppiMET_phi
   - HT
+  # - HT_log
   - dR_dilep
   - dR_dibjet
   - dR_dilep_dibjet
@@ -28,33 +32,48 @@ features:
   - MT2_bb
   - MT2_blbl
   - MT2_blbl2
+  # - MT_log
+  # - MT2_ll_log
+  # - MT2_bb_log
+  # - MT2_blbl_log
+  # - MT2_blbl2_log
   - ll_mass
+  # - ll_mass_log
   - CosTheta_bb
   - bjet1_pt
+  # - bjet1_pt_log
   - bjet1_phi
   - bjet1_eta
   - bjet1_mass
+  # - bjet1_mass_log
   - bjet1_btagPNetB
   - bjet2_pt
+  # - bjet2_pt_log
   - bjet2_phi
   - bjet2_eta
   - bjet2_mass
+  # - bjet2_mass_log
   - bjet2_btagPNetB
   - other_jet1_pt
+  # - other_jet1_pt_log
   - other_jet1_phi
   - other_jet1_eta
   - other_jet1_mass
+  # - other_jet1_mass_log
   - other_jet1_btagPNetB
   - other_jet2_pt
+  # - other_jet2_pt_log
   - other_jet2_phi
   - other_jet2_eta
   - other_jet2_mass
+  # - other_jet2_mass_log
   - other_jet2_btagPNetB
   - fatbjet_pt
+  # - fatbjet_pt_log
   - fatbjet_phi
   - fatbjet_eta
-  - fatbjet_mass
   - fatbjet_mass_PNetCorr
+  # - fatbjet_mass_PNetCorr_log
   - fatbjet_particleNetWithMass_HbbvsQCD
   - fatbjet_tau1
   - fatbjet_tau2
@@ -67,18 +86,21 @@ features:
   - fatbjet_muEF
   - fatbjet_neEmEF
 
-  - DoubleLep_DeepHME_mass
-  - DoubleLep_DeepHME_mass_error
+  # - DoubleLep_DeepHME_mass
+  # - DoubleLep_DeepHME_mass_log
+  # - DoubleLep_DeepHME_mass_error_rel # Relative error (error/mass)
 
-  - channelId
+  # - channelId
 gamma1: 2
 gamma2: 0.5
 learning_rate: 0.0005
-lr_decay: 0.8
-lr_patience: 3
+lr_decay: 0.1
+lr_patience: 20
 l2_rate: 0.001
+loss_scale: 0.2
 n_layers: 5
 n_units: 512
+n_units_reduction_ratio: 1.0
 n_epochs: 100
 parametric_list:
   - 300
@@ -102,4 +124,5 @@ parametric_list:
   - 4000
 patience: 100
 use_batch_norm: true
+use_film: false
 weight_decay: 0.004

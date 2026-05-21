@@ -2,15 +2,15 @@ imax    1 number of bins
 jmax    3 number of processes minus 1
 kmax    0 number of nuisance parameters
 --------------------------------------------------------------------------------
-shapes data_obs boosted run3_boosted.root $PROCESS
-shapes * boosted run3_boosted.root m$MASS_$PROCESS_class0
+shapes data_obs recovery run3_res1b.root $PROCESS
+shapes * recovery run3_res1b.root m$MASS_$PROCESS
 --------------------------------------------------------------------------------
-bin             boosted         
-observation     -1              
-bin             boosted         boosted         boosted         boosted         
-process         Signal          TT              DY              Other
+bin             recovery
+observation     -1
+bin             recovery        recovery        recovery        recovery
+process         signal          TT              fit_DY              Other
 process         0               1               2               3  
 rate            -1              -1              -1              -1
 --------------------------------------------------------------------------------
 
-boosted autoMCStats 20 1 1
+recovery autoMCStats 20 1 1
