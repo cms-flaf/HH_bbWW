@@ -121,11 +121,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 "cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow"
             )
 
-    def defineCategories(self):
+    def defineLeptonChannel(self):
         self.DefineAndAppend("SL", "channelId == 1 || channelId == 2")
         self.DefineAndAppend(
             "DL", "channelId == 11 || channelId == 12 || channelId == 22"
         )
+
+    def defineCategories(self):
         self.DefineAndAppend("baseline", f"return true;")
 
         # Test boosted -> res2b -> recovery
@@ -563,7 +565,7 @@ def defineJetSelections(df, isData):
         )
 
     df = df.Define("Nfatwjets", "FatWJet_pt.size()")
-    df = df.Define("fatwjet_isValid", "Nfatwjets > 0")
+    df = df.Define("fatwjet_isValid", "(Nfatwjets > 0) && !DL")
     df = df.Define(
         "fatwjet",
         "fatwjet_isValid ? FatWJet_p4[0] : LorentzVectorM()",
@@ -601,8 +603,8 @@ def defineJetSelections(df, isData):
             f"Take(centralJet_{var}[WJet_Sel], WJet_idxSorted)",
         )
 
-    df = df.Define("wjet1_isValid", "WJet_p4.size() > 0")
-    df = df.Define("wjet2_isValid", "WJet_p4.size() > 1")
+    df = df.Define("wjet1_isValid", "(WJet_p4.size() > 0) && !DL")
+    df = df.Define("wjet2_isValid", "(WJet_p4.size() > 1) && !DL")
     df = df.Define(
         "wjet1",
         "wjet1_isValid ? WJet_p4[0] : LorentzVectorM()",
@@ -669,6 +671,7 @@ def defineJetSelections(df, isData):
 
 
 def PrepareDfForHistograms(dfForHistograms, isData):
+    dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
