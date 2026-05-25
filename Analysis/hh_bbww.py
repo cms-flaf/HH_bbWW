@@ -265,7 +265,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
-            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
+            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep2_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
             "MT_tot",
@@ -428,6 +428,23 @@ def AddDNNVariables(df):
     )
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
+
+    df = df.Define("nExtraLeps", "nExtraMuon + nExtraElectron")
+
+    df = df.Define(
+        "m_b1leps",
+        "ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep2_p4) ? (bjet1_p4 + lep1_p4).M() : (bjet1_p4 + lep2_p4).M()",
+    )
+    df = df.Define(
+        "m_b2leps",
+        "ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep2_p4) ? (bjet2_p4 + lep1_p4).M() : (bjet2_p4 + lep2_p4).M()",
+    )
+
+    df = df.Define("pt_bb", "(bjet1_p4 + bjet2_p4).Pt()")
+    df = df.Define("m_llmet", "(lep1_p4 + lep2_p4 + PuppiMET_p4).M()")
+    df = df.Define(
+        "m_bbllmet", "(bjet1_p4 + bjet2_p4 + lep1_p4 + lep2_p4 + PuppiMET_p4).M()"
+    )
 
     return df
 
