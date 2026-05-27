@@ -49,27 +49,75 @@ class DeepHMEProducer:
             jet_eta=array["centralJet_eta"],
             jet_phi=array["centralJet_phi"],
             jet_mass=array["centralJet_mass"],
-            jet_btagPNetB=array["centralJet_btagPNetB"],
-            jet_btagPNetCvB=array["centralJet_btagPNetCvB"],
-            jet_btagPNetCvL=array["centralJet_btagPNetCvL"],
-            jet_btagPNetCvNotB=array["centralJet_btagPNetCvNotB"],
-            jet_btagPNetQvG=array["centralJet_btagPNetQvG"],
-            jet_PNetRegPtRawCorr=array["centralJet_PNetRegPtRawCorr"],
-            jet_PNetRegPtRawCorrNeutrino=array["centralJet_PNetRegPtRawCorrNeutrino"],
-            jet_PNetRegPtRawRes=array["centralJet_PNetRegPtRawRes"],
+            jet_btagPNetB=(
+                array["centralJet_btagPNetB"]
+                if "centralJet_btagPNetB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvB=(
+                array["centralJet_btagPNetCvB"]
+                if "centralJet_btagPNetCvB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvL=(
+                array["centralJet_btagPNetCvL"]
+                if "centralJet_btagPNetCvL" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvNotB=(
+                array["centralJet_btagPNetCvNotB"]
+                if "centralJet_btagPNetCvNotB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetQvG=(
+                array["centralJet_btagPNetQvG"]
+                if "centralJet_btagPNetQvG" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawCorr=(
+                array["centralJet_PNetRegPtRawCorr"]
+                if "centralJet_PNetRegPtRawCorr" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawCorrNeutrino=(
+                array["centralJet_PNetRegPtRawCorrNeutrino"]
+                if "centralJet_PNetRegPtRawCorrNeutrino" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawRes=(
+                array["centralJet_PNetRegPtRawRes"]
+                if "centralJet_PNetRegPtRawRes" in self.vars_to_save
+                else None
+            ),
             fatjet_pt=array["SelectedFatJet_pt"],
             fatjet_eta=array["SelectedFatJet_eta"],
             fatjet_phi=array["SelectedFatJet_phi"],
             fatjet_mass=array["SelectedFatJet_mass"],
-            fatjet_particleNet_QCD=array["SelectedFatJet_particleNet_QCD"],
-            fatjet_particleNet_XbbVsQCD=array["SelectedFatJet_particleNet_XbbVsQCD"],
-            fatjet_particleNetWithMass_QCD=array[
-                "SelectedFatJet_particleNetWithMass_QCD"
-            ],
-            fatjet_particleNetWithMass_HbbvsQCD=array[
-                "SelectedFatJet_particleNetWithMass_HbbvsQCD"
-            ],
-            fatjet_particleNet_massCorr=array["SelectedFatJet_particleNet_massCorr"],
+            fatjet_particleNet_QCD=(
+                array["SelectedFatJet_particleNet_QCD"]
+                if "SelectedFatJet_particleNet_QCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNet_XbbVsQCD=(
+                array["SelectedFatJet_particleNet_XbbVsQCD"]
+                if "SelectedFatJet_particleNet_XbbVsQCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNetWithMass_QCD=(
+                array["SelectedFatJet_particleNetWithMass_QCD"]
+                if "SelectedFatJet_particleNetWithMass_QCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNetWithMass_HbbvsQCD=(
+                array["SelectedFatJet_particleNetWithMass_HbbvsQCD"]
+                if "SelectedFatJet_particleNetWithMass_HbbvsQCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNet_massCorr=(
+                array["SelectedFatJet_particleNet_massCorr"]
+                if "SelectedFatJet_particleNet_massCorr" in self.vars_to_save
+                else None
+            ),
             output_format="mass",
         )
 
@@ -95,27 +143,75 @@ class DeepHMEProducer:
             jet_eta=array["centralJet_eta"],
             jet_phi=array["centralJet_phi"],
             jet_mass=array["centralJet_mass"],
-            jet_btagPNetB=array["centralJet_btagPNetB"],
-            jet_btagPNetCvB=array["centralJet_btagPNetCvB"],
-            jet_btagPNetCvL=array["centralJet_btagPNetCvL"],
-            jet_btagPNetCvNotB=array["centralJet_btagPNetCvNotB"],
-            jet_btagPNetQvG=array["centralJet_btagPNetQvG"],
-            jet_PNetRegPtRawCorr=array["centralJet_PNetRegPtRawCorr"],
-            jet_PNetRegPtRawCorrNeutrino=array["centralJet_PNetRegPtRawCorrNeutrino"],
-            jet_PNetRegPtRawRes=array["centralJet_PNetRegPtRawRes"],
+            jet_btagPNetB=(
+                array["centralJet_btagPNetB"]
+                if "centralJet_btagPNetB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvB=(
+                array["centralJet_btagPNetCvB"]
+                if "centralJet_btagPNetCvB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvL=(
+                array["centralJet_btagPNetCvL"]
+                if "centralJet_btagPNetCvL" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetCvNotB=(
+                array["centralJet_btagPNetCvNotB"]
+                if "centralJet_btagPNetCvNotB" in self.vars_to_save
+                else None
+            ),
+            jet_btagPNetQvG=(
+                array["centralJet_btagPNetQvG"]
+                if "centralJet_btagPNetQvG" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawCorr=(
+                array["centralJet_PNetRegPtRawCorr"]
+                if "centralJet_PNetRegPtRawCorr" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawCorrNeutrino=(
+                array["centralJet_PNetRegPtRawCorrNeutrino"]
+                if "centralJet_PNetRegPtRawCorrNeutrino" in self.vars_to_save
+                else None
+            ),
+            jet_PNetRegPtRawRes=(
+                array["centralJet_PNetRegPtRawRes"]
+                if "centralJet_PNetRegPtRawRes" in self.vars_to_save
+                else None
+            ),
             fatjet_pt=array["SelectedFatJet_pt"],
             fatjet_eta=array["SelectedFatJet_eta"],
             fatjet_phi=array["SelectedFatJet_phi"],
             fatjet_mass=array["SelectedFatJet_mass"],
-            fatjet_particleNet_QCD=array["SelectedFatJet_particleNet_QCD"],
-            fatjet_particleNet_XbbVsQCD=array["SelectedFatJet_particleNet_XbbVsQCD"],
-            fatjet_particleNetWithMass_QCD=array[
-                "SelectedFatJet_particleNetWithMass_QCD"
-            ],
-            fatjet_particleNetWithMass_HbbvsQCD=array[
-                "SelectedFatJet_particleNetWithMass_HbbvsQCD"
-            ],
-            fatjet_particleNet_massCorr=array["SelectedFatJet_particleNet_massCorr"],
+            fatjet_particleNet_QCD=(
+                array["SelectedFatJet_particleNet_QCD"]
+                if "SelectedFatJet_particleNet_QCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNet_XbbVsQCD=(
+                array["SelectedFatJet_particleNet_XbbVsQCD"]
+                if "SelectedFatJet_particleNet_XbbVsQCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNetWithMass_QCD=(
+                array["SelectedFatJet_particleNetWithMass_QCD"]
+                if "SelectedFatJet_particleNetWithMass_QCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNetWithMass_HbbvsQCD=(
+                array["SelectedFatJet_particleNetWithMass_HbbvsQCD"]
+                if "SelectedFatJet_particleNetWithMass_HbbvsQCD" in self.vars_to_save
+                else None
+            ),
+            fatjet_particleNet_massCorr=(
+                array["SelectedFatJet_particleNet_massCorr"]
+                if "SelectedFatJet_particleNet_massCorr" in self.vars_to_save
+                else None
+            ),
             output_format="p4",
         )
 

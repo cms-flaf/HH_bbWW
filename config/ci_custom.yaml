@@ -18,8 +18,8 @@ StatInference:
 # Do not remove DNN variables, they are needed for the datacard creation.
 variables:
   - lep1_pt
-  # - SingleLep_DeepHME_mass
-  # - DoubleLep_DeepHME_mass
+  - SingleLep_DeepHME_mass
+  - DoubleLep_DeepHME_mass
   # - DNNParametric_SL_NoHME_M300_Signal
   # - DNNParametric_DL_NoHME_M300_Signal
 
