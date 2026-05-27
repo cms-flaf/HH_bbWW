@@ -539,6 +539,14 @@ MT2_blbl:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+m_bbllmet:
+  x_bins: "1000|0:2500"
+  x_title: m(bbllmet)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 bb_mass:
   x_bins: "100|0:300"
   x_title: m(bb)
@@ -1015,6 +1023,97 @@ HMEinDNNBins_HME_mass_DL_DNN_M800_0p8_1p0:
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+
+DNN_IndependentMasses_DL_M300_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M300 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M400_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M400 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M500_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M500 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M550_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M550 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M600_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M600 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M650_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M650 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M700_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M700 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M800_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M800 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M900_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M900 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
+  divide_by_bin_width: False
+  blind: True
+
+DNN_IndependentMasses_DL_M1000_Signal:
+  x_bins: "150|-15.0:15.0"
+  x_title: DNN M1000 Signal Logit
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 10.0
   divide_by_bin_width: False
   blind: True
 
@@ -1854,3 +1953,4 @@ SL_DNN_m1000_vs_HME:
   divide_by_bin_width: False
   blind: True
   var_list: [ DNNParametric_SL_NoHME_M1000_Signal, SingleLep_DeepHME_mass ]
+

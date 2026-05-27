@@ -153,10 +153,12 @@ class DNNProducer:
             # Last save the branches
             for param_idx, param_mass in enumerate(param_mass_list):
                 this_param_prediction = all_predictions[param_idx, :, :]
+                this_param_prediction_logit = np.clip(this_param_prediction, 1e-7, 1 - 1e-7)
+                this_param_prediction_logit = np.log(this_param_prediction_logit / (1 - this_param_prediction_logit))
 
                 for class_idx, class_name in enumerate(class_names_list):
                     field_name = f"M{param_mass}_{class_name}"
-                    output_fields[field_name] = this_param_prediction[
+                    output_fields[field_name] = this_param_prediction_logit[
                         :, class_idx
                     ].copy()
 
