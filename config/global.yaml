@@ -104,71 +104,14 @@ payload_producers:
     n_cpus: 4
     max_runtime: 30.0
     cmssw_env: True
-  DNNParametric_DL_WithHME:
+  DNN:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
-    channel: "DL"
-    version: "DoubleLepton_WithDeepHME"
+    DL:
+      version: "DoubleLepton_IndependentMasses_v1"
+      parametric: False
+    SL: null
     columns:
-      - M250_Signal
-      - M260_Signal
-      - M270_Signal
-      - M280_Signal
-      - M300_Signal
-      - M350_Signal
-      - M450_Signal
-      - M550_Signal
-      - M600_Signal
-      - M650_Signal
-      - M700_Signal
-      - M800_Signal
-      - M1000_Signal
-      - M1200_Signal
-      - M1400_Signal
-      - M1600_Signal
-      - M1800_Signal
-      - M2000_Signal
-      - M2500_Signal
-      - M3000_Signal
-      - M4000_Signal
-      - M5000_Signal
-    dependencies:
-      - DoubleLep_DeepHME
-    n_cpus: 4
-    max_runtime: 8.0
-    cmssw_env: False
-    awkward_based: True
-    uproot_stepsize: '50MB'
-  DNNParametric_DL_NoHME:
-    producers_module_name: Analysis.DNN_Application
-    producer_name: DNNProducer
-    channel: "DL"
-    version: "DoubleLepton_WithoutDeepHME"
-    columns:
-      # - M250_Signal
-      # - M260_Signal
-      # - M270_Signal
-      # - M280_Signal
-      # - M300_Signal
-      # - M350_Signal
-      # - M450_Signal
-      # - M550_Signal
-      # - M600_Signal
-      # - M650_Signal
-      # - M700_Signal
-      # - M800_Signal
-      # - M1000_Signal
-      # - M1200_Signal
-      # - M1400_Signal
-      # - M1600_Signal
-      # - M1800_Signal
-      # - M2000_Signal
-      # - M2500_Signal
-      # - M3000_Signal
-      # - M4000_Signal
-      # - M5000_Signal
-
-      # XtoYH doesn't have the same mass points
       - M300_Signal
       - M400_Signal
       - M500_Signal
@@ -179,86 +122,63 @@ payload_producers:
       - M800_Signal
       - M900_Signal
       - M1000_Signal
-    dependencies:
-    n_cpus: 4
-    max_runtime: 8.0
-    cmssw_env: False
-    awkward_based: True
-    uproot_stepsize: '50MB'
-  DNNParametric_SL_NoHME:
-    producers_module_name: Analysis.DNN_Application
-    producer_name: DNNProducer
-    channel: "SL"
-    version: "SingleLepton_WithoutDeepHME"
-    columns:
-      # - M250_Signal
-      # - M260_Signal
-      # - M270_Signal
-      # - M280_Signal
-      # - M300_Signal
-      # - M350_Signal
-      # - M450_Signal
-      # - M550_Signal
-      # - M600_Signal
-      # - M650_Signal
-      # - M700_Signal
-      # - M800_Signal
-      # - M1000_Signal
-      # - M1200_Signal
-      # - M1400_Signal
-      # - M1600_Signal
-      # - M1800_Signal
-      # - M2000_Signal
-      # - M2500_Signal
-      # - M3000_Signal
-      # - M4000_Signal
-      # - M5000_Signal
 
-      # XtoYH doesn't have the same mass points
-      - M300_Signal
-      - M400_Signal
-      - M500_Signal
-      - M550_Signal
-      - M600_Signal
-      - M650_Signal
-      - M700_Signal
-      - M800_Signal
-      - M900_Signal
-      - M1000_Signal
+      - M300_TT
+      - M400_TT
+      - M500_TT
+      - M550_TT
+      - M600_TT
+      - M650_TT
+      - M700_TT
+      - M800_TT
+      - M900_TT
+      - M1000_TT
+
+      - M300_DY
+      - M400_DY
+      - M500_DY
+      - M550_DY
+      - M600_DY
+      - M650_DY
+      - M700_DY
+      - M800_DY
+      - M900_DY
+      - M1000_DY
+
+      - M300_ST
+      - M400_ST
+      - M500_ST
+      - M550_ST
+      - M600_ST
+      - M650_ST
+      - M700_ST
+      - M800_ST
+      - M900_ST
+      - M1000_ST
+    masses:
+      - 300
+      - 400
+      - 500
+      - 550
+      - 600
+      - 650
+      - 700
+      - 800
+      - 900
+      - 1000
     dependencies:
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
-  DoubleLep_DeepHME:
+  DeepHME:
     producers_module_name: Analysis.DeepHMEProducer
     producer_name: DeepHMEProducer
-    channel: "DL"
-    model_name: predict_quantiles3D_DL_v12
-    return_errors: True
-    columns:
-      - mass
-      - mass_error
-      - Hbb_px
-      - Hbb_py
-      - Hbb_pz
-      - Hbb_E
-      - HVV_px
-      - HVV_py
-      - HVV_pz
-      - HVV_E
-    n_cpus: 4
-    max_runtime: 8.0
-    cmssw_env: False
-    awkward_based: True
-    uproot_stepsize: '50MB'
-    dependencies:
-  SingleLep_DeepHME:
-    producers_module_name: Analysis.DeepHMEProducer
-    producer_name: DeepHMEProducer
-    channel: "SL"
-    model_name: predict_quantiles3D_SL_v12
+    DL:
+      model_name: predict_quantiles3D_DL_v12
+    SL:
+      model_name: predict_quantiles3D_SL_v12
     return_errors: True
     columns:
       - mass
@@ -445,17 +365,17 @@ histTuple_flavors:
       - bjet2_mass
       - bjet2_btagPNetB
 
-      - other_jet1_pt
-      - other_jet1_phi
-      - other_jet1_eta
-      - other_jet1_mass
-      - other_jet1_btagPNetB
+      - wjet1_pt
+      - wjet1_phi
+      - wjet1_eta
+      - wjet1_mass
+      - wjet1_btagPNetB
 
-      - other_jet2_pt
-      - other_jet2_phi
-      - other_jet2_eta
-      - other_jet2_mass
-      - other_jet2_btagPNetB
+      - wjet2_pt
+      - wjet2_phi
+      - wjet2_eta
+      - wjet2_mass
+      - wjet2_btagPNetB
 
       - fatbjet_pt
       - fatbjet_phi
@@ -465,11 +385,7 @@ histTuple_flavors:
 
       - fatbjet_mass_PNetCorr
       - fatbjet_msoftdrop
-      - fatbjet_muEF
       - fatbjet_nConstituents
-      - fatbjet_neEmEF
-      - fatbjet_neHEF
-      - fatbjet_neMultiplicity
       - fatbjet_tau1
       - fatbjet_tau2
       - fatbjet_tau3
@@ -487,26 +403,29 @@ histTuple_flavors:
       - dPhi_jet1_jet2
       - dPhi_MET_dilep
       - dPhi_MET_dibjet
+      - MT_lep1
+      - MT_lep2
+      - MT_tot
       - MT
       - MT2_ll
       - MT2_bb
       - MT2_blbl
+      - MT2_blbl2
       - ll_mass
       - CosTheta_bb
+      - nExtraTau
+      - nExtraLeps
 
       - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
-      - SingleLep_DeepHME_mass
-      - SingleLep_DeepHME_mass_error
-
-      - DoubleLep_DeepHME_mass
-      - DoubleLep_DeepHME_mass_error
+      - DeepHME_mass
+      - DeepHME_mass_error
 
       - event
 
     variables:
-      - SingleLep_DeepHME_mass
-      - DoubleLep_DeepHME_mass
+      - DeepHME_mass
+      - lep1_pt
 
 histTuple_fullResolution_variables: [ ]
 
@@ -571,73 +490,41 @@ variables:
   - lep2_Electron_pfRelIso03_all
   - mT_fix
 
-  # High Level Single Lepton
-  - SingleLep_DeepHME_mass
-  - SingleLep_DeepHME_mass_error
+  # High Level
+  - DeepHME_mass
+  - DeepHME_mass_error
 
-  # High Level Double Lepton
-  - DoubleLep_DeepHME_mass
-  - DoubleLep_DeepHME_mass_error
+  - DNN_M300_Signal
+  - DNN_M400_Signal
+  - DNN_M500_Signal
+  - DNN_M550_Signal
+  - DNN_M600_Signal
+  - DNN_M650_Signal
+  - DNN_M700_Signal
+  - DNN_M800_Signal
+  - DNN_M900_Signal
+  - DNN_M1000_Signal
 
-  - name: DL_DNN_m300_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M300_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m400_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M400_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m500_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M500_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m550_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M550_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m600_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M600_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m650_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M650_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m700_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M700_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m800_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M800_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m900_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M900_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: DL_DNN_m1000_vs_HME
-    vars: [ DNNParametric_DL_NoHME_M1000_Signal, DoubleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m300_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M300_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m400_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M400_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m500_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M500_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m550_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M550_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m600_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M600_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m650_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M650_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m700_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M700_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m800_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M800_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m900_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M900_Signal, SingleLep_DeepHME_mass ]
-
-  - name: SL_DNN_m1000_vs_HME
-    vars: [ DNNParametric_SL_NoHME_M1000_Signal, SingleLep_DeepHME_mass ]
+  - name: DNN_m300_vs_HME
+    vars: [ DNN_M300_Signal, DeepHME_mass ]
+  - name: DNN_m400_vs_HME
+    vars: [ DNN_M400_Signal, DeepHME_mass ]
+  - name: DNN_m500_vs_HME
+    vars: [ DNN_M500_Signal, DeepHME_mass ]
+  - name: DNN_m550_vs_HME
+    vars: [ DNN_M550_Signal, DeepHME_mass ]
+  - name: DNN_m600_vs_HME
+    vars: [ DNN_M600_Signal, DeepHME_mass ]
+  - name: DNN_m650_vs_HME
+    vars: [ DNN_M650_Signal, DeepHME_mass ]
+  - name: DNN_m700_vs_HME
+    vars: [ DNN_M700_Signal, DeepHME_mass ]
+  - name: DNN_m800_vs_HME
+    vars: [ DNN_M800_Signal, DeepHME_mass ]
+  - name: DNN_m900_vs_HME
+    vars: [ DNN_M900_Signal, DeepHME_mass ]
+  - name: DNN_m1000_vs_HME
+    vars: [ DNN_M1000_Signal, DeepHME_mass ]
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml

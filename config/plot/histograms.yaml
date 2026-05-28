@@ -929,7 +929,7 @@ DNN_m300_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M300_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M300_Signal, DeepHME_mass ]
 
 DNN_m400_vs_HME:
   2d:
@@ -947,7 +947,7 @@ DNN_m400_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M400_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M400_Signal, DeepHME_mass ]
 
 DNN_m500_vs_HME:
   2d:
@@ -965,7 +965,7 @@ DNN_m500_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M500_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M500_Signal, DeepHME_mass ]
 
 DNN_m550_vs_HME:
   2d:
@@ -983,7 +983,7 @@ DNN_m550_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M550_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M550_Signal, DeepHME_mass ]
 
 DNN_m600_vs_HME:
   2d:
@@ -1016,7 +1016,7 @@ DNN_m600_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M600_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M600_Signal, DeepHME_mass ]
 
 
 DNN_m650_vs_HME:
@@ -1035,7 +1035,7 @@ DNN_m650_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M650_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M650_Signal, DeepHME_mass ]
 
 DNN_m700_vs_HME:
   2d:
@@ -1053,7 +1053,7 @@ DNN_m700_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M700_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M700_Signal, DeepHME_mass ]
 
 DNN_m800_vs_HME:
   2d:
@@ -1071,7 +1071,7 @@ DNN_m800_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M800_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M800_Signal, DeepHME_mass ]
 
 DNN_m900_vs_HME:
   2d:
@@ -1089,7 +1089,7 @@ DNN_m900_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M900_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M900_Signal, DeepHME_mass ]
 
 DNN_m1000_vs_HME:
   2d:
@@ -1107,4 +1107,4 @@ DNN_m1000_vs_HME:
   max_y_sf: 100
   divide_by_bin_width: False
   blind: True
-  var_list: [ DNN_M1000_Signal, DoubleLep_DeepHME_mass ]
+  var_list: [ DNN_M1000_Signal, DeepHME_mass ]
