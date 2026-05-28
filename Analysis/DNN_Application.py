@@ -222,9 +222,9 @@ class DNNProducer:
             field_name = f"M{mass}_Signal"
             # Build the empty branches with ones
             if f"SL_{field_name}" not in branches.fields:
-                branches[f"SL_{field_name}"] = np.ones_like(branches.event)
+                branches[f"SL_{field_name}"] = np.zeros_like(branches.event)
             if f"DL_{field_name}" not in branches.fields:
-                branches[f"DL_{field_name}"] = np.ones_like(branches.event)
+                branches[f"DL_{field_name}"] = np.zeros_like(branches.event)
             output_fields[field_name] = np.where(
                 branches.SL,
                 branches[f"SL_{field_name}"],
