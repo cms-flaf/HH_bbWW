@@ -218,18 +218,21 @@ class DNNProducer:
         # Here we will take SL and DL and choose which branch to save as final column
         output_fields = {}
 
+        classes_to_save = ["Signal", "TT", "DY", "ST"]
+
         for mass in self.masses:
-            field_name = f"M{mass}_Signal"
-            # Build the empty branches with ones
-            if f"SL_{field_name}" not in branches.fields:
-                branches[f"SL_{field_name}"] = np.zeros_like(branches.event)
-            if f"DL_{field_name}" not in branches.fields:
-                branches[f"DL_{field_name}"] = np.zeros_like(branches.event)
-            output_fields[field_name] = np.where(
-                branches.SL,
-                branches[f"SL_{field_name}"],
-                branches[f"DL_{field_name}"],
-            )
+            for class_name in classes_to_save:
+                field_name = f"M{mass}_{class_name}"
+                # Build the empty branches with ones
+                if f"SL_{field_name}" not in branches.fields:
+                    branches[f"SL_{field_name}"] = np.zeros_like(branches.event)
+                if f"DL_{field_name}" not in branches.fields:
+                    branches[f"DL_{field_name}"] = np.zeros_like(branches.event)
+                output_fields[field_name] = np.where(
+                    branches.SL,
+                    branches[f"SL_{field_name}"],
+                    branches[f"DL_{field_name}"],
+                )
 
         for field_name, values in output_fields.items():
             branches[field_name] = values
