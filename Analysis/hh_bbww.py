@@ -228,16 +228,14 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
 
-        self.DefineAndAppend("SR", f" !Zpeak && diLep_mass < 70 && OS_Iso") #not including mbb_SR due to wrong mbb correction (rawFactor on jets)
+        self.DefineAndAppend(
+            "SR", f" !Zpeak && diLep_mass < 70 && OS_Iso"
+        )  # not including mbb_SR due to wrong mbb correction (rawFactor on jets)
 
+        self.DefineAndAppend("TTbar_CR", f"OS_Iso && diLep_mass > 110 ")
+        self.DefineAndAppend("DY_CR", f"Zpeak && OS_Iso ")
         self.DefineAndAppend(
-            "TTbar_CR", f"OS_Iso && diLep_mass > 110 "
-        )
-        self.DefineAndAppend(
-            "DY_CR", f"Zpeak && OS_Iso "
-        )
-        self.DefineAndAppend(
-            "W_CR", f"Iso && MT_lep1 > 50"  #this is for single lepton
+            "W_CR", f"Iso && MT_lep1 > 50"  # this is for single lepton
         )
         self.DefineAndAppend(
             "mbb_SR",
@@ -394,7 +392,7 @@ def AddDNNVariables(df):
         "MT2_bb",
         f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
-    #New MT2 implementation for ttbar and returning invisible splitting solution
+    # New MT2 implementation for ttbar and returning invisible splitting solution
     # MT2_blbl / MT2_blbl2: two b-lepton pairings — (lep1+b1, lep2+b2) and (lep1+b2, lep2+b1).
     # vis=(lep+b, lep+b), invis=MET, chi=0 (neutrino)
     # Both computed via _withSolution which is added into MT2.h to recover the neutrino momentum splitting at the MT2 minimum.
@@ -404,7 +402,7 @@ def AddDNNVariables(df):
         "MT2_blbl_sol",
         f"(lep1_legType > 0 && lep2_legType > 0) ? analysis::Calculate_MT2_func_withSolution(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0) : analysis::MT2Result{{-100., 0., 0., 0., 0.}}",
     )
-    df = df.Define("MT2_blbl",        "float(MT2_blbl_sol.mt2)")
+    df = df.Define("MT2_blbl", "float(MT2_blbl_sol.mt2)")
     df = df.Define("MT2_blbl_nu1_px", "float(MT2_blbl_sol.px_inv_A)")
     df = df.Define("MT2_blbl_nu1_py", "float(MT2_blbl_sol.py_inv_A)")
     df = df.Define("MT2_blbl_nu2_px", "float(MT2_blbl_sol.px_inv_B)")
@@ -413,14 +411,14 @@ def AddDNNVariables(df):
         "MT2_blbl2_sol",
         f"(lep1_legType > 0 && lep2_legType > 0) ? analysis::Calculate_MT2_func_withSolution(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0) : analysis::MT2Result{{-100., 0., 0., 0., 0.}}",
     )
-    df = df.Define("MT2_blbl2",        "float(MT2_blbl2_sol.mt2)")
+    df = df.Define("MT2_blbl2", "float(MT2_blbl2_sol.mt2)")
     df = df.Define("MT2_blbl2_nu1_px", "float(MT2_blbl2_sol.px_inv_A)")
     df = df.Define("MT2_blbl2_nu1_py", "float(MT2_blbl2_sol.py_inv_A)")
     df = df.Define("MT2_blbl2_nu2_px", "float(MT2_blbl2_sol.px_inv_B)")
     df = df.Define("MT2_blbl2_nu2_py", "float(MT2_blbl2_sol.py_inv_B)")
     # min over both bl pairings: guarantees ttbar is always bounded by m_top regardless of jet/lepton pT ordering
-    df = df.Define("MT2_blbl_min",    "float(min(MT2_blbl, MT2_blbl2))")
-    # dR pairing: assign lep+b by smallest total deltaR sum 
+    df = df.Define("MT2_blbl_min", "float(min(MT2_blbl, MT2_blbl2))")
+    # dR pairing: assign lep+b by smallest total deltaR sum
     df = df.Define(
         "MT2_blbl_dR",
         f"(lep1_legType > 0 && lep2_legType > 0) ? float("
@@ -466,7 +464,7 @@ def AddDNNVariables(df):
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
 
-    #adding nExtraLeps
+    # adding nExtraLeps
     df = df.Define("nExtraLeptons", "(nExtraElectron + nExtraMuon)")
 
     return df
