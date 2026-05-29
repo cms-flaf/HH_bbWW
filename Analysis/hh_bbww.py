@@ -211,7 +211,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         # Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
         self.DefineAndAppend(
             "Zpeak",
-            f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)",
+            # f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)"
+            f"(abs(diLep_mass - 91.1876) < 10)",
         )
         self.DefineAndAppend(
             "Zveto",
@@ -227,8 +228,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
 
+        self.DefineAndAppend("SR", f" !Zpeak && diLep_mass < 70 && OS_Iso") #not including mbb_SR due to wrong mbb correction (rawFactor on jets)
+
         self.DefineAndAppend(
-            "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 "
+            "TTbar_CR", f"OS_Iso && diLep_mass > 110 "
+        )
+        self.DefineAndAppend(
+            "DY_CR", f"Zpeak && OS_Iso "
+        )
+        self.DefineAndAppend(
+            "W_CR", f"Iso && MT_lep1 > 50"  #this is for single lepton
         )
         self.DefineAndAppend(
             "mbb_SR",
@@ -265,7 +274,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
-            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
+            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep2_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
             "MT_tot",
@@ -376,7 +385,7 @@ def AddDNNVariables(df):
         f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",
     )
 
-    # Functional form of MT2 claculation
+    # Old implementation of MT2 calculation uses Calculate_MT2_func
     df = df.Define(
         "MT2_ll",
         f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.",
@@ -385,13 +394,41 @@ def AddDNNVariables(df):
         "MT2_bb",
         f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
+    #New MT2 implementation for ttbar and returning invisible splitting solution
+    # MT2_blbl / MT2_blbl2: two b-lepton pairings — (lep1+b1, lep2+b2) and (lep1+b2, lep2+b1).
+    # vis=(lep+b, lep+b), invis=MET, chi=0 (neutrino)
+    # Both computed via _withSolution which is added into MT2.h to recover the neutrino momentum splitting at the MT2 minimum.
+    # Note: ben_findsols uses a 10k-step grid scan; returns (0,0) for kinematically unbalanced
+    # events where the ellipses never become tangent — flag these with MT2_blbl>0 && nu1_px==0.
     df = df.Define(
-        "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+        "MT2_blbl_sol",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? analysis::Calculate_MT2_func_withSolution(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0) : analysis::MT2Result{{-100., 0., 0., 0., 0.}}",
     )
+    df = df.Define("MT2_blbl",        "float(MT2_blbl_sol.mt2)")
+    df = df.Define("MT2_blbl_nu1_px", "float(MT2_blbl_sol.px_inv_A)")
+    df = df.Define("MT2_blbl_nu1_py", "float(MT2_blbl_sol.py_inv_A)")
+    df = df.Define("MT2_blbl_nu2_px", "float(MT2_blbl_sol.px_inv_B)")
+    df = df.Define("MT2_blbl_nu2_py", "float(MT2_blbl_sol.py_inv_B)")
     df = df.Define(
-        "MT2_blbl2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+        "MT2_blbl2_sol",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? analysis::Calculate_MT2_func_withSolution(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0) : analysis::MT2Result{{-100., 0., 0., 0., 0.}}",
+    )
+    df = df.Define("MT2_blbl2",        "float(MT2_blbl2_sol.mt2)")
+    df = df.Define("MT2_blbl2_nu1_px", "float(MT2_blbl2_sol.px_inv_A)")
+    df = df.Define("MT2_blbl2_nu1_py", "float(MT2_blbl2_sol.py_inv_A)")
+    df = df.Define("MT2_blbl2_nu2_px", "float(MT2_blbl2_sol.px_inv_B)")
+    df = df.Define("MT2_blbl2_nu2_py", "float(MT2_blbl2_sol.py_inv_B)")
+    # min over both bl pairings: guarantees ttbar is always bounded by m_top regardless of jet/lepton pT ordering
+    df = df.Define("MT2_blbl_min",    "float(min(MT2_blbl, MT2_blbl2))")
+    # dR pairing: assign lep+b by smallest total deltaR sum 
+    df = df.Define(
+        "MT2_blbl_dR",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float("
+        f"(ROOT::Math::VectorUtil::DeltaR(lep1_p4, bjet1_p4) + ROOT::Math::VectorUtil::DeltaR(lep2_p4, bjet2_p4)) <= "
+        f"(ROOT::Math::VectorUtil::DeltaR(lep1_p4, bjet2_p4) + ROOT::Math::VectorUtil::DeltaR(lep2_p4, bjet1_p4)) ? "
+        f"analysis::Calculate_MT2_func(lep1_p4+bjet1_p4, lep2_p4+bjet2_p4, PuppiMET_p4, 0.0, 0.0) : "
+        f"analysis::Calculate_MT2_func(lep1_p4+bjet2_p4, lep2_p4+bjet1_p4, PuppiMET_p4, 0.0, 0.0)"
+        f") : -100.",
     )
 
     df = df.Define(
@@ -428,6 +465,9 @@ def AddDNNVariables(df):
     )
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
+
+    #adding nExtraLeps
+    df = df.Define("nExtraLeptons", "(nExtraElectron + nExtraMuon)")
 
     return df
 
@@ -640,6 +680,8 @@ def defineJetSelections(df, isData):
             f"fatwjet_{var}",
             f"fatwjet_isValid ? FatWJet_{var}[0] : std::decay_t<decltype(FatWJet_{var})>::value_type()",
         )
+    df = df.Define("Whad_resolved_mass", "(wjet1_p4 + wjet2_p4).mass()")
+    df = df.Define("Whad_boosted_mass", "fatwjet_mass")
 
     # Lastly set mbb
     # PNet Corrections are currently incorrect
@@ -673,6 +715,7 @@ def defineJetSelections(df, isData):
 def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+    dfForHistograms.calculateMT()
     dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
     dfForHistograms.defineTriggers()
@@ -681,6 +724,5 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
     dfForHistograms.addDYReweighting()
-    dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms
