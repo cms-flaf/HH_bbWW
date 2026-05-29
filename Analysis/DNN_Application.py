@@ -109,9 +109,7 @@ class DNNProducer:
                 print(f"Channel {channel} does not have DNN defined, skip.")
                 continue
 
-            masses = (
-                self.masses if ("m0" not in all_dnnConfig.keys()) else [0]
-            )
+            masses = self.masses if ("m0" not in all_dnnConfig.keys()) else [0]
             for mass in masses:
                 dnnConfig = all_dnnConfig[f"m{mass}"]
                 models = dnnConfig["model_paths"]
