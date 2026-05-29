@@ -110,7 +110,7 @@ class DNNProducer:
                 continue
 
             masses = (
-                self.masses if not all_dnnConfig.get("use_parametric", False) else [0]
+                self.masses if ("m0" not in all_dnnConfig.keys()) else [0]
             )
             for mass in masses:
                 dnnConfig = all_dnnConfig[f"m{mass}"]

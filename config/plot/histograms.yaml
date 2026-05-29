@@ -953,6 +953,14 @@ DNN_M600_Signal:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+DNN_M650_Signal:
+  x_bins: "100|-15.0:15.0"
+  x_title: DNN M650 Signal Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 DNN_M700_Signal:
   x_bins: "100|-15.0:15.0"
   x_title: DNN M700 Signal Logits
@@ -1024,6 +1032,15 @@ DNN_M600_TT:
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+DNN_M650_TT:
+  x_bins: "100|-15.0:15.0"
+  x_title: DNN M650 TT Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 
 DNN_M700_TT:
   x_bins: "100|-15.0:15.0"
@@ -1097,6 +1114,14 @@ DNN_M600_DY:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+DNN_M650_DY:
+  x_bins: "100|-15.0:15.0"
+  x_title: DNN M650 DY Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 DNN_M700_DY:
   x_bins: "100|-15.0:15.0"
   x_title: DNN M700 DY Logits
@@ -1164,6 +1189,14 @@ DNN_M550_ST:
 DNN_M600_ST:
   x_bins: "100|-15.0:15.0"
   x_title: DNN M600 ST Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+DNN_M650_ST:
+  x_bins: "100|-15.0:15.0"
+  x_title: DNN M650 ST Logits
   y_title: Events
   use_log_y: True
   max_y_sf: 1.5

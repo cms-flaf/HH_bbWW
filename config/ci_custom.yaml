@@ -20,12 +20,7 @@ variables:
   - lep1_pt
   - DeepHME_mass
   - DNN_M300_Signal
-  - DNN_M600_Signal
-  - DNN_M1000_Signal
-
   - DNN_M300_TT
-  - DNN_M600_TT
-  - DNN_M1000_TT
 
   - name: lep1_pt_vs_eta
     vars: [ lep1_pt, lep1_eta ]
