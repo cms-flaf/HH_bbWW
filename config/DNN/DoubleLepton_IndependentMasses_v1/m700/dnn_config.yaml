@@ -1,0 +1,94 @@
+features: &id001
+  - lep1_pt
+  - lep1_legType
+  - lep2_pt
+  - lep2_legType
+  - PuppiMET_pt
+  - HT
+  - dR_dilep
+  - dR_dibjet
+  - dR_dilep_dibjet
+  - dPhi_lep1_lep2
+  - dPhi_MET_dilep
+  - dPhi_MET_dibjet
+  - MT2_ll
+  - MT2_bb
+  - MT2_blbl
+  - MT_tot
+  - MT_lep1
+  - MT_lep2
+  - m_b1leps
+  - m_b2leps
+  - m_bbllmet
+  - m_llmet
+  - pt_bb
+  - pt_ll
+  - ll_mass
+  - CosTheta_bb
+  - bjet1_pt
+  - bjet1_phi
+  - bjet1_eta
+  - bjet1_mass
+  - bjet1_btagPNetB
+  - bjet2_pt
+  - bjet2_phi
+  - bjet2_eta
+  - bjet2_mass
+  - bjet2_btagPNetB
+model_setup:
+  UseParametric: false
+  activation: tanh
+  batch_size: 10000
+  dropout: 0.2
+  features: *id001
+  gamma1: 3.0
+  gamma2: 1.0
+  l2_rate: 0.001
+  learning_rate: 0.0005
+  loss_scale: 1.0
+  lr_decay: 0.8
+  lr_patience: 3
+  nClasses: 7
+  n_epochs: 500
+  n_layers: 10
+  n_units: 512
+  n_units_reduction_factor: 0.8
+  n_units_reduction_ratio: 1.0
+  parametric_list: &id002
+    - 700
+  patience: 50
+  test_training_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity1_Merged.root
+  test_weight_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity1_Merged_weight_m700.root
+  training_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity0_Merged.root
+  training_name: DNN_DoubleLepton_Resolved_Training0_par0_m700
+  use_batch_norm: true
+  use_film: false
+  validation_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity2_Merged.root
+  validation_weight_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity2_Merged_weight_m700.root
+  weight_decay: 0.004
+  weight_file: /eos/user/d/daebi/HH_bbWW/DNNDatasets/ResolvedDataset_22May/Dataset/nParity0_Merged_weight_m700.root
+nClasses: 7
+nParity: 4
+parametric_list: *id002
+use_parametric: false
+modelname_parity:
+  - - ResHH_Classifier_parity0
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 0)
+  - - ResHH_Classifier_parity1
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 1)
+  - - ResHH_Classifier_parity2
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 2)
+  - - ResHH_Classifier_parity3
+    - (lep1_legType > 0) && (lep2_legType > 0) && ( (centralJet_pt.size() > 1) || (SelectedFatJet_pt.size()
+      > 0) ) && (event%4 == 3)
+class_names:
+  - Signal
+  - TT
+  - DY
+  - ST
+  - SMHiggs
+  - VV
+  - Other
