@@ -62,6 +62,10 @@ corrections:
       HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
+  Vpt:
+    stages: [ AnalysisCache, HistTuple ]
+  # dy_hhbbtautau:
+  #   stages: [ HistTuple ]
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -256,7 +260,7 @@ custom_categories: ""
 custom_subcategories: [ ]
 
 # Option to scale signal by some factor in HistPlotTask.py
-signal_plot_scale: 50
+signal_plot_scale: 2500
 
 # This is for Analysis Selection
 channelSelection:
@@ -427,7 +431,9 @@ histTuple_flavors:
       - DeepHME_mass
       - lep1_pt
 
-histTuple_fullResolution_variables: [ ]
+histTuple_fullResolution_variables:
+  - weight_DYw_DYWeightCentral
+  - weight_EWKCorr_VptCentral
 
 # DNN Inputs
 variables:
@@ -464,7 +470,7 @@ variables:
   - fatbjet_eta
   - fatbjet_phi
   - fatbjet_mass
-  - fatbjet_XbbVsQCD
+  - fatbjet_particleNetWithMass_HbbvsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
