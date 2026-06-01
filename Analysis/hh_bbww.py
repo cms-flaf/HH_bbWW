@@ -91,7 +91,9 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
 
 
 def GetDYReweight():
-    return "weight_DYw_DYWeightCentral * weight_EWKCorr_VptCentral"
+    DY_weight = "weight_dy_hhbbww_central"
+    # DY_weight = "weight_DYw_DYWeightCentral * weight_EWKCorr_VptCentral"
+    return DY_weight
 
 
 def GetLepWeight(lep_index):
