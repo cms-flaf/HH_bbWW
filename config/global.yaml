@@ -65,7 +65,7 @@ corrections:
   Vpt:
     stages: [ AnalysisCache, HistTuple ]
   dy_hhbbww:
-    stages: [ HistTuple ]
+    stages: [ AnalysisCache, HistTuple ]
   # dy_hhbbtautau:
   #   stages: [ HistTuple ]
 extraFormat_for_triggerMatchingAndSF:
