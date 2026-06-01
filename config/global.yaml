@@ -431,9 +431,7 @@ histTuple_flavors:
       - DeepHME_mass
       - lep1_pt
 
-histTuple_fullResolution_variables:
-  - weight_DYw_DYWeightCentral
-  - weight_EWKCorr_VptCentral
+histTuple_fullResolution_variables: []
 
 # DNN Inputs
 variables:
