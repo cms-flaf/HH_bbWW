@@ -91,7 +91,9 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
 
 
 def GetDYReweight():
-    DY_weight = "weight_dy_hhbbww_central"
+    DY_weight = "1.0"
+    # DY_weight = "weight_dy_hhbbww_central"
+    # DY_weight = "weight_dy_central"
     # DY_weight = "weight_DYw_DYWeightCentral * weight_EWKCorr_VptCentral"
     return DY_weight
 
@@ -249,6 +251,15 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
+        self.DefineAndAppend("SR", f"m_lep1_lep2 < 70 && OS_Iso")
+
+        self.DefineAndAppend("TT_CR", f"m_lep1_lep2 > 110 && OS_Iso")
+
+        self.DefineAndAppend("DY_CR", f"abs(m_lep1_lep2 - 91.1876) < 10")
+
+        self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
+
+
     def addDYReweighting(self):
         self.DefineAndAppend(
             "ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0"
@@ -340,7 +351,7 @@ def defineAllP4(df):
     return df
 
 
-def AddDNNVariables(df):
+def AddDNNVariables(df, isData=False):
     df = df.Define("HT", f"Sum(centralJet_pt)")
 
     df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
@@ -415,9 +426,13 @@ def AddDNNVariables(df):
         f"diLep_mass",
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
+    df = df.Define("m_lep1_lep2", f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
 
-    df = df.Define(f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()")
+    df = df.Define(f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()") # Required name format for bbWW DY reweighting
+    if not isData:
+        df = df.Define(f"pt_ll_gen", "LHE_Vpt") # Required name format for bbtautau DY reweighting
+    df = df.Define(f"nBJets", "Nbjets")  # Name format for bbtautau DY reweighting
 
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
@@ -701,7 +716,7 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
-    dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
+    dfForHistograms.df = AddDNNVariables(dfForHistograms.df, isData)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineQCDRegions()
