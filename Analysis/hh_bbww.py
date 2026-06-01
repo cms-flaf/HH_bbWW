@@ -259,7 +259,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
 
-
     def addDYReweighting(self):
         self.DefineAndAppend(
             "ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0"
@@ -426,12 +425,19 @@ def AddDNNVariables(df, isData=False):
         f"diLep_mass",
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
-    df = df.Define("m_lep1_lep2", f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0")
+    df = df.Define(
+        "m_lep1_lep2",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
+    )
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
 
-    df = df.Define(f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()") # Required name format for bbWW DY reweighting
+    df = df.Define(
+        f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()"
+    )  # Required name format for bbWW DY reweighting
     if not isData:
-        df = df.Define(f"pt_ll_gen", "LHE_Vpt") # Required name format for bbtautau DY reweighting
+        df = df.Define(
+            f"pt_ll_gen", "LHE_Vpt"
+        )  # Required name format for bbtautau DY reweighting
     df = df.Define(f"nBJets", "Nbjets")  # Name format for bbtautau DY reweighting
 
     df = df.Define(
