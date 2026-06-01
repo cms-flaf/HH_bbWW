@@ -66,8 +66,8 @@ corrections:
     stages: [ AnalysisCache, HistTuple ]
   dy_hhbbww:
     stages: [ AnalysisCache, HistTuple ]
-  # dy_hhbbtautau:
-  #   stages: [ HistTuple ]
+  dy_hhbbtautau:
+    stages: [ AnalysisCache, HistTuple ]
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
