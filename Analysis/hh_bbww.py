@@ -85,10 +85,14 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     for lep_index in [1, 2]:
         total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
     total_weight = f"{total_weight} * {GetTriggerWeight()}"
-    total_weight = f"{total_weight} * weight_bTagShape_Central"
+    total_weight = f"{total_weight} * {GetBtagShapeWeight()}"
     total_weight = f"{total_weight} * {GetDYReweight()}"
     return total_weight
 
+def GetBtagShapeWeight():
+    BTag_weight = "1.0"
+    # BTag_weight = "weight_bTagShape_Central"
+    return BTag_weight
 
 def GetDYReweight():
     DY_weight = "1.0"
@@ -252,6 +256,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
 
         self.DefineAndAppend("SR", f"m_lep1_lep2 < 70 && OS_Iso")
+
+        self.DefineAndAppend("SR_mbb", f"m_lep1_lep2 < 70 && OS_Iso && mbb_SR")
 
         self.DefineAndAppend("TT_CR", f"m_lep1_lep2 > 110 && OS_Iso")
 
@@ -721,6 +727,7 @@ def defineJetSelections(df, isData):
 def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+    dfForHistograms.calculateMT()
     dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariables(dfForHistograms.df, isData)
     dfForHistograms.defineTriggers()
@@ -729,6 +736,5 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
     dfForHistograms.addDYReweighting()
-    dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms
