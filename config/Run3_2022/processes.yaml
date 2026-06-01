@@ -10,9 +10,6 @@ DY:
 
 DYto2L_InclusivePlusBinned:
   processors: *DY_processors_allFlavors
-  Vpt_corr_type: DY
-  dy_hbbtautau_corr_type: DY
-  dy_hhbbww_corr_type: DY
   datasets:
     - DYto2L_M_50_amcatnloFXFX
     - DYto2L_M_50_0J_amcatnloFXFX
@@ -32,9 +29,6 @@ DYto2L_InclusivePlusBinned:
 DY_M_10to50:
   name: "DY M10to50"
   color: "kAzure+10"
-  Vpt_corr_type: DY
-  dy_hbbtautau_corr_type: DY
-  dy_hhbbww_corr_type: DY
   datasets:
     - DYto2L_M_10to50_amcatnloFXFX
     # - DYto2E_M_10to50_amcatnloFXFX

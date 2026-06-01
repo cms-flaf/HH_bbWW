@@ -105,9 +105,21 @@ def DefineWeightForHistograms(
     categories = global_params["categories"]
     boosted_categories = global_params.get("boosted_categories", [])
     process_group = global_params["process_group"]
+    corrections_cfg = global_params.get("corrections", {})
+    weights_this_process = set()
+    for corr_name, corr_info in corrections_cfg.items():
+        if "processes" in corr_info:
+            if global_params["process_name"] not in corr_info["processes"]:
+                continue
+        weights_this_process.add(corr_name)
+
+    print(
+        f"For process {global_params['process_name']}, applying corrections: {weights_this_process}"
+    )
+
     total_weight_expression = (
         # channel, cat, boosted_categories --> these are not needed in the GetWeight function therefore I just put some placeholders
-        analysis.GetWeight("", "", boosted_categories)
+        analysis.GetWeight(weights_this_process)
         if process_group != "data"
         else "1"
     )  # are we sure?

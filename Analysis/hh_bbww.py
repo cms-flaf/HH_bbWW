@@ -78,33 +78,54 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
     return f"{btag_weight}*{btagshape_weight}"
 
 
-def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
+def GetWeight(weights_this_process):  # do you need all these args?
+    # weights_this_process is a set of corrections from global.yaml
+    # e.g. {'lumi', 'dy_hhbbww', 'trigger', 'base', 'btag', 'dy_hhbbtautau', 'JER', 'pu', 'JEC', 'ele', 'gen', 'muScaRe', 'mu', 'eleES', 'fatjet', 'xs'}
+
     # weights_to_apply = ["weight_base", "ExtraDYWeight"]
     weights_to_apply = ["weight_base"]
-    total_weight = "*".join(weights_to_apply)
+
     for lep_index in [1, 2]:
-        total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
-    total_weight = f"{total_weight} * {GetTriggerWeight()}"
-    total_weight = f"{total_weight} * {GetBtagShapeWeight()}"
-    total_weight = f"{total_weight} * {GetDYReweight()}"
+        if "ele" in weights_this_process:
+            weights_to_apply.append(f"{GetEleWeight(lep_index)}")
+        if "mu" in weights_this_process:
+            weights_to_apply.append(f"{GetMuWeight(lep_index)}")
+    if "trigger" in weights_this_process:
+        weights_to_apply.append(f"{GetTriggerWeight()}")
+    if "btag" in weights_this_process:
+        weights_to_apply.append(f"{GetBtagShapeWeight()}")
+    if "dy_hhbbtautau" in weights_this_process:
+        weights_to_apply.append(f"{GetDYbbtautauReweight()}")
+    if "dy_hhbbww" in weights_this_process:
+        weights_to_apply.append(f"{GetDYbbwwReweight()}")
+
+    total_weight = "*".join(weights_to_apply)
+
     return total_weight
+
 
 def GetBtagShapeWeight():
     BTag_weight = "1.0"
     # BTag_weight = "weight_bTagShape_Central"
     return BTag_weight
 
-def GetDYReweight():
-    DY_weight = "1.0"
-    # DY_weight = "weight_dy_hhbbww_central"
-    # DY_weight = "weight_dy_central"
-    # DY_weight = "weight_DYw_DYWeightCentral * weight_EWKCorr_VptCentral"
-    return DY_weight
+
+def GetDYbbtautauReweight():
+    DY_bbtautau_weight = "weight_dy_central"
+    return DY_bbtautau_weight
 
 
-def GetLepWeight(lep_index):
+def GetDYbbwwReweight():
+    DY_bbww_weight = "weight_dy_hhbbww_central"
+    return DY_bbww_weight
+
+
+def GetEleWeight(lep_index):
     weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
+    return weight_Ele
 
+
+def GetMuWeight(lep_index):
     # Medium pT Muon SF
     weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_LoosePFIso_TightIDCentral : 1.0)"
 
@@ -114,7 +135,7 @@ def GetLepWeight(lep_index):
     # No Muon SF
     # weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? 1.0 : 1.0)"
 
-    return f"{weight_Mu} * {weight_Ele}"
+    return weight_Mu
 
 
 def GetTriggerWeight():
