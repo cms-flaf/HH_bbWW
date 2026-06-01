@@ -414,6 +414,9 @@ def AddDNNVariables(df):
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
+
+    df = df.Define(f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()")
+
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
         "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+lep2_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
