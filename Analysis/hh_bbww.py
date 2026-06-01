@@ -89,6 +89,7 @@ def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
     total_weight = f"{total_weight} * {GetDYReweight()}"
     return total_weight
 
+
 def GetDYReweight():
     return "weight_DYw_DYWeightCentral * weight_EWKCorr_VptCentral"
 
