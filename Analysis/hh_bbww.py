@@ -105,8 +105,7 @@ def GetWeight(weights_this_process):  # do you need all these args?
 
 
 def GetBtagShapeWeight():
-    BTag_weight = "1.0"
-    # BTag_weight = "weight_bTagShape_Central"
+    BTag_weight = "weight_bTagShape_Central"
     return BTag_weight
 
 
@@ -282,7 +281,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         self.DefineAndAppend("TT_CR", f"m_lep1_lep2 > 110 && OS_Iso")
 
-        self.DefineAndAppend("DY_CR", f"abs(m_lep1_lep2 - 91.1876) < 10")
+        self.DefineAndAppend("DY_CR", f"(abs(m_lep1_lep2 - 91.1876) < 10) && OS_Iso")
 
         self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
 
