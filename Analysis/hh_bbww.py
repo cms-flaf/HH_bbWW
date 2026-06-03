@@ -84,6 +84,8 @@ def GetWeight(weights_this_process):  # do you need all these args?
 
     # weights_to_apply = ["weight_base", "ExtraDYWeight"]
     weights_to_apply = ["weight_base"]
+    weights_to_apply_resolved = []
+    weights_to_apply_boosted = []
 
     for lep_index in [1, 2]:
         if "ele" in weights_this_process:
@@ -93,20 +95,30 @@ def GetWeight(weights_this_process):  # do you need all these args?
     if "trigger" in weights_this_process:
         weights_to_apply.append(f"{GetTriggerWeight()}")
     if "btag" in weights_this_process:
-        weights_to_apply.append(f"{GetBtagShapeWeight()}")
+        weights_to_apply_resolved.append(f"{GetBtagShapeWeight()}")
+    if "fatjet" in weights_this_process:
+        weights_to_apply_boosted.append(f"{GetFatBtagWeight()}")
     if "dy_hhbbtautau" in weights_this_process:
         weights_to_apply.append(f"{GetDYbbtautauReweight()}")
     if "dy_hhbbww" in weights_this_process:
         weights_to_apply.append(f"{GetDYbbwwReweight()}")
 
-    total_weight = "*".join(weights_to_apply)
+    # total_weight = "*".join(weights_to_apply)
+    total_weight_resolved = "*".join(weights_to_apply + weights_to_apply_resolved)
+    total_weight_boosted = "*".join(weights_to_apply + weights_to_apply_boosted)
 
+    total_weight = f"(boosted) ? {total_weight_boosted} : {total_weight_resolved}"
     return total_weight
 
 
 def GetBtagShapeWeight():
     BTag_weight = "weight_bTagShape_Central"
     return BTag_weight
+
+
+def GetFatBtagWeight():
+    FatBTag_weight = "fatbjet_weight_FatJetSF_Central"
+    return FatBTag_weight
 
 
 def GetDYbbtautauReweight():
