@@ -134,6 +134,6 @@ def DefineWeightForHistograms(
             weight_name = unc_cfg_dict["norm"][uncName]["expression"].format(
                 scale=uncScale,
                 muIso_WP_for_SF=global_params.get("muIso_WP_for_SF", "Tight"),
-                muID_WP_for_SF=global_params.get("muID_WP_for_SF", "Tight")
+                muID_WP_for_SF=global_params.get("muID_WP_for_SF", "Tight"),
             )
     dfw.df = dfw.df.Define(final_weight_name, weight_name)
