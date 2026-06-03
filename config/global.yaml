@@ -62,9 +62,9 @@ corrections:
       HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
-  # dy_hhbbww:
-  #   stages: [ AnalysisCache, HistTuple ]
-  #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
+  dy_hhbbww:
+    stages: [ AnalysisCache, HistTuple ]
+    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
   # dy_hhbbtautau:
   #   stages: [ AnalysisCache, HistTuple ]
   #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
