@@ -107,10 +107,6 @@ def DefineWeightForHistograms(
     process_group = global_params["process_group"]
     weights_this_process = set(corrections.to_apply.keys())
 
-    print(
-        f"For process {global_params['process_name']}, applying corrections: {weights_this_process}"
-    )
-
     total_weight_expression = (
         analysis.GetWeight(weights_this_process) if process_group != "data" else "1"
     )  # are we sure?
@@ -123,8 +119,6 @@ def DefineWeightForHistograms(
             and "expression" in unc_cfg_dict["norm"][uncName].keys()
         ):
             weight_name = unc_cfg_dict["norm"][uncName]["expression"].format(
-                scale=uncScale,
-                muIso_WP_for_SF=global_params.get("muIso_WP_for_SF", "Tight"),
-                muID_WP_for_SF=global_params.get("muID_WP_for_SF", "Tight"),
+                scale=uncScale
             )
     dfw.df = dfw.df.Define(final_weight_name, weight_name)
