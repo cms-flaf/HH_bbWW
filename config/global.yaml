@@ -4,6 +4,45 @@ analysis_import: Analysis.hh_bbww
 analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
 
+bundles:
+  core:
+    period_specific: false
+    patterns:
+      - FLAF
+      - AnaProd
+      - Analysis
+      - config
+      - env.sh
+      - soft/flaf_env
+      - Corrections
+      - DeepHME
+      - Studies
+      - include
+  cmssw:
+    period_specific: false
+    patterns:
+      - soft/CMSSW_16_0_6
+  inputFileList:
+    period_specific: true
+    patterns:
+      - data/{version}/InputFileTask/{period}
+    task_requires:
+      module: FLAF.AnaProd.tasks
+      class: InputFileTask
+  AnaTupleFileList:
+    period_specific: true
+    patterns:
+      - data/{version}/AnaTupleFileListBuilderTask/{period}
+      - data/{version}/AnaTupleFileListTask/{period}
+    task_requires:
+      module: FLAF.AnaProd.tasks
+      class: AnaTupleFileListBuilderTask
+  inference:
+    period_specific: false
+    patterns:
+      - inference
+      - StatInference
+
 WLCGFileSystem:
   remotePathCacheHost: cms-flaf.cern.ch
   remotePathCachePort: 5000
