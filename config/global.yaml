@@ -101,6 +101,12 @@ corrections:
       HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
+  dy_hhbbww:
+    stages: [ AnalysisCache, HistTuple ]
+    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
+  # dy_hhbbtautau:
+  #   stages: [ AnalysisCache, HistTuple ]
+  #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -295,7 +301,7 @@ custom_categories: ""
 custom_subcategories: [ ]
 
 # Option to scale signal by some factor in HistPlotTask.py
-signal_plot_scale: 50
+signal_plot_scale: 2500
 
 # This is for Analysis Selection
 channelSelection:
@@ -328,14 +334,21 @@ categories:
   - baseline
 
 QCDRegions:
+  # - OS_Iso
+  # - SS_Iso
+  # - OS_AntiIso
+  # - SS_AntiIso
+  # - ZVeto_OS_Iso
+  # - ZPeak_OS_Iso
+  # - mbbCR_Tight
+  # - mbbCR_AntiTight
+
   - OS_Iso
-  - SS_Iso
-  - OS_AntiIso
-  - SS_AntiIso
-  - ZVeto_OS_Iso
-  - ZPeak_OS_Iso
-  - mbbCR_Tight
-  - mbbCR_AntiTight
+  - SR
+  - TT_CR
+  - DY_CR
+  - W_CR
+  - SR_mbb
 
 histTuple_selectors:
   - QCDRegions
@@ -503,7 +516,7 @@ variables:
   - fatbjet_eta
   - fatbjet_phi
   - fatbjet_mass
-  - fatbjet_XbbVsQCD
+  - fatbjet_particleNetWithMass_HbbvsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
@@ -517,9 +530,13 @@ variables:
   - dPhi_MET_dilep
   - dPhi_MET_dibjet
   - MT
+  - MT_lep1
+  - MT_lep2
+  - MT_tot
   - MT2_ll
   - MT2_bb
   - MT2_blbl
+  - MT2_blbl2
   - ll_mass
   - CosTheta_bb
 

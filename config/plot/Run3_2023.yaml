@@ -20,3 +20,7 @@ customregion_text:
   'SS_AntiIso': 'SS, Non-Isolated'
   'ZVeto_OS_Iso': 'Z Veto, OS, Isolated'
   'ZPeak_OS_Iso': 'Z Peak, OS, Isolated'
+  'SR': 'Signal Region'
+  'TT_CR': 'TT Control Region'
+  'DY_CR': 'DY Control Region'
+  'W_CR': 'W Control Region'

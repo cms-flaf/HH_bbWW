@@ -78,20 +78,65 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
     return f"{btag_weight}*{btagshape_weight}"
 
 
-def GetWeight(channel, cat, boosted_categories):  # do you need all these args?
+def GetWeight(weights_this_process):  # do you need all these args?
+    # weights_this_process is a set of corrections from global.yaml
+    # e.g. {'lumi', 'dy_hhbbww', 'trigger', 'base', 'btag', 'dy_hhbbtautau', 'JER', 'pu', 'JEC', 'ele', 'gen', 'muScaRe', 'mu', 'eleES', 'fatjet', 'xs'}
+
     # weights_to_apply = ["weight_base", "ExtraDYWeight"]
     weights_to_apply = ["weight_base"]
-    total_weight = "*".join(weights_to_apply)
+    weights_to_apply_resolved = []
+    weights_to_apply_boosted = []
+
     for lep_index in [1, 2]:
-        total_weight = f"{total_weight} * {GetLepWeight(lep_index)}"
-    total_weight = f"{total_weight} * {GetTriggerWeight()}"
-    total_weight = f"{total_weight} * weight_bTagShape_Central"
+        if "ele" in weights_this_process:
+            weights_to_apply.append(f"{GetEleWeight(lep_index)}")
+        if "mu" in weights_this_process:
+            weights_to_apply.append(f"{GetMuWeight(lep_index)}")
+    if "trigger" in weights_this_process:
+        weights_to_apply.append(f"{GetTriggerWeight()}")
+    if "btag" in weights_this_process:
+        weights_to_apply_resolved.append(f"{GetBtagShapeWeight()}")
+    if "fatjet" in weights_this_process:
+        weights_to_apply_boosted.append(f"{GetFatBtagWeight()}")
+    if "dy_hhbbtautau" in weights_this_process:
+        weights_to_apply.append(f"{GetDYbbtautauReweight()}")
+    if "dy_hhbbww" in weights_this_process:
+        weights_to_apply.append(f"{GetDYbbwwReweight()}")
+
+    # total_weight = "*".join(weights_to_apply)
+    total_weight_resolved = "*".join(weights_to_apply + weights_to_apply_resolved)
+    total_weight_boosted = "*".join(weights_to_apply + weights_to_apply_boosted)
+
+    total_weight = f"(boosted) ? {total_weight_boosted} : {total_weight_resolved}"
     return total_weight
 
 
-def GetLepWeight(lep_index):
-    weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
+def GetBtagShapeWeight():
+    BTag_weight = "weight_bTagShape_Central"
+    return BTag_weight
 
+
+def GetFatBtagWeight():
+    FatBTag_weight = "fatbjet_weight_FatJetSF_Central"
+    return FatBTag_weight
+
+
+def GetDYbbtautauReweight():
+    DY_bbtautau_weight = "weight_dy_central"
+    return DY_bbtautau_weight
+
+
+def GetDYbbwwReweight():
+    DY_bbww_weight = "weight_dy_hhbbww_central"
+    return DY_bbww_weight
+
+
+def GetEleWeight(lep_index):
+    weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
+    return weight_Ele
+
+
+def GetMuWeight(lep_index):
     # Medium pT Muon SF
     weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_LoosePFIso_TightIDCentral : 1.0)"
 
@@ -101,7 +146,7 @@ def GetLepWeight(lep_index):
     # No Muon SF
     # weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? 1.0 : 1.0)"
 
-    return f"{weight_Mu} * {weight_Ele}"
+    return weight_Mu
 
 
 def GetTriggerWeight():
@@ -242,6 +287,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
+        self.DefineAndAppend("SR", f"m_lep1_lep2 < 70 && OS_Iso")
+
+        self.DefineAndAppend("SR_mbb", f"m_lep1_lep2 < 70 && OS_Iso && mbb_SR")
+
+        self.DefineAndAppend("TT_CR", f"m_lep1_lep2 > 110 && OS_Iso")
+
+        self.DefineAndAppend("DY_CR", f"(abs(m_lep1_lep2 - 91.1876) < 10) && OS_Iso")
+
+        self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
+
     def addDYReweighting(self):
         self.DefineAndAppend(
             "ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0"
@@ -333,7 +388,7 @@ def defineAllP4(df):
     return df
 
 
-def AddDNNVariables(df):
+def AddDNNVariables(df, isData=False):
     df = df.Define("HT", f"Sum(centralJet_pt)")
 
     df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
@@ -385,13 +440,17 @@ def AddDNNVariables(df):
         "MT2_bb",
         f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
     )
+    df = df.Define("l1b1_p4", "lep1_p4 + bjet1_p4")
+    df = df.Define("l1b2_p4", "lep1_p4 + bjet2_p4")
+    df = df.Define("l2b1_p4", "lep2_p4 + bjet1_p4")
+    df = df.Define("l2b2_p4", "lep2_p4 + bjet2_p4")
     df = df.Define(
         "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet1_p4, lep2_p4 + bjet2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b1_p4.mass()) && std::isfinite(l2b2_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b1_p4, l2b2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
     df = df.Define(
         "MT2_blbl2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4 + bjet2_p4, lep2_p4 + bjet1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b2_p4.mass()) && std::isfinite(l2b1_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b2_p4, l2b1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
     )
 
     df = df.Define(
@@ -408,7 +467,21 @@ def AddDNNVariables(df):
         f"diLep_mass",
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
+    df = df.Define(
+        "m_lep1_lep2",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
+    )
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
+
+    df = df.Define(
+        f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()"
+    )  # Required name format for bbWW DY reweighting
+    if not isData:
+        df = df.Define(
+            f"pt_ll_gen", "LHE_Vpt"
+        )  # Required name format for bbtautau DY reweighting
+    df = df.Define(f"nBJets", "Nbjets")  # Name format for bbtautau DY reweighting
+
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
         "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+lep2_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
@@ -690,14 +763,14 @@ def defineJetSelections(df, isData):
 def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
+    dfForHistograms.calculateMT()
     dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
-    dfForHistograms.df = AddDNNVariables(dfForHistograms.df)
+    dfForHistograms.df = AddDNNVariables(dfForHistograms.df, isData)
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineQCDRegions()
     dfForHistograms.defineControlRegions()
     dfForHistograms.defineCategories()
     dfForHistograms.addDYReweighting()
-    dfForHistograms.calculateMT()
     dfForHistograms.defineCutFlow()
     return dfForHistograms

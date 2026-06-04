@@ -10,10 +10,6 @@ DY:
 
 DYto2L_InclusivePlusBinned:
   processors: *DY_processors_allFlavors
-  corrections:
-    Vpt:
-      type: DY
-      stages: [ 'AnalysisCache', 'HistTuple' ]
   datasets:
     - DYto2L_M_50_amcatnloFXFX
     - DYto2L_M_50_0J_amcatnloFXFX
@@ -199,7 +195,7 @@ XtoHHto2B2W_DoubleLepton:
     dataset_name_pattern: XtoYHto2B2Wto2B2L2Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_2L_${MASS}
-    name_pattern: Xto2B2W 2L ${MASS} GeV (x50)
+    name_pattern: Xto2B2W 2L ${MASS} GeV (x2500)
     to_plot:
       - [ '300' ]
       - [ '600' ]
@@ -236,7 +232,7 @@ XtoHHto2B2W_SingleLepton:
     dataset_name_pattern: XtoYHto2B2Wto2B2Q1L1Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_1L_${MASS}
-    name_pattern: Xto2B2W 1L ${MASS} GeV (x50)
+    name_pattern: Xto2B2W 1L ${MASS} GeV (x2500)
     to_plot:
       - [ '300' ]
       - [ '600' ]
@@ -438,7 +434,7 @@ custom_CI_Signal:
     dataset_name_pattern: XtoYHto2B2Wto2B2L2Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_2L_${MASS}
-    name_pattern: Xto2B2W 2L ${MASS} GeV (x50)
+    name_pattern: Xto2B2W 2L ${MASS} GeV (x2500)
     to_plot:
       - [ '300' ]
     plot_color: [ "kBlack" ]
