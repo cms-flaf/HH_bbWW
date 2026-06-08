@@ -211,8 +211,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             "tightlep_Iso",
-            # " (((lep1_legType == 1 && lep1_Electron_pfRelIso03_all < 0.15) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1 && lep2_Electron_pfRelIso03_all < 0.15) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",
-            " (((lep1_legType == 1) || (lep1_legType == 2 && lep1_Muon_pfRelIso04_all < 0.15)) || ((lep2_legType < 1 ) || ((lep2_legType == 1) || (lep2_legType == 2 && lep2_Muon_pfRelIso04_all < 0.15)) ) )",  # Remove any electron Iso since we use iso in the ID
+            """
+            ((lep1_legType != 2) || (lep1_Muon_pfRelIso04_all < 0.15)) &&
+            ((lep2_legType != 2) || (lep2_Muon_pfRelIso04_all < 0.15))
+            """,
         )
         self.df = self.df.Define(
             "Single_lep_trg",
