@@ -117,7 +117,7 @@ def GetBtagShapeWeight():
 
 
 def GetFatBtagWeight():
-    FatBTag_weight = "fatbjet_weight_FatJetSF_Central"
+    FatBTag_weight = "weight_FatJetSF_Central"
     return FatBTag_weight
 
 
