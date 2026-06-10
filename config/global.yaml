@@ -452,6 +452,14 @@ histTuple_flavors:
       - fatbjet_tau3
       - fatbjet_tau4
 
+      - fatwjet_mass_PNetCorr
+      - fatwjet_msoftdrop
+      - fatwjet_nConstituents
+      - fatwjet_tau1
+      - fatwjet_tau2
+      - fatwjet_tau3
+      - fatwjet_tau4
+
       - PuppiMET_pt
       - PuppiMET_phi
 
@@ -482,7 +490,51 @@ histTuple_flavors:
       - DeepHME_mass
       - DeepHME_mass_error
 
+      - disc_higgs_sqr
+      - disc_top_sqr
+      - hadT_mass
+      - lepT_mass
+      - WW_ptToE
+      - bb_ptToE
+      - hadT_pt
+      - lepT_pt
+      - hadT_constituentPtFrac
+      - lepT_constituentPtFrac
+      - TT_mass
+      - lepT_mT
+      - hadT_hadW_dphi
+      - hadT_hadW_deta
+      - hadT_hadW_dR
+      - hadW_leadbjet_dphi
+      - hadW_leadbjet_deta
+      - hadW_leadbjet_dR
+      - hadW_mass
+      - bb_dphi
+      - bb_deta
+      - bb_pt
+      - bb_mass
+      - hadW_lep_dphi
+      - hadW_lep_deta
+      - hadW_lep_dR
+      - hadW_lepWfromT_dphi
+      - hadW_lepWfromT_deta
+      - hadW_lepWfromT_dR
+      - hadW_lepWfromH_dphi
+      - hadW_lepWfromH_deta
+      - hadW_lepWfromH_dR
+      - Hbb_lepWfromH_dphi
+      - Hbb_lepWfromH_deta
+      - Hbb_lepWfromH_dR
+      - bjet_lep_minDr
+      - bjet_lep_minDphi
+      - bjet_lepWfromT_minDphi
+      - bjet_lepWfromH_minDphi
+      - WW_pt
+      - fatbjet_2prong
+      - fatbjet_3prong
+
       - event
+      - valid
 
     variables:
       - DeepHME_mass
@@ -555,9 +607,49 @@ variables:
   - lep2_Electron_pfRelIso03_all
   - mT_fix
 
-  # High Level
-  - DeepHME_mass
-  - DeepHME_mass_error
+  # High Level Single Lepton
+  # need to be added to hist config
+  # I will comment out them for now
+  # - disc_higgs_sqr
+  # - disc_top_sqr
+  # - hadT_mass
+  # - lepT_mass
+  # - WW_ptToE
+  # - bb_ptToE
+  # - hadT_pt
+  # - lepT_pt
+  # - hadT_constituentPtFrac
+  # - lepT_constituentPtFrac
+  # - TT_mass
+  # - lepT_mT
+  # - hadT_hadW_dphi
+  # - hadT_hadW_deta
+  # - hadT_hadW_dR
+  # - hadW_leadbjet_dphi
+  # - hadW_leadbjet_deta
+  # - hadW_leadbjet_dR
+  # - hadW_mass
+  # - bb_dphi
+  # - bb_deta
+  # - bb_pt
+  # - bb_mass
+  # - hadW_lep_dphi
+  # - hadW_lep_deta
+  # - hadW_lep_dR
+  # - hadW_lepWfromT_dphi
+  # - hadW_lepWfromT_deta
+  # - hadW_lepWfromT_dR
+  # - hadW_lepWfromH_dphi
+  # - hadW_lepWfromH_deta
+  # - hadW_lepWfromH_dR
+  # - Hbb_lepWfromH_dphi
+  # - Hbb_lepWfromH_deta
+  # - Hbb_lepWfromH_dR
+  # - bjet_lep_minDr
+  # - bjet_lep_minDphi
+  # - bjet_lepWfromT_minDphi
+  # - bjet_lepWfromH_minDphi
+  # - WW_pt
 
   - DNN_M300_Signal
   - DNN_M400_Signal
