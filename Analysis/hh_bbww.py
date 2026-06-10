@@ -183,9 +183,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "WhadCand_isValid", "(wjet1_isValid && wjet2_isValid) || fatwjet_isValid"
         )
         self.DefineAndAppend("inclusive", "HbbCand_isValid && (DL || WhadCand_isValid)")
-        self.DefineAndAppend(
-            "boosted", "inclusive && (fatbjet_isValid || fatwjet_isValid)"
-        )
+        self.DefineAndAppend("boosted", "inclusive && (fatbjet_isValid || fatwjet_isValid)")
+        self.DefineAndAppend("boosted_H", "inclusive && (fatbjet_isValid && !fatwjet_isValid)")
+        self.DefineAndAppend("boosted_W", "inclusive && (!fatbjet_isValid && fatwjet_isValid)")
+        self.DefineAndAppend("boosted_HW", "inclusive && (fatbjet_isValid && fatwjet_isValid)")
         self.DefineAndAppend("resolved", "inclusive && !boosted")
         self.DefineAndAppend("res2b", "resolved && bjet1_isBTagged && bjet2_isBTagged")
         self.DefineAndAppend("recovery", "resolved && !res2b && bjet1_isBTagged")
@@ -482,7 +483,11 @@ def AddDNNVariables(df, isData=False):
         df = df.Define(
             f"pt_ll_gen", "LHE_Vpt"
         )  # Required name format for bbtautau DY reweighting
-    df = df.Define(f"nBJets", "Nbjets")  # Name format for bbtautau DY reweighting
+    if isData:
+        df = df.Define(
+            f"pt_ll_gen", "-1.0"
+        )  # Required name format for bbtautau DY reweighting
+    df = df.Define(f"nBJets", "int(bjet1_isValid) + int(bjet2_isValid)")  # Name format for bbtautau DY reweighting
 
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
@@ -663,7 +668,7 @@ def defineJetSelections(df, isData):
         "fatwjet_isValid ? FatWJet_p4[0] : LorentzVectorM()",
     )
 
-    df = df.Define("Njets", "centralJet_pt.size()")
+    df = df.Define("Njets", "centralJet_pt.size()") # Used in DY corrections as well
     df = df.Define("AllTrue_Jet", "centralJet_pt > 0.0")
     # Create a mask removing Jets that are chosen as the BJets
     df = df.Define(
