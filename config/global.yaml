@@ -114,7 +114,7 @@ corrections:
   #   stages: [ AnalysisCache, HistTuple ]
   #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
   #   njets_branch: Njets # Use nCentralJets, not raw nJet
-  #   ntags_branch: nBJets
+  #   ntags_branch: nBTaggedJets
   #   pt_ll_gen: ll_pt_gen
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
@@ -615,7 +615,7 @@ variables:
   # Variables for DY corrections
   - nJet
   - Njets
-  - nBJets
+  - nBTaggedJets
   - ll_pt
   - ll_pt_gen
 

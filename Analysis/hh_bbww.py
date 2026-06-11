@@ -410,12 +410,11 @@ def AddDNNVariablesDL(df, isData=False):
     if not isData:
         df = df.Define(
             f"ll_pt_gen", "LHE_Vpt"
-        )  # Required name format for bbtautau DY reweighting
-    if isData:
+        )  # Used in bbtautau DY reweight, name configured in global.yaml
+    else:
         df = df.Define(
             f"ll_pt_gen", "-1.0"
-        )  # Required name format for bbtautau DY reweighting
-    df = df.Define(f"nBJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)")  # Name format for bbtautau DY reweighting
+        )  # Not required for reweight, but needed to make histograms of the variable
 
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
@@ -531,6 +530,7 @@ def defineJetSelections(df, isData):
 
     df = df.Define("bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0")
     df = df.Define("bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0")
+    df = df.Define(f"nBTaggedJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)")  # Used in bbtautau DY reweight, name configured in global.yaml
 
     df = df.Define("Nfatbjets", "FatBJet_pt.size()")
     df = df.Define("fatbjet_isValid", "(Nfatbjets > 0)")

@@ -223,6 +223,88 @@ bjet2_btagPNetB:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+########## wjet BEGIN ##########
+
+wjet1_phi:
+  x_bins: "50|-3.2:3.2"
+  x_title: wjet1_phi
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet2_phi:
+  x_bins: "50|-3.2:3.2"
+  x_title: wjet2_phi
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet1_eta:
+  x_bins: "50|-2.5:2.5"
+  x_title: wjet1_eta
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet2_eta:
+  x_bins: "50|-2.5:2.5"
+  x_title: wjet2_eta
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet1_pt:
+  x_bins: "50|20:500"
+  x_title: wjet1_pt [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet2_pt:
+  x_bins: "50|20:500"
+  x_title: wjet2_pt [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet1_mass:
+  x_bins: "20|0:200"
+  x_title: wjet1_mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet2_mass:
+  x_bins: "20|0:200"
+  x_title: wjet2_mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet1_wtagPNetB:
+  x_bins: "10|0.0:1.0"
+  x_title: bjet1 btagPNetB
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+wjet2_wtagPNetB:
+  x_bins: "10|0.0:1.0"
+  x_title: bjet2 btagPNetB
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 ########## fatbjet BEGIN ##########
 
 fatbjet_phi:
@@ -268,6 +350,64 @@ fatbjet_XbbVsQCD:
 fatbjet_particleNetWithMass_HbbvsQCD:
   x_bins: "10|0.0:1.0"
   x_title: fatbjet HbbVsQCD
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+########## fatwjet BEGIN ##########
+
+fatwjet_phi:
+  x_bins: "50|-3.2:3.2"
+  x_title: fatwjet_phi
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_eta:
+  x_bins: "50|-2.5:2.5"
+  x_title: fatwjet eta
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_pt:
+  x_bins: "50|20:500"
+  x_title: fatwjet pt [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_mass:
+  x_bins: "20|0:200"
+  x_title: fatwjet mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_XbbVsQCD:
+  x_bins: "10|0.0:1.0"
+  x_title: fatwjet XbbVsQCD
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_particleNetWithMass_HbbvsQCD:
+  x_bins: "10|0.0:1.0"
+  x_title: fatwjet HbbVsQCD
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatwjet_particleNetWithMass_WvsQCD:
+  x_bins: "10|0.0:1.0"
+  x_title: fatwjet WvsQCD
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
