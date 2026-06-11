@@ -160,7 +160,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCutFlow(self):
         self.df = self.df.Define("cutflow", "int(0)")
-        cutflow_cuts = ["event_selection", "OS_Iso", "Zveto || OppFlavor", "mbb_SR"]
+        cutflow_cuts = ["event_selection", "OS_Iso", "SR", "SR_mbb", "inclusive", "res2b"]
         for i, cut in enumerate(cutflow_cuts):
             self.df = self.df.Redefine(
                 "cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow"
@@ -262,68 +262,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
 
     def defineControlRegions(self):
-        # Define Single Muon Control Region (W Region) -- Require Muon + High MT (>50)
-        # Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
-        self.DefineAndAppend(
-            "Zpeak",
-            f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) < 10)",
-        )
-        self.DefineAndAppend(
-            "Zveto",
-            # f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) > 10)",
-            f"(lep1_legType == lep2_legType ) && (ll_mass < 70)",
-        )
-
-        self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
-
-        self.DefineAndAppend("ZVeto_OS_Iso", f"(Zveto || OppFlavor) && OS_Iso")
-
-        self.DefineAndAppend("ZVeto_SS_Iso", f"(Zveto || OppFlavor) && SS_Iso")
-
-        self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
-
-        self.DefineAndAppend(
-            "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && ll_mass > 100 "
-        )
-        self.DefineAndAppend(
-            "mbb_SR",
-            f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150",
-        )
-        self.DefineAndAppend(
-            "Lep1Lep2Jet1Jet2_mass",
-            f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
-        )
-        self.DefineAndAppend(
-            "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
-        )
-
         self.DefineAndAppend("SR", f"ll_mass < 70 && OS_Iso")
-
         self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
-
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
-
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
-
         self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
-
-    def addDYReweighting(self):
-        self.DefineAndAppend(
-            "ExtraDYWeight_ee_res2b", f"channelId == 11  && res2b ? 1.4 : 1.0"
-        )
-        self.DefineAndAppend(
-            "ExtraDYWeight_ee_recovery", f"channelId == 11 && recovery ? 1.13 : 1.0"
-        )
-        self.DefineAndAppend(
-            "ExtraDYWeight_mumu_res2b", f"channelId == 22 && res2b ? 1.39 : 1.0"
-        )
-        self.DefineAndAppend(
-            "ExtraDYWeight_mumu_recovery", f"channelId == 22 && recovery ? 1.12 : 1.0"
-        )
-        self.DefineAndAppend(
-            "ExtraDYWeight",
-            f"ExtraDYWeight_ee_res2b * ExtraDYWeight_ee_recovery * ExtraDYWeight_mumu_res2b * ExtraDYWeight_mumu_recovery",
-        )
 
     def calculateMT(self):
         self.df = self.df.Define(
@@ -399,6 +342,14 @@ def defineAllP4(df):
 
 
 def AddDNNVariablesDL(df, isData=False):
+    self.DefineAndAppend(
+        "Lep1Lep2Jet1Jet2_mass",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
+    )
+    self.DefineAndAppend(
+        "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
+    )
+
     df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
     df = df.Define(
         "dR_dilep_dibjet",
@@ -454,27 +405,15 @@ def AddDNNVariablesDL(df, isData=False):
         f"ll_mass",
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
-    # df = df.Define(
-    #     f"diLep_mass",
-    #     f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
-    # )
-    # df = df.Define(
-    #     "m_lep1_lep2",
-    #     f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
-    # )
-    df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
-    df = df.Define(f"ll_pt", "(lep1_p4+lep2_p4).Pt()")
+    df = df.Define(f"ll_pt", "(lep1_p4+lep2_p4).Pt()") # Used in bbWW DY reweight, name configured in global.yaml
 
-    df = df.Define(
-        f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()"
-    )  # Required name format for bbWW DY reweighting
     if not isData:
         df = df.Define(
-            f"pt_ll_gen", "LHE_Vpt"
+            f"ll_pt_gen", "LHE_Vpt"
         )  # Required name format for bbtautau DY reweighting
     if isData:
         df = df.Define(
-            f"pt_ll_gen", "-1.0"
+            f"ll_pt_gen", "-1.0"
         )  # Required name format for bbtautau DY reweighting
     df = df.Define(f"nBJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)")  # Name format for bbtautau DY reweighting
 
@@ -1660,6 +1599,5 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     # this is a placeholder, calling without DeepHME loaded will result in a crash
     # also needs to be disabled for CI
     # dfForHistograms.df = addDeepHMERelErr(dfForHistograms.df)
-    dfForHistograms.addDYReweighting()
     dfForHistograms.defineCutFlow()
     return dfForHistograms

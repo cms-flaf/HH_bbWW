@@ -22,7 +22,7 @@ features: &id001
   - m_bbllmet
   - m_llmet
   - pt_bb
-  - pt_ll
+  - ll_pt
   - ll_mass
   - CosTheta_bb
   - bjet1_pt

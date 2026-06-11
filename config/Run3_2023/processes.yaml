@@ -146,7 +146,7 @@ W:
 
 VV_inclusive:
   name: "VV"
-  color: "kGreen"
+  color: "kViolet+1"
   datasets:
     - WW
     - WZ
@@ -154,7 +154,7 @@ VV_inclusive:
 
 VV:
   name: "VV"
-  color: "kGreen"
+  color: "kViolet+1"
   datasets:
     - WWto2L2Nu_powheg
     - WWto4Q_powheg
@@ -195,7 +195,7 @@ XtoHHto2B2W_DoubleLepton:
     dataset_name_pattern: XtoYHto2B2Wto2B2L2Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_2L_${MASS}
-    name_pattern: Xto2B2W 2L ${MASS} GeV (x2500)
+    name_pattern: Xto2B2W 2L ${MASS} GeV (x100)
     to_plot:
       - [ '300' ]
       - [ '600' ]
@@ -232,7 +232,7 @@ XtoHHto2B2W_SingleLepton:
     dataset_name_pattern: XtoYHto2B2Wto2B2Q1L1Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_1L_${MASS}
-    name_pattern: Xto2B2W 1L ${MASS} GeV (x2500)
+    name_pattern: Xto2B2W 1L ${MASS} GeV (x100)
     to_plot:
       - [ '300' ]
       - [ '600' ]
@@ -434,7 +434,7 @@ custom_CI_Signal:
     dataset_name_pattern: XtoYHto2B2Wto2B2L2Nu_MX_(\d+)_MY_125
     parameters: [ MASS ]
     process_name: XtoHHto2B2W_2L_${MASS}
-    name_pattern: Xto2B2W 2L ${MASS} GeV (x2500)
+    name_pattern: Xto2B2W 2L ${MASS} GeV (x100)
     to_plot:
       - [ '300' ]
     plot_color: [ "kBlack" ]
