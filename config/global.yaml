@@ -528,8 +528,8 @@ histTuple_flavors:
       - Hbb_lepWfromH_dphi
       - Hbb_lepWfromH_deta
       - Hbb_lepWfromH_dR
-      - bjet_lep_minDr
-      - bjet_lep_minDphi
+      - lep1_bjets_minDr
+      - lep1_bjets_minDphi
       - bjet_lepWfromT_minDphi
       - bjet_lepWfromH_minDphi
       - WW_pt
@@ -661,8 +661,8 @@ variables:
   # - Hbb_lepWfromH_dphi
   # - Hbb_lepWfromH_deta
   # - Hbb_lepWfromH_dR
-  # - bjet_lep_minDr
-  # - bjet_lep_minDphi
+  # - lep1_bjets_minDr
+  # - lep1_bjets_minDphi
   # - bjet_lepWfromT_minDphi
   # - bjet_lepWfromH_minDphi
   # - WW_pt

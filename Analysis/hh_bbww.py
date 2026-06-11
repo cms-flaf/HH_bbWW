@@ -1451,7 +1451,7 @@ def AddDNNVariablesSL(df, isData=False):
     )
 
     df = df.Define(
-        "bjet_lep_minDr",
+        "lep1_bjets_minDr",
         """
             RVecF drs;
             if (fatbjet_isValid)
@@ -1469,7 +1469,7 @@ def AddDNNVariablesSL(df, isData=False):
     )
 
     df = df.Define(
-        "bjet_lep_minDphi",
+        "lep1_bjets_minDphi",
         """
             RVecF dphis;
             if (fatbjet_isValid)

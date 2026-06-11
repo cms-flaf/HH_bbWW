@@ -473,6 +473,15 @@ ll_pt_gen:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+ll_dphi:
+  x_bins: "10|0:4.0"  # Since Δφ ranges from 0 to π
+  # x_bins: [ 0.0, 0.32, 0.64, 0.96, 1.28, 1.6, 1.92, 2.24, 2.56, 2.88, 3.14 ]
+  x_title: "dPhi between lepton 1 and lepton 2"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 ########## bb BEGIN ##########
 
 bb_pt:
@@ -512,6 +521,116 @@ bb_CosTheta:
   x_title: CosTheta (bb)
   y_title: Events
   use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_dphi:
+  x_bins: "10|0:4.0"
+  x_title: "dPhi between bjet 1 and bjet 2"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_deta:
+  x_bins: "20|-5.0:5.0"
+  x_title: "dEta between bjet 1 and bjet 2"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_ptToE:
+  x_bins: "20|0.0:1.0"
+  x_title: bb pt / E
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+########## WW BEGIN ##########
+
+WW_pt:
+  x_bins: "50|20:500"
+  x_title: WW pt [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+WW_ptToE:
+  x_bins: "20|0.0:1.0"
+  x_title: WW pt / E
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+
+
+########## hadT BEGIN ##########
+
+hadT_constituentPtFrac:
+  x_bins: "20|0.0:1.0"
+  x_title: had top pT / sum(had top q constituents pT)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+hadT_mass:
+  x_bins: "100|0:300"
+  x_title: hadronic top mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+hadT_pt:
+  x_bins: "50|20:500"
+  x_title: hadronic top pt [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+hadW_mass:
+  x_bins: "100|0:300"
+  x_title: hadronic W mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+lepT_constituentPtFrac:
+  x_bins: "20|0.0:1.0"
+  x_title: leptonic top pT / sum(leptonic top q constituents pT)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+lepT_mass:
+  x_bins: "100|0:300"
+  x_title: leptonic top mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+lepT_mT:
+  x_bins: "100|0:200"
+  x_title: leptonic top MT [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+lepT_pt:
+  x_bins: "50|20:500"
+  x_title: leptonic top pt [GeV]
+  y_title: Events
+  use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
@@ -632,16 +751,31 @@ Hbb_lepWfromH_dR:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-########## dPhi BEGIN ##########
-
-ll_dphi:
-  x_bins: "10|0:4.0"  # Since Δφ ranges from 0 to π
-  # x_bins: [ 0.0, 0.32, 0.64, 0.96, 1.28, 1.6, 1.92, 2.24, 2.56, 2.88, 3.14 ]
-  x_title: "dPhi between lepton 1 and lepton 2"
+lep1_bjets_minDr:
+  x_bins: "25|0:5.0"
+  x_title: "min(dR) between lep1 and bjets"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+Hbb_lepWfromH_dR:
+  x_bins: "25|0:5.0"
+  x_title: "dR between Hbb and W-lepton"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+hadT_hadW_dR:
+  x_bins: "25|0:5.0"
+  x_title: "dR hadronic T and hadronic W"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+########## dPhi BEGIN ##########
 
 dPhi_jet1_jet2:
   x_bins: "10|0:4.0"  # Δφ ranges from 0 to π (between two jets)
@@ -723,14 +857,6 @@ nBJets:
 HT:
   x_bins: "100|40:1000"
   x_title: HT [GeV]
-  y_title: Events
-  use_log_y: False
-  max_y_sf: 1.5
-  divide_by_bin_width: False
-
-WW_pt:
-  x_bins: "50|20:500"
-  x_title: WW_pt [GeV]
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
