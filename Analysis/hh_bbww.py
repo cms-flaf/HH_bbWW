@@ -160,7 +160,14 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCutFlow(self):
         self.df = self.df.Define("cutflow", "int(0)")
-        cutflow_cuts = ["event_selection", "OS_Iso", "SR", "SR_mbb", "inclusive", "res2b"]
+        cutflow_cuts = [
+            "event_selection",
+            "OS_Iso",
+            "SR",
+            "SR_mbb",
+            "inclusive",
+            "res2b",
+        ]
         for i, cut in enumerate(cutflow_cuts):
             self.df = self.df.Redefine(
                 "cutflow", f"{cut} && cutflow >= {i} ? cutflow+1 : cutflow"
@@ -351,12 +358,18 @@ def AddDNNVariablesDL(df, isData=False):
 
     # ll variables
     df = df.Define("ll_mass", "(lep1_p4+lep2_p4).mass()")
-    df = df.Define("ll_pt", "(lep1_p4+lep2_p4).Pt()") # Used in bbWW DY reweight, name configured in global.yaml
+    df = df.Define(
+        "ll_pt", "(lep1_p4+lep2_p4).Pt()"
+    )  # Used in bbWW DY reweight, name configured in global.yaml
 
     if not isData:
-        df = df.Define("ll_pt_gen", "LHE_Vpt")  # Used in bbtautau DY reweight, name configured in global.yaml
+        df = df.Define(
+            "ll_pt_gen", "LHE_Vpt"
+        )  # Used in bbtautau DY reweight, name configured in global.yaml
     else:
-        df = df.Define("ll_pt_gen", "-1.0")  # Not required for reweight, but needed to make histograms of the variable
+        df = df.Define(
+            "ll_pt_gen", "-1.0"
+        )  # Not required for reweight, but needed to make histograms of the variable
 
     # mass variables
     df = df.Define(
@@ -373,19 +386,41 @@ def AddDNNVariablesDL(df, isData=False):
 
     # dR variables
     df = df.Define("ll_dR", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
-    df = df.Define("ll_bb_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (Hbb_p4))")
-    df = df.Define("ll_jj_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (hadW_p4))")
+    df = df.Define(
+        "ll_bb_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (Hbb_p4))"
+    )
+    df = df.Define(
+        "ll_jj_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (hadW_p4))"
+    )
 
     # dPhi variables
     df = df.Define("ll_dphi", f"ROOT::Math::VectorUtil::DeltaPhi(lep1_p4,lep2_p4)")
-    df = df.Define("met_ll_dphi", f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))")
+    df = df.Define(
+        "met_ll_dphi",
+        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))",
+    )
 
     # MT and MT2 variables
-    df = df.Define("MT2", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",)
-    df = df.Define("MT2_ll", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.")
-    df = df.Define("MT2_bb", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.")
-    df = df.Define("MT2_blbl", f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b1_p4.mass()) && std::isfinite(l2b2_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b1_p4, l2b2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.")
-    df = df.Define("MT2_blbl2", f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b2_p4.mass()) && std::isfinite(l2b1_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b2_p4, l2b1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.")
+    df = df.Define(
+        "MT2",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",
+    )
+    df = df.Define(
+        "MT2_ll",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.",
+    )
+    df = df.Define(
+        "MT2_bb",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
+    )
+    df = df.Define(
+        "MT2_blbl",
+        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b1_p4.mass()) && std::isfinite(l2b2_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b1_p4, l2b2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+    )
+    df = df.Define(
+        "MT2_blbl2",
+        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b2_p4.mass()) && std::isfinite(l2b1_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b2_p4, l2b1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
+    )
 
     # Extras
     df = df.Define(
@@ -410,9 +445,13 @@ def AddDNNVariablesDL(df, isData=False):
 
     # fixed PT values for mT_fix (decorrelated from lepton pt)
     # 35 GeV for muons, 30 GeV for electrons
-    df = df.Define("pT_fix", "(lep1_legType == static_cast<int>(Leg::mu) ? 35.0 : 30.0)")
+    df = df.Define(
+        "pT_fix", "(lep1_legType == static_cast<int>(Leg::mu) ? 35.0 : 30.0)"
+    )
     # dphi between lepton and MET using VectorUtil
-    df = df.Define("dphi_fix", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))")
+    df = df.Define(
+        "dphi_fix", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))"
+    )
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
 
@@ -496,7 +535,9 @@ def defineJetSelections(df, isData):
 
     df = df.Define("bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0")
     df = df.Define("bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0")
-    df = df.Define(f"nBTaggedJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)")  # Used in bbtautau DY reweight, name configured in global.yaml
+    df = df.Define(
+        f"nBTaggedJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)"
+    )  # Used in bbtautau DY reweight, name configured in global.yaml
 
     df = df.Define("Nfatbjets", "FatBJet_pt.size()")
     df = df.Define("fatbjet_isValid", "(Nfatbjets > 0)")
