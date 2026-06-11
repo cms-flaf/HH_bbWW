@@ -94,7 +94,7 @@ lep2_Muon_pfRelIso04_all:
   use_log_y: True
   max_y_sf: 1.5
   divide_by_bin_width: False
-  
+
 lep1_Electron_pfRelIso03_all:
   x_bins: "50|0:0.5"
   x_title: Ele1_Iso [GeV]
@@ -688,10 +688,6 @@ Lep1Lep2Jet1Jet2_mass:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-
-
-
-
 bbllmet_mass:
   x_bins: "1000|0:2500"
   x_title: m(bbllmet)
@@ -700,7 +696,6 @@ bbllmet_mass:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-
 Njets:
   x_bins: "10|0:10"
   x_title: Njets
@@ -708,6 +703,7 @@ Njets:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
 nJet:
   x_bins: "10|0:10"
   x_title: nJet (raw?)
@@ -715,6 +711,7 @@ nJet:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
 nBJets:
   x_bins: "10|0:10"
   x_title: nBjets (loose)
@@ -722,6 +719,7 @@ nBJets:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
 HT:
   x_bins: "100|40:1000"
   x_title: HT [GeV]
@@ -737,7 +735,6 @@ WW_pt:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
-
 
 ########## DNN and HME BEGIN ##########
 
