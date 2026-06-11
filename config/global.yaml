@@ -109,13 +109,13 @@ corrections:
     stages: [ AnalysisCache, HistTuple ]
     processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
     njets_branch: Njets # Use nCentralJets, not raw nJet
-    pt_ll: pt_lep1_lep2
+    pt_ll: ll_pt
   # dy_hhbbtautau:
   #   stages: [ AnalysisCache, HistTuple ]
   #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
   #   njets_branch: Njets # Use nCentralJets, not raw nJet
   #   ntags_branch: nBJets
-  #   pt_ll_gen: pt_ll_gen
+  #   pt_ll_gen: ll_pt_gen
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -583,6 +583,8 @@ variables:
   - fatbjet_particleNetWithMass_HbbvsQCD
 
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
+  - bb_pt
+  - bb_mass
 
   - HT
   - dR_dilep
@@ -614,8 +616,8 @@ variables:
   - nJet
   - Njets
   - nBJets
-  - pt_lep1_lep2
-  - pt_ll_gen
+  - ll_pt
+  - ll_pt_gen
 
   # High Level
   - DeepHME_mass
@@ -626,27 +628,27 @@ variables:
   # I will comment out them for now
   # - disc_higgs_sqr
   # - disc_top_sqr
-  - hadT_mass
-  - lepT_mass
-  - WW_ptToE
-  - bb_ptToE
-  - hadT_pt
-  - lepT_pt
-  - hadT_constituentPtFrac
-  - lepT_constituentPtFrac
+  # - hadT_mass
+  # - lepT_mass
+  # - WW_ptToE
+  # - bb_ptToE
+  # - hadT_pt
+  # - lepT_pt
+  # - hadT_constituentPtFrac
+  # - lepT_constituentPtFrac
   # - TT_mass
-  - lepT_mT
+  # - lepT_mT
   # - hadT_hadW_dphi
   # - hadT_hadW_deta
-  - hadT_hadW_dR
+  # - hadT_hadW_dR
   # - hadW_leadbjet_dphi
   # - hadW_leadbjet_deta
   # - hadW_leadbjet_dR
-  - hadW_mass
-  - bb_dphi
-  - bb_deta
-  - bb_pt
-  - bb_mass
+  # - hadW_mass
+  # - bb_dphi
+  # - bb_deta
+  # - bb_pt
+  # - bb_mass
   # - hadW_lep_dphi
   # - hadW_lep_deta
   # - hadW_lep_dR
@@ -658,15 +660,12 @@ variables:
   # - hadW_lepWfromH_dR
   # - Hbb_lepWfromH_dphi
   # - Hbb_lepWfromH_deta
-  - Hbb_lepWfromH_dR
-  - bjet_lep_minDr
+  # - Hbb_lepWfromH_dR
+  # - bjet_lep_minDr
   # - bjet_lep_minDphi
   # - bjet_lepWfromT_minDphi
   # - bjet_lepWfromH_minDphi
-  - WW_pt
-  - wjet1_pt
-  - wjet2_pt
-  - fatwjet_pt
+  # - WW_pt
 
   - DNN_M300_Signal
   - DNN_M400_Signal

@@ -448,7 +448,6 @@ def AddDNNVariablesDL(df, isData=False):
         "ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep2_p4) ? (bjet2_p4 + lep1_p4).M() : (bjet2_p4 + lep2_p4).M()",
     )
 
-    df = df.Define("pt_bb", "(bjet1_p4 + bjet2_p4).Pt()")
     df = df.Define("m_llmet", "(lep1_p4 + lep2_p4 + PuppiMET_p4).M()")
     df = df.Define(
         "m_bbllmet", "(bjet1_p4 + bjet2_p4 + lep1_p4 + lep2_p4 + PuppiMET_p4).M()"

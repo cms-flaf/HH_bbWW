@@ -21,7 +21,7 @@ features: &id001
   - m_b2leps
   - m_bbllmet
   - m_llmet
-  - pt_bb
+  - bb_pt
   - ll_pt
   - ll_mass
   - CosTheta_bb
