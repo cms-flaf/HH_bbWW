@@ -233,7 +233,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
         self.df = self.df.Define(
             "event_selection",
-            "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  diLep_mass > 12 )",
+            "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
         )
 
     def defineQCDRegions(self):
@@ -266,12 +266,12 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         # Define Double Muon Control Region (Z Region) -- Require lep1 lep2 are opposite sign muons, and combined mass is within 10GeV of 91
         self.DefineAndAppend(
             "Zpeak",
-            f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) < 10)",
+            f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) < 10)",
         )
         self.DefineAndAppend(
             "Zveto",
-            # f"(lep1_legType == lep2_legType ) && (abs(diLep_mass - 91.1876) > 10)",
-            f"(lep1_legType == lep2_legType ) && (diLep_mass < 70)",
+            # f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) > 10)",
+            f"(lep1_legType == lep2_legType ) && (ll_mass < 70)",
         )
 
         self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
@@ -283,7 +283,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("ZPeak_OS_Iso", f"(Zpeak || OppFlavor) && OS_Iso")
 
         self.DefineAndAppend(
-            "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && diLep_mass > 100 "
+            "TTbar_CR", f"OS_Iso && lep1_legType == lep2_legType && ll_mass > 100 "
         )
         self.DefineAndAppend(
             "mbb_SR",
@@ -297,13 +297,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
         )
 
-        self.DefineAndAppend("SR", f"m_lep1_lep2 < 70 && OS_Iso")
+        self.DefineAndAppend("SR", f"ll_mass < 70 && OS_Iso")
 
-        self.DefineAndAppend("SR_mbb", f"m_lep1_lep2 < 70 && OS_Iso && mbb_SR")
+        self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
 
-        self.DefineAndAppend("TT_CR", f"m_lep1_lep2 > 110 && OS_Iso")
+        self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
 
-        self.DefineAndAppend("DY_CR", f"(abs(m_lep1_lep2 - 91.1876) < 10) && OS_Iso")
+        self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
 
         self.DefineAndAppend("W_CR", f"MT_lep1 > 50 && Iso")
 
@@ -454,15 +454,16 @@ def AddDNNVariablesDL(df, isData=False):
         f"ll_mass",
         f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
     )
-    df = df.Define(
-        f"diLep_mass",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
-    )
-    df = df.Define(
-        "m_lep1_lep2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
-    )
+    # df = df.Define(
+    #     f"diLep_mass",
+    #     f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
+    # )
+    # df = df.Define(
+    #     "m_lep1_lep2",
+    #     f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
+    # )
     df = df.Define(f"pt_ll", "(lep1_p4+lep2_p4).Pt()")
+    df = df.Define(f"ll_pt", "(lep1_p4+lep2_p4).Pt()")
 
     df = df.Define(
         f"pt_lep1_lep2", "(lep1_p4+lep2_p4).Pt()"
@@ -475,7 +476,7 @@ def AddDNNVariablesDL(df, isData=False):
         df = df.Define(
             f"pt_ll_gen", "-1.0"
         )  # Required name format for bbtautau DY reweighting
-    df = df.Define(f"nBJets", "int(bjet1_isValid) + int(bjet2_isValid)")  # Name format for bbtautau DY reweighting
+    df = df.Define(f"nBJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)")  # Name format for bbtautau DY reweighting
 
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
