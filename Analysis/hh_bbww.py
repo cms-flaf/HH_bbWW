@@ -270,13 +270,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def calculateMT(self):
         self.df = self.df.Define(
-            "MT_lep1", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
+            "lep1_MT", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
-            "MT_lep2", f"(lep2_legType > 0) ? Calculate_MT(lep2_p4, PuppiMET_p4) : 0.0"
+            "lep2_MT", f"(lep2_legType > 0) ? Calculate_MT(lep2_p4, PuppiMET_p4) : 0.0"
         )
         self.df = self.df.Define(
-            "MT_tot",
+            "total_MT",
             f"(lep1_legType > 0 && lep2_legType > 0) ? Calculate_TotalMT(lep1_p4, lep2_p4, PuppiMET_p4) : 0.0",
         )
 
@@ -342,80 +342,56 @@ def defineAllP4(df):
 
 
 def AddDNNVariablesDL(df, isData=False):
-    self.DefineAndAppend(
-        "Lep1Lep2Jet1Jet2_mass",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
-    )
-    self.DefineAndAppend(
-        "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
-    )
 
-    df = df.Define("dR_dilep", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
-    df = df.Define(
-        "dR_dilep_dibjet",
-        f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (bjet1_p4+bjet2_p4))",
-    )
-    df = df.Define(
-        "dR_dilep_dijet",
-        f"(wjet1_isValid && wjet2_isValid) ? ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (wjet1_p4+wjet2_p4)) : -100.",
-    )
-    df = df.Define(
-        "dPhi_lep1_lep2", f"ROOT::Math::VectorUtil::DeltaPhi(lep1_p4,lep2_p4)"
-    )
-    df = df.Define(
-        "dPhi_MET_dilep",
-        f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))",
-    )
-
-    df = df.Define(
-        "MT2",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",
-    )
-
-    # Functional form of MT2 claculation
-    df = df.Define(
-        "MT2_ll",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.",
-    )
-    df = df.Define(
-        "MT2_bb",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.",
-    )
+    # Define needed p4
     df = df.Define("l1b1_p4", "lep1_p4 + bjet1_p4")
     df = df.Define("l1b2_p4", "lep1_p4 + bjet2_p4")
     df = df.Define("l2b1_p4", "lep2_p4 + bjet1_p4")
     df = df.Define("l2b2_p4", "lep2_p4 + bjet2_p4")
-    df = df.Define(
-        "MT2_blbl",
-        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b1_p4.mass()) && std::isfinite(l2b2_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b1_p4, l2b2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
-    )
-    df = df.Define(
-        "MT2_blbl2",
-        f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b2_p4.mass()) && std::isfinite(l2b1_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b2_p4, l2b1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.",
-    )
 
-    df = df.Define(
-        "CosTheta_bb",
-        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(bjet1_p4, bjet2_p4) : -100.",
-    )
-
-    # repeated variables
-    df = df.Define("diLep_p4", "(lep1_p4+lep2_p4)")
-    df = df.Define(
-        f"ll_mass",
-        f"(lep1_legType > 0 && lep2_legType > 0) ? (lep1_p4+lep2_p4).mass() : -1.0",
-    )
-    df = df.Define(f"ll_pt", "(lep1_p4+lep2_p4).Pt()") # Used in bbWW DY reweight, name configured in global.yaml
+    # ll variables
+    df = df.Define("ll_mass", "(lep1_p4+lep2_p4).mass()")
+    df = df.Define("ll_pt", "(lep1_p4+lep2_p4).Pt()") # Used in bbWW DY reweight, name configured in global.yaml
 
     if not isData:
-        df = df.Define(
-            f"ll_pt_gen", "LHE_Vpt"
-        )  # Used in bbtautau DY reweight, name configured in global.yaml
+        df = df.Define("ll_pt_gen", "LHE_Vpt")  # Used in bbtautau DY reweight, name configured in global.yaml
     else:
-        df = df.Define(
-            f"ll_pt_gen", "-1.0"
-        )  # Not required for reweight, but needed to make histograms of the variable
+        df = df.Define("ll_pt_gen", "-1.0")  # Not required for reweight, but needed to make histograms of the variable
 
+    # mass variables
+    df = df.Define(
+        "b1leps_mass",
+        "ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep2_p4) ? (bjet1_p4 + lep1_p4).M() : (bjet1_p4 + lep2_p4).M()",
+    )
+    df = df.Define(
+        "b2leps_mass",
+        "ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep2_p4) ? (bjet2_p4 + lep1_p4).M() : (bjet2_p4 + lep2_p4).M()",
+    )
+
+    df = df.Define("llmet_mass", "(lep1_p4 + lep2_p4 + PuppiMET_p4).M()")
+    df = df.Define("bbllmet_mass", "(Hbb_p4 + lep1_p4 + lep2_p4 + PuppiMET_p4).M()")
+
+    # dR variables
+    df = df.Define("ll_dR", f"ROOT::Math::VectorUtil::DeltaR(lep1_p4, lep2_p4)")
+    df = df.Define("ll_bb_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (Hbb_p4))")
+    df = df.Define("ll_jj_dR", f"ROOT::Math::VectorUtil::DeltaR((lep1_p4+lep2_p4), (hadW_p4))")
+
+    # dPhi variables
+    df = df.Define("ll_dphi", f"ROOT::Math::VectorUtil::DeltaPhi(lep1_p4,lep2_p4)")
+    df = df.Define("met_ll_dphi", f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(lep1_p4+lep2_p4))")
+
+    # MT and MT2 variables
+    df = df.Define("MT2", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2(lep1_p4, lep2_p4, bjet1_p4, bjet2_p4, PuppiMET_p4)) : -100.",)
+    df = df.Define("MT2_ll", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(lep1_p4, lep2_p4, bjet1_p4 + bjet2_p4 + PuppiMET_p4, bjet1_p4.mass(), bjet2_p4.mass())) : -100.")
+    df = df.Define("MT2_bb", f"(lep1_legType > 0 && lep2_legType > 0) ? float(analysis::Calculate_MT2_func(bjet1_p4, bjet2_p4, lep1_p4 + lep2_p4 + PuppiMET_p4, 80.4, 80.4)) : -100.")
+    df = df.Define("MT2_blbl", f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b1_p4.mass()) && std::isfinite(l2b2_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b1_p4, l2b2_p4, PuppiMET_p4, 0.0, 0.0)) : -100.")
+    df = df.Define("MT2_blbl2", f"(lep1_legType > 0 && lep2_legType > 0) && std::isfinite(l1b2_p4.mass()) && std::isfinite(l2b1_p4.mass()) ? float(analysis::Calculate_MT2_func(l1b2_p4, l2b1_p4, PuppiMET_p4, 0.0, 0.0)) : -100.")
+
+    # Extras
+    df = df.Define(
+        "bb_CosTheta",
+        f"(centralJet_pt.size() > 1) ? analysis::Calculate_CosDTheta(bjet1_p4, bjet2_p4) : -100.",
+    )
     df = df.Define(
         "Lep1Lep2Jet1Jet2_p4",
         "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+lep2_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
@@ -424,33 +400,23 @@ def AddDNNVariablesDL(df, isData=False):
         "Lep1Jet1Jet2_p4",
         "(bjet1_isValid && bjet2_isValid) ? (lep1_p4+bjet1_p4+bjet2_p4) : LorentzVectorM()",
     )
+    self.DefineAndAppend(
+        "Lep1Lep2Jet1Jet2_mass",
+        f"(lep1_legType > 0 && lep2_legType > 0) ? Lep1Lep2Jet1Jet2_p4.mass() : 0.0",
+    )
+    self.DefineAndAppend(
+        "Lep1Jet1Jet2_mass", f"(lep1_legType > 0) ? Lep1Jet1Jet2_p4.mass() : 0.0"
+    )
+
     # fixed PT values for mT_fix (decorrelated from lepton pt)
     # 35 GeV for muons, 30 GeV for electrons
-    df = df.Define(
-        "pT_fix", "(lep1_legType == static_cast<int>(Leg::mu) ? 35.0 : 30.0)"
-    )
+    df = df.Define("pT_fix", "(lep1_legType == static_cast<int>(Leg::mu) ? 35.0 : 30.0)")
     # dphi between lepton and MET using VectorUtil
-    df = df.Define(
-        "dphi_fix", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))"
-    )
+    df = df.Define("dphi_fix", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))")
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
 
     df = df.Define("nExtraLeps", "nExtraMuon + nExtraElectron")
-
-    df = df.Define(
-        "m_b1leps",
-        "ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet1_p4, lep2_p4) ? (bjet1_p4 + lep1_p4).M() : (bjet1_p4 + lep2_p4).M()",
-    )
-    df = df.Define(
-        "m_b2leps",
-        "ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep1_p4) < ROOT::Math::VectorUtil::DeltaR(bjet2_p4, lep2_p4) ? (bjet2_p4 + lep1_p4).M() : (bjet2_p4 + lep2_p4).M()",
-    )
-
-    df = df.Define("m_llmet", "(lep1_p4 + lep2_p4 + PuppiMET_p4).M()")
-    df = df.Define(
-        "m_bbllmet", "(bjet1_p4 + bjet2_p4 + lep1_p4 + lep2_p4 + PuppiMET_p4).M()"
-    )
 
     return df
 
@@ -1537,7 +1503,7 @@ def AddDNNVariablesCommon(df, isData=False):
     df = df.Define("HT", f"Sum(centralJet_pt)")
 
     df = df.Define(
-        "dR_dibjet",
+        "bb_dR",
         f"ROOT::Math::VectorUtil::DeltaR(bjet1_p4, bjet2_p4)",
     )
 
@@ -1547,7 +1513,7 @@ def AddDNNVariablesCommon(df, isData=False):
     )
 
     df = df.Define(
-        "dPhi_MET_dibjet",
+        "met_bb_dphi"
         f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(bjet1_p4+bjet2_p4))",
     )
     df = df.Define("min_dR_lep0_jets", f"MinDeltaR(lep1_p4, centralJet_p4)")

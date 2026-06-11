@@ -467,24 +467,24 @@ histTuple_flavors:
       - PuppiMET_phi
 
       - HT
-      - dR_dilep
-      - dR_dibjet
-      - dR_dilep_dibjet
-      - dR_dilep_dijet
-      - dPhi_lep1_lep2
-      - dPhi_jet1_jet2
-      - dPhi_MET_dilep
-      - dPhi_MET_dibjet
-      - MT_lep1
-      - MT_lep2
-      - MT_tot
+      - ll_dR
+      - bb_dR
+      - ll_bb_dR
+      - ll_jj_dR
+      - ll_dphi
+      - jj_dphi
+      - met_ll_dphi
+      - met_bb_dphi
+      - lep1_MT
+      - lep2_MT
+      - total_MT
       - MT
       - MT2_ll
       - MT2_bb
       - MT2_blbl
       - MT2_blbl2
       - ll_mass
-      - CosTheta_bb
+      - bb_CosTheta
       - nExtraTau
       - nExtraLeps
 
@@ -596,15 +596,15 @@ variables:
   - dPhi_MET_dilep
   - dPhi_MET_dibjet
   - MT
-  - MT_lep1
-  - MT_lep2
-  - MT_tot
+  - lep1_MT
+  - lep2_MT
+  - total_MT
   - MT2_ll
   - MT2_bb
   - MT2_blbl
   - MT2_blbl2
   - ll_mass
-  - CosTheta_bb
+  - bb_CosTheta
 
   - lep1_Muon_pfRelIso04_all
   - lep2_Muon_pfRelIso04_all

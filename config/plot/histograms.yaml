@@ -507,7 +507,7 @@ bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-CosTheta_bb:
+bb_CosTheta:
   x_bins: "10|0.0:1.0"
   x_title: CosTheta (bb)
   y_title: Events
@@ -533,15 +533,15 @@ MT:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-MT_tot:
+total_MT:
   x_bins: "100|0:200"
-  x_title: MT tot
+  x_title: MT total
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-MT_lep1:
+lep1_MT:
   x_bins: "100|0:200"
   x_title: MT lep1
   y_title: Events
@@ -549,7 +549,7 @@ MT_lep1:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-MT_lep2:
+lep2_MT:
   x_bins: "100|0:200"
   x_title: MT lep2
   y_title: Events
@@ -592,7 +592,7 @@ MT2_blbl2:
 
 ########## dR BEGIN ##########
 
-dR_dilep:
+ll_dR:
   x_bins: "25|0:5.0"
   x_title: "dR between leptons"
   y_title: "Events"
@@ -600,7 +600,7 @@ dR_dilep:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-dR_dibjet:
+bb_dR:
   x_bins: "25|0:5.0"
   x_title: "dR between two b-jets"
   y_title: "Events"
@@ -608,7 +608,7 @@ dR_dibjet:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-dR_dilep_dibjet:
+ll_bb_dR:
   x_bins: "25|0:5.0"
   x_title: "dR between dilepton and dibjet system"
   y_title: "Events"
@@ -616,7 +616,7 @@ dR_dilep_dibjet:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-dR_dilep_dijet:
+ll_jj_dR:
   x_bins: "25|0:5.0"
   x_title: "dR between dilepton and dijet system"
   y_title: "Events"
@@ -634,7 +634,7 @@ Hbb_lepWfromH_dR:
 
 ########## dPhi BEGIN ##########
 
-dPhi_lep1_lep2:
+ll_dphi:
   x_bins: "10|0:4.0"  # Since Δφ ranges from 0 to π
   # x_bins: [ 0.0, 0.32, 0.64, 0.96, 1.28, 1.6, 1.92, 2.24, 2.56, 2.88, 3.14 ]
   x_title: "dPhi between lepton 1 and lepton 2"
@@ -652,7 +652,7 @@ dPhi_jet1_jet2:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-dPhi_MET_dilep:
+met_ll_dphi:
   x_bins: "10|0:4.0"  # Δφ between MET and dilepton (usually in range [0, π])
   # x_bins: [ 0.0, 0.348, 0.696, 1.044, 1.392, 1.74, 2.088, 2.436, 2.784, 3.14 ]
   x_title: "dPhi between MET and dilepton system"
@@ -661,7 +661,7 @@ dPhi_MET_dilep:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-dPhi_MET_dibjet:
+met_bb_dphi:
   x_bins: "10|0:4.0"  # Δφ between MET and dibjet system (typically between 0 and π)
   # x_bins: [ 0.0, 0.348, 0.696, 1.044, 1.392, 1.74, 2.088, 2.436, 2.784, 3.14 ]
   x_title: "dPhi between MET and dibjet system"
@@ -692,7 +692,7 @@ Lep1Lep2Jet1Jet2_mass:
 
 
 
-m_bbllmet:
+bbllmet_mass:
   x_bins: "1000|0:2500"
   x_title: m(bbllmet)
   y_title: Events
