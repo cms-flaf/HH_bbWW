@@ -566,8 +566,6 @@ WW_ptToE:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-
-
 ########## hadT BEGIN ##########
 
 hadT_constituentPtFrac:
@@ -594,6 +592,8 @@ hadT_pt:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+########## hadW BEGIN ##########
+
 hadW_mass:
   x_bins: "100|0:300"
   x_title: hadronic W mass [GeV]
@@ -601,6 +601,8 @@ hadW_mass:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+########## lepT BEGIN ##########
 
 lepT_constituentPtFrac:
   x_bins: "20|0.0:1.0"
@@ -754,14 +756,6 @@ Hbb_lepWfromH_dR:
 lep1_bjets_minDr:
   x_bins: "25|0:5.0"
   x_title: "min(dR) between lep1 and bjets"
-  y_title: "Events"
-  use_log_y: False
-  max_y_sf: 1.5
-  divide_by_bin_width: False
-
-Hbb_lepWfromH_dR:
-  x_bins: "25|0:5.0"
-  x_title: "dR between Hbb and W-lepton"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
