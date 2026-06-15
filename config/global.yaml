@@ -105,17 +105,17 @@ corrections:
       HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
-  dy_hhbbww:
-    stages: [ AnalysisCache, HistTuple ]
-    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
-    njets_branch: Njets # Use nCentralJets, not raw nJet
-    pt_ll: ll_pt
-  # dy_hhbbtautau:
+  # dy_hhbbww:
   #   stages: [ AnalysisCache, HistTuple ]
   #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
   #   njets_branch: Njets # Use nCentralJets, not raw nJet
-  #   ntags_branch: nBTaggedJets
-  #   pt_ll_gen: ll_pt_gen
+  #   pt_ll: ll_pt
+  dy_hhbbtautau:
+    stages: [ AnalysisCache, HistTuple ]
+    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
+    njets_branch: Njets # Use nCentralJets, not raw nJet
+    ntags_branch: nBTaggedJets
+    pt_ll_gen: ll_pt_gen
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -576,25 +576,31 @@ variables:
   - bjet2_mass
   - bjet2_btagPNetB
 
+  - wjet1_pt
+
+  - wjet2_pt
+
   - fatbjet_pt
   - fatbjet_eta
   - fatbjet_phi
   - fatbjet_mass
   - fatbjet_particleNetWithMass_HbbvsQCD
 
+  - fatwjet_pt
+
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
   - bb_pt
   - bb_mass
 
   - HT
-  - dR_dilep
-  - dR_dibjet
-  - dR_dilep_dibjet
-  - dR_dilep_dijet
-  - dPhi_lep1_lep2
-  - dPhi_jet1_jet2
-  - dPhi_MET_dilep
-  - dPhi_MET_dibjet
+  - ll_dR
+  - bb_dR
+  - ll_bb_dR
+  - ll_jj_dR
+  - ll_dphi
+  - jj_dphi
+  - met_ll_dphi
+  - met_bb_dphi
   - MT
   - lep1_MT
   - lep2_MT
@@ -628,27 +634,27 @@ variables:
   # I will comment out them for now
   # - disc_higgs_sqr
   # - disc_top_sqr
-  # - hadT_mass
-  # - lepT_mass
-  # - WW_ptToE
-  # - bb_ptToE
-  # - hadT_pt
-  # - lepT_pt
-  # - hadT_constituentPtFrac
-  # - lepT_constituentPtFrac
+  - hadT_mass
+  - lepT_mass
+  - WW_ptToE
+  - bb_ptToE
+  - hadT_pt
+  - lepT_pt
+  - hadT_constituentPtFrac
+  - lepT_constituentPtFrac
   # - TT_mass
-  # - lepT_mT
+  - lepT_mT
   # - hadT_hadW_dphi
   # - hadT_hadW_deta
-  # - hadT_hadW_dR
+  - hadT_hadW_dR
   # - hadW_leadbjet_dphi
   # - hadW_leadbjet_deta
   # - hadW_leadbjet_dR
-  # - hadW_mass
-  # - bb_dphi
-  # - bb_deta
-  # - bb_pt
-  # - bb_mass
+  - hadW_mass
+  - bb_dphi
+  - bb_deta
+  - bb_pt
+  - bb_mass
   # - hadW_lep_dphi
   # - hadW_lep_deta
   # - hadW_lep_dR
@@ -660,12 +666,12 @@ variables:
   # - hadW_lepWfromH_dR
   # - Hbb_lepWfromH_dphi
   # - Hbb_lepWfromH_deta
-  # - Hbb_lepWfromH_dR
-  # - lep1_bjets_minDr
+  - Hbb_lepWfromH_dR
+  - lep1_bjets_minDr
   # - lep1_bjets_minDphi
   # - bjet_lepWfromT_minDphi
   # - bjet_lepWfromH_minDphi
-  # - WW_pt
+  - WW_pt
 
   - DNN_M300_Signal
   - DNN_M400_Signal
