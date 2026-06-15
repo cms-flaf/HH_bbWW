@@ -5,8 +5,11 @@ action() {
 
     export ANALYSIS_PATH="$this_dir"
     export HH_INFERENCE_PATH="$ANALYSIS_PATH/inference"
+    # FLAF_PATH defaults to the submodule copy but is respected if pre-set (flaf_dev.sh
+    # points it at the edited top-level FLAF in a FLAF_all workspace).
+    [ -z "$FLAF_PATH" ] && export FLAF_PATH="$ANALYSIS_PATH/FLAF"
 
-    source $this_dir/FLAF/env.sh "$this_file_path" "$@"
+    source "$FLAF_PATH/env.sh" "$this_file_path" "$@"
 }
 
 action "$@"
