@@ -10,6 +10,12 @@ eras:
   - Run3_2022EE
   - Run3_2023
   - Run3_2023BPix
+era_groups:
+  Early_Run3:
+    - Run3_2022
+    - Run3_2022EE
+    - Run3_2023
+    - Run3_2023BPix
 channels:
   - muMu
   - eMu
