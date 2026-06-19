@@ -1561,11 +1561,6 @@ def AddDNNVariablesCommon(df, isData=False):
     )
 
     df = df.Define(
-        "jj_dphi",
-        f"ROOT::Math::VectorUtil::DeltaPhi(bjet1_p4,bjet2_p4)",
-    )
-
-    df = df.Define(
         "met_bb_dphi",
         f"ROOT::Math::VectorUtil::DeltaPhi(PuppiMET_p4,(bjet1_p4+bjet2_p4))",
     )

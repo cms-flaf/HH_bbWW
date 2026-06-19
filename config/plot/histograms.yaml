@@ -771,15 +771,6 @@ hadT_hadW_dR:
 
 ########## dPhi BEGIN ##########
 
-jj_dphi:
-  x_bins: "10|0:4.0"  # Δφ ranges from 0 to π (between two jets)
-  # x_bins: [ 0.0, 0.348, 0.696, 1.044, 1.392, 1.74, 2.088, 2.436, 2.784, 3.14 ]
-  x_title: "dPhi between jet 1 and jet 2"
-  y_title: "Events"
-  use_log_y: False
-  max_y_sf: 1.5
-  divide_by_bin_width: False
-
 met_ll_dphi:
   x_bins: "10|0:4.0"  # Δφ between MET and dilepton (usually in range [0, π])
   # x_bins: [ 0.0, 0.348, 0.696, 1.044, 1.392, 1.74, 2.088, 2.436, 2.784, 3.14 ]
