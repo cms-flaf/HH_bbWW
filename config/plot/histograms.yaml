@@ -289,17 +289,17 @@ wjet2_mass:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-wjet1_wtagPNetB:
+wjet1_btagPNetB:
   x_bins: "10|0.0:1.0"
-  x_title: bjet1 btagPNetB
+  x_title: wjet1 btagPNetB
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-wjet2_wtagPNetB:
+wjet2_btagPNetB:
   x_bins: "10|0.0:1.0"
-  x_title: bjet2 btagPNetB
+  x_title: wjet2 btagPNetB
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
