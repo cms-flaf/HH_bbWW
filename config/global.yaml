@@ -105,17 +105,17 @@ corrections:
       HistTuple: shape_and_norm
     tagger: particleNet
     jetCollection: centralJet
-  dy_hhbbww:
-    stages: [ AnalysisCache, HistTuple ]
-    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
-    njets_branch: Njets # Use nCentralJets, not raw nJet
-    pt_ll: pt_lep1_lep2
+  # dy_hhbbww:
+  #   stages: [ AnalysisCache, HistTuple ]
+  #   processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
+  #   njets_branch: Njets # Use nCentralJets, not raw nJet
+  #   pt_ll: ll_pt
   dy_hhbbtautau:
     stages: [ AnalysisCache, HistTuple ]
     processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
     njets_branch: Njets # Use nCentralJets, not raw nJet
-    ntags_branch: nBJets
-    pt_ll_gen: pt_ll_gen
+    ntags_branch: nBTaggedJets
+    pt_ll_gen: ll_pt_gen
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -310,7 +310,7 @@ custom_categories: ""
 custom_subcategories: [ ]
 
 # Option to scale signal by some factor in HistPlotTask.py
-signal_plot_scale: 2500
+signal_plot_scale: 100.0
 
 # This is for Analysis Selection
 channelSelection:
@@ -340,6 +340,9 @@ categories:
   - recovery
   - res2b
   - boosted
+  - boosted_H
+  - boosted_W
+  - boosted_HW
   - baseline
 
 QCDRegions:
@@ -464,24 +467,24 @@ histTuple_flavors:
       - PuppiMET_phi
 
       - HT
-      - dR_dilep
-      - dR_dibjet
-      - dR_dilep_dibjet
-      - dR_dilep_dijet
-      - dPhi_lep1_lep2
-      - dPhi_jet1_jet2
-      - dPhi_MET_dilep
-      - dPhi_MET_dibjet
-      - MT_lep1
-      - MT_lep2
-      - MT_tot
+      - ll_dR
+      - bb_dR
+      - ll_bb_dR
+      - ll_jj_dR
+      - ll_dphi
+      - jj_dphi
+      - met_ll_dphi
+      - met_bb_dphi
+      - lep1_MT
+      - lep2_MT
+      - total_MT
       - MT
       - MT2_ll
       - MT2_bb
       - MT2_blbl
       - MT2_blbl2
       - ll_mass
-      - CosTheta_bb
+      - bb_CosTheta
       - nExtraTau
       - nExtraLeps
 
@@ -525,8 +528,8 @@ histTuple_flavors:
       - Hbb_lepWfromH_dphi
       - Hbb_lepWfromH_deta
       - Hbb_lepWfromH_dR
-      - bjet_lep_minDr
-      - bjet_lep_minDphi
+      - lep1_bjets_minDr
+      - lep1_bjets_minDphi
       - bjet_lepWfromT_minDphi
       - bjet_lepWfromH_minDphi
       - WW_pt
@@ -573,33 +576,41 @@ variables:
   - bjet2_mass
   - bjet2_btagPNetB
 
+  - wjet1_pt
+
+  - wjet2_pt
+
   - fatbjet_pt
   - fatbjet_eta
   - fatbjet_phi
   - fatbjet_mass
   - fatbjet_particleNetWithMass_HbbvsQCD
 
+  - fatwjet_pt
+
   - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
+  - bb_pt
+  - bb_mass
 
   - HT
-  - dR_dilep
-  - dR_dibjet
-  - dR_dilep_dibjet
-  - dR_dilep_dijet
-  - dPhi_lep1_lep2
-  - dPhi_jet1_jet2
-  - dPhi_MET_dilep
-  - dPhi_MET_dibjet
+  - ll_dR
+  - bb_dR
+  - ll_bb_dR
+  - ll_jj_dR
+  - ll_dphi
+  - jj_dphi
+  - met_ll_dphi
+  - met_bb_dphi
   - MT
-  - MT_lep1
-  - MT_lep2
-  - MT_tot
+  - lep1_MT
+  - lep2_MT
+  - total_MT
   - MT2_ll
   - MT2_bb
   - MT2_blbl
   - MT2_blbl2
   - ll_mass
-  - CosTheta_bb
+  - bb_CosTheta
 
   - lep1_Muon_pfRelIso04_all
   - lep2_Muon_pfRelIso04_all
@@ -607,32 +618,43 @@ variables:
   - lep2_Electron_pfRelIso03_all
   - mT_fix
 
+  # Variables for DY corrections
+  - nJet
+  - Njets
+  - nBTaggedJets
+  - ll_pt
+  - ll_pt_gen
+
+  # High Level
+  - DeepHME_mass
+  - DeepHME_mass_error
+
   # High Level Single Lepton
   # need to be added to hist config
   # I will comment out them for now
   # - disc_higgs_sqr
   # - disc_top_sqr
-  # - hadT_mass
-  # - lepT_mass
-  # - WW_ptToE
-  # - bb_ptToE
-  # - hadT_pt
-  # - lepT_pt
-  # - hadT_constituentPtFrac
-  # - lepT_constituentPtFrac
+  - hadT_mass
+  - lepT_mass
+  - WW_ptToE
+  - bb_ptToE
+  - hadT_pt
+  - lepT_pt
+  - hadT_constituentPtFrac
+  - lepT_constituentPtFrac
   # - TT_mass
-  # - lepT_mT
+  - lepT_mT
   # - hadT_hadW_dphi
   # - hadT_hadW_deta
-  # - hadT_hadW_dR
+  - hadT_hadW_dR
   # - hadW_leadbjet_dphi
   # - hadW_leadbjet_deta
   # - hadW_leadbjet_dR
-  # - hadW_mass
-  # - bb_dphi
-  # - bb_deta
-  # - bb_pt
-  # - bb_mass
+  - hadW_mass
+  - bb_dphi
+  - bb_deta
+  - bb_pt
+  - bb_mass
   # - hadW_lep_dphi
   # - hadW_lep_deta
   # - hadW_lep_dR
@@ -644,12 +666,12 @@ variables:
   # - hadW_lepWfromH_dR
   # - Hbb_lepWfromH_dphi
   # - Hbb_lepWfromH_deta
-  # - Hbb_lepWfromH_dR
-  # - bjet_lep_minDr
-  # - bjet_lep_minDphi
+  - Hbb_lepWfromH_dR
+  - lep1_bjets_minDr
+  # - lep1_bjets_minDphi
   # - bjet_lepWfromT_minDphi
   # - bjet_lepWfromH_minDphi
-  # - WW_pt
+  - WW_pt
 
   - DNN_M300_Signal
   - DNN_M400_Signal

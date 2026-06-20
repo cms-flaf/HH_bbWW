@@ -5,26 +5,26 @@ features: &id001
   - lep2_legType
   - PuppiMET_pt
   - HT
-  - dR_dilep
-  - dR_dibjet
-  - dR_dilep_dibjet
-  - dPhi_lep1_lep2
-  - dPhi_MET_dilep
-  - dPhi_MET_dibjet
+  - ll_dR
+  - bb_dR
+  - ll_bb_dR
+  - ll_dphi
+  - met_ll_dphi
+  - met_bb_dphi
   - MT2_ll
   - MT2_bb
   - MT2_blbl
-  - MT_tot
-  - MT_lep1
-  - MT_lep2
-  - m_b1leps
-  - m_b2leps
-  - m_bbllmet
-  - m_llmet
-  - pt_bb
-  - pt_ll
+  - total_MT
+  - lep1_MT
+  - lep2_MT
+  - b1leps_mass
+  - b2leps_mass
+  - bbllmet_mass
+  - llmet_mass
+  - bb_pt
+  - ll_pt
   - ll_mass
-  - CosTheta_bb
+  - bb_CosTheta
   - bjet1_pt
   - bjet1_phi
   - bjet1_eta
