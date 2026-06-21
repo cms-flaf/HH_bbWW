@@ -1,7 +1,7 @@
 import argparse
 import threading
 import yaml
-from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
+from FLAF.RunKit.kinit import cond as kInit_cond, update_kinit_thread
 import os
 import shutil
 from FLAF.RunKit.run_tools import ps_call
