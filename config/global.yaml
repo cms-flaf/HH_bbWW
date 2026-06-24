@@ -654,8 +654,6 @@ variables:
   - hadW_mass
   - bb_dphi
   - bb_deta
-  - bb_pt
-  - bb_mass
   # - hadW_lep_dphi
   # - hadW_lep_deta
   # - hadW_lep_dR
