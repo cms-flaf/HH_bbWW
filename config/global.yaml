@@ -97,7 +97,7 @@ corrections:
     stage: AnaTuple
     apply_jet_horns_fix: true
   btag:
-    normFilePattern: data/{version}/AnalysisCacheAggregationTask/{period}/{dataset_name}/BtagShape/aggregatedCache.json
+    normCacheProducer: BtagShape
     stages: [ AnaTuple, HistTuple, AnalysisCache ]
     modes:
       AnaTuple: none # just load to define WP ID branches
@@ -472,7 +472,6 @@ histTuple_flavors:
       - ll_bb_dR
       - ll_jj_dR
       - ll_dphi
-      - jj_dphi
       - met_ll_dphi
       - met_bb_dphi
       - lep1_MT
@@ -598,7 +597,6 @@ variables:
   - ll_bb_dR
   - ll_jj_dR
   - ll_dphi
-  - jj_dphi
   - met_ll_dphi
   - met_bb_dphi
   - MT
@@ -656,8 +654,6 @@ variables:
   - hadW_mass
   - bb_dphi
   - bb_deta
-  - bb_pt
-  - bb_mass
   # - hadW_lep_dphi
   # - hadW_lep_deta
   # - hadW_lep_dR
