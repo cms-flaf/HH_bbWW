@@ -309,8 +309,9 @@ custom_regions: QCDRegions
 custom_categories: ""
 custom_subcategories: [ ]
 
-# Option to scale signal by some factor in HistPlotTask.py
-signal_plot_scale: 100.0
+# Signal overlay scaling in HistPlotTask: a fixed factor (e.g. 100), or "bkg" to
+# normalise each signal's integral to the summed background (shape comparison).
+signal_plot_scale: bkg
 
 # This is for Analysis Selection
 channelSelection:
