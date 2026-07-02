@@ -250,7 +250,7 @@ XtoHHto2Tau2B:
       - [ '600' ]
       - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
-    channels: [ "eE", "eMu", "muMu" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:
     - XtoYHto2Tau2B_MX_300_MY_125
     - XtoYHto2Tau2B_MX_400_MY_125

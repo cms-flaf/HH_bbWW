@@ -6667,7 +6667,7 @@ VBFHHto2B2Vto2L2Nu_CV_m1p83_C2V_3p57_C3_m3p39:
   generator: madgraph
   crossSection: 1pb
 # Finished non -Resonant Signal samples) #
-# Finished X->YH->bbtt samples #
+# Start X->YH->bbtt samples #
 XtoYHto2B2Tau_MX_300_MY_125:
   sampleType: XtoYH
   mass: 300
