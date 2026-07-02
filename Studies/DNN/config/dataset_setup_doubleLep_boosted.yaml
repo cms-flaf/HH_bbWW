@@ -8,7 +8,8 @@ iterate_cut: (
   (ZVeto_OS_Iso == 1) &&
   (boosted == 1) &&
   ( (channelId == 11) || (channelId == 12) || (channelId == 22) )
-  )
+  ) &&
+  ( ll_mass < 70 )
 parity_cut: (
   (event%{nParity} == {parity_scan})
   )

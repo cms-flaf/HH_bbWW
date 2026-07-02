@@ -17,7 +17,7 @@ import gc
 
 
 import threading
-from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
+from FLAF.RunKit.kinit import cond as kInit_cond, update_kinit_thread
 
 
 # Need to get train_features and train_labels

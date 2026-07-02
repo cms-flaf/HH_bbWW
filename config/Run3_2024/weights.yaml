@@ -3,10 +3,10 @@ norm:
     expression: weight_base_pu{scale}_rel  * final_weight
     name: CMS_pileup_{}
   MuonID_SF_Iso_ID:
-    expression: weight_lep1_MuonID_SF_{muIso_WP_for_SF}PFIso_{muID_WP_for_SF}ID{scale}_rel * weight_lep2_MuonID_SF_{muIso_WP_for_SF}PFIso_{muID_WP_for_SF}ID{scale}_rel * final_weight
+    expression: weight_lep1_MuonID_SF_TightPFIso_TightID{scale}_rel * weight_lep2_MuonID_SF_TightPFIso_TightID{scale}_rel * final_weight
     name: CMS_eff_m_id_iso_{}
   MuonID_SF_ID:
-    expression: weight_lep1_MuonID_SF_{muID_WP_for_SF}ID_Trk{scale}_rel * weight_lep2_MuonID_SF_{muID_WP_for_SF}ID_Trk{scale}_rel * final_weight
+    expression: weight_lep1_MuonID_SF_TightID_Trk{scale}_rel * weight_lep2_MuonID_SF_TightID_Trk{scale}_rel * final_weight
     name: CMS_eff_m_id_{}
   # MuonID_TightID:
   #   expression: weight_lep1_MuonID_SF_TightID_Trk{scale}_rel * weight_lep2_MuonID_SF_TightID_Trk{scale}_rel * final_weight
