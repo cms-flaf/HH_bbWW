@@ -621,5 +621,8 @@ def addAllVariables(
         )
         dfw.colToSave.extend(hltBranches)
 
-    if isSignal:
+    if isSignal and not (
+        ("XtoHHto2B2Tau" in dataset_cfg["process_name"])
+        or ("XtoHHto2Tau2B" in dataset_cfg["process_name"])
+    ):
         defineSignalVariables(dfw)
