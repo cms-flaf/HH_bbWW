@@ -16,15 +16,15 @@ StatInference:
   param_values: [ 300 ]
 
 # Do not remove DNN variables, they are needed for the datacard creation.
-variables:
-  - lep1_pt
-  - DeepHME_mass
-  - DNN_M300_Signal
-  - DNN_M300_TT
+# variables:
+#   - lep1_pt
+#   - DeepHME_mass
+#   - DNN_M300_Signal
+#   - DNN_M300_TT
 
-  - name: lep1_pt_vs_eta
-    vars: [ lep1_pt, lep1_eta ]
-    plot_task: False
+#   - name: lep1_pt_vs_eta
+#     vars: [ lep1_pt, lep1_eta ]
+#     plot_task: False
 
-  - name: DNN_m300_vs_HME
-    vars: [ DNN_M300_Signal, DeepHME_mass ]
+#   - name: DNN_m300_vs_HME
+#     vars: [ DNN_M300_Signal, DeepHME_mass ]
