@@ -614,8 +614,6 @@ variables:
   - MT2_blbl2_delta_phi
   - MT2_blbl1_ptratio
   - MT2_blbl2_ptratio
-  - MT2_blbl1_balanced
-  - MT2_blbl2_balanced
   - ll_mass
   - bb_CosTheta
 
