@@ -774,6 +774,54 @@ MT2_blbl2_ptratio:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+MT2_blbl1_nu1_ptfrac:
+  x_bins: "50|0:1"
+  x_title: MT2 blbl1 nu1 pt fraction
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MT2_blbl1_nu2_ptfrac:
+  x_bins: "50|0:1"
+  x_title: MT2 blbl1 nu2 pt fraction
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MT2_blbl2_nu1_ptfrac:
+  x_bins: "50|0:1"
+  x_title: MT2 blbl2 nu1 pt fraction
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MT2_blbl2_nu2_ptfrac:
+  x_bins: "50|0:1"
+  x_title: MT2 blbl2 nu2 pt fraction
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MT2_blbl1_balanced:
+  x_bins: "100|0:500"
+  x_title: MT2 blbl1 (balanced)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MT2_blbl2_balanced:
+  x_bins: "100|0:500"
+  x_title: MT2 blbl2 (balanced)
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 m_bbllmet:
   x_bins: "1000|0:2500"
   x_title: m(bbllmet)
