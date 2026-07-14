@@ -2,7 +2,7 @@ import argparse
 import Studies.DNN.DNN_Class_HistTuples as DNNClass
 import threading
 import yaml
-from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
+from FLAF.RunKit.kinit import cond as kInit_cond, update_kinit_thread
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create TrainTest Files for DNN.")

@@ -5262,6 +5262,123 @@ XtoYHto2Z2Bto2L2J2B_MX_900_MY_400:
   crossSection: 1pb
   generator: madgraph
 # Finished YH samples #
+# Started X->YH->ttbb samples #
+XtoYHto2Tau2B_MX_300_MY_125:
+  sampleType: XtoYH
+  mass: 300
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_400_MY_125:
+  sampleType: XtoYH
+  mass: 400
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_500_MY_125:
+  sampleType: XtoYH
+  mass: 500
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_550_MY_125:
+  sampleType: XtoYH
+  mass: 550
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_600_MY_125:
+  sampleType: XtoYH
+  mass: 600
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_650_MY_125:
+  sampleType: XtoYH
+  mass: 650
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_700_MY_125:
+  sampleType: XtoYH
+  mass: 700
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_800_MY_125:
+  sampleType: XtoYH
+  mass: 800
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_900_MY_125:
+  sampleType: XtoYH
+  mass: 900
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_1000_MY_125:
+  sampleType: XtoYH
+  mass: 1000
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_1200_MY_125:
+  sampleType: XtoYH
+  mass: 1200
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_1400_MY_125:
+  sampleType: XtoYH
+  mass: 1400
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_1600_MY_125:
+  sampleType: XtoYH
+  mass: 1600
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_1800_MY_125:
+  sampleType: XtoYH
+  mass: 1800
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_2000_MY_125:
+  sampleType: XtoYH
+  mass: 2000
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_2500_MY_125:
+  sampleType: XtoYH
+  mass: 2500
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_3000_MY_125:
+  sampleType: XtoYH
+  mass: 3000
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_3500_MY_125:
+  sampleType: XtoYH
+  mass: 3500
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+XtoYHto2Tau2B_MX_4000_MY_125:
+  sampleType: XtoYH
+  mass: 4000
+  spin: 0
+  crossSection: XtoHHto2Tau2B
+  generator: madgraph
+# Finished X->YH->ttbb samples #
+
 
 custom_CI:
   sampleType: HH
