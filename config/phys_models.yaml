@@ -11,6 +11,8 @@ Run3_Model:
   signals:
     - XtoHHto2B2W_SingleLepton
     - XtoHHto2B2W_DoubleLepton
+    # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
+    - XtoHHto2Tau2B
   data:
     - Data_Full
 
@@ -48,5 +50,7 @@ Production_Model:
     - GluGluToRadion_SingleLepton
     - GluGluToBulkGraviton_DoubleLepton
     - GluGluToBulkGraviton_SingleLepton
+    # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
+    - XtoHHto2Tau2B
   data:
     - Data_Full

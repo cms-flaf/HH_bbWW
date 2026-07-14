@@ -1,6 +1,6 @@
 import argparse
 import threading
-from FLAF.RunKit.crabLaw import cond as kInit_cond, update_kinit_thread
+from FLAF.RunKit.kinit import cond as kInit_cond, update_kinit_thread
 import os
 import shutil
 import json

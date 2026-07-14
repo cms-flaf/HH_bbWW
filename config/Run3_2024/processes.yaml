@@ -87,7 +87,6 @@ XtoHHto2B2W_DoubleLepton:
     channels: [ "eE", "eMu", "muMu" ]
   datasets: [ ]
 
-
 XtoHHto2B2W_SingleLepton:
   name: "XtoHHto2B2W_SingleLepton"
   color: "kBlack"
@@ -104,6 +103,42 @@ XtoHHto2B2W_SingleLepton:
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "e", "mu" ]
   datasets: [ ]
+
+XtoHHto2Tau2B:
+  name: "XtoHHto2Tau2B"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: XtoYHto2Tau2B_MX_(\d+)_MY_125
+    parameters: [ MASS ]
+    process_name: XtoHHto2Tau2B_${MASS}
+    name_pattern: Xto2Tau2B ${MASS} GeV (x50)
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
+  datasets:
+    - XtoYHto2Tau2B_MX_300_MY_125
+    - XtoYHto2Tau2B_MX_400_MY_125
+    - XtoYHto2Tau2B_MX_500_MY_125
+    - XtoYHto2Tau2B_MX_550_MY_125
+    - XtoYHto2Tau2B_MX_600_MY_125
+    - XtoYHto2Tau2B_MX_650_MY_125
+    - XtoYHto2Tau2B_MX_700_MY_125
+    - XtoYHto2Tau2B_MX_800_MY_125
+    - XtoYHto2Tau2B_MX_900_MY_125
+    - XtoYHto2Tau2B_MX_1000_MY_125
+    - XtoYHto2Tau2B_MX_1200_MY_125
+    - XtoYHto2Tau2B_MX_1400_MY_125
+    - XtoYHto2Tau2B_MX_1600_MY_125
+    - XtoYHto2Tau2B_MX_1800_MY_125
+    - XtoYHto2Tau2B_MX_2000_MY_125
+    - XtoYHto2Tau2B_MX_2500_MY_125
+    - XtoYHto2Tau2B_MX_3000_MY_125
+    - XtoYHto2Tau2B_MX_3500_MY_125
+    - XtoYHto2Tau2B_MX_4000_MY_125
 
 Data_Full:
   name: "Data"
