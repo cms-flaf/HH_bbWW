@@ -545,7 +545,9 @@ histTuple_flavors:
 
   default:
     # DNN Inputs
-    fullResolution_variables: [ ]
+    fullResolution_variables:
+      # Add one default fullres for CI to validate it works
+      - lep1_pt
 
     variables:
       - lep1_pt
