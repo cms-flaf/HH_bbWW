@@ -37,6 +37,7 @@ def GetDfw(df, setup, dataset_name):
     isData = dataset_name == "data"
     period = global_params["era"]
     dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period)
+    new_dfw = analysis.PrepareDfForHistograms(dfw, isData)
     return new_dfw
 
 
