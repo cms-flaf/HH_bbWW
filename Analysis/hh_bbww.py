@@ -504,6 +504,40 @@ def AddDNNVariablesDL(df, isData=False):
 
     df = df.Define("nExtraLeps", "nExtraMuon + nExtraElectron")
 
+    df = df.Define(
+        "min_lb_dR",
+        f"min("
+        f"min(ROOT::Math::VectorUtil::DeltaR(lep1_p4, bjet1_p4), ROOT::Math::VectorUtil::DeltaR(lep1_p4, bjet2_p4)),"
+        f"min(ROOT::Math::VectorUtil::DeltaR(lep2_p4, bjet1_p4), ROOT::Math::VectorUtil::DeltaR(lep2_p4, bjet2_p4))"
+        ")",
+    )
+
+    df = df.Define(
+        "lb_centrality", "(lep1_pt + lep2_pt) / (bjet1_pt + bjet2_pt + PuppiMET_pt)"
+    )
+
+    df = df.Define("HT_total", "HT + PuppiMET_pt + lep1_pt + lep2_pt")
+
+    df = df.Define("ll_bb_pt_ratio", "ll_pt / bb_pt")
+
+    df = df.Define(
+        "min_lmet_mt",
+        f"min("
+        "pow(2 * lep1_pt * PuppiMET_pt * (1 - cos(lep1_phi - PuppiMET_phi)), 0.5),"
+        "pow(2 * lep2_pt * PuppiMET_pt * (1 - cos(lep2_phi - PuppiMET_phi)), 0.5)"
+        ")",
+    )
+
+    df = df.Define("ll_cos_theta_star", "tanh((lep1_eta - lep2_eta) / 2.0)")
+
+    df = df.Define(
+        "min_lmet_dphi",
+        f"min("
+        "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4)),"
+        "abs(ROOT::Math::VectorUtil::DeltaPhi(lep2_p4, PuppiMET_p4))"
+        ")",
+    )
+
     return df
 
 
@@ -1456,20 +1490,6 @@ def AddDNNVariablesSL(df, isData=False):
     )
     df = df.Define("hadW_mass", "return hadW_p4.M();")
     df = df.Define(
-        "bb_dphi", "return ROOT::Math::VectorUtil::DeltaPhi(bjet1_p4, bjet2_p4);"
-    )
-    df = df.Define("bb_deta", "return bjet1_p4.Eta() - bjet2_p4.Eta();")
-    df = df.Define(
-        "bb_pt",
-        """
-            if (fatbjet_isValid)
-                return static_cast<float>(fatbjet_p4.Pt());
-            else if (bjet1_isValid && bjet2_isValid)
-                return static_cast<float>((bjet1_p4 + bjet2_p4).Pt());
-            return 0.0f;
-        """,
-    )
-    df = df.Define(
         "hadW_lep_dphi", "return ROOT::Math::VectorUtil::DeltaPhi(hadW_p4, lep1_p4);"
     )
     df = df.Define(
@@ -1612,6 +1632,26 @@ def AddDNNVariablesCommon(df, isData=False):
             return -1.0f;
         """,
     )
+
+    df = df.Define(
+        "bb_dphi", "return ROOT::Math::VectorUtil::DeltaPhi(bjet1_p4, bjet2_p4);"
+    )
+    df = df.Define("bb_deta", "return bjet1_p4.Eta() - bjet2_p4.Eta();")
+    df = df.Define(
+        "bb_pt",
+        """
+            if (fatbjet_isValid)
+                return static_cast<float>(fatbjet_p4.Pt());
+            else if (bjet1_isValid && bjet2_isValid)
+                return static_cast<float>((bjet1_p4 + bjet2_p4).Pt());
+            return 0.0f;
+        """,
+    )
+
+    df = df.Define("MET_over_sqrtHT", "PuppiMET_pt / pow(HT, 0.5)")
+
+    df = df.Define("bb_btag_product", "bjet1_btagPNetB * bjet2_btagPNetB")
+
     return df
 
 
