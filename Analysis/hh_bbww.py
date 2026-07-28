@@ -513,12 +513,14 @@ def AddDNNVariablesDL(df, isData=False):
     )
 
     df = df.Define(
-        "lb_centrality", "(lep1_pt + lep2_pt) / (bjet1_pt + bjet2_pt + PuppiMET_pt)"
+        "lb_centrality",
+        "(bjet1_pt + bjet2_pt + PuppiMET_pt) > 0.0 ? "
+        "(lep1_pt + lep2_pt) / (bjet1_pt + bjet2_pt + PuppiMET_pt) : 0.0",
     )
 
     df = df.Define("HT_total", "HT + PuppiMET_pt + lep1_pt + lep2_pt")
 
-    df = df.Define("ll_bb_pt_ratio", "ll_pt / bb_pt")
+    df = df.Define("ll_bb_pt_ratio", "bb_pt > 0.0 ? ll_pt / bb_pt : 0.0")
 
     df = df.Define(
         "min_lmet_mt",
@@ -536,6 +538,11 @@ def AddDNNVariablesDL(df, isData=False):
         "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4)),"
         "abs(ROOT::Math::VectorUtil::DeltaPhi(lep2_p4, PuppiMET_p4))"
         ")",
+    )
+
+    df = df.Define(
+        "ll_met_MT_WithMass",
+        "static_cast<float>(Calculate_MT_WithMass(lep1_p4 + lep2_p4, PuppiMET_p4))",
     )
 
     return df
@@ -1648,7 +1655,10 @@ def AddDNNVariablesCommon(df, isData=False):
         """,
     )
 
-    df = df.Define("MET_over_sqrtHT", "PuppiMET_pt / pow(HT, 0.5)")
+    df = df.Define(
+        "MET_over_sqrt_HT",
+        "HT > 0.0 ? PuppiMET_pt / sqrt(HT) : 0.0",
+    )
 
     df = df.Define("bb_btag_product", "bjet1_btagPNetB * bjet2_btagPNetB")
 
