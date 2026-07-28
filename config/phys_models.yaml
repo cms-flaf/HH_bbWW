@@ -75,10 +75,3 @@ DNNTraining_Model:
     - GluGluToRadion_SingleLepton
   data:
     - Data_Full
-
-OnlyData:
-  name: "Only Data"
-  backgrounds: [ ]
-  signals: [ ]
-  data:
-    - Data_Full
