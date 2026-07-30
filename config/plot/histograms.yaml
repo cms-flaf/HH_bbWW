@@ -48,7 +48,7 @@ lep2_eta:
   divide_by_bin_width: False
 
 lep1_pt:
-  x_bins: "50|20:500"
+  x_bins: "50|20:300"
   x_title: lep1_pt [GeV]
   y_title: Events
   use_log_y: False
@@ -56,7 +56,7 @@ lep1_pt:
   divide_by_bin_width: False
 
 lep2_pt:
-  x_bins: "50|20:500"
+  x_bins: "50|20:300"
   x_title: lep2_pt [GeV]
   y_title: Events
   use_log_y: False
@@ -324,7 +324,7 @@ fatbjet_eta:
   divide_by_bin_width: False
 
 fatbjet_pt:
-  x_bins: "50|20:500"
+  x_bins: "35|150:500"
   x_title: fatbjet pt [GeV]
   y_title: Events
   use_log_y: False
@@ -332,7 +332,15 @@ fatbjet_pt:
   divide_by_bin_width: False
 
 fatbjet_mass:
-  x_bins: "20|0:200"
+  x_bins: "50|0:300"
+  x_title: fatbjet mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatbjet_mass_PNetCorr:
+  x_bins: "50|0:300"
   x_title: fatbjet mass [GeV]
   y_title: Events
   use_log_y: False
@@ -354,6 +362,47 @@ fatbjet_particleNetWithMass_HbbvsQCD:
   use_log_y: False
   max_y_sf: 1.5
   divide_by_bin_width: False
+
+fatbjet_tau1:
+  x_bins: "20|0.0:1.0"
+  x_title: fatbjet tau1
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatbjet_tau2:
+  x_bins: "20|0.0:0.5"
+  x_title: fatbjet tau2
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatbjet_tau3:
+  x_bins: "20|0.0:0.25"
+  x_title: fatbjet tau3
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatbjet_tau4:
+  x_bins: "20|0.0:0.25"
+  x_title: fatbjet tau4
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+fatbjet_msoftdrop:
+  x_bins: "50|0:200"
+  x_title: fatbjet mass [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 
 ########## fatwjet BEGIN ##########
 
@@ -450,7 +499,7 @@ met_phi:
 ########## ll BEGIN ##########
 
 ll_mass:
-  x_bins: "200|12:400"
+  x_bins: "100|0.0:400.0"
   x_title: diLep mass
   y_title: Events
   use_log_y: True
@@ -493,7 +542,7 @@ bb_pt:
   divide_by_bin_width: False
 
 bb_mass:
-  x_bins: "100|0:300"
+  x_bins: "50|0:500"
   x_title: m(bb)
   y_title: Events
   use_log_y: False
@@ -543,6 +592,14 @@ bb_deta:
 bb_ptToE:
   x_bins: "20|0.0:1.0"
   x_title: bb pt / E
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_btag_product:
+  x_bins: "20|0.0:1.0"
+  x_title: bjet1 btag * bjet2 btag
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
@@ -647,7 +704,7 @@ mT_fix:
   divide_by_bin_width: False
 
 MT:
-  x_bins: "100|0:200"
+  x_bins: "25|0:200"
   x_title: MT
   y_title: Events
   use_log_y: False
@@ -657,6 +714,14 @@ MT:
 total_MT:
   x_bins: "100|0:200"
   x_title: MT total
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+ll_met_MT_WithMass:
+  x_bins: "25|0:200"
+  x_title: ll met MT with mass
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
@@ -703,7 +768,7 @@ MT2_bb:
   divide_by_bin_width: False
 
 MT2_blbl1:
-  x_bins: "100|0:500"
+  x_bins: "50|0:500"
   x_title: MT2 blbl1
   y_title: Events
   use_log_y: False
@@ -711,7 +776,7 @@ MT2_blbl1:
   divide_by_bin_width: False
 
 MT2_blbl2:
-  x_bins: "100|0:500"
+  x_bins: "50|0:500"
   x_title: MT2 blbl2
   y_title: Events
   use_log_y: False
@@ -830,6 +895,14 @@ m_bbllmet:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+min_lmet_mt:
+  x_bins: "50|0:200"
+  x_title: min(lmet) mT
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 ########## dR BEGIN ##########
 
 ll_dR:
@@ -888,6 +961,30 @@ hadT_hadW_dR:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+min_lb_dR:
+  x_bins: "25|0:5.0"
+  x_title: "min dR (l1b1, l1b2, l2b1, l2b2)"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+lb_centrality:
+  x_bins: "50|0:3.0"
+  x_title: "pT centrality (l1+l2)/(b1+b2+met)"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MET_over_sqrt_HT:
+  x_bins: "25|0:10.0"
+  x_title: "PuppiMET pT / sqrt(HT)"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 ########## dPhi BEGIN ##########
 
 met_ll_dphi:
@@ -903,6 +1000,14 @@ met_bb_dphi:
   x_bins: "10|0:4.0"  # Δφ between MET and dibjet system (typically between 0 and π)
   # x_bins: [ 0.0, 0.348, 0.696, 1.044, 1.392, 1.74, 2.088, 2.436, 2.784, 3.14 ]
   x_title: "dPhi between MET and dibjet system"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+min_lmet_dphi:
+  x_bins: "10|0:4.0"
+  x_title: "min(dPhi) between leptons and MET"
   y_title: "Events"
   use_log_y: False
   max_y_sf: 1.5
@@ -927,7 +1032,7 @@ Lep1Lep2Jet1Jet2_mass:
   divide_by_bin_width: False
 
 bbllmet_mass:
-  x_bins: "1000|0:2500"
+  x_bins: "50|0:1000"
   x_title: m(bbllmet)
   y_title: Events
   use_log_y: False
@@ -966,6 +1071,22 @@ HT:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
+HT_total:
+  x_bins: "25|40:1000"
+  x_title: HT Total [GeV]
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+ll_bb_pt_ratio:
+  x_bins: "50|0:5.0"
+  x_title: "ll_pT / bb_pT"
+  y_title: "Events"
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
 ########## DNN and HME BEGIN ##########
 
 SingleLepHME_mass:
@@ -983,7 +1104,7 @@ DoubleLepHME_mass:
   divide_by_bin_width: False
 
 DeepHME_mass:
-  x_bins: "250|0.0:2500"
+  x_bins: "50|0.0:1500"
   x_title: "Deep HME Mass"
   y_title: "Events"
   use_log_y: False
@@ -1413,6 +1534,96 @@ DNN_M900_ST:
 DNN_M1000_ST:
   x_bins: "50|-7.5:7.5"
   x_title: DNN M1000 ST Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M300_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M300 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M400_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M400 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M500_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M500 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M550_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M550 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M600_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M600 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M650_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M650 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M700_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M700 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M800_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M800 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M900_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M900 Other Logits
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+DNN_M1000_Other:
+  x_bins: "50|-7.5:7.5"
+  x_title: DNN M1000 Other Logits
   y_title: Events
   use_log_y: True
   max_y_sf: 1.5
