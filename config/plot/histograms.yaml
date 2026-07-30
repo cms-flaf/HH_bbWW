@@ -985,9 +985,6 @@ MET_over_sqrt_HT:
   max_y_sf: 1.5
   divide_by_bin_width: False
 
-
-
-
 ########## dPhi BEGIN ##########
 
 met_ll_dphi:

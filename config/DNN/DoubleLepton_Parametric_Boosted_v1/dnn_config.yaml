@@ -12,7 +12,7 @@ dedicated_mass: null  # Set to an integer (e.g., 500) if evaluating a single mas
 # Cross-Validation Parity Setup
 nParity: 4
 model_name: pdnn_model_{regime}_nparity{nParity}.onnx
-train_parity: 
+train_parity:
   index: (nParity) % 4
   func: (event_number + {nParity}) % 4
 test_parity:
@@ -26,13 +26,13 @@ app_parity:
   func: (event_number + {nParity} + 3) % 4
 
 # Class Output Mapping
-class_names: ["Signal", "TT", "Other"]
+class_names: [ "Signal", "TT", "Other" ]
 
 # Hypothesis Mass Points for Parametric Inference & Training
-signal_mass_points: [300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000]
+signal_mass_points: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000 ]
 
 # Execution Regimes / Topologies
-regimes: ["boosted", "resolved"]
+regimes: [ "boosted", "resolved" ]
 
 # Training Hyperparameters
 training:
@@ -42,15 +42,15 @@ training:
   learning_rate: 0.002
   weight_decay: 0.01
   dropout_rate: 0.35
-  hidden_dims: [512, 256, 128, 64]
+  hidden_dims: [ 512, 256, 128, 64 ]
   num_classes: 3
-  
+
   # Scheduler & Early Stopping
   early_stopping_patience: 10
   lr_scheduler:
     patience: 6
     factor: 0.5
-    
+
   # Feature Scan Settings
   perm_subsample_fraction: 0.20  # Subsample fraction for feature importance scans
 
