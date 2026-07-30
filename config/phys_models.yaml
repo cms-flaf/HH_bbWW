@@ -54,3 +54,24 @@ Production_Model:
     - XtoHHto2Tau2B
   data:
     - Data_Full
+
+DNNTraining_Model:
+  name: "Base model for Run 3"
+  backgrounds:
+    - TT
+    - DY
+    - ST
+    - VV
+    - W
+    - SingleHiggs
+    # - QCD_PT
+  signals:
+    - XtoHHto2B2W_SingleLepton
+    - XtoHHto2B2W_DoubleLepton
+    # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
+    - XtoHHto2Tau2B
+    # Include Radion for DNN Training
+    - GluGluToRadion_DoubleLepton
+    - GluGluToRadion_SingleLepton
+  data:
+    - Data_Full
