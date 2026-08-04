@@ -349,16 +349,37 @@ class TwoStageDNNProducer:
             [f"{self.payload_name}_{col}" for col in self.cfg["columns"]]
         )
 
-        load_features.update(["FullEventId", "event", "SL", "DL"])
+        load_features.update(["FullEventId", "event", "SL", "DL", "boosted"])
         self.vars_to_save = load_features
 
 
     def run(self, array):
-        print("Running TwoStageDNN producer")
+        print("Running TwoStageDNNProducer producer")
+
+        array = self.ApplyDNN(array)
+        array = self.SelectDNN(array)
+
+        # Delete not-needed branches
+        for col in array.fields:
+            if col not in self.cfg["columns"]:
+                if col != "FullEventId":
+                    del array[col]
+
+        # Rename the branches
+        for col in self.cfg["columns"]:
+            if col in array.fields:
+                array[f"{self.payload_name}_{col}"] = array[f"{col}"]
+                del array[f"{col}"]
+            else:
+                print(f"Expected column {col} not found in your payload array!")
+                print(f"Available columns were {array.fields}")
+
+        return array
 
 
     def ApplyDNN(self, branches):
         output_fields = {}
+        class_names_list = self.cfg["class_names"]
 
         for channel, specs in self.channel_dnn_specs.items():
             if specs is None:
@@ -369,8 +390,6 @@ class TwoStageDNNProducer:
             num_classes = specs["num_classes"]
             num_events = len(branches)
             event_id = np.asarray(branches.event)
-
-            class_names_list = specs["class_names"]
 
             bin_name_pattern = specs["binary_name_pattern"]
             multiclass_name_pattern = specs["multiclass_name_pattern"]
@@ -457,4 +476,56 @@ class TwoStageDNNProducer:
 
         del output_fields
         gc.collect()
+        return branches
+
+    
+    def SelectDNN(self, branches):
+        nEvents = len(branches)
+        output_fields = {}
+        class_names_list = self.cfg["class_names"]
+
+        sl_mask = (
+            np.asarray(branches.SL, dtype=bool)
+            if "SL" in branches.fields
+            else np.zeros(nEvents, dtype=bool)
+        )
+        boosted_mask = (
+            np.asarray(branches.boosted, dtype=bool)
+            if "boosted" in branches.fields
+            else np.zeros(nEvents, dtype=bool)
+        )
+
+        for mass in self.masses:
+            for class_name in class_names_list:
+                target_field = f"M{int(mass)}_{class_name}"
+
+                sl_boosted = (
+                    np.asarray(branches[f"SL_boosted_{target_field}"])
+                    if f"SL_boosted_{target_field}" in branches.fields
+                    else np.zeros(nEvents, dtype=np.float32)
+                )
+                sl_resolved = (
+                    np.asarray(branches[f"SL_resolved_{target_field}"])
+                    if f"SL_resolved_{target_field}" in branches.fields
+                    else np.zeros(nEvents, dtype=np.float32)
+                )
+                dl_boosted = (
+                    np.asarray(branches[f"DL_boosted_{target_field}"])
+                    if f"DL_boosted_{target_field}" in branches.fields
+                    else np.zeros(nEvents, dtype=np.float32)
+                )
+                dl_resolved = (
+                    np.asarray(branches[f"DL_resolved_{target_field}"])
+                    if f"DL_resolved_{target_field}" in branches.fields
+                    else np.zeros(nEvents, dtype=np.float32)
+                )
+
+                sl_sel = np.where(boosted_mask, sl_boosted, sl_resolved)
+                dl_sel = np.where(boosted_mask, dl_boosted, dl_resolved)
+
+                output_fields[target_field] = np.where(sl_mask, sl_sel, dl_sel)
+
+        for field_name, values in output_fields.items():
+            branches[field_name] = values
+
         return branches
