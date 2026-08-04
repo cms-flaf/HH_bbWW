@@ -103,8 +103,7 @@ class CellObs(object):
         self.is_empty_meta = bool(is_empty_meta)
         if rects is not None:
             self.rects = [
-                (float(r[0]), float(r[1]), float(r[2]), float(r[3]))
-                for r in rects
+                (float(r[0]), float(r[1]), float(r[2]), float(r[3])) for r in rects
             ]
             self.n_subrects = len(self.rects)
             # Bbox of the union (diagnostic only; integral uses rects)
@@ -124,9 +123,7 @@ class CellObs(object):
 
 
 def _garwood_poisson_sigma0():
-    return 0.5 * float(
-        ROOT.TMath.ChisquareQuantile(1.0 - 0.5 * _POISSON_ALPHA, 2)
-    )
+    return 0.5 * float(ROOT.TMath.ChisquareQuantile(1.0 - 0.5 * _POISSON_ALPHA, 2))
 
 
 def _sigma0_from_th1():
@@ -156,9 +153,7 @@ def _cell_sigma(content, error, cell_id=None):
         return _SIGMA_N0
     if e > 0.0 and math.isfinite(e):
         return e
-    raise ValueError(
-        "cell id=%s n=%g has non-positive error %g" % (cell_id, c, e)
-    )
+    raise ValueError("cell id=%s n=%g has non-positive error %g" % (cell_id, c, e))
 
 
 def effective_sigma(content, error_stat, thr):
@@ -255,8 +250,7 @@ def _empty_rects_from_cells(empty_cells, x_edges, y_edges):
     if not empty_cells:
         return []
     have_idx = all(
-        ("ix0" in c and "ix1" in c and "iy0" in c and "iy1" in c)
-        for c in empty_cells
+        ("ix0" in c and "ix1" in c and "iy0" in c and "iy1" in c) for c in empty_cells
     )
     if not have_idx or x_edges is None or y_edges is None:
         return [
@@ -277,15 +271,11 @@ def _empty_rects_from_cells(empty_cells, x_edges, y_edges):
     ye = list(y_edges)
     rects = []
     for ix0, ix1, iy0, iy1 in merged:
-        rects.append(
-            (float(xe[ix0]), float(xe[ix1]), float(ye[iy0]), float(ye[iy1]))
-        )
+        rects.append((float(xe[ix0]), float(xe[ix1]), float(ye[iy0]), float(ye[iy1])))
     return rects
 
 
-def cells_to_observations(
-    grid, dnn_min, dnn_max, hme_min, hme_max, empty_meta=True
-):
+def cells_to_observations(grid, dnn_min, dnn_max, hme_min, hme_max, empty_meta=True):
     """Build CellObs list: centres inside the fit window, content ≥ 0.
 
     If ``empty_meta`` is True (default), all zero-yield cells are merged into
@@ -312,9 +302,7 @@ def cells_to_observations(
             empty_cells.append(c)
             continue
         err = _cell_sigma(cont, float(c.get("error") or 0.0), c.get("id"))
-        pos.append(
-            CellObs(c.get("id", len(pos)), xlo, xhi, ylo, yhi, cont, err)
-        )
+        pos.append(CellObs(c.get("id", len(pos)), xlo, xhi, ylo, yhi, cont, err))
 
     out = list(pos)
     n_empty_cells = len(empty_cells)
@@ -386,9 +374,7 @@ def _reseed_N(model, obs, inits, gl_pack=None):
 
 def _read_cov(mini, npar):
     try:
-        mat = [
-            [float(mini.CovMatrix(i, j)) for j in range(npar)] for i in range(npar)
-        ]
+        mat = [[float(mini.CovMatrix(i, j)) for j in range(npar)] for i in range(npar)]
         diags = [mat[i][i] for i in range(npar)]
         if all(math.isfinite(d) and d >= 0 for d in diags) and max(diags) > 0.0:
             return mat
@@ -499,11 +485,7 @@ def fit_chi2_norm_cells(
     ndata = len(obs)
     ndf = ndata - npar
     chi2ndf = chi2val / ndf if ndf > 0 else float("inf")
-    pval = (
-        float(ROOT.TMath.Prob(chi2val, ndf))
-        if ndf > 0 and chi2val < 1e20
-        else 0.0
-    )
+    pval = float(ROOT.TMath.Prob(chi2val, ndf)) if ndf > 0 and chi2val < 1e20 else 0.0
     soft_ok = (
         status in (0, 1)
         or (status in (2, 3, 4, 5) and chi2ndf < 5.0)
@@ -541,6 +523,7 @@ def fit_chi2_norm_cells(
         "fit_mode": "chi2_norm",
         "_keepalive": _keepalive,
     }
+
 
 def json_safe(obj):
     if isinstance(obj, float):
@@ -663,9 +646,7 @@ def select_degree_and_thr(
 
     last = None
     for d in degrees:
-        model = ExpPolyLogY2D(
-            xmin, xmax, ymin, ymax, degree=d, n_quad=n_quad
-        )
+        model = ExpPolyLogY2D(xmin, xmax, ymin, ymax, degree=d, n_quad=n_quad)
         model.initial_params[0] = integral
         print(
             "[fit_one] try degree=%d  npar=%d  thr_mode=%s thr_max=%g"
@@ -802,13 +783,10 @@ def main(argv=None):
     n_neg = sum(1 for c in cells if float(c.get("content", 0)) < 0)
     if n_neg:
         sys.exit(
-            "[ERROR] grid has %d negative cells — re-run grid_merge (strict)"
-            % n_neg
+            "[ERROR] grid has %d negative cells — re-run grid_merge (strict)" % n_neg
         )
 
-    auto_xmin, auto_xmax, auto_ymin, auto_ymax = fit_range_from_positive_cells(
-        cells
-    )
+    auto_xmin, auto_xmax, auto_ymin, auto_ymax = fit_range_from_positive_cells(cells)
     dnn_min = auto_xmin if args.dnn_min is None else float(args.dnn_min)
     dnn_max = auto_xmax if args.dnn_max is None else float(args.dnn_max)
     hme_min = auto_ymin if args.hme_min is None else float(args.hme_min)

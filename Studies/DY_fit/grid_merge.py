@@ -207,9 +207,10 @@ def validate_grid(grid, fine_content=None):
             )
             continue
         # Edge alignment (cell is a true axis-aligned rectangle of fine bins)
-        if abs(c.xmin - float(grid.x_edges[c.ix0])) > 1e-9 or abs(
-            c.xmax - float(grid.x_edges[c.ix1])
-        ) > 1e-9:
+        if (
+            abs(c.xmin - float(grid.x_edges[c.ix0])) > 1e-9
+            or abs(c.xmax - float(grid.x_edges[c.ix1])) > 1e-9
+        ):
             issues.append(
                 "cell %d x-edges mismatch fine edges (%.6g,%.6g) vs (%.6g,%.6g)"
                 % (
@@ -220,9 +221,10 @@ def validate_grid(grid, fine_content=None):
                     float(grid.x_edges[c.ix1]),
                 )
             )
-        if abs(c.ymin - float(grid.y_edges[c.iy0])) > 1e-9 or abs(
-            c.ymax - float(grid.y_edges[c.iy1])
-        ) > 1e-9:
+        if (
+            abs(c.ymin - float(grid.y_edges[c.iy0])) > 1e-9
+            or abs(c.ymax - float(grid.y_edges[c.iy1])) > 1e-9
+        ):
             issues.append(
                 "cell %d y-edges mismatch fine edges (%.6g,%.6g) vs (%.6g,%.6g)"
                 % (
@@ -252,9 +254,7 @@ def validate_grid(grid, fine_content=None):
     if fc is not None:
         fc = np.asarray(fc, dtype=float)
         if fc.shape != (nx, ny):
-            issues.append(
-                "fine_content shape %s != (%d,%d)" % (fc.shape, nx, ny)
-            )
+            issues.append("fine_content shape %s != (%d,%d)" % (fc.shape, nx, ny))
         else:
             for c in grid.cells:
                 expect = float(fc[c.ix0 : c.ix1, c.iy0 : c.iy1].sum())
@@ -545,9 +545,7 @@ def _strip_extension_candidates(
     # --- guaranteed single-path fallbacks ---
     dummy = np.zeros((nx, ny), dtype=bool)
     for mode in ("greedy", "mild"):
-        g = _grow_rectangle(
-            content, dummy, sx, sy, mode=mode, respect_claimed=False
-        )
+        g = _grow_rectangle(content, dummy, sx, sy, mode=mode, respect_claimed=False)
         if _rect_sum(P, *g) >= 0.0:
             add(g)
     sq = _expanding_square_clear(P, sx, sy, nx, ny)
@@ -568,7 +566,6 @@ def _seeds_covered_by_rect(seed_map, rect):
     if ids.size == 0:
         return frozenset()
     return frozenset(int(v) - 1 for v in np.unique(ids))
-
 
 
 def _select_orthogonal_merges(content, P, seeds, seed_candidates):
@@ -756,17 +753,14 @@ def _min_clear_rect(content, P, sx, sy):
         cands.append(sq)
     dummy = np.zeros((nx, ny), dtype=bool)
     for mode in ("mild", "greedy"):
-        g = _grow_rectangle(
-            content, dummy, sx, sy, mode=mode, respect_claimed=False
-        )
+        g = _grow_rectangle(content, dummy, sx, sy, mode=mode, respect_claimed=False)
         if _rect_sum(P, *g) >= 0.0:
             cands.append(tuple(g))
     if not cands:
         if float(content.sum()) >= 0.0:
             return (0, nx, 0, ny)
         raise RuntimeError(
-            "no clearing rect for seed (%d,%d); total integral negative"
-            % (sx, sy)
+            "no clearing rect for seed (%d,%d); total integral negative" % (sx, sy)
         )
 
     def area(r):
@@ -1104,9 +1098,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
                 if not strip_hits_frozen(srect):
                     new_a = ((ix1 + 1) - ix0) * (iy1 - iy0)
                     if new_a <= HARD_MAX:
-                        opts.append(
-                            (float(content[ix1, iy0:iy1].sum()), "R", srect)
-                        )
+                        opts.append((float(content[ix1, iy0:iy1].sum()), "R", srect))
             if iy0 > 0:
                 srect = (ix0, ix1, iy0 - 1, iy0)
                 if not strip_hits_frozen(srect):
@@ -1120,9 +1112,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
                 if not strip_hits_frozen(srect):
                     new_a = (ix1 - ix0) * ((iy1 + 1) - iy0)
                     if new_a <= HARD_MAX:
-                        opts.append(
-                            (float(content[ix0:ix1, iy1].sum()), "U", srect)
-                        )
+                        opts.append((float(content[ix0:ix1, iy1].sum()), "U", srect))
             if not opts:
                 return None
             opts.sort(key=lambda o: (0 if sm + o[0] >= 0 else 1, -o[0]))
@@ -1136,9 +1126,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
                 iy0 -= 1
             else:
                 iy1 += 1
-        ix0, ix1, iy0, iy1 = _tighten_rect(
-            content, ix0, ix1, iy0, iy1, sx, sy
-        )
+        ix0, ix1, iy0, iy1 = _tighten_rect(content, ix0, ix1, iy0, iy1, sx, sy)
         R = as_rect((ix0, ix1, iy0, iy1))
         dissolve_soft_intersecting([R])
         if float(content[R[0] : R[1], R[2] : R[3]].sum()) < 0.0:
@@ -1242,8 +1230,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
                 break
         raise RuntimeError(
             "mega-free residual cannot clear seed (%d,%d) content=%.6g "
-            "HARD_MAX=%d"
-            % (sx, sy, float(content[sx, sy]), HARD_MAX)
+            "HARD_MAX=%d" % (sx, sy, float(content[sx, sy]), HARD_MAX)
         )
 
     # ---- Stage 2: clear residuals, prefer small seeds ----
@@ -1274,9 +1261,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
                 max_frozen_this = max(max_frozen_this, area(as_rect(rect)))
 
         n_left = resoft()
-        max_now = max(
-            (area(r) for r in soft_blocks + frozen_blocks), default=0
-        )
+        max_now = max((area(r) for r in soft_blocks + frozen_blocks), default=0)
         print(
             "[grid_merge] residual pass %d: cleared=%d free %d→%d  "
             "soft=%d frozen=%d diss+=%d unfreeze+=%d max_cell_n=%d"
@@ -1296,9 +1281,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
         if n_left == 0:
             break
         if n_cleared == 0:
-            raise RuntimeError(
-                "mega-free residual made no progress (%d free)" % n_left
-            )
+            raise RuntimeError("mega-free residual made no progress (%d free)" % n_left)
 
     n_left = len(free_neg_coords())
     if n_left:
@@ -1357,9 +1340,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
         claimed = _rebuild_claimed(merged_blocks, nx, ny)
         n_left = int(np.sum((content < 0.0) & (~claimed)))
         if n_left:
-            raise RuntimeError(
-                "after mega-free post-pass, %d free neg remain" % n_left
-            )
+            raise RuntimeError("after mega-free post-pass, %d free neg remain" % n_left)
 
     # Final hard ban: bipartition any remaining mega; refuse to emit one.
     max_all = max((area(as_rect(r)) for r in merged_blocks), default=0)
@@ -1380,9 +1361,7 @@ def _build_grid_residual_local(content, error, x_edges, y_edges):
         claimed = _rebuild_claimed(merged_blocks, nx, ny)
         n_left = int(np.sum((content < 0.0) & (~claimed)))
         if n_left:
-            raise RuntimeError(
-                "mega-free final split left %d free neg" % n_left
-            )
+            raise RuntimeError("mega-free final split left %d free neg" % n_left)
         max_all = max((area(as_rect(r)) for r in merged_blocks), default=0)
 
     print(
@@ -1504,15 +1483,11 @@ def _repartition_large_rect(content, rect, max_keep=500):
             sub = _soft_repartition_sub(content, p, max_keep=max_keep)
             for q in sub:
                 qa = (q[1] - q[0]) * (q[3] - q[2])
-                if (
-                    float(content[q[0] : q[1], q[2] : q[3]].sum()) >= -1e-12
-                ):
+                if float(content[q[0] : q[1], q[2] : q[3]].sum()) >= -1e-12:
                     if qa <= max_keep:
                         final.append(q)
                     else:
-                        final.extend(
-                            _bipartition_nonneg(content, q, max_keep)
-                        )
+                        final.extend(_bipartition_nonneg(content, q, max_keep))
         except Exception as exc:
             print(
                 "[grid_merge] WARN: soft_repartition failed (%s); "
@@ -1547,9 +1522,7 @@ def _soft_repartition_sub(content, rect, max_keep=500):
         sx, sy = seeds[0]
         # exclusive grow from seed (soft+frozen claimed)
         rebuild()
-        g = _grow_rectangle(
-            sub, claimed, sx, sy, mode="mild", respect_claimed=True
-        )
+        g = _grow_rectangle(sub, claimed, sx, sy, mode="mild", respect_claimed=True)
         g = tuple(g)
         if float(sub[g[0] : g[1], g[2] : g[3]].sum()) < 0.0:
             g = _grow_rectangle(
@@ -1561,9 +1534,7 @@ def _soft_repartition_sub(content, rect, max_keep=500):
             P = _prefix_2d(sub)
             sq = _expanding_square_clear(P, sx, sy, snx, sny)
             if sq is None:
-                raise RuntimeError(
-                    "soft_repartition cannot clear (%d,%d)" % (sx, sy)
-                )
+                raise RuntimeError("soft_repartition cannot clear (%d,%d)" % (sx, sy))
             soft = [b for b in soft if not _rects_intersect(b, sq)]
             rebuild()
             g = _grow_rectangle(
@@ -1587,9 +1558,7 @@ def _soft_repartition_sub(content, rect, max_keep=500):
                             "soft_repartition stuck at (%d,%d)" % (sx, sy)
                         )
                 else:
-                    raise RuntimeError(
-                        "soft_repartition stuck at (%d,%d)" % (sx, sy)
-                    )
+                    raise RuntimeError("soft_repartition stuck at (%d,%d)" % (sx, sy))
         # dissolve soft overlapping g, freeze g (must not hit frozen)
         if any(_rects_intersect(f, g) for f in frozen):
             # shrink not possible easily — skip freeze absorb; try next seed
@@ -1598,18 +1567,14 @@ def _soft_repartition_sub(content, rect, max_keep=500):
             rebuild()
             if claimed[sx, sy]:
                 continue
-            raise RuntimeError(
-                "soft_repartition frozen block at (%d,%d)" % (sx, sy)
-            )
+            raise RuntimeError("soft_repartition frozen block at (%d,%d)" % (sx, sy))
         soft = [b for b in soft if not _rects_intersect(b, g)]
         rebuild()
         if claimed[g[0] : g[1], g[2] : g[3]].any():
             soft = [b for b in soft if not _rects_intersect(b, g)]
             rebuild()
         if claimed[g[0] : g[1], g[2] : g[3]].any():
-            raise RuntimeError(
-                "soft_repartition claim conflict at (%d,%d)" % (sx, sy)
-            )
+            raise RuntimeError("soft_repartition claim conflict at (%d,%d)" % (sx, sy))
         frozen.append(g)
         rebuild()
 
@@ -1619,9 +1584,7 @@ def _soft_repartition_sub(content, rect, max_keep=500):
         for j in range(sny):
             if not claimed[i, j]:
                 if sub[i, j] < 0.0:
-                    raise RuntimeError(
-                        "soft_repartition free neg (%d,%d)" % (i, j)
-                    )
+                    raise RuntimeError("soft_repartition free neg (%d,%d)" % (i, j))
                 parts.append((i, i + 1, j, j + 1))
     out = [(ix0 + a, ix0 + b, iy0 + c, iy0 + d) for a, b, c, d in parts]
     # recurse large parts
@@ -1634,9 +1597,7 @@ def _soft_repartition_sub(content, rect, max_keep=500):
             and pa < parent_a
             and float(content[p[0] : p[1], p[2] : p[3]].sum()) >= 0.0
         ):
-            final.extend(
-                _repartition_large_rect(content, p, max_keep=max_keep)
-            )
+            final.extend(_repartition_large_rect(content, p, max_keep=max_keep))
         else:
             final.append(p)
     return final
@@ -1744,8 +1705,7 @@ def _build_grid_force_clear_legacy(content, error, x_edges, y_edges):
 
     if free_neg_coords():
         raise RuntimeError(
-            "force-clear did not finish (%d free neg left)"
-            % len(free_neg_coords())
+            "force-clear did not finish (%d free neg left)" % len(free_neg_coords())
         )
     return merged_blocks, n_neg_before, force_iters, n_force_dissolves
 
@@ -1800,9 +1760,7 @@ def build_grid_from_arrays(
         algorithm = "residual_local"
 
     if algorithm == "soft":
-        merged_blocks, claimed, n_neg_before, n_res = _soft_strip_expand(
-            content
-        )
+        merged_blocks, claimed, n_neg_before, n_res = _soft_strip_expand(content)
         algo_name = "soft_strip_expand"
         allow_residual_neg = True
         print(
@@ -1864,8 +1822,7 @@ def build_grid_from_arrays(
             c = float(content[ix, iy])
             if c < 0.0 and not allow_residual_neg:
                 raise RuntimeError(
-                    "singleton fine bin (%d,%d) still negative (%.6g)"
-                    % (ix, iy, c)
+                    "singleton fine bin (%d,%d) still negative (%.6g)" % (ix, iy, c)
                 )
             e = float(error[ix, iy])
             cells.append(
@@ -1889,8 +1846,7 @@ def build_grid_from_arrays(
     n_neg_after = sum(1 for c in cells if c.content < 0)
     if n_neg_after > 0 and not allow_residual_neg:
         raise RuntimeError(
-            "no-negative grid failed: %d cells still have content < 0"
-            % n_neg_after
+            "no-negative grid failed: %d cells still have content < 0" % n_neg_after
         )
 
     integral = float(sum(c.content for c in cells))
@@ -1938,11 +1894,10 @@ def build_grid_from_arrays(
     grid.meta["validation"] = vstats
     return grid
 
+
 def build_grid_from_th2(h, algorithm="residual_local", **meta_kw):
     content, error, x_edges, y_edges = th2_to_arrays(h)
-    g = build_grid_from_arrays(
-        content, error, x_edges, y_edges, algorithm=algorithm
-    )
+    g = build_grid_from_arrays(content, error, x_edges, y_edges, algorithm=algorithm)
     g.meta.update(meta_kw)
     return g
 
@@ -2054,9 +2009,7 @@ def plot_grid(grid, output_pdf, title=None):
         cmap = ListedColormap(["#dddddd", "#4C78A8", "#E45756"])
         bounds = [-0.5, 0.5, 1.5, 2.5]
         norm = BoundaryNorm(bounds, cmap.N)
-        pcm = ax.pcolormesh(
-            xe, ye, own.T, cmap=cmap, norm=norm, shading="flat"
-        )
+        pcm = ax.pcolormesh(xe, ye, own.T, cmap=cmap, norm=norm, shading="flat")
         cbar = fig.colorbar(pcm, ax=ax, ticks=[0, 1, 2])
         cbar.ax.set_yticklabels(["singleton (≥0)", "merged block", "residual neg"])
         # Draw each merged cell as a true Rectangle outline (no fill)
@@ -2228,8 +2181,7 @@ def plot_grid(grid, output_pdf, title=None):
         ax.set_title(
             "%s — merged blocks only (each patch is one axis-aligned rectangle)\n"
             "n_merged=%d  residual_neg singletons=%d (red)  "
-            "validation: no overlap, full coverage"
-            % (ttl, n_merged, len(residual_neg))
+            "validation: no overlap, full coverage" % (ttl, n_merged, len(residual_neg))
         )
         fig.tight_layout()
         pdf.savefig(fig)
@@ -2300,8 +2252,7 @@ def plot_grid(grid, output_pdf, title=None):
 
     print(
         "[grid_merge] plot: %d pages, %d rectangular merged patches, "
-        "validation OK (cover=1 everywhere)"
-        % (5, n_merged),
+        "validation OK (cover=1 everywhere)" % (5, n_merged),
         flush=True,
     )
     return output_pdf
@@ -2480,9 +2431,9 @@ def main(argv=None):
 
     allow_res = args.allow_residual_neg or args.algorithm == "soft"
     if grid.meta["n_neg_after"] > 0:
-        msg = (
-            "[grid_merge] residual negative cells remain: %d  algorithm=%s"
-            % (grid.meta["n_neg_after"], grid.meta.get("algorithm"))
+        msg = "[grid_merge] residual negative cells remain: %d  algorithm=%s" % (
+            grid.meta["n_neg_after"],
+            grid.meta.get("algorithm"),
         )
         if allow_res:
             print(msg + "  (allowed)", flush=True)

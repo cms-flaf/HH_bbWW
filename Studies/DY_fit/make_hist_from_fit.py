@@ -88,7 +88,11 @@ def parse_from_hist_spec(spec):
             return root_file, hist_path
         # generic last colon
         root_file, hist_path = spec.rsplit(":", 1)
-        if hist_path and not hist_path.startswith("/") and os.path.sep not in hist_path[:2]:
+        if (
+            hist_path
+            and not hist_path.startswith("/")
+            and os.path.sep not in hist_path[:2]
+        ):
             return root_file, hist_path
     return spec, _DEFAULT_FROM_HIST
 
@@ -315,8 +319,7 @@ def resolve_binning(args):
     """Return (x_edges, y_edges, binning_meta)."""
     has_from = bool(args.from_hist)
     has_explicit = any(
-        v is not None
-        for v in (args.x_range, args.x_bins, args.y_range, args.y_bins)
+        v is not None for v in (args.x_range, args.x_bins, args.y_range, args.y_bins)
     )
     if has_from and has_explicit:
         sys.exit(

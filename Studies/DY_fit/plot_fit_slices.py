@@ -245,8 +245,7 @@ def _parse_dnn_slices(s: str) -> List[float]:
     parts = [p.strip() for p in s.split(",") if p.strip()]
     if len(parts) < 2:
         sys.exit(
-            "[ERROR] --dnn-slices needs at least two edges "
-            "(e.g. -7.5,-3,0,3,6.5)"
+            "[ERROR] --dnn-slices needs at least two edges " "(e.g. -7.5,-3,0,3,6.5)"
         )
     try:
         edges = [float(p) for p in parts]
@@ -320,7 +319,9 @@ def _slice_ranges_from_edges(
     return out
 
 
-def _load_signal_dnn_projection(result: dict, args, data: core.Hist2DData) -> np.ndarray:
+def _load_signal_dnn_projection(
+    result: dict, args, data: core.Hist2DData
+) -> np.ndarray:
     """Per-DNN-bin signal yield inside the fit HME window (native bins).
 
     Uses plots_2d/signal_2d (override with --signal-hist).
@@ -357,7 +358,9 @@ def _load_signal_dnn_projection(result: dict, args, data: core.Hist2DData) -> np
             % (hist_name, mx, cat, exc)
         )
 
-    if sig.nx != data.nx or not np.allclose(sig.x_edges, data.x_edges, atol=1e-9, rtol=0):
+    if sig.nx != data.nx or not np.allclose(
+        sig.x_edges, data.x_edges, atol=1e-9, rtol=0
+    ):
         raise RuntimeError(
             "signal DNN binning does not match DY (native bins must agree)"
         )
@@ -387,15 +390,9 @@ def _auto_const_signal_slice_edges(
     if n_slices < 1:
         sys.exit("[ERROR] --auto-dnn-slice-n-const-signal-bins must be >= 1")
 
-    window_idxs = [
-        i
-        for i, x in enumerate(x_centers)
-        if dnn_min <= float(x) <= dnn_max
-    ]
+    window_idxs = [i for i, x in enumerate(x_centers) if dnn_min <= float(x) <= dnn_max]
     if not window_idxs:
-        sys.exit(
-            f"[ERROR] no DNN bins in fit window [{dnn_min:g}, {dnn_max:g}]"
-        )
+        sys.exit(f"[ERROR] no DNN bins in fit window [{dnn_min:g}, {dnn_max:g}]")
 
     window_yields = np.array(
         [float(max(sig_yield_dnn[i], 0.0)) for i in window_idxs], dtype=float
@@ -655,7 +652,9 @@ def _draw_slice_pad(
     pave.AddText(str(key))
     if chi2ndf is not None and math.isfinite(float(chi2ndf)):
         if chi2 is not None and ndf is not None:
-            pave.AddText(f"chi^{{2}}/ndf = {float(chi2ndf):.3f}  ({float(chi2):.1f}/{int(ndf)})")
+            pave.AddText(
+                f"chi^{{2}}/ndf = {float(chi2ndf):.3f}  ({float(chi2):.1f}/{int(ndf)})"
+            )
         else:
             pave.AddText(f"chi^{{2}}/ndf = {float(chi2ndf):.3f}")
     if pval is not None and math.isfinite(float(pval)):
@@ -778,8 +777,7 @@ def main():
         sys.exit("[ERROR] fit JSON has no p-value")
     if float(pval) < 0.05:
         sys.exit(
-            "[ERROR] fit JSON p-value %.4g < 0.05 - refit before plotting"
-            % float(pval)
+            "[ERROR] fit JSON p-value %.4g < 0.05 - refit before plotting" % float(pval)
         )
 
     # Cov eigen +/-1sigma grids for fit-integral uncertainty
@@ -845,9 +843,7 @@ def main():
                 for i, x in enumerate(data.x_centers)
                 if dnn_min <= float(x) <= dnn_max
             ]
-            yields = np.array(
-                [float(max(sig_dnn[i], 0.0)) for i in idxs], dtype=float
-            )
+            yields = np.array([float(max(sig_dnn[i], 0.0)) for i in idxs], dtype=float)
             per_slice_signal = _slice_signal_yields(
                 idxs, yields, slice_edges, data.x_edges
             )
@@ -921,11 +917,7 @@ def main():
                 f"  [plot] slice {global_k} DNN=[{xlo:g},{xhi:g}]  "
                 f"I_DY={int_dy:.4g}+/-{int_dy_err:.4g}  "
                 f"I_Fit={int_fit:.4g}+/-{int_fit_err:.4g}"
-                + (
-                    f"  ratio={int_fit / int_dy:.3f}"
-                    if int_dy > 0
-                    else ""
-                )
+                + (f"  ratio={int_fit / int_dy:.3f}" if int_dy > 0 else "")
             )
             keep.extend([hd, hf, pad])
         canvas.Print(pdf)

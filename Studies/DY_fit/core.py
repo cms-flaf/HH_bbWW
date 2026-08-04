@@ -1,10 +1,10 @@
 """Shared helpers used by more than one script in this directory.
 
-  load_hist_2d  - load TH2 (native bins; no rebin)
-  ContinuousDensity2D family (N × pdf, Gauss–Legendre cell integrals):
-    ExpPoly2D, ExpPolyCheb2D, ExpPolyLogY2D, LogBern2D, MixtureExpPoly2D
-  eval / integrate for templates and plots
-  eigen_shape_shifts
+load_hist_2d  - load TH2 (native bins; no rebin)
+ContinuousDensity2D family (N × pdf, Gauss–Legendre cell integrals):
+  ExpPoly2D, ExpPolyCheb2D, ExpPolyLogY2D, LogBern2D, MixtureExpPoly2D
+eval / integrate for templates and plots
+eigen_shape_shifts
 """
 
 import math
@@ -206,15 +206,12 @@ def hist_quality_issues(data, window_only=True, allow_empty=True):
     if n_neg:
         issues.append(
             "%d bins with negative yields in %s "
-            "(run grid_merge.py to build a non-negative cell grid)"
-            % (n_neg, scope)
+            "(run grid_merge.py to build a non-negative cell grid)" % (n_neg, scope)
         )
     if not allow_empty:
         n_empty = count_empty_bins(data, window_only=window_only)
         if n_empty:
-            issues.append(
-                "%d empty (zero-yield) bins in %s" % (n_empty, scope)
-            )
+            issues.append("%d empty (zero-yield) bins in %s" % (n_empty, scope))
     return issues
 
 
@@ -224,9 +221,7 @@ def assert_hist_quality(data, window_only=True, allow_empty=True):
     Empty bins are allowed by default (``allow_empty=True``).  Negatives
     must be cleared (via ``grid_merge.py``) before fitting.
     """
-    issues = hist_quality_issues(
-        data, window_only=window_only, allow_empty=allow_empty
-    )
+    issues = hist_quality_issues(data, window_only=window_only, allow_empty=allow_empty)
     if issues:
         raise ValueError("; ".join(issues))
 
@@ -403,9 +398,7 @@ class ContinuousDensity2D(object):
                     y = ymid + yhalf * float(nodes[j])
                     xs[s, i, j] = x
                     ys[s, i, j] = y
-                    fac[s, i, j] = (
-                        float(weights[i]) * float(weights[j]) * xhalf * yhalf
-                    )
+                    fac[s, i, j] = float(weights[i]) * float(weights[j]) * xhalf * yhalf
         xmid_w = 0.5 * (self.xmin + self.xmax)
         xhalf_w = 0.5 * (self.xmax - self.xmin)
         ymid_w = 0.5 * (self.ymin + self.ymax)
@@ -419,9 +412,7 @@ class ContinuousDensity2D(object):
                 y = ymid_w + yhalf_w * float(nodes[j])
                 wxs[i, j] = x
                 wys[i, j] = y
-                wfac[i, j] = (
-                    float(weights[i]) * float(weights[j]) * xhalf_w * yhalf_w
-                )
+                wfac[i, j] = float(weights[i]) * float(weights[j]) * xhalf_w * yhalf_w
         return {
             "xs": xs,
             "ys": ys,
@@ -440,8 +431,7 @@ class ContinuousDensity2D(object):
         n_cells = gl_pack["n_cells"]
         Is = float(
             np.sum(
-                gl_pack["wfac"]
-                * self._shape_at_arr(gl_pack["wxs"], gl_pack["wys"], sp)
+                gl_pack["wfac"] * self._shape_at_arr(gl_pack["wxs"], gl_pack["wys"], sp)
             )
         )
         if not (Is > 0.0 and math.isfinite(Is)):
@@ -479,9 +469,7 @@ class ContinuousDensity2D(object):
                 for iy in range(ny):
                     ylo = float(y_edges[iy])
                     yhi = float(y_edges[iy + 1])
-                    Z[ix, iy] = (
-                        N * self._integral_s_rect(sp, xlo, xhi, ylo, yhi) / Is
-                    )
+                    Z[ix, iy] = N * self._integral_s_rect(sp, xlo, xhi, ylo, yhi) / Is
             return Z
         finally:
             if n_quad is not None and int(n_quad) != old_nq:
@@ -533,21 +521,17 @@ def _bernstein_basis(t, n):
     """Bernstein basis B_0^n .. B_n^n on t ∈ [0,1]. Returns list of arrays."""
     t = np.clip(np.asarray(t, dtype=float), 0.0, 1.0)
     om = 1.0 - t
-    return [
-        float(math.comb(n, i)) * (t**i) * (om ** (n - i)) for i in range(n + 1)
-    ]
+    return [float(math.comb(n, i)) * (t**i) * (om ** (n - i)) for i in range(n + 1)]
 
 
 class ExpPoly2D(ContinuousDensity2D):
     """exp(polynomial) on normalised (xn,yn) ∈ [-1,1] (monomial basis).
 
-        s = exp( sum_{1≤i+j≤deg} a_ij · xn^i · yn^j )
+    s = exp( sum_{1≤i+j≤deg} a_ij · xn^i · yn^j )
     """
 
     def __init__(self, xmin, xmax, ymin, ymax, degree=4, key=None, n_quad=4):
-        super(ExpPoly2D, self).__init__(
-            xmin, xmax, ymin, ymax, n_quad=n_quad, key=key
-        )
+        super(ExpPoly2D, self).__init__(xmin, xmax, ymin, ymax, n_quad=n_quad, key=key)
         self.degree = int(degree)
         self._terms = _total_degree_terms(self.degree)
         self.param_names = ["N"] + ["a_%d_%d" % (i, j) for i, j in self._terms]
@@ -592,9 +576,7 @@ class ExpPolyCheb2D(ContinuousDensity2D):
         )
         self.degree = int(degree)
         self._terms = _total_degree_terms(self.degree)
-        self.param_names = ["N"] + [
-            "c_%d_%d" % (i, j) for i, j in self._terms
-        ]
+        self.param_names = ["N"] + ["c_%d_%d" % (i, j) for i, j in self._terms]
         self.npar = len(self.param_names)
         self.key = key or ("ExpPolyCheb2D-%d" % self.degree)
         self.label = self.key
@@ -605,12 +587,8 @@ class ExpPolyCheb2D(ContinuousDensity2D):
         self.initial_params = inits
 
     def _shape_at_arr(self, x, y, coeffs):
-        xn = np.clip(
-            (np.asarray(x, dtype=float) - self._x0) / self._xhalf, -1.0, 1.0
-        )
-        yn = np.clip(
-            (np.asarray(y, dtype=float) - self._y0) / self._yhalf, -1.0, 1.0
-        )
+        xn = np.clip((np.asarray(x, dtype=float) - self._x0) / self._xhalf, -1.0, 1.0)
+        yn = np.clip((np.asarray(y, dtype=float) - self._y0) / self._yhalf, -1.0, 1.0)
         max_n = self.degree
         Tx = _chebyshev_T_powers(xn, max_n)
         Ty = _chebyshev_T_powers(yn, max_n)
@@ -655,9 +633,7 @@ class ExpPolyLogY2D(ContinuousDensity2D):
         self.initial_params = inits
         # log map: u = log1p((y-ymin)/span) / log1p(1) → [0,1] then → [-1,1]
         self._y_eps = 1e-3
-        self._log_span = math.log1p(
-            (self.ymax - self.ymin + self._y_eps) / self._y_eps
-        )
+        self._log_span = math.log1p((self.ymax - self.ymin + self._y_eps) / self._y_eps)
 
     def _yn_log(self, y):
         y = np.asarray(y, dtype=float)
@@ -694,12 +670,8 @@ class LogBern2D(ContinuousDensity2D):
     More stable than high-degree monomials on a compact domain.
     """
 
-    def __init__(
-        self, xmin, xmax, ymin, ymax, nx=4, ny=4, key=None, n_quad=4
-    ):
-        super(LogBern2D, self).__init__(
-            xmin, xmax, ymin, ymax, n_quad=n_quad, key=key
-        )
+    def __init__(self, xmin, xmax, ymin, ymax, nx=4, ny=4, key=None, n_quad=4):
+        super(LogBern2D, self).__init__(xmin, xmax, ymin, ymax, n_quad=n_quad, key=key)
         self.nx = int(nx)
         self.ny = int(ny)
         self._terms = []
@@ -708,9 +680,7 @@ class LogBern2D(ContinuousDensity2D):
                 if i == 0 and j == 0:
                     continue
                 self._terms.append((i, j))
-        self.param_names = ["N"] + [
-            "b_%d_%d" % (i, j) for i, j in self._terms
-        ]
+        self.param_names = ["N"] + ["b_%d_%d" % (i, j) for i, j in self._terms]
         self.npar = len(self.param_names)
         self.key = key or ("LogBern2D-%d-%d" % (self.nx, self.ny))
         self.label = self.key
@@ -721,12 +691,8 @@ class LogBern2D(ContinuousDensity2D):
         self.initial_params = inits
 
     def _uv(self, x, y):
-        u = (np.asarray(x, dtype=float) - self.xmin) / max(
-            self.xmax - self.xmin, 1e-12
-        )
-        v = (np.asarray(y, dtype=float) - self.ymin) / max(
-            self.ymax - self.ymin, 1e-12
-        )
+        u = (np.asarray(x, dtype=float) - self.xmin) / max(self.xmax - self.xmin, 1e-12)
+        v = (np.asarray(y, dtype=float) - self.ymin) / max(self.ymax - self.ymin, 1e-12)
         return np.clip(u, 0.0, 1.0), np.clip(v, 0.0, 1.0)
 
     def _shape_at_arr(self, x, y, coeffs):
@@ -788,9 +754,7 @@ class MixtureExpPoly2D(ContinuousDensity2D):
                 names.append("a%d_%d_%d" % (k, i, j))
         self.param_names = names
         self.npar = len(names)
-        self.key = key or (
-            "MixExpPoly2D-k%d-d%d" % (self.n_comp, self.degree)
-        )
+        self.key = key or ("MixExpPoly2D-k%d-d%d" % (self.n_comp, self.degree))
         self.label = self.key
         inits = [1.0]
         for _k in range(1, self.n_comp):
@@ -816,7 +780,10 @@ class MixtureExpPoly2D(ContinuousDensity2D):
         off = K - 1
         for k in range(K):
             blocks.append(
-                [float(shape_par[off + k * self._n_shape + t]) for t in range(self._n_shape)]
+                [
+                    float(shape_par[off + k * self._n_shape + t])
+                    for t in range(self._n_shape)
+                ]
             )
         return w, blocks
 
@@ -852,9 +819,7 @@ class ExpPolySep2D(ContinuousDensity2D):
     Cheap baseline; underfits when DNN–HME correlation is strong.
     """
 
-    def __init__(
-        self, xmin, xmax, ymin, ymax, dx=4, dy=4, key=None, n_quad=4
-    ):
+    def __init__(self, xmin, xmax, ymin, ymax, dx=4, dy=4, key=None, n_quad=4):
         super(ExpPolySep2D, self).__init__(
             xmin, xmax, ymin, ymax, n_quad=n_quad, key=key
         )
@@ -925,9 +890,7 @@ def make_density_2d(
     """
     n = (name or "exppoly").strip().lower().replace("-", "_")
     if n in ("exppoly", "exppoly2d", "poly", "exp_poly"):
-        return ExpPoly2D(
-            xmin, xmax, ymin, ymax, degree=degree, n_quad=n_quad, key=key
-        )
+        return ExpPoly2D(xmin, xmax, ymin, ymax, degree=degree, n_quad=n_quad, key=key)
     if n in ("cheb", "exppoly_cheb", "exppolycheb2d", "chebyshev"):
         return ExpPolyCheb2D(
             xmin, xmax, ymin, ymax, degree=degree, n_quad=n_quad, key=key
@@ -980,11 +943,7 @@ def rebuild_exppoly2d(result):
 def rebuild_density_2d(result):
     """Rebuild continuous density from fit JSON."""
     spec = result.get("function") or {}
-    model_name = (
-        spec.get("model")
-        or result.get("model")
-        or "exppoly2d"
-    )
+    model_name = spec.get("model") or result.get("model") or "exppoly2d"
     n_quad = int(spec.get("n_quad") or result.get("n_quad") or 4)
     deg = int(spec.get("degree") or result.get("degree") or 4)
     edges = result.get("fit_range_edges") or {}
@@ -996,17 +955,11 @@ def rebuild_density_2d(result):
     key = result.get("key")
     m = str(model_name).lower()
     if m in ("exppoly2d", "exppoly", "poly"):
-        return ExpPoly2D(
-            xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad
-        )
+        return ExpPoly2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
     if m in ("exppoly_cheb2d", "cheb", "exppolycheb2d"):
-        return ExpPolyCheb2D(
-            xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad
-        )
+        return ExpPolyCheb2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
     if m in ("exppoly_logy2d", "logy", "exppolylogy2d"):
-        return ExpPolyLogY2D(
-            xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad
-        )
+        return ExpPolyLogY2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
     if m in ("logbern2d", "logbern", "bernstein"):
         return LogBern2D(
             xmin,
@@ -1041,9 +994,7 @@ def rebuild_density_2d(result):
             n_quad=n_quad,
         )
     # default fallback
-    return ExpPoly2D(
-        xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad
-    )
+    return ExpPoly2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
 
 
 def eval_model_grid(result, x_c, y_c, params=None):
