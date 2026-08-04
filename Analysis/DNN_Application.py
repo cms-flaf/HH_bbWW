@@ -290,14 +290,21 @@ class TwoStageDNNProducer:
         load_features = set()
         columns_to_save = set()
 
+        # categories with dedicated networks/configs, each in its own subdir
+        self.categories = ["boosted", "resolved"]
+
         # maps channel -> dnn specs
         self.channel_dnn_specs = {
             "DL": self.cfg.get("DL", None),
             "SL": self.cfg.get("SL", None),
         }
 
+        self.dnn_configs = {}
+        # channel -> category -> models directory
+        self.models_folders = {}
+
         for channel, specs in self.channel_dnn_specs.items():
-            if specs == None:
+            if specs is None:
                 print(f"Channel {channel} does not have DNN defined, skip.")
                 continue
 
@@ -305,24 +312,43 @@ class TwoStageDNNProducer:
             if parametric:
                 raise NotImplementedError("Parametric two-stage DNN inference has not been implemented.")
 
-            # all models piled in one directory
-            self.models_folder = os.path.join(os.environ["ANALYSIS_PATH"], "config", "DNN", specs["version"])
+            base_folder = os.path.join(
+                os.environ["ANALYSIS_PATH"], "config", "DNN", specs["version"]
+            )
 
-            # save model configuration files as channel -> model_param_dict
             self.dnn_configs[channel] = {}
-            with open(file_name, "r") as file:
-                self.dnn_configs[channel]["binary"] = yaml.safe_load(os.path.join(models_folder, "binary_dnn_config.yaml"))
-                self.dnn_configs[channel]["multiclass"] = yaml.safe_load(os.path.join(models_folder, "multiclass_dnn_config.yaml"))
+            self.models_folders[channel] = {}
 
-            # add binary and multiclass variables
-            load_features.update(self.dnn_configs[channel]["binary"]["features"])
-            load_features.update(self.dnn_configs[channel]["multiclass"]["features"])
+            for category in self.categories:
+                # boosted/resolved live in their own subdirectories
+                category_folder = os.path.join(base_folder, category)
+                self.models_folders[channel][category] = category_folder
+
+                self.dnn_configs[channel][category] = {}
+
+                binary_cfg_path = os.path.join(
+                    category_folder, f"binary_{category}_dnn_config.yaml"
+                )
+                multiclass_cfg_path = os.path.join(
+                    category_folder, f"multiclass_{category}_dnn_config.yaml"
+                )
+
+                with open(binary_cfg_path, "r") as f:
+                    self.dnn_configs[channel][category]["binary"] = yaml.safe_load(f)
+                with open(multiclass_cfg_path, "r") as f:
+                    self.dnn_configs[channel][category]["multiclass"] = yaml.safe_load(f)
+
+                load_features.update(
+                    self.dnn_configs[channel][category]["binary"]["features"]
+                )
+                load_features.update(
+                    self.dnn_configs[channel][category]["multiclass"]["features"]
+                )
 
         columns_to_save.update(
             [f"{self.payload_name}_{col}" for col in self.cfg["columns"]]
         )
 
-        # What to save in tmp file
         load_features.update(["FullEventId", "event", "SL", "DL"])
         self.vars_to_save = load_features
 
@@ -335,81 +361,100 @@ class TwoStageDNNProducer:
         output_fields = {}
 
         for channel, specs in self.channel_dnn_specs.items():
-            if specs == None:
+            if specs is None:
                 print(f"Channel {channel} does not have DNN defined, skip.")
                 continue
 
             num_parities = specs["num_parities"]
+            num_classes = specs["num_classes"]
+            num_events = len(branches)
+            event_id = np.asarray(branches.event)
+
+            class_names_list = specs["class_names"]
+
             bin_name_pattern = specs["binary_name_pattern"]
             multiclass_name_pattern = specs["multiclass_name_pattern"]
 
-            num_classes = specs["num_classes"]
-            num_events = len(branches)
+            for category in self.categories:
+                models_folder = self.models_folders[channel][category]
 
-            # first num_classes on axis 1 - multicalss scoresm last - binary score
-            predictions = np.full_like((num_events, num_classes + 1), -1, dtype=np.float32)
-            event_id = np.asarray(branches.event)
+                # 0..num_classes - multiclass scores
+                # -1 in the last axis - binary score
+                predictions = np.full(
+                    (num_events, num_classes + 1), -1.0, dtype=np.float32
+                )
 
-            binary_feature_list = self.dnn_configs[channel]["binary"]["features"]
-            multiclass_feature_list = self.dnn_configs[channel]["multiclass"]["features"]
+                binary_feature_list = self.dnn_configs[channel][category]["binary"]["features"]
+                multiclass_feature_list = self.dnn_configs[channel][category]["multiclass"]["features"]
 
-            # can save allocating two arrays if model inputs are identical (order and content)
-            reuse_inputs = binary_feature_list == multiclass_feature_list
+                reuse_inputs = binary_feature_list == multiclass_feature_list
 
-            # model name has training parity it was trained on
-            # model trained on parity i will be applied to (i + 3) % num_parities
-            for train_parity in range(num_parities):
-                application_parity = (train_parity + 3) % num_parities
-                application_mask = event_id % num_parities == application_parity
-                selected = branches[application_mask]
+                for train_parity in range(num_parities):
+                    application_parity = (train_parity + 3) % num_parities
+                    application_mask = event_id % num_parities == application_parity
 
-                def build(feature_list):
-                    return np.stack(
-                        [np.asarray(getattr(selected, fn), dtype=np.float32) for fn in feature_list],
-                        axis=1,
-                    )
+                    if not np.any(application_mask):
+                        continue
 
-                if reuse_inputs:
-                    inputs = build(binary_feature_list)
-                else:
-                    binary_inputs = build(binary_feature_list)
-                    multiclass_inputs = build(multiclass_feature_list)
+                    selected = branches[application_mask]
+
+                    def build(feature_list):
+                        return np.stack(
+                            [np.asarray(getattr(selected, fn), dtype=np.float32)
+                             for fn in feature_list],
+                            axis=1,
+                        )
+
+                    if reuse_inputs:
+                        inputs = build(binary_feature_list)
+                    else:
+                        binary_inputs = build(binary_feature_list)
+                        multiclass_inputs = build(multiclass_feature_list)
+
+                    for mp in self.masses:
+                        binary_model_name = bin_name_pattern.format(
+                            train_parity=train_parity, mass=mp
+                        )
+                        multiclass_model_name = multiclass_name_pattern.format(
+                            train_parity=train_parity, mass=mp
+                        )
+
+                        binary_model_path = os.path.join(models_folder, binary_model_name)
+                        multiclass_model_path = os.path.join(models_folder, multiclass_model_name)
+
+                        with onnx_session(binary_model_path) as bs, \
+                             onnx_session(multiclass_model_path) as ms:
+                            bs_in = bs.get_inputs()[0].name
+                            ms_in = ms.get_inputs()[0].name
+
+                            multiclass_scores = ms.run(
+                                None,
+                                {ms_in: inputs if reuse_inputs else multiclass_inputs},
+                            )[0]
+                            binary_scores = bs.run(
+                                None,
+                                {bs_in: inputs if reuse_inputs else binary_inputs},
+                            )[0]
+
+                            predictions[application_mask, :num_classes] = multiclass_scores
+                            predictions[application_mask, -1] = binary_scores.ravel()
+
+                assert np.all(predictions >= 0), \
+                    f"All predictions must be filled/positive for {channel}/{category}"
 
                 for mp in self.masses:
-                    binary_model_name = bin_name_pattern.format(train_parity=train_parity, mass=mp)
-                    multiclass_model_name = multiclass_name_pattern.format(train_parity=train_parity, mass=mp)
+                    for class_idx, class_name in enumerate(class_names_list):
+                        mc_field_name = f"multiclass_{channel}_{category}_M{mp}_{class_name}"
+                        output_fields[mc_field_name] = predictions[:, class_idx].copy()
 
-                    binary_model_path = os.path.join(self.models_folder, binary_model_name)
-                    multiclass_model_path = os.path.join(self.models_folder, multiclass_model_name)
+                    bin_field_name = f"binary_{channel}_{category}_M{mp}"
+                    output_fields[bin_field_name] = predictions[:, -1].copy()
 
-                    with onnx_session(binary_model_path), onnx_session(multiclass_model_path) as bs, ms:
-                        ms_in = ms.get_inputs()[0].name
-                        bs_in = bs.get_inputs()[0].name
-
-                        multiclass_scores = ms.run(None, {ms_in: inputs if reuse_inputs else multiclass_inputs})[0]
-                        binary_scores = bs.run(None, {bs_in: inputs if reuse_inputs else binary_inputs})[0]
-
-                        predictions[:, :num_classes] = np.where(
-                            application_mask[:, None], multiclass_scores, -1
-                        )
-                        predictions[:, -1] = np.where(application_mask, binary_scores.ravel(), -1)
-
-            assert np.all(predictions), "All predictions must be positive"
-
-            class_names_list = specs["class_names"]
-            for mp in self.masses:
-                # write multiclass scores
-                for class_idx, class_name in enumerate(class_names_list):
-                    mc_field_name = f"multiclass_{channel}_M{mp}_{class_name}"
-                    output_fields[mc_field_name] = predictions[:, class_idx].copy()
-
-                bin_field_name = f"binary_{channel}_M{mp}"
-                output_fields[field_name] = predictions[:, -1].copy()
+                del predictions
 
         for field_name, values in output_fields.items():
             branches[field_name] = values
 
-        del predictions
         del output_fields
         gc.collect()
         return branches
