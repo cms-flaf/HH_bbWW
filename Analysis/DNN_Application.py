@@ -484,46 +484,52 @@ class TwoStageDNNProducer:
         output_fields = {}
         class_names_list = self.cfg["class_names"]
 
-        sl_mask = (
-            np.asarray(branches.SL, dtype=bool)
-            if "SL" in branches.fields
-            else np.zeros(nEvents, dtype=bool)
-        )
-        boosted_mask = (
-            np.asarray(branches.boosted, dtype=bool)
-            if "boosted" in branches.fields
-            else np.zeros(nEvents, dtype=bool)
-        )
+        def get_field(name):
+            """Fetch a branch as float32, or zeros if it's missing."""
+            if name in branches.fields:
+                return np.asarray(branches[name], dtype=np.float32)
+            return np.zeros(nEvents, dtype=np.float32)
+
+        def get_mask(name):
+            if name in branches.fields:
+                return np.asarray(branches[name], dtype=bool)
+            return np.zeros(nEvents, dtype=bool)
+
+        sl_mask = get_mask("SL")
+        boosted_mask = get_mask("boosted")
+
+        def select(field_builder):
+            """
+            field_builder(channel, category) -> branch field name.
+            Picks boosted/resolved per event, then SL/DL per event.
+            """
+            sl_sel = np.where(
+                boosted_mask,
+                get_field(field_builder("SL", "boosted")),
+                get_field(field_builder("SL", "resolved")),
+            )
+            dl_sel = np.where(
+                boosted_mask,
+                get_field(field_builder("DL", "boosted")),
+                get_field(field_builder("DL", "resolved")),
+            )
+            return np.where(sl_mask, sl_sel, dl_sel)
 
         for mass in self.masses:
+            m = int(mass)
+
+            # multiclass scores
             for class_name in class_names_list:
-                target_field = f"M{int(mass)}_{class_name}"
-
-                sl_boosted = (
-                    np.asarray(branches[f"SL_boosted_{target_field}"])
-                    if f"SL_boosted_{target_field}" in branches.fields
-                    else np.zeros(nEvents, dtype=np.float32)
-                )
-                sl_resolved = (
-                    np.asarray(branches[f"SL_resolved_{target_field}"])
-                    if f"SL_resolved_{target_field}" in branches.fields
-                    else np.zeros(nEvents, dtype=np.float32)
-                )
-                dl_boosted = (
-                    np.asarray(branches[f"DL_boosted_{target_field}"])
-                    if f"DL_boosted_{target_field}" in branches.fields
-                    else np.zeros(nEvents, dtype=np.float32)
-                )
-                dl_resolved = (
-                    np.asarray(branches[f"DL_resolved_{target_field}"])
-                    if f"DL_resolved_{target_field}" in branches.fields
-                    else np.zeros(nEvents, dtype=np.float32)
+                target_field = f"M{m}_{class_name}"
+                output_fields[target_field] = select(
+                    lambda ch, cat: f"multiclass_{ch}_{cat}_{target_field}"
                 )
 
-                sl_sel = np.where(boosted_mask, sl_boosted, sl_resolved)
-                dl_sel = np.where(boosted_mask, dl_boosted, dl_resolved)
-
-                output_fields[target_field] = np.where(sl_mask, sl_sel, dl_sel)
+            # binary score
+            target_field = f"M{m}_binary"
+            output_fields[target_field] = select(
+                lambda ch, cat: f"binary_{ch}_{cat}_M{m}"
+            )
 
         for field_name, values in output_fields.items():
             branches[field_name] = values
