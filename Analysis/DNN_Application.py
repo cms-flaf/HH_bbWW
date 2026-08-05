@@ -248,7 +248,9 @@ def make_session(path):
     so.enable_mem_pattern = False
     so.intra_op_num_threads = 1
     so.inter_op_num_threads = 1
-    return ort.InferenceSession(path, sess_options=so, providers=["CPUExecutionProvider"])
+    return ort.InferenceSession(
+        path, sess_options=so, providers=["CPUExecutionProvider"]
+    )
 
 
 @contextmanager
@@ -264,7 +266,7 @@ def onnx_session(path):
         gc.collect()
 
 
-def compute_probas(logits, eps=1e-7):    
+def compute_probas(logits, eps=1e-7):
     max_logits = np.max(logits, axis=axis, keepdims=True)
     exp_values = np.exp(logits - max_logits)
     probas = exp_values / np.sum(exp_values, axis=axis, keepdims=True)
@@ -275,7 +277,7 @@ def compute_probas(logits, eps=1e-7):
 
 def compute_logits(probas, eps=1e-7):
     probas = np.clip(probas, eps, 1 - eps)
-    return np.log(probas/(1 - probas))
+    return np.log(probas / (1 - probas))
 
 
 class TwoStageDNNProducer:
@@ -310,7 +312,9 @@ class TwoStageDNNProducer:
 
             parametric = specs.get("parametric", False)
             if parametric:
-                raise NotImplementedError("Parametric two-stage DNN inference has not been implemented.")
+                raise NotImplementedError(
+                    "Parametric two-stage DNN inference has not been implemented."
+                )
 
             base_folder = os.path.join(
                 os.environ["ANALYSIS_PATH"], "config", "DNN", specs["version"]
@@ -327,16 +331,18 @@ class TwoStageDNNProducer:
                 self.dnn_configs[channel][category] = {}
 
                 binary_cfg_path = os.path.join(
-                    category_folder, f"binary_{category}_dnn_config.yaml"
+                    base_folder, f"binary_{category}_dnn_config.yaml"
                 )
                 multiclass_cfg_path = os.path.join(
-                    category_folder, f"multiclass_{category}_dnn_config.yaml"
+                    base_folder, f"multiclass_{category}_dnn_config.yaml"
                 )
 
                 with open(binary_cfg_path, "r") as f:
                     self.dnn_configs[channel][category]["binary"] = yaml.safe_load(f)
                 with open(multiclass_cfg_path, "r") as f:
-                    self.dnn_configs[channel][category]["multiclass"] = yaml.safe_load(f)
+                    self.dnn_configs[channel][category]["multiclass"] = yaml.safe_load(
+                        f
+                    )
 
                 load_features.update(
                     self.dnn_configs[channel][category]["binary"]["features"]
@@ -351,7 +357,6 @@ class TwoStageDNNProducer:
 
         load_features.update(["FullEventId", "event", "SL", "DL", "boosted"])
         self.vars_to_save = load_features
-
 
     def run(self, array):
         print("Running TwoStageDNNProducer producer")
@@ -376,7 +381,6 @@ class TwoStageDNNProducer:
 
         return array
 
-
     def ApplyDNN(self, branches):
         output_fields = {}
         class_names_list = self.cfg["class_names"]
@@ -397,17 +401,16 @@ class TwoStageDNNProducer:
             for category in self.categories:
                 models_folder = self.models_folders[channel][category]
 
-                # 0..num_classes - multiclass scores
-                # -1 in the last axis - binary score
-                predictions = np.full(
-                    (num_events, num_classes + 1), -1.0, dtype=np.float32
-                )
-
-                binary_feature_list = self.dnn_configs[channel][category]["binary"]["features"]
-                multiclass_feature_list = self.dnn_configs[channel][category]["multiclass"]["features"]
+                binary_feature_list = self.dnn_configs[channel][category]["binary"][
+                    "features"
+                ]
+                multiclass_feature_list = self.dnn_configs[channel][category][
+                    "multiclass"
+                ]["features"]
 
                 reuse_inputs = binary_feature_list == multiclass_feature_list
 
+                parity_data = {}
                 for train_parity in range(num_parities):
                     application_parity = (train_parity + 3) % num_parities
                     application_mask = event_id % num_parities == application_parity
@@ -419,18 +422,39 @@ class TwoStageDNNProducer:
 
                     def build(feature_list):
                         return np.stack(
-                            [np.asarray(getattr(selected, fn), dtype=np.float32)
-                             for fn in feature_list],
+                            [
+                                np.asarray(getattr(selected, fn), dtype=np.float32)
+                                for fn in feature_list
+                            ],
                             axis=1,
                         )
 
                     if reuse_inputs:
-                        inputs = build(binary_feature_list)
+                        parity_data[train_parity] = {
+                            "mask": application_mask,
+                            "binary_inputs": build(binary_feature_list),
+                            "multiclass_inputs": None,
+                        }
                     else:
-                        binary_inputs = build(binary_feature_list)
-                        multiclass_inputs = build(multiclass_feature_list)
+                        parity_data[train_parity] = {
+                            "mask": application_mask,
+                            "binary_inputs": build(binary_feature_list),
+                            "multiclass_inputs": build(multiclass_feature_list),
+                        }
 
-                    for mp in self.masses:
+                for mp in self.masses:
+                    # 0..num_classes - multiclass scores, -1 - binary score
+                    predictions = np.full(
+                        (num_events, num_classes + 1), -1.0, dtype=np.float32
+                    )
+
+                    for train_parity, data in parity_data.items():
+                        application_mask = data["mask"]
+                        binary_inputs = data["binary_inputs"]
+                        multiclass_inputs = (
+                            binary_inputs if reuse_inputs else data["multiclass_inputs"]
+                        )
+
                         binary_model_name = bin_name_pattern.format(
                             train_parity=train_parity, mass=mp
                         )
@@ -438,38 +462,45 @@ class TwoStageDNNProducer:
                             train_parity=train_parity, mass=mp
                         )
 
-                        binary_model_path = os.path.join(models_folder, binary_model_name)
-                        multiclass_model_path = os.path.join(models_folder, multiclass_model_name)
+                        binary_model_path = os.path.join(
+                            models_folder, binary_model_name
+                        )
+                        multiclass_model_path = os.path.join(
+                            models_folder, multiclass_model_name
+                        )
 
-                        with onnx_session(binary_model_path) as bs, \
-                             onnx_session(multiclass_model_path) as ms:
+                        with onnx_session(binary_model_path) as bs, onnx_session(
+                            multiclass_model_path
+                        ) as ms:
                             bs_in = bs.get_inputs()[0].name
                             ms_in = ms.get_inputs()[0].name
 
                             multiclass_scores = ms.run(
-                                None,
-                                {ms_in: inputs if reuse_inputs else multiclass_inputs},
+                                None, {ms_in: multiclass_inputs}
                             )[0]
-                            binary_scores = bs.run(
-                                None,
-                                {bs_in: inputs if reuse_inputs else binary_inputs},
-                            )[0]
+                            binary_scores = bs.run(None, {bs_in: binary_inputs})[0]
 
-                            predictions[application_mask, :num_classes] = multiclass_scores
+                            predictions[application_mask, :num_classes] = (
+                                multiclass_scores
+                            )
                             predictions[application_mask, -1] = binary_scores.ravel()
 
-                assert np.all(predictions >= 0), \
-                    f"All predictions must be filled/positive for {channel}/{category}"
+                    assert np.all(
+                        predictions >= 0
+                    ), f"All predictions must be filled/positive for {channel}/{category}/M{mp}"
 
-                for mp in self.masses:
                     for class_idx, class_name in enumerate(class_names_list):
-                        mc_field_name = f"multiclass_{channel}_{category}_M{mp}_{class_name}"
+                        mc_field_name = (
+                            f"multiclass_{channel}_{category}_M{mp}_{class_name}"
+                        )
                         output_fields[mc_field_name] = predictions[:, class_idx].copy()
 
                     bin_field_name = f"binary_{channel}_{category}_M{mp}"
                     output_fields[bin_field_name] = predictions[:, -1].copy()
 
-                del predictions
+                    del predictions
+
+                del parity_data
 
         for field_name, values in output_fields.items():
             branches[field_name] = values
@@ -478,7 +509,6 @@ class TwoStageDNNProducer:
         gc.collect()
         return branches
 
-    
     def SelectDNN(self, branches):
         nEvents = len(branches)
         output_fields = {}
