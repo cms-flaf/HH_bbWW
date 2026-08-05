@@ -226,6 +226,129 @@ payload_producers:
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
+  TwoStageDNN:
+    producers_module_name: Analysis.DNN_Application
+    producer_name: TwoStageDNNProducer
+    DL: null
+    SL:
+      version: SingleLepton_IndependentMasses
+      num_parities: 4
+      binary_name_pattern: binary_nParity{train_parity}_M{mass}.onnx
+      multiclass_name_pattern: multiclass_nParity{train_parity}_M{mass}.onnx
+      num_classes: 7
+    class_names:
+      - Signal
+      - TT
+      - ST
+      - WJets
+      - DY
+      - H
+      - VV
+    columns:
+      - M300_Signal
+      - M400_Signal
+      - M500_Signal
+      - M550_Signal
+      - M600_Signal
+      - M650_Signal
+      - M700_Signal
+      - M800_Signal
+      - M900_Signal
+      - M1000_Signal
+
+      - M300_TT
+      - M400_TT
+      - M500_TT
+      - M550_TT
+      - M600_TT
+      - M650_TT
+      - M700_TT
+      - M800_TT
+      - M900_TT
+      - M1000_TT
+
+      - M300_DY
+      - M400_DY
+      - M500_DY
+      - M550_DY
+      - M600_DY
+      - M650_DY
+      - M700_DY
+      - M800_DY
+      - M900_DY
+      - M1000_DY
+
+      - M300_ST
+      - M400_ST
+      - M500_ST
+      - M550_ST
+      - M600_ST
+      - M650_ST
+      - M700_ST
+      - M800_ST
+      - M900_ST
+      - M1000_ST
+
+      - M300_WJets
+      - M400_WJets
+      - M500_WJets
+      - M550_WJets
+      - M600_WJets
+      - M650_WJets
+      - M700_WJets
+      - M800_WJets
+      - M900_WJets
+      - M1000_WJets
+
+      - M300_H
+      - M400_H
+      - M500_H
+      - M550_H
+      - M600_H
+      - M650_H
+      - M700_H
+      - M800_H
+      - M900_H
+      - M1000_H
+
+      - M300_VV
+      - M400_VV
+      - M500_VV
+      - M550_VV
+      - M600_VV
+      - M650_VV
+      - M700_VV
+      - M800_VV
+      - M900_VV
+      - M1000_VV
+
+      - M300_binary
+      - M400_binary
+      - M500_binary
+      - M550_binary
+      - M600_binary
+      - M650_binary
+      - M700_binary
+      - M800_binary
+      - M900_binary
+      - M1000_binary
+    masses:
+      - 300
+      - 400
+      - 500
+      - 550
+      - 600
+      - 650
+      - 700
+      - 800
+      - 900
+      - 1000
+    dependencies:
+    n_cpus: 4
+    max_runtime: 8.0
+    cmssw_env: False
+    awkward_based: True
+    uproot_stepsize: '64MB'
   DeepHME:
     producers_module_name: Analysis.DeepHMEProducer
     producer_name: DeepHMEProducer
