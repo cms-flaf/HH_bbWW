@@ -386,7 +386,7 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
-histTuple_flavor: DNN_Outputs
+histTuple_flavor: default
 histTuple_flavors:
   DNN_training:
     fullResolution_variables:
