@@ -410,6 +410,29 @@ class TwoStageDNNProducer:
 
                 reuse_inputs = binary_feature_list == multiclass_feature_list
 
+                def feature_means(feature_list):
+                    means = {}
+                    for fn in feature_list:
+                        col = np.asarray(getattr(branches, fn), dtype=np.float32)
+                        finite = np.isfinite(col)
+                        if finite.any():
+                            means[fn] = np.float32(col[finite].mean())
+                        else:
+                            # no finite value at all -> fall back to 0
+                            print(
+                                f"WARNING {channel}/{category}: feature {fn} has "
+                                f"no finite values; using 0 as fill."
+                            )
+                            means[fn] = np.float32(0.0)
+                    return means
+
+                binary_means = feature_means(binary_feature_list)
+                multiclass_means = (
+                    binary_means
+                    if reuse_inputs
+                    else feature_means(multiclass_feature_list)
+                )
+
                 parity_data = {}
                 for train_parity in range(num_parities):
                     application_parity = (train_parity + 3) % num_parities
@@ -420,26 +443,45 @@ class TwoStageDNNProducer:
 
                     selected = branches[application_mask]
 
-                    def build(feature_list):
-                        return np.stack(
-                            [
-                                np.asarray(getattr(selected, fn), dtype=np.float32)
-                                for fn in feature_list
-                            ],
-                            axis=1,
-                        )
+                    def build(feature_list, means, tag):
+                        cols = []
+                        total_bad = 0
+                        bad_feats = []
+                        for fn in feature_list:
+                            col = np.asarray(getattr(selected, fn), dtype=np.float32)
+                            nonfinite = ~np.isfinite(col)
+                            n_bad = int(nonfinite.sum())
+                            if n_bad:
+                                col = col.copy()
+                                col[nonfinite] = means[fn]
+                                total_bad += n_bad
+                                bad_feats.append(fn)
+                            cols.append(col)
+                        if total_bad:
+                            print(
+                                f"WARNING {channel}/{category} parity={train_parity} "
+                                f"[{tag}]: filled {total_bad} non-finite value(s) in "
+                                f"features {bad_feats} with per-feature mean."
+                            )
+                        return np.stack(cols, axis=1)
 
                     if reuse_inputs:
                         parity_data[train_parity] = {
                             "mask": application_mask,
-                            "binary_inputs": build(binary_feature_list),
+                            "binary_inputs": build(
+                                binary_feature_list, binary_means, "binary"
+                            ),
                             "multiclass_inputs": None,
                         }
                     else:
                         parity_data[train_parity] = {
                             "mask": application_mask,
-                            "binary_inputs": build(binary_feature_list),
-                            "multiclass_inputs": build(multiclass_feature_list),
+                            "binary_inputs": build(
+                                binary_feature_list, binary_means, "binary"
+                            ),
+                            "multiclass_inputs": build(
+                                multiclass_feature_list, multiclass_means, "multiclass"
+                            ),
                         }
 
                 for mp in self.masses:
@@ -485,9 +527,10 @@ class TwoStageDNNProducer:
                             )
                             predictions[application_mask, -1] = binary_scores.ravel()
 
-                    assert np.all(
-                        predictions >= 0
-                    ), f"All predictions must be filled/positive for {channel}/{category}/M{mp}"
+                    assert np.all(predictions >= 0), (
+                        f"Bad predictions for {channel}/{category}/M{mp} "
+                        f"(unfilled sentinel or unexpected model output)."
+                    )
 
                     for class_idx, class_name in enumerate(class_names_list):
                         mc_field_name = (
