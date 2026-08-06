@@ -76,13 +76,18 @@ class DNNProducer:
             features = model_config.get("features", [])
             regime = "boosted" if "Boosted" in channel else "resolved"
             model_name = model_config.get(
-                "model_name", "pdnn_model_{regime}_nparity{nParity}.onnx"
+                "model_name", "pdnn_model_{regime}_nparity{fold}.onnx"
             )
 
+            # `{fold}` is the cross-validation fold index (0..nParity-1). It is
+            # deliberately not called `{nParity}`: nParity is the *number* of
+            # folds, and conflating the two is what allows a fold index to be
+            # silently substituted where a fold count is meant.
             model_paths = []
-            for parity_idx in range(nParity):
+            for fold_idx in range(nParity):
                 onnx_path = os.path.join(
-                    dnnFolder, model_name.format(nParity=parity_idx, regime=regime)
+                    dnnFolder,
+                    model_name.format(fold=fold_idx, nParity=nParity, regime=regime),
                 )
                 model_paths.append(onnx_path)
 
@@ -191,6 +196,95 @@ class DNNProducer:
             print(f" -> NaNs count: {nan_count} | Infs count: {inf_count}")
             print("!" * 80 + "\n")
 
+    def _compute_fold_masks(
+        self,
+        dnnConfig: dict,
+        channel: str,
+        event_number: np.ndarray,
+        nParity: int,
+    ) -> list[np.ndarray]:
+        """
+        Builds the per-fold application masks, one boolean array per fold.
+
+        Fold `f` is applied to events satisfying
+        ``(event_number + f + offset) % nParity == 0``, where ``offset`` comes
+        from the ``app_parity`` section of the model configuration. The masks
+        are required to partition the events: every event must be claimed by
+        exactly one fold, or the ensemble below would silently drop or
+        double-count it.
+        """
+        app_parity_cfg = dnnConfig.get("app_parity")
+        if app_parity_cfg is None:
+            raise RuntimeError(
+                f"[pDNNProducer] Missing required 'app_parity' section in channel '{channel}' configuration!"
+            )
+
+        offset = (
+            app_parity_cfg.get("offset")
+            if isinstance(app_parity_cfg, dict)
+            else app_parity_cfg
+        )
+
+        if isinstance(offset, bool) or not isinstance(offset, int):
+            # Legacy configurations expressed the fold assignment as a Python
+            # snippet under 'func'. Support it, but evaluate it with no builtins
+            # and only the fold variables in scope -- a model directory is data,
+            # and data must not be able to execute arbitrary code.
+            legacy_expr = (
+                app_parity_cfg.get("func")
+                if isinstance(app_parity_cfg, dict)
+                else app_parity_cfg
+            )
+            if not isinstance(legacy_expr, str):
+                raise RuntimeError(
+                    f"[pDNNProducer] Channel '{channel}': 'app_parity' must provide an integer "
+                    f"'offset' (or a legacy 'func' string); got {app_parity_cfg!r}."
+                )
+
+            print(
+                f"[WARNING] Channel '{channel}': 'app_parity' uses the deprecated 'func' "
+                "expression. Replace it with an integer 'offset' -- see the comment in "
+                "dnn_config.yaml."
+            )
+
+            masks = []
+            for fold_idx in range(nParity):
+                try:
+                    formatted = legacy_expr.format(fold=fold_idx, nParity=nParity)
+                except (KeyError, IndexError) as exc:
+                    raise RuntimeError(
+                        f"[pDNNProducer] Channel '{channel}': cannot substitute fold index into "
+                        f"app_parity func {legacy_expr!r} ({exc!r}). It must contain '{{fold}}'."
+                    ) from exc
+
+                value = eval(
+                    formatted,
+                    {"__builtins__": {}},
+                    {"event_number": event_number, "nParity": nParity},
+                )
+                masks.append(np.asarray(value) == 0)
+        else:
+            masks = [
+                ((event_number + fold_idx + offset) % nParity) == 0
+                for fold_idx in range(nParity)
+            ]
+
+        # The folds must tile the events exactly once each. This single check
+        # catches a wrong modulus, a fold offset that does not vary with the
+        # fold index, and an event_number that does not match the training one.
+        coverage = np.sum(np.stack(masks, axis=0), axis=0)
+        if not np.all(coverage == 1):
+            unclaimed = int(np.count_nonzero(coverage == 0))
+            multiclaimed = int(np.count_nonzero(coverage > 1))
+            raise RuntimeError(
+                f"[pDNNProducer] Channel '{channel}': the {nParity} application folds do not "
+                f"partition the events ({unclaimed} events claimed by no fold, {multiclaimed} "
+                f"claimed by more than one). Check 'nParity' and the 'app_parity' offset in the "
+                f"model configuration."
+            )
+
+        return masks
+
     def ApplyDNN(self, branches: ak.Array) -> ak.Array:
         """
         Evaluates ONNX inference sessions across channels and parametric mass hypotheses.
@@ -199,9 +293,26 @@ class DNNProducer:
         if nEvents == 0:
             return branches
 
-        event_number = np.asarray(
-            branches.event if "event" in branches.fields else branches.FullEventId
-        )
+        # The fold assignment must be computed from the *same* quantity that
+        # defined the training folds. There is deliberately no fallback to
+        # FullEventId: that is a packed (crc16(dataset), crc16(file), entry)
+        # identifier with no relation to the event number, so falling back to it
+        # would still produce a valid-looking partition while scoring events
+        # with folds that were trained on them.
+        if "event" not in branches.fields:
+            raise RuntimeError(
+                "[pDNNProducer] Required branch 'event' is missing from the input array; "
+                "it defines the cross-validation folds and has no safe substitute."
+            )
+
+        event_number = np.asarray(branches.event)
+        if not np.issubdtype(event_number.dtype, np.integer):
+            raise RuntimeError(
+                f"[pDNNProducer] Branch 'event' has non-integer dtype '{event_number.dtype}'. "
+                "Fold assignment uses modular arithmetic and needs exact integers "
+                "(float64 silently loses the low bits of large event numbers)."
+            )
+
         output_fields = {}
 
         for channel, dnnConfig in self.dnnConfig.items():
@@ -214,31 +325,29 @@ class DNNProducer:
             nParity = dnnConfig.get("nParity", 4)
             model_paths = dnnConfig.get("model_paths", [])
 
-            # Extract app_parity configuration
-            app_parity_cfg = dnnConfig.get("app_parity")
-            if app_parity_cfg is None:
-                raise RuntimeError(
-                    f"[pDNNProducer] Missing required 'app_parity' section in channel '{channel}' configuration!"
-                )
-
-            app_parity_expr = (
-                app_parity_cfg.get("func")
-                if isinstance(app_parity_cfg, dict)
-                else app_parity_cfg
+            # Fold assignment depends only on the event number, not on the mass
+            # hypothesis, so it is computed once per channel rather than once
+            # per (mass, fold) pair.
+            fold_masks = self._compute_fold_masks(
+                dnnConfig, channel, event_number, nParity
             )
 
-            # Prepare ONNX Inference Sessions
+            # Prepare ONNX Inference Sessions. Every fold must be present: the
+            # fold masks partition the events, so a single missing model leaves
+            # its events with all-zero probabilities, which the logit transform
+            # below turns into a finite, plausible-looking score (~-16.1) rather
+            # than an obvious failure.
+            missing = [path for path in model_paths if not os.path.exists(path)]
+            if missing or len(model_paths) != nParity:
+                raise RuntimeError(
+                    f"[pDNNProducer] Channel '{channel}': expected {nParity} ONNX models, "
+                    f"found {len(model_paths) - len(missing)}. Missing: {missing}"
+                )
+
             sessions = []
             for p_idx, path in enumerate(model_paths):
-                if os.path.exists(path):
-                    sess = ort.InferenceSession(
-                        path, providers=["CPUExecutionProvider"]
-                    )
-                    sessions.append((p_idx, sess))
-
-            if not sessions:
-                print(f"[WARNING] No valid ONNX models found for channel '{channel}'.")
-                continue
+                sess = ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+                sessions.append((p_idx, sess))
 
             for mass in self.target_masses:
                 # Build feature inputs per event
@@ -273,30 +382,42 @@ class DNNProducer:
 
                 all_predictions = np.zeros((nEvents, nClasses), dtype=np.float32)
 
-                # Run inference fold by fold
+                # Run inference fold by fold. Each fold is evaluated only on the
+                # events it owns, rather than on all events followed by masking,
+                # which costs nParity times less ONNX work.
                 for parity_idx, sess in sessions:
+                    app_mask = fold_masks[parity_idx]
+                    if not app_mask.any():
+                        continue
+
                     input_name = sess.get_inputs()[0].name
-                    preds = sess.run(None, {input_name: X_mat})[0]
+                    preds = sess.run(None, {input_name: X_mat[app_mask]})[0]
 
                     # AUDIT STEP 2: Audit raw ONNX model prediction outputs
                     self._audit_predictions(
                         preds, f"Raw ONNX fold {parity_idx}", channel, mass
                     )
 
-                    # Dynamic Evaluation of app_parity["func"]
-                    computed_app_parity = eval(
-                        app_parity_expr.format(nParity=parity_idx)
-                    )
-
-                    # Application Parity Mask: Keep only events where computed app parity matches current fold
-                    app_mask = computed_app_parity == 0
-                    preds[~app_mask, :] = 0.0
-                    all_predictions += preds
+                    all_predictions[app_mask] = preds
 
                 # AUDIT STEP 3: Audit ensemble probabilities before logit transformation
                 self._audit_predictions(
                     all_predictions, "Ensembled Probabilities", channel, mass
                 )
+
+                # The models emit a softmax over the classes, so every event must
+                # carry exactly one fold's worth of probability. A row summing to
+                # 0 means an event was scored by no fold; anything else means the
+                # ensemble is not the per-event probability it is treated as below.
+                prob_sums = all_predictions.sum(axis=1)
+                if not np.allclose(prob_sums, 1.0, atol=1e-4):
+                    bad = np.flatnonzero(~np.isclose(prob_sums, 1.0, atol=1e-4))
+                    raise RuntimeError(
+                        f"[pDNNProducer] Channel '{channel}', mass {mass}: {bad.size} events have "
+                        f"class probabilities summing to something other than 1 "
+                        f"(e.g. rows {bad[:5].tolist()} -> {prob_sums[bad[:5]].tolist()}). "
+                        "The fold ensemble is incomplete or the models are not emitting probabilities."
+                    )
 
                 # Transform raw probabilities to logit scores (numerically safe subtraction)
                 probs_clipped = np.clip(all_predictions, 1e-7, 1.0 - 1e-7)
