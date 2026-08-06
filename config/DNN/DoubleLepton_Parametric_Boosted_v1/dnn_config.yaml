@@ -10,20 +10,25 @@ tree_name: "AppliedTree"
 dedicated_mass: null  # Set to an integer (e.g., 500) if evaluating a single mass point
 
 # Cross-Validation Parity Setup
+#
+# Fold `f` (0 <= f < nParity) owns the events satisfying
+#     (event_number + f + offset) % nParity == 0
+# for the offset of the split in question. The offsets below must be distinct
+# and cover 0..nParity-1, so that the folds of any single split partition the
+# events exactly once each; DNN_Application.py verifies this at runtime.
+#
+# `offset` is a plain integer and is read as data. Do not put Python
+# expressions here -- they are no longer evaluated.
 nParity: 4
-model_name: pdnn_model_{regime}_nparity{nParity}.onnx
+model_name: pdnn_model_{regime}_nparity{fold}.onnx
 train_parity:
-  index: (nParity) % 4
-  func: (event_number + {nParity}) % 4
+  offset: 0
 test_parity:
-  index: (nParity + 1) % 4
-  func: (event_number + {nParity} + 1) % 4
+  offset: 1
 val_parity:
-  index: (nParity + 2) % 4
-  func: (event_number + {nParity} + 2) % 4
+  offset: 2
 app_parity:
-  index: (nParity + 3) % 4
-  func: (event_number + {nParity} + 3) % 4
+  offset: 3
 
 # Class Output Mapping
 class_names: [ "Signal", "TT", "Other" ]
