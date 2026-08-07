@@ -4,7 +4,6 @@ import os
 import sys
 import gc
 import yaml
-import psutil
 import numpy as np
 import awkward as ak
 import onnxruntime as ort
