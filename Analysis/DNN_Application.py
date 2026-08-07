@@ -279,6 +279,14 @@ def compute_logits(probas, eps=1e-7):
     probas = np.clip(probas, eps, 1 - eps)
     return np.log(probas / (1 - probas))
 
+# a value is "bad" if it is non-finite OR a large sentinel / padding value.
+# btag, dR, masses etc. never legitimately reach ~1e30, so anything
+# beyond a sane cap is treated as missing.
+SENTINEL_CAP = 1e15   # tune: well above any real feature, below FLT_MAX(~3.4e38)
+
+def is_bad(col):
+    return ~np.isfinite(col) | (np.abs(col) > SENTINEL_CAP)
+
 
 class TwoStageDNNProducer:
     def __init__(self, cfg, payload_name, period):
@@ -414,15 +422,12 @@ class TwoStageDNNProducer:
                     means = {}
                     for fn in feature_list:
                         col = np.asarray(getattr(branches, fn), dtype=np.float32)
-                        finite = np.isfinite(col)
-                        if finite.any():
-                            means[fn] = np.float32(col[finite].mean())
+                        good = ~is_bad(col)
+                        if good.any():
+                            means[fn] = np.float32(col[good].mean())
                         else:
-                            # no finite value at all -> fall back to 0
-                            print(
-                                f"WARNING {channel}/{category}: feature {fn} has "
-                                f"no finite values; using 0 as fill."
-                            )
+                            print(f"WARNING {channel}/{category}: feature {fn} has no valid "
+                                f"values; using 0 as fill.")
                             means[fn] = np.float32(0.0)
                     return means
 
@@ -449,20 +454,18 @@ class TwoStageDNNProducer:
                         bad_feats = []
                         for fn in feature_list:
                             col = np.asarray(getattr(selected, fn), dtype=np.float32)
-                            nonfinite = ~np.isfinite(col)
-                            n_bad = int(nonfinite.sum())
+                            bad = is_bad(col)
+                            n_bad = int(bad.sum())
                             if n_bad:
                                 col = col.copy()
-                                col[nonfinite] = means[fn]
+                                col[bad] = means[fn]
                                 total_bad += n_bad
                                 bad_feats.append(fn)
                             cols.append(col)
                         if total_bad:
-                            print(
-                                f"WARNING {channel}/{category} parity={train_parity} "
-                                f"[{tag}]: filled {total_bad} non-finite value(s) in "
-                                f"features {bad_feats} with per-feature mean."
-                            )
+                            print(f"WARNING {channel}/{category} parity={train_parity} "
+                                f"[{tag}]: filled {total_bad} out-of-range/non-finite value(s) "
+                                f"in features {bad_feats} with per-feature mean.")
                         return np.stack(cols, axis=1)
 
                     if reuse_inputs:
@@ -527,9 +530,78 @@ class TwoStageDNNProducer:
                             )
                             predictions[application_mask, -1] = binary_scores.ravel()
 
-                    assert np.all(predictions >= 0), (
-                        f"Bad predictions for {channel}/{category}/M{mp} "
-                        f"(unfilled sentinel or unexpected model output)."
+                    finite = np.isfinite(predictions)
+                    bad_row_mask = ~finite.all(axis=1)          # rows with any non-finite score
+                    n_bad = int(bad_row_mask.sum())
+
+                    if n_bad:
+                        print(f"\n=== Bad predictions for {channel}/{category}/M{mp}: "
+                            f"{n_bad} event(s) with non-finite scores ===")
+
+                        # global row indices (into the full `branches`) of the bad events
+                        bad_global_idx = np.where(bad_row_mask)[0]
+                        print(f"global row indices: {bad_global_idx[:50]}"
+                            f"{' ...' if n_bad > 50 else ''}")
+
+                        # which parity each bad event was assigned to, and whether that parity ran
+                        covered_by = np.full(num_events, -1, dtype=np.int64)
+                        for tp, data in parity_data.items():
+                            covered_by[data["mask"]] = tp
+                        print("parity assignment of bad rows:",
+                            np.unique(covered_by[bad_row_mask], return_counts=True))
+                        # -1 here would mean the row was never assigned to any parity -> stayed sentinel
+
+                        # inspect the raw INPUT features for the bad events, per feature list
+                        def dump_inputs(feature_list, means, tag):
+                            print(f"\n--- {tag} inputs for bad events ---")
+                            for fn in feature_list:
+                                col_full = np.asarray(getattr(branches, fn), dtype=np.float32)
+                                vals = col_full[bad_global_idx]
+                                nonfinite = ~np.isfinite(vals)
+                                flag = ""
+                                if nonfinite.any():
+                                    flag = f"  <-- {int(nonfinite.sum())} non-finite in bad rows"
+                                # also report the fill mean and whether the mean itself is finite
+                                mean_val = means.get(fn, None)
+                                mean_flag = ""
+                                if mean_val is not None and not np.isfinite(mean_val):
+                                    mean_flag = "  <-- FILL MEAN IS NON-FINITE!"
+                                print(f"  {fn}: values={vals[:10]}"
+                                    f"{' ...' if len(vals) > 10 else ''}"
+                                    f"  fill_mean={mean_val}{flag}{mean_flag}")
+
+                        dump_inputs(binary_feature_list, binary_means, "binary")
+                        if not reuse_inputs:
+                            dump_inputs(multiclass_feature_list, multiclass_means, "multiclass")
+
+                        # also check: are the model input arrays (post-fill) finite for these rows?
+                        # reconstruct which parity + local position each bad row maps to
+                        for tp, data in parity_data.items():
+                            mask = data["mask"]
+                            local_bad = np.where(mask & bad_row_mask)[0]
+                            if len(local_bad) == 0:
+                                continue
+                            # position within the selected (parity) input array
+                            parity_global = np.where(mask)[0]
+                            local_pos = np.searchsorted(parity_global, local_bad)
+                            bin_in = data["binary_inputs"][local_pos]
+                            print(f"\nparity {tp}: post-fill binary input finite? "
+                                f"{np.isfinite(bin_in).all()}; "
+                                f"non-finite entries={int((~np.isfinite(bin_in)).sum())}")
+                            if not reuse_inputs and data["multiclass_inputs"] is not None:
+                                mc_in = data["multiclass_inputs"][local_pos]
+                                print(f"parity {tp}: post-fill multiclass input finite? "
+                                    f"{np.isfinite(mc_in).all()}; "
+                                    f"non-finite entries={int((~np.isfinite(mc_in)).sum())}")
+
+                    # keep the assert so the job still fails loudly after printing the diagnosis
+                    finite = np.isfinite(predictions)
+                    nan_cols = np.where(~finite.all(axis=0))[0]
+                    neg_cols = np.where(np.any((predictions < 0.0) & finite, axis=0))[0]
+                    assert finite.all() and np.all(predictions[finite] >= 0), (
+                        f"Bad predictions for {channel}/{category}/M{mp}; "
+                        f"non-finite columns={nan_cols}, negative columns={neg_cols} "
+                        f"(cols 0..{num_classes-1}=multiclass, {num_classes}=binary)"
                     )
 
                     for class_idx, class_name in enumerate(class_names_list):
