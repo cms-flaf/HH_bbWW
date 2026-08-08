@@ -274,7 +274,6 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
-        self.DefineAndAppend("SR_puppiPTcut", f"SR && PuppiMET_pt > 30")
 
     def calculateMT(self):
         self.df = self.df.Define(
