@@ -337,33 +337,22 @@ channelDefinition:
   muMu: 22
 
 categories:
-  # - inclusive
+  - inclusive
   - recovery
   - res2b
   - boosted
-  # - boosted_H
-  # - boosted_W
-  # - boosted_HW
-  # - baseline
+  - boosted_H
+  - boosted_W
+  - boosted_HW
+  - baseline
 
 QCDRegions:
-  # - OS_Iso
-  # - SS_Iso
-  # - OS_AntiIso
-  # - SS_AntiIso
-  # - ZVeto_OS_Iso
-  # - ZPeak_OS_Iso
-  # - mbbCR_Tight
-  # - mbbCR_AntiTight
-
-  # - OS_Iso
+  - OS_Iso
   - SR
-  # - TT_CR
-  # - DY_CR
-  # - W_CR
-  # - SR_mbb
-
-  - SR_puppiPTcut
+  - TT_CR
+  - DY_CR
+  - W_CR
+  - SR_mbb
 
 histTuple_selectors:
   - QCDRegions
