@@ -406,7 +406,7 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
-histTuple_flavor: METphi_test
+histTuple_flavor: default
 histTuple_flavors:
   DNN_training:
     fullResolution_variables:
@@ -819,20 +819,20 @@ histTuple_flavors:
       - name: DNN_m1000_vs_HME
         vars: [ DNN_M1000_Signal, DeepHME_mass ]
 
-  # METphi_test:
-  #   fullResolution_variables: [ ]
+  METphi_test:
+    fullResolution_variables: [ ]
 
-  #   variables:
-  #     - "MT"
-  #     - "MET_over_sqrt_HT"
-  #     - "PuppiMET_pt"
-  #     - "PuppiMET_phi"
-  #     - "ll_dphi"
-  #     - "met_ll_dphi"
-  #     - "min_lmet_mt"
-  #     - "min_lmet_dphi"
-  #     - "ll_met_MT_WithMass"
-  #     - "bbllmet_mass"
+    variables:
+      - "MT"
+      - "MET_over_sqrt_HT"
+      - "PuppiMET_pt"
+      - "PuppiMET_phi"
+      - "ll_dphi"
+      - "met_ll_dphi"
+      - "min_lmet_mt"
+      - "min_lmet_dphi"
+      - "ll_met_MT_WithMass"
+      - "bbllmet_mass"
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
