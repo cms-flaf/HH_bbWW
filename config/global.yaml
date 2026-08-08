@@ -511,6 +511,42 @@ met_type: "PuppiMET"
 
 histTuple_flavor: default
 histTuple_flavors:
+  binary_DNN_outputs:
+    fullResolution_variables: [ ]
+
+    variables:
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+
+      - name: binary_DNN_m300_vs_HME
+        vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
+      - name: binary_DNN_m400_vs_HME
+        vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
+      - name: binary_DNN_m500_vs_HME
+        vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
+      - name: binary_DNN_m550_vs_HME
+        vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
+      - name: binary_DNN_m600_vs_HME
+        vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
+      - name: binary_DNN_m650_vs_HME
+        vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
+      - name: binary_DNN_m700_vs_HME
+        vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
+      - name: binary_DNN_m800_vs_HME
+        vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
+      - name: binary_DNN_m900_vs_HME
+        vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
+      - name: binary_DNN_m1000_vs_HME
+        vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
+
   DNN_training:
     fullResolution_variables:
       - lep1_pt
@@ -830,6 +866,39 @@ histTuple_flavors:
         vars: [ DNN_M900_Signal, DeepHME_mass ]
       - name: DNN_m1000_vs_HME
         vars: [ DNN_M1000_Signal, DeepHME_mass ]
+
+      # two-stage dnn outputs
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+
+      - name: binary_DNN_m300_vs_HME
+        vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
+      - name: binary_DNN_m400_vs_HME
+        vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
+      - name: binary_DNN_m500_vs_HME
+        vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
+      - name: binary_DNN_m550_vs_HME
+        vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
+      - name: binary_DNN_m600_vs_HME
+        vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
+      - name: binary_DNN_m650_vs_HME
+        vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
+      - name: binary_DNN_m700_vs_HME
+        vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
+      - name: binary_DNN_m800_vs_HME
+        vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
+      - name: binary_DNN_m900_vs_HME
+        vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
+      - name: binary_DNN_m1000_vs_HME
+        vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
 
   DL_DNN_Inputs:
     # DL DNN Inputs
