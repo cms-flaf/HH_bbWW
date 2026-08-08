@@ -337,14 +337,14 @@ channelDefinition:
   muMu: 22
 
 categories:
-  - inclusive
+  # - inclusive
   - recovery
   - res2b
   - boosted
-  - boosted_H
-  - boosted_W
-  - boosted_HW
-  - baseline
+  # - boosted_H
+  # - boosted_W
+  # - boosted_HW
+  # - baseline
 
 QCDRegions:
   # - OS_Iso
@@ -356,12 +356,14 @@ QCDRegions:
   # - mbbCR_Tight
   # - mbbCR_AntiTight
 
-  - OS_Iso
+  # - OS_Iso
   - SR
-  - TT_CR
-  - DY_CR
-  - W_CR
-  - SR_mbb
+  # - TT_CR
+  # - DY_CR
+  # - W_CR
+  # - SR_mbb
+
+  - SR_puppiPTcut
 
 histTuple_selectors:
   - QCDRegions
@@ -404,7 +406,7 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
-histTuple_flavor: default
+histTuple_flavor: METphi_test
 histTuple_flavors:
   DNN_training:
     fullResolution_variables:
@@ -712,7 +714,128 @@ histTuple_flavors:
       - name: DNN_m1000_vs_HME
         vars: [ DNN_M1000_Signal, DeepHME_mass ]
 
+  DL_DNN_Inputs:
+    # DL DNN Inputs
+    fullResolution_variables: [ ]
+
+    variables:
+      - "MT"
+      - "ll_mass"
+      - "ll_pt"
+      - "lep1_pt"
+      - "lep2_pt"
+      - "ll_dR" # DNN uses _scaled
+      - "min_lb_dR"
+      - "lb_centrality"
+      - "MET_over_sqrt_HT"
+      - "HT_total"
+      - "PuppiMET_pt"
+      - "ll_dphi"
+      - "met_ll_dphi"
+      - "min_lmet_mt"
+      - "min_lmet_dphi"
+      - "ll_met_MT_WithMass"
+      - "bbllmet_mass"
+      - "ll_bb_dR"
+      - "MT2_blbl1"
+      - "MT2_blbl2"
+      - "bb_pt"
+      - "bb_mass"
+      - "ll_bb_pt_ratio"
+      - "bb_dR" # DNN uses _scaled
+      - "bjet1_pt"
+      - "bjet2_pt"
+      - "bjet1_btagPNetB"
+      - "bjet2_btagPNetB"
+      - "bb_btag_product"
+      - "fatbjet_pt"
+      - "fatbjet_mass_PNetCorr"
+      - "fatbjet_tau1"
+      - "fatbjet_tau2"
+      - "fatbjet_tau3"
+      - "fatbjet_tau4"
+      - "fatbjet_msoftdrop"
+
+      - DeepHME_mass
+
+  DNN_Outputs:
+    # DNN Outputs (Shapes)
+    fullResolution_variables: [ ]
+
+    variables:
+      - DeepHME_mass
+
+      - DNN_M300_Signal
+      - DNN_M400_Signal
+      - DNN_M500_Signal
+      - DNN_M550_Signal
+      - DNN_M600_Signal
+      - DNN_M650_Signal
+      - DNN_M700_Signal
+      - DNN_M800_Signal
+      - DNN_M900_Signal
+      - DNN_M1000_Signal
+
+      # - DNN_M300_TT
+      # - DNN_M400_TT
+      # - DNN_M500_TT
+      # - DNN_M550_TT
+      # - DNN_M600_TT
+      # - DNN_M650_TT
+      # - DNN_M700_TT
+      # - DNN_M800_TT
+      # - DNN_M900_TT
+      # - DNN_M1000_TT
+
+      # - DNN_M300_Other
+      # - DNN_M400_Other
+      # - DNN_M500_Other
+      # - DNN_M550_Other
+      # - DNN_M600_Other
+      # - DNN_M650_Other
+      # - DNN_M700_Other
+      # - DNN_M800_Other
+      # - DNN_M900_Other
+      # - DNN_M1000_Other
+
+      - name: DNN_m300_vs_HME
+        vars: [ DNN_M300_Signal, DeepHME_mass ]
+      - name: DNN_m400_vs_HME
+        vars: [ DNN_M400_Signal, DeepHME_mass ]
+      - name: DNN_m500_vs_HME
+        vars: [ DNN_M500_Signal, DeepHME_mass ]
+      - name: DNN_m550_vs_HME
+        vars: [ DNN_M550_Signal, DeepHME_mass ]
+      - name: DNN_m600_vs_HME
+        vars: [ DNN_M600_Signal, DeepHME_mass ]
+      - name: DNN_m650_vs_HME
+        vars: [ DNN_M650_Signal, DeepHME_mass ]
+      - name: DNN_m700_vs_HME
+        vars: [ DNN_M700_Signal, DeepHME_mass ]
+      - name: DNN_m800_vs_HME
+        vars: [ DNN_M800_Signal, DeepHME_mass ]
+      - name: DNN_m900_vs_HME
+        vars: [ DNN_M900_Signal, DeepHME_mass ]
+      - name: DNN_m1000_vs_HME
+        vars: [ DNN_M1000_Signal, DeepHME_mass ]
+
+  # METphi_test:
+  #   fullResolution_variables: [ ]
+
+  #   variables:
+  #     - "MT"
+  #     - "MET_over_sqrt_HT"
+  #     - "PuppiMET_pt"
+  #     - "PuppiMET_phi"
+  #     - "ll_dphi"
+  #     - "met_ll_dphi"
+  #     - "min_lmet_mt"
+  #     - "min_lmet_dphi"
+  #     - "ll_met_MT_WithMass"
+  #     - "bbllmet_mass"
+
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
-  hist_bins: config/Datacards/CI_binning.json
+  # hist_bins is unset: HistRebinTask already reduces the 2D DNN-vs-HME shapes to
+  # significance-sliced 1D categories, so no further rebinning is needed at datacard time.
   # param_values: [ 300 ]
