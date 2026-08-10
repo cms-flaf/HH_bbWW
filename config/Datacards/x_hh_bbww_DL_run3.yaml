@@ -260,19 +260,19 @@ limit_plots:
   - name: channels
     datacards:
       - { name: "Combined", glob: "*.txt" }
-      - { name: "ee",       glob: "${ERA}/eE/*.txt" }
-      - { name: "e#mu",     glob: "${ERA}/eMu/*.txt" }
-      - { name: "#mu#mu",   glob: "${ERA}/muMu/*.txt" }
+      - { name: "ee", glob: "${ERA}/eE/*.txt" }
+      - { name: "e#mu", glob: "${ERA}/eMu/*.txt" }
+      - { name: "#mu#mu", glob: "${ERA}/muMu/*.txt" }
     external_limits:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style
 
   - name: categories
     datacards:
-      - { name: "Combined",  glob: "*.txt" }
-      - { name: "res 2b",    glob: "${ERA}/categories/SR_res2b/*.txt" }
-      - { name: "recovery",  glob: "${ERA}/categories/SR_recovery/*.txt" }
-      - { name: "boosted",   glob: "${ERA}/categories/SR_boosted/*.txt" }
+      - { name: "Combined", glob: "*.txt" }
+      - { name: "res 2b", glob: "${ERA}/categories/SR_res2b/*.txt" }
+      - { name: "recovery", glob: "${ERA}/categories/SR_recovery/*.txt" }
+      - { name: "boosted", glob: "${ERA}/categories/SR_boosted/*.txt" }
     external_limits:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style
