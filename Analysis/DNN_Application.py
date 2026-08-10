@@ -7,6 +7,13 @@ import yaml
 import numpy as np
 import awkward as ak
 import onnxruntime as ort
+import psutil
+import yaml
+import os
+import ROOT
+import FLAF.Common.Utilities as Utilities
+import Analysis.hh_bbww as analysis
+from contextlib import contextmanager
 
 
 class DNNProducer:
@@ -485,6 +492,404 @@ class DNNProducer:
                 dl_sel = np.where(boosted_mask, dl_boosted, dl_resolved)
 
                 output_fields[target_field] = np.where(sl_mask, sl_sel, dl_sel)
+
+        for field_name, values in output_fields.items():
+            branches[field_name] = values
+
+        return branches
+
+
+def make_session(path):
+    """
+    Helper function to create onnx sessions with options
+    """
+    so = ort.SessionOptions()
+    so.enable_cpu_mem_arena = False
+    so.enable_mem_pattern = False
+    so.intra_op_num_threads = 1
+    so.inter_op_num_threads = 1
+    return ort.InferenceSession(
+        path, sess_options=so, providers=["CPUExecutionProvider"]
+    )
+
+
+@contextmanager
+def onnx_session(path):
+    """
+    RAII session helper
+    """
+    sess = make_session(path)
+    try:
+        yield sess
+    finally:
+        del sess
+        gc.collect()
+
+
+class TwoStageDNNProducer:
+    def __init__(self, cfg, payload_name, period):
+        self.cfg = cfg
+        self.payload_name = payload_name
+        self.period = period
+        self.masses = self.cfg.get("masses")
+
+        sys.path.append(os.environ["ANALYSIS_PATH"])
+
+        load_features = set()
+        columns_to_save = set()
+
+        # categories with dedicated networks/configs, each in its own subdir
+        self.categories = ["boosted", "resolved"]
+
+        # maps channel -> dnn specs
+        self.channel_dnn_specs = {
+            "DL": self.cfg.get("DL", None),
+            "SL": self.cfg.get("SL", None),
+        }
+
+        self.dnn_configs = {}
+        # channel -> category -> models directory
+        self.models_folders = {}
+
+        for channel, specs in self.channel_dnn_specs.items():
+            if specs is None:
+                print(f"Channel {channel} does not have DNN defined, skip.")
+                continue
+
+            parametric = specs.get("parametric", False)
+            if parametric:
+                raise NotImplementedError(
+                    "Parametric two-stage DNN inference has not been implemented."
+                )
+
+            base_folder = os.path.join(
+                os.environ["ANALYSIS_PATH"], "config", "DNN", specs["version"]
+            )
+
+            self.dnn_configs[channel] = {}
+            self.models_folders[channel] = {}
+
+            for category in self.categories:
+                # boosted/resolved live in their own subdirectories
+                category_folder = os.path.join(base_folder, category)
+                self.models_folders[channel][category] = category_folder
+
+                self.dnn_configs[channel][category] = {}
+
+                binary_cfg_path = os.path.join(
+                    base_folder, f"binary_{category}_dnn_config.yaml"
+                )
+                multiclass_cfg_path = os.path.join(
+                    base_folder, f"multiclass_{category}_dnn_config.yaml"
+                )
+
+                with open(binary_cfg_path, "r") as f:
+                    self.dnn_configs[channel][category]["binary"] = yaml.safe_load(f)
+                with open(multiclass_cfg_path, "r") as f:
+                    self.dnn_configs[channel][category]["multiclass"] = yaml.safe_load(
+                        f
+                    )
+
+                load_features.update(
+                    self.dnn_configs[channel][category]["binary"]["features"]
+                )
+                load_features.update(
+                    self.dnn_configs[channel][category]["multiclass"]["features"]
+                )
+
+        columns_to_save.update(
+            [f"{self.payload_name}_{col}" for col in self.cfg["columns"]]
+        )
+
+        load_features.update(["FullEventId", "event", "SL", "DL", "boosted"])
+        self.vars_to_save = load_features
+
+    def run(self, array):
+        print("Running TwoStageDNNProducer producer")
+
+        array = self.ApplyDNN(array)
+        array = self.SelectDNN(array)
+
+        # Delete not-needed branches
+        for col in array.fields:
+            if col not in self.cfg["columns"]:
+                if col != "FullEventId":
+                    del array[col]
+
+        # Rename the branches
+        for col in self.cfg["columns"]:
+            if col in array.fields:
+                array[f"{self.payload_name}_{col}"] = array[f"{col}"]
+                del array[f"{col}"]
+            else:
+                print(f"Expected column {col} not found in your payload array!")
+                print(f"Available columns were {array.fields}")
+
+        return array
+
+    def ApplyDNN(self, branches):
+        output_fields = {}
+        class_names_list = self.cfg["class_names"]
+
+        # a feature value is flagged if it is non-finite (NaN/inf) OR a large
+        # sentinel/padding value. Inputs are still fed to the model as-is; this is
+        # warning-only. Real features never legitimately reach this scale.
+        SENTINEL_CAP = 1e15
+
+        def bad_values(col):
+            return ~np.isfinite(col) | (np.abs(col) > SENTINEL_CAP)
+
+        for channel, specs in self.channel_dnn_specs.items():
+            if specs is None:
+                print(f"Channel {channel} does not have DNN defined, skip.")
+                continue
+
+            num_parities = specs["num_parities"]
+            num_classes = specs["num_classes"]
+            num_events = len(branches)
+            event_id = np.asarray(branches.event, dtype=np.int64)
+
+            bin_name_pattern = specs["binary_name_pattern"]
+            multiclass_name_pattern = specs["multiclass_name_pattern"]
+
+            for category in self.categories:
+                models_folder = self.models_folders[channel][category]
+
+                binary_feature_list = self.dnn_configs[channel][category]["binary"][
+                    "features"
+                ]
+                multiclass_feature_list = self.dnn_configs[channel][category][
+                    "multiclass"
+                ]["features"]
+
+                reuse_inputs = binary_feature_list == multiclass_feature_list
+
+                # union of all features actually fed to either model
+                all_features = list(binary_feature_list)
+                if not reuse_inputs:
+                    all_features += [
+                        f
+                        for f in multiclass_feature_list
+                        if f not in binary_feature_list
+                    ]
+
+                # detect flagged (non-finite or large sentinel) feature values and
+                # warn. inputs are still fed to the model as-is.
+                flagged_mask = np.zeros(num_events, dtype=bool)
+                flagged_by_feature = {}
+                for fn in all_features:
+                    col = np.asarray(getattr(branches, fn), dtype=np.float32)
+                    bad = bad_values(col)
+                    if bad.any():
+                        flagged_by_feature[fn] = bad
+                        flagged_mask |= bad
+
+                n_flagged = int(flagged_mask.sum())
+                if n_flagged:
+                    flagged_idx = np.where(flagged_mask)[0]
+                    flagged_event_ids = event_id[flagged_idx]
+                    print(
+                        f"\n=== WARNING {channel}/{category}: "
+                        f"{n_flagged} event(s) have flagged feature(s) "
+                        f"(non-finite or |value| > {SENTINEL_CAP:g}); "
+                        f"inputs fed as-is ==="
+                    )
+                    print(
+                        f"event ids: {flagged_event_ids[:100].tolist()}"
+                        f"{' ...' if n_flagged > 100 else ''}"
+                    )
+                    print(
+                        "features with flagged values "
+                        "(feature -> #events -> affected event ids):"
+                    )
+                    for fn, bad in flagged_by_feature.items():
+                        ids = event_id[bad]
+                        print(
+                            f"  {fn}: {int(bad.sum())} -> "
+                            f"{ids[:100].tolist()}{' ...' if bad.sum() > 100 else ''}"
+                        )
+
+                # precompute per-parity masks and inputs once (shared across masses)
+                parity_data = {}
+                for train_parity in range(num_parities):
+                    application_parity = (train_parity + 3) % num_parities
+                    application_mask = event_id % num_parities == application_parity
+
+                    if not np.any(application_mask):
+                        continue
+
+                    selected = branches[application_mask]
+
+                    def build(feature_list):
+                        return np.stack(
+                            [
+                                np.asarray(getattr(selected, fn), dtype=np.float32)
+                                for fn in feature_list
+                            ],
+                            axis=1,
+                        )
+
+                    if reuse_inputs:
+                        parity_data[train_parity] = {
+                            "mask": application_mask,
+                            "binary_inputs": build(binary_feature_list),
+                            "multiclass_inputs": None,
+                        }
+                    else:
+                        parity_data[train_parity] = {
+                            "mask": application_mask,
+                            "binary_inputs": build(binary_feature_list),
+                            "multiclass_inputs": build(multiclass_feature_list),
+                        }
+
+                for mp in self.masses:
+                    # 0..num_classes - multiclass scores, -1 - binary score
+                    predictions = np.full(
+                        (num_events, num_classes + 1), -1.0, dtype=np.float32
+                    )
+
+                    for train_parity, data in parity_data.items():
+                        application_mask = data["mask"]
+                        binary_inputs = data["binary_inputs"]
+                        multiclass_inputs = (
+                            binary_inputs if reuse_inputs else data["multiclass_inputs"]
+                        )
+
+                        binary_model_name = bin_name_pattern.format(
+                            train_parity=train_parity, mass=mp
+                        )
+                        multiclass_model_name = multiclass_name_pattern.format(
+                            train_parity=train_parity, mass=mp
+                        )
+
+                        binary_model_path = os.path.join(
+                            models_folder, binary_model_name
+                        )
+                        multiclass_model_path = os.path.join(
+                            models_folder, multiclass_model_name
+                        )
+
+                        with onnx_session(binary_model_path) as bs, onnx_session(
+                            multiclass_model_path
+                        ) as ms:
+                            bs_in = bs.get_inputs()[0].name
+                            ms_in = ms.get_inputs()[0].name
+
+                            multiclass_scores = ms.run(
+                                None, {ms_in: multiclass_inputs}
+                            )[0]
+                            binary_scores = bs.run(None, {bs_in: binary_inputs})[0]
+
+                            predictions[application_mask, :num_classes] = (
+                                multiclass_scores
+                            )
+                            predictions[application_mask, -1] = binary_scores.ravel()
+
+                    # report events whose model OUTPUTS are non-finite (kept as-is).
+                    # only consider events actually assigned to a parity (i.e. not
+                    # left at the -1 sentinel).
+                    assigned_mask = np.zeros(num_events, dtype=bool)
+                    for data in parity_data.values():
+                        assigned_mask |= data["mask"]
+
+                    out_bad_mask = assigned_mask & ~np.isfinite(predictions).all(axis=1)
+                    n_out_bad = int(out_bad_mask.sum())
+                    if n_out_bad:
+                        out_bad_idx = np.where(out_bad_mask)[0]
+                        out_bad_ids = event_id[out_bad_idx]
+                        also_flagged = flagged_mask[out_bad_idx]
+                        print(
+                            f"\n=== WARNING {channel}/{category}/M{mp}: "
+                            f"{n_out_bad} event(s) have non-finite MODEL OUTPUTS "
+                            f"(kept as-is) ==="
+                        )
+                        print(
+                            f"event ids: {out_bad_ids[:100].tolist()}"
+                            f"{' ...' if n_out_bad > 100 else ''}"
+                        )
+                        print(
+                            f"  of these, {int(also_flagged.sum())} also had "
+                            f"flagged input feature(s); "
+                            f"{int((~also_flagged).sum())} had clean inputs "
+                            f"(suggests model/overflow issue)."
+                        )
+
+                    # check that all events have been processed
+                    assert np.all(
+                        np.isnan(predictions) | (predictions >= 0)
+                    ), f"All predictions must be filled for {channel}/{category}/M{mp}"
+
+                    for class_idx, class_name in enumerate(class_names_list):
+                        mc_field_name = (
+                            f"multiclass_{channel}_{category}_M{mp}_{class_name}"
+                        )
+                        output_fields[mc_field_name] = predictions[:, class_idx].copy()
+
+                    bin_field_name = f"binary_{channel}_{category}_M{mp}"
+                    output_fields[bin_field_name] = predictions[:, -1].copy()
+
+                    del predictions
+
+                del parity_data
+
+        for field_name, values in output_fields.items():
+            branches[field_name] = values
+
+        del output_fields
+        gc.collect()
+        return branches
+
+    def SelectDNN(self, branches):
+        nEvents = len(branches)
+        output_fields = {}
+        class_names_list = self.cfg["class_names"]
+
+        def get_field(name):
+            """Fetch a branch as float32, or zeros if it's missing."""
+            if name in branches.fields:
+                return np.asarray(branches[name], dtype=np.float32)
+            return np.zeros(nEvents, dtype=np.float32)
+
+        def get_mask(name):
+            if name in branches.fields:
+                return np.asarray(branches[name], dtype=bool)
+            return np.zeros(nEvents, dtype=bool)
+
+        sl_mask = get_mask("SL")
+        boosted_mask = get_mask("boosted")
+
+        def select(field_builder):
+            """
+            field_builder(channel, category) -> branch field name.
+            Picks boosted/resolved per event, then SL/DL per event.
+            """
+            sl_sel = np.where(
+                boosted_mask,
+                get_field(field_builder("SL", "boosted")),
+                get_field(field_builder("SL", "resolved")),
+            )
+            dl_sel = np.where(
+                boosted_mask,
+                get_field(field_builder("DL", "boosted")),
+                get_field(field_builder("DL", "resolved")),
+            )
+            return np.where(sl_mask, sl_sel, dl_sel)
+
+        for mass in self.masses:
+            m = int(mass)
+
+            # multiclass scores
+            for class_name in class_names_list:
+                target_field = f"M{m}_{class_name}"
+                output_fields[target_field] = select(
+                    lambda ch, cat: f"multiclass_{ch}_{cat}_{target_field}"
+                )
+
+            # binary score
+            target_field = f"M{m}_binary"
+            output_fields[target_field] = select(
+                lambda ch, cat: f"binary_{ch}_{cat}_M{m}"
+            )
 
         for field_name, values in output_fields.items():
             branches[field_name] = values
