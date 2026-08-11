@@ -17,6 +17,23 @@ channels:
 categories:
   - OS_Iso/res2b
   - OS_Iso/recovery
+
+# The CI runs with --test, i.e. --nEvents 1000 per dataset, so every yield is ~1e-3 of
+# nominal. The production gates (min_signal 0.5, min_dnn_bkg_sum 1.0, the N_eff floors)
+# would drop every category before a single shape was written, so they are all off here
+# and the rebinning collapses to one DNN slice with one mass bin -- enough to exercise
+# the chain end to end without asking a thousand events to support a real binning.
+binning:
+  n_dnn_slices: 1
+  max_mass_bins: 1
+  min_dnn_bkg_sum: 0.0
+  min_mass_bkg_each: 0.0
+  min_signal: 0.0
+  min_bkg_neff: 0.0
+  min_bkg_frac: 0.0
+  min_mass_bkg_neff: 0.0
+  bkg_per_mass_bin: 0.0
+  significance_mode: asimov
 processes:
   - process: data_obs
     is_data: true
