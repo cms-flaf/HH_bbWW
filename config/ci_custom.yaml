@@ -13,13 +13,8 @@ QCDRegions:
 StatInference:
   config: config/Datacards/CI_card.yaml
   # hist_bins is unset, as in global.yaml: HistRebinTask already reduces the 2D
-  # DNN-vs-HME shapes to significance-sliced 1D categories, so there is nothing left to
-  # rebin at datacard time. CI_binning.json is a 2D combined_bins/x_bins/y_bins spec
-  # written for the pre-rebinning histograms, and its entries key on base category names
-  # ("OS_Iso/res2b") while the datacard bins are the sliced ones -- so nothing would match
-  # and Binner.applyBinning would fail on new_binning[0] (the linearize branch has no
-  # empty-list guard).
-  # hist_bins: config/Datacards/CI_binning.json
+  # DNN-vs-HME shapes to significance-sliced 1D categories, so no further rebinning is
+  # needed at datacard time.
   param_values: [ 300 ]
 
 # Do not remove DNN variables, they are needed for the datacard creation.

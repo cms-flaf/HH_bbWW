@@ -1,0 +1,13 @@
+# Runs the limit chain on the 1D DNN score shapes instead of the 2D DNN-vs-HME ones.
+#
+#   law run PlotResonantLimitsTask --version <own version> --hists-version <...> \
+#     --period Run3_2022 --user-custom config/user_custom_1D.yaml
+#
+# Give it a --version of its own: the datacard/limit output paths do not encode which
+# configuration produced them, so sharing a version with a 2D run overwrites those cards.
+#
+# This file is appended after global.yaml and user_custom.yaml and parsed with them as
+# one document, so it replaces the whole StatInference block and inherits everything
+# else (fs_default and friends) from those.
+StatInference:
+  config: config/Datacards/x_hh_bbww_DL_run3_1D.yaml
