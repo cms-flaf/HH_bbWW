@@ -263,6 +263,11 @@ campaigns:
 
 limit_plots:
   - name: run3_vs_run2
+    # Also draw the standard single-curve plot with the +-1/+-2 sigma bands, which the
+    # overlay cannot show. This entry's one curve is the full combined result, so this is
+    # the headline limit plot. The external Run 2 limits and the projection below are
+    # separate curves rather than datacards, so they appear only on the overlay.
+    bands: true
     datacards:
       - { name: "Early Run 3", glob: "*.txt" }
     # Statistical extrapolation of the curve above, recomputed from the limits produced

@@ -31,7 +31,13 @@ It runs, in order:
 | `HistRebinTask` | rebins the 2D DNN×HME shapes into significance-sliced 1D categories |
 | `CreateDatacardsTask` | builds the datacards from those shapes |
 | `ResonantLimitsTask` | runs combine and combines the per-era cards per mass point |
-| `PlotResonantLimitsTask` | draws the overlays declared in the configuration's `limit_plots` |
+| `PlotResonantLimitsTask` | draws the plots declared in the configuration's `limit_plots` |
+
+Each `limit_plots` entry becomes one overlay of its datacard globs. An entry that also
+sets `bands: true` gets, in addition, the standard single-curve plot with the ±1σ/±2σ
+bands for each of its curves — the overlay draws expected lines only. Note the dhi task
+of almost the same name below (`PlotResonantLimits`, no `Task`): that is the one this
+task shells out to for the band plots.
 
 `--version` names what the chain *writes*; `--hists-version` names the `Hists_merged`
 tree it *reads*, so a re-binning or a re-fit does not require the input histograms to be
