@@ -57,5 +57,6 @@ New to FLAF? Read [Key terms](https://cms-flaf.github.io/FLAF/getting-started/ke
 
 ## Eras
 
-HH→bb̄WW runs over the Run 3 eras `Run3_2022`, `Run3_2022EE`, `Run3_2023` and `Run3_2023BPix`.
-See [FLAF → Eras](https://cms-flaf.github.io/FLAF/concepts/eras/).
+HH→bb̄WW runs over the Run 3 eras `Run3_2022`, `Run3_2022EE`, `Run3_2023`, `Run3_2023BPix`,
+`Run3_2024` and `Run3_2025`. 2025 reuses the 2024 Summer24 MC (with 2025 corrections);
+see [FLAF → Eras](https://cms-flaf.github.io/FLAF/concepts/eras/).

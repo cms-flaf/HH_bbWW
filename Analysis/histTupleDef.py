@@ -93,7 +93,12 @@ def DefineWeightForHistograms(
     weights_this_process = set(corrections.to_apply.keys())
 
     total_weight_expression = (
-        analysis.GetWeight(weights_this_process) if process_group != "data" else "1"
+        analysis.GetWeight(
+            weights_this_process,
+            weight_base_name=global_params.get("weight_base_branch", "weight_base"),
+        )
+        if process_group != "data"
+        else "1"
     )  # are we sure?
     weight_name = "final_weight"
     if weight_name not in dfw.df.GetColumnNames():

@@ -78,12 +78,14 @@ def GetBTagWeight(global_cfg_dict, cat, applyBtag=False):
     return f"{btag_weight}*{btagshape_weight}"
 
 
-def GetWeight(weights_this_process):  # do you need all these args?
+def GetWeight(
+    weights_this_process, weight_base_name="weight_base"
+):  # do you need all these args?
     # weights_this_process is a set of corrections from global.yaml
     # e.g. {'lumi', 'dy_hhbbww', 'trigger', 'base', 'btag', 'dy_hhbbtautau', 'JER', 'pu', 'JEC', 'ele', 'gen', 'muScaRe', 'mu', 'eleES', 'fatjet', 'xs'}
 
     # weights_to_apply = ["weight_base", "ExtraDYWeight"]
-    weights_to_apply = ["weight_base"]
+    weights_to_apply = [weight_base_name]
     weights_to_apply_resolved = []
     weights_to_apply_boosted = []
 
