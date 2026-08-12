@@ -43,14 +43,14 @@ corrections:
     stage: AnaTuple
     apply_jet_horns_fix: true
   btag:
-    normCacheProducer: BtagShape
     stages: [ AnaTuple, HistTuple, AnalysisCache ]
     modes:
       AnaTuple: none
-      AnalysisCache: shape
-      HistTuple: shape_and_norm
+      AnalysisCache: none
+      HistTuple: none
     tagger: UParTAK4
     jetCollection: centralJet
+    wantShape: false
   dy_hhbbtautau:
     stages: [ AnalysisCache, HistTuple ]
     processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]

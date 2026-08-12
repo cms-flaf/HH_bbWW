@@ -7,10 +7,6 @@ DY:
 
 DYto2L_InclusivePlusBinned:
   processors: *DY_processors
-  corrections:
-    Vpt:
-      type: DY
-      stages: [ 'AnalysisCache', 'HistTuple' ]
   datasets:
     - DYto2E_M_50_amcatnloFXFX
     - DYto2E_M_50_0J_amcatnloFXFX
