@@ -553,7 +553,7 @@ def AddDNNVariablesDL(df, isData=False):
     return df
 
 
-def defineJetSelections(df, isData):
+def defineJetSelections(df, isData, bTagWP=0.1919):
     # Define vars to save
     jet_vars = [
         "p4",
@@ -589,6 +589,11 @@ def defineJetSelections(df, isData):
     if not isData:
         fatjet_vars = fatjet_vars + fatjet_mc_vars
         jet_vars = jet_vars + jet_mc_vars
+    existing_cols = {str(c) for c in df.GetColumnNames()}
+    jet_vars = [v for v in jet_vars if v == "p4" or f"centralJet_{v}" in existing_cols]
+    fatjet_vars = [
+        v for v in fatjet_vars if v == "p4" or f"SelectedFatJet_{v}" in existing_cols
+    ]
 
     # First step is to decide Hbb boosted
     # Take FatJets, mask by BTag and msoftdrop, sort by BTag Score
@@ -611,7 +616,10 @@ def defineJetSelections(df, isData):
 
     # Do not need a selection, we should just take the top 2 score Jets whether they pass the cut
     # df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
-    df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= -1")
+    if "centralJet_idbtagPNetB" in existing_cols:
+        df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= -1")
+    else:
+        df = df.Define("BJet_Sel", "centralJet_pt >= 0.f")
     df = df.Define("BJet_idx", "CreateIndexes(Sum(BJet_Sel))")
     df = df.Define(
         "BJet_idxSorted",
@@ -626,8 +634,22 @@ def defineJetSelections(df, isData):
     df = df.Define("bjet1_isValid", "(Nbjets > 0)")
     df = df.Define("bjet2_isValid", "(Nbjets > 1)")
 
-    df = df.Define("bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0")
-    df = df.Define("bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0")
+    if "idbtagPNetB" in jet_vars:
+        df = df.Define(
+            "bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0"
+        )
+        df = df.Define(
+            "bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0"
+        )
+    else:
+        df = df.Define(
+            "bjet1_isBTagged",
+            f"bjet1_isValid ? BJet_btagPNetB[0] >= {bTagWP}f : 0",
+        )
+        df = df.Define(
+            "bjet2_isBTagged",
+            f"bjet2_isValid ? BJet_btagPNetB[1] >= {bTagWP}f : 0",
+        )
     df = df.Define(
         f"nBTaggedJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)"
     )  # Used in bbtautau DY reweight, name configured in global.yaml
@@ -1685,7 +1707,9 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.calculateMT()
-    dfForHistograms.df = defineJetSelections(dfForHistograms.df, isData)
+    dfForHistograms.df = defineJetSelections(
+        dfForHistograms.df, isData, getattr(dfForHistograms, "bTagWP", 0.1919)
+    )
     dfForHistograms.df = AddDNNVariablesCommon(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariablesDL(dfForHistograms.df, isData)
     dfForHistograms.defineTriggers()
