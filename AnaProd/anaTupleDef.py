@@ -606,6 +606,7 @@ def addAllVariables(
         min_n_effective_jets_DL=global_params["anaTupleSelection"][
             "min_n_effective_jets_DL"
         ],
+        era=global_params["era"],
     )
 
     defineCentralJetVariables(dfw, isData)

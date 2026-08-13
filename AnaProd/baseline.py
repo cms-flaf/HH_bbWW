@@ -106,7 +106,7 @@ def selectExtraLeptons(df):
     return df
 
 
-def selectJets(df, *, min_n_effective_jets_SL, min_n_effective_jets_DL):
+def selectJets(df, *, min_n_effective_jets_SL, min_n_effective_jets_DL, era=None):
     df = df.Define(
         "Jet_Incl",
         "v_ops::pt(Jet_p4) > 20 && abs(v_ops::eta(Jet_p4)) < 2.5 && Jet_passJetIdTight",
@@ -115,9 +115,10 @@ def selectJets(df, *, min_n_effective_jets_SL, min_n_effective_jets_DL):
         "ForwardJet_sel",
         "v_ops::pt(Jet_p4) > 20 && abs(v_ops::eta(Jet_p4)) > 2.5 && Jet_passJetIdTight",
     )
+    fatjet_id = "" if era in ("Run3_2024", "Run3_2025") else " && ( FatJet_jetId & 2 )"
     df = df.Define(
         "FatJet_Incl",
-        "v_ops::pt(FatJet_p4) > 200 && abs(v_ops::eta(FatJet_p4)) < 2.5 && ( FatJet_jetId & 2 ) ",
+        f"v_ops::pt(FatJet_p4) > 200 && abs(v_ops::eta(FatJet_p4)) < 2.5{fatjet_id}",
     )
     df = df.Define(
         "Jet_sel",
