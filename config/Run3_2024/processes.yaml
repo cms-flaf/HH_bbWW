@@ -388,7 +388,7 @@ custom_CI_Signal:
   name: "CI -- Signal"
   color: "kBlack"
   datasets:
-    - GluGlutoHHto2B2V_kl_1p00_kt_1p00_c2_0p00
+    - GluGlutoHHto2B2Vto2L2Nu_kl_1p00_kt_1p00_c2_0p00
 
 custom_CI_Data:
   name: "CI -- Data"
