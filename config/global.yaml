@@ -503,6 +503,7 @@ uncs_to_exclude:
   Run3_2023BPix: [ ]
   Run3_2024: [ ]
   Run3_2025: [ ]
+  Run3_2026: [ ]
 
 storeExtraJets: False
 scales:
