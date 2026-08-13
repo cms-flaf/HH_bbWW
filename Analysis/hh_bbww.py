@@ -11,6 +11,9 @@ WorkingPointsParticleNet = {
     "Run3_2022EE": {"Loose": 0.0499, "Medium": 0.2605, "Tight": 0.6915},
     "Run3_2023": {"Loose": 0.0358, "Medium": 0.1917, "Tight": 0.6172},
     "Run3_2023BPix": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
+    # UParTAK4 WP values from BTV Summer24 NanoAODv15 (L/M/T).
+    "Run3_2024": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
+    "Run3_2025": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
 }
 
 
