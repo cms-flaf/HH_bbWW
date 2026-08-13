@@ -11,7 +11,11 @@ WorkingPointsParticleNet = {
     "Run3_2022EE": {"Loose": 0.0499, "Medium": 0.2605, "Tight": 0.6915},
     "Run3_2023": {"Loose": 0.0358, "Medium": 0.1917, "Tight": 0.6172},
     "Run3_2023BPix": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
-    # UParTAK4 WP values from BTV Summer24 NanoAODv15 (L/M/T).
+    "Run3_2024": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
+    "Run3_2025": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
+}
+WorkingPointsUParTAK4 = {
+    # BTV Summer24 NanoAODv15 (L/M/T).
     "Run3_2024": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
     "Run3_2025": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
 }
@@ -553,7 +557,7 @@ def AddDNNVariablesDL(df, isData=False):
     return df
 
 
-def defineJetSelections(df, isData, bTagWP=0.1919):
+def defineJetSelections(df, isData, period="Run3_2023BPix"):
     # Define vars to save
     jet_vars = [
         "p4",
@@ -563,6 +567,8 @@ def defineJetSelections(df, isData, bTagWP=0.1919):
         "mass",
         "btagPNetB",
         "idbtagPNetB",
+        "btagUParTAK4B",
+        "idbtagUParTAK4B",
         "rawFactor",
         "PNetRegPtRawCorr",
         "PNetRegPtRawCorrNeutrino",
@@ -616,14 +622,24 @@ def defineJetSelections(df, isData, bTagWP=0.1919):
 
     # Do not need a selection, we should just take the top 2 score Jets whether they pass the cut
     # df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= 1")
-    if "centralJet_idbtagPNetB" in existing_cols:
-        df = df.Define("BJet_Sel", "centralJet_idbtagPNetB >= -1")
+    if (
+        "centralJet_idbtagPNetB" in existing_cols
+        or "centralJet_idbtagUParTAK4B" in existing_cols
+    ):
+        id_sel = (
+            "centralJet_idbtagUParTAK4B"
+            if "centralJet_idbtagUParTAK4B" in existing_cols
+            else "centralJet_idbtagPNetB"
+        )
+        df = df.Define("BJet_Sel", f"{id_sel} >= -1")
     else:
         df = df.Define("BJet_Sel", "centralJet_pt >= 0.f")
+    use_upart = "centralJet_btagUParTAK4B" in existing_cols
+    sort_score = "centralJet_btagUParTAK4B" if use_upart else "centralJet_btagPNetB"
     df = df.Define("BJet_idx", "CreateIndexes(Sum(BJet_Sel))")
     df = df.Define(
         "BJet_idxSorted",
-        "Take(ReorderObjects(centralJet_btagPNetB[BJet_Sel], BJet_idx), min((int)BJet_idx.size(), 2))",
+        f"Take(ReorderObjects({sort_score}[BJet_Sel], BJet_idx), min((int)BJet_idx.size(), 2))",
     )
     for var in jet_vars:
         df = df.Define(
@@ -634,21 +650,39 @@ def defineJetSelections(df, isData, bTagWP=0.1919):
     df = df.Define("bjet1_isValid", "(Nbjets > 0)")
     df = df.Define("bjet2_isValid", "(Nbjets > 1)")
 
-    if "idbtagPNetB" in jet_vars:
+    if "idbtagUParTAK4B" in jet_vars:
+        id_branch = "idbtagUParTAK4B"
+        score_branch = None
+        bTagWP = None
+    elif "idbtagPNetB" in jet_vars:
+        id_branch = "idbtagPNetB"
+        score_branch = None
+        bTagWP = None
+    elif use_upart:
+        id_branch = None
+        score_branch = "btagUParTAK4B"
+        bTagWP = WorkingPointsUParTAK4.get(period, WorkingPointsParticleNet[period])[
+            "Medium"
+        ]
+    else:
+        id_branch = None
+        score_branch = "btagPNetB"
+        bTagWP = WorkingPointsParticleNet[period]["Medium"]
+    if id_branch is not None:
         df = df.Define(
-            "bjet1_isBTagged", "bjet1_isValid ? BJet_idbtagPNetB[0] >= 1 : 0"
+            "bjet1_isBTagged", f"bjet1_isValid ? BJet_{id_branch}[0] >= 1 : 0"
         )
         df = df.Define(
-            "bjet2_isBTagged", "bjet2_isValid ? BJet_idbtagPNetB[1] >= 1 : 0"
+            "bjet2_isBTagged", f"bjet2_isValid ? BJet_{id_branch}[1] >= 1 : 0"
         )
     else:
         df = df.Define(
             "bjet1_isBTagged",
-            f"bjet1_isValid ? BJet_btagPNetB[0] >= {bTagWP}f : 0",
+            f"bjet1_isValid ? BJet_{score_branch}[0] >= {bTagWP}f : 0",
         )
         df = df.Define(
             "bjet2_isBTagged",
-            f"bjet2_isValid ? BJet_btagPNetB[1] >= {bTagWP}f : 0",
+            f"bjet2_isValid ? BJet_{score_branch}[1] >= {bTagWP}f : 0",
         )
     df = df.Define(
         f"nBTaggedJets", "int(bjet1_isBTagged) + int(bjet2_isBTagged)"
@@ -1708,7 +1742,9 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.calculateMT()
     dfForHistograms.df = defineJetSelections(
-        dfForHistograms.df, isData, getattr(dfForHistograms, "bTagWP", 0.1919)
+        dfForHistograms.df,
+        isData,
+        getattr(dfForHistograms, "period", "Run3_2023BPix"),
     )
     dfForHistograms.df = AddDNNVariablesCommon(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariablesDL(dfForHistograms.df, isData)

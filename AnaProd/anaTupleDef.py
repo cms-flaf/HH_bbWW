@@ -53,6 +53,7 @@ JetObservables = [
     "PNetRegPtRawRes",
     "rawFactor",
     "btagPNetB",
+    "btagUParTAK4B",
     "btagPNetCvB",
     "btagPNetCvL",
     # "btagPNetCvNotB",
@@ -79,6 +80,7 @@ JetObservables = [
     # "neMultiplicity",
     "ptRes",
     "idbtagPNetB",
+    "idbtagUParTAK4B",
     "area",
 ]  # 2024
 
@@ -379,8 +381,12 @@ def defineExtraLeptonVariables(dfw):
 def defineCentralJetVariables(dfw, isData):
     # save all selected reco jets
     dfw.Define("centralJet_idx", "CreateIndexes(Sum(Jet_sel))")
+    existing_cols = {str(c) for c in dfw.df.GetColumnNames()}
+    sort_score = (
+        "Jet_btagUParTAK4B" if "Jet_btagUParTAK4B" in existing_cols else "Jet_btagPNetB"
+    )
     dfw.Define(
-        "centralJet_idxSorted", "ReorderObjects(Jet_btagPNetB[Jet_sel], centralJet_idx)"
+        "centralJet_idxSorted", f"ReorderObjects({sort_score}[Jet_sel], centralJet_idx)"
     )
     for var in PtEtaPhiM:
         name = f"centralJet_{var}"
