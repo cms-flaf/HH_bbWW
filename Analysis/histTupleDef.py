@@ -91,6 +91,13 @@ def DefineWeightForHistograms(
     boosted_categories = global_params.get("boosted_categories", [])
     process_group = global_params["process_group"]
     weights_this_process = set(corrections.to_apply.keys())
+    # Mode "none" still loads btag (WP-id branches) but does not create SF
+    # columns. GetWeight must not multiply by weight_bTagShape_Central then.
+    btag_mode = (
+        corrections.to_apply.get("btag", {}).get("modes", {}).get("HistTuple", "none")
+    )
+    if btag_mode not in ("shape", "shape_and_norm", "wp"):
+        weights_this_process.discard("btag")
 
     total_weight_expression = (
         analysis.GetWeight(

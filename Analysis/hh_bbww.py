@@ -13,11 +13,13 @@ WorkingPointsParticleNet = {
     "Run3_2023BPix": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
     "Run3_2024": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
     "Run3_2025": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
+    "Run3_2026": {"Loose": 0.0359, "Medium": 0.1919, "Tight": 0.6133},
 }
 WorkingPointsUParTAK4 = {
     # BTV Summer24 NanoAODv15 (L/M/T).
     "Run3_2024": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
     "Run3_2025": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
+    "Run3_2026": {"Loose": 0.0246, "Medium": 0.1272, "Tight": 0.4648},
 }
 
 
