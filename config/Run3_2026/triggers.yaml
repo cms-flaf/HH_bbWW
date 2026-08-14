@@ -17,7 +17,8 @@ singleIsoMu:
         "2023_Summer23": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
         "2023_Summer23BPix": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
         "2024_Summer24": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
-        "2025_Summer24": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight"
+        "2025_Summer24": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight",
+        "2026_Summer24": "NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight"
       }
 
 singleIsoMuHT:
@@ -69,7 +70,8 @@ singleEleWpTight:
         "2023_Summer23": "Electron-HLT-SF",
         "2023_Summer23BPix": "Electron-HLT-SF",
         "2024_Summer24": "Electron-HLT-SF",
-        "2025_Summer24": "Electron-HLT-SF"
+        "2025_Summer24": "Electron-HLT-SF",
+        "2026_Summer24": "Electron-HLT-SF"
       }
 
 diElec:
