@@ -1014,4 +1014,4 @@ StatInference:
   # param_values: [ 300 ]
 
 crab:
-  input_dataset: TTto2L2Nu
+  input_dataset: /TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer22NanoAODv12-130X_mcRun3_2022_realistic_v5-v2/NANOAODSIM
