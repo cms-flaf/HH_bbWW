@@ -275,6 +275,47 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
 
+        # Individual mass signal regions
+        masspoints = [
+            300,
+            400,
+            500,
+            550,
+            600,
+            650,
+            700,
+            800,
+            900,
+            1000,
+        ]
+
+        for mp in masspoints:
+            self.Define(
+                f"predicted_class_M{mp}", 
+                f"""std::vector<double> scores = {{
+                        TwoStageDNN_M{mp}_Signal,
+                        TwoStageDNN_M{mp}_TT,
+                        TwoStageDNN_M{mp}_ST,
+                        TwoStageDNN_M{mp}_WJets,
+                        TwoStageDNN_M{mp}_DY,
+                        TwoStageDNN_M{mp}_H,
+                        TwoStageDNN_M{mp}_VV
+                    }};
+                    auto it = std::max_element(scores.begin(), scores.end());
+                    size_t cls = it - scores.begin();
+                    return cls;
+                """
+            )
+
+            self.DefineAndAppend(f"SR_SL_M{mp}", f"return predicted_class_M{mp} == 0;")
+            self.DefineAndAppend(f"CR_SL_TT_M{mp}", f"return predicted_class_M{mp} == 1;")
+            self.DefineAndAppend(f"CR_SL_ST_M{mp}", f"return predicted_class_M{mp} == 2;")
+            self.DefineAndAppend(f"CR_SL_WJets_M{mp}", f"return predicted_class_M{mp} == 3;")
+            self.DefineAndAppend(f"CR_SL_DY_M{mp}", f"return predicted_class_M{mp} == 4;")
+            self.DefineAndAppend(f"CR_SL_H_M{mp}", f"return predicted_class_M{mp} == 5;")
+            self.DefineAndAppend(f"CR_SL_VV_M{mp}", f"return predicted_class_M{mp} == 6;")
+
+        
     def calculateMT(self):
         self.df = self.df.Define(
             "lep1_MT", f"(lep1_legType > 0) ? Calculate_MT(lep1_p4, PuppiMET_p4) : 0.0"

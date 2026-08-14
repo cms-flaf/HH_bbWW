@@ -2118,3 +2118,663 @@ binary_DNN_m1000_vs_HME:
   divide_by_bin_width: False
   blind: True
   var_list: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
+
+# ==============================================================================
+# M300 Configurations
+# ==============================================================================
+TwoStageDNN_M300_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M300_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M300 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M400 Configurations
+# ==============================================================================
+TwoStageDNN_M400_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M400_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M400 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M500 Configurations
+# ==============================================================================
+TwoStageDNN_M500_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M500_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M500 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M550 Configurations
+# ==============================================================================
+TwoStageDNN_M550_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M550_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M550 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M600 Configurations
+# ==============================================================================
+TwoStageDNN_M600_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M600_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M600 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M650 Configurations
+# ==============================================================================
+TwoStageDNN_M650_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M650_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M650 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M700 Configurations
+# ==============================================================================
+TwoStageDNN_M700_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M700_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M700 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M800 Configurations
+# ==============================================================================
+TwoStageDNN_M800_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M800_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M800 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M900 Configurations
+# ==============================================================================
+TwoStageDNN_M900_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M900_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M900 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+# ==============================================================================
+# M1000 Configurations
+# ==============================================================================
+TwoStageDNN_M1000_Signal:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 Signal score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_TT:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 TT score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_ST:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 ST score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_WJets:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 WJets score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_DY:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 DY score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_H:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 H score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
+
+TwoStageDNN_M1000_VV:
+  x_bins: "100|0.0:1.0"
+  x_title: Multiclass DNN M1000 VV score
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+  blind: True
