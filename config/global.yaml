@@ -1012,3 +1012,6 @@ StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
   hist_bins: config/Datacards/CI_binning.json
   # param_values: [ 300 ]
+
+crab:
+  input_dataset: TTto2L2Nu
