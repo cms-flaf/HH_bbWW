@@ -329,38 +329,46 @@ VBFHHto2B2WtoLNu2Q:
 Data_Full:
   name: "Data"
   datasets:
-    - EGamma0_Run2024C
-    - EGamma0_Run2024D
-    - EGamma0_Run2024E
-    - EGamma0_Run2024F
-    - EGamma0_Run2024G
-    - EGamma0_Run2024H
-    - EGamma0_Run2024I_v1
-    - EGamma0_Run2024I_v2
-    - EGamma1_Run2024C
-    - EGamma1_Run2024D
-    - EGamma1_Run2024E
-    - EGamma1_Run2024F
-    - EGamma1_Run2024G
-    - EGamma1_Run2024H
-    - EGamma1_Run2024I_v1
-    - EGamma1_Run2024I_v2
-    - Muon0_Run2024C
-    - Muon0_Run2024D
-    - Muon0_Run2024E
-    - Muon0_Run2024F
-    - Muon0_Run2024G
-    - Muon0_Run2024H
-    - Muon0_Run2024I_v1
-    - Muon0_Run2024I_v2
-    - Muon1_Run2024C
-    - Muon1_Run2024D
-    - Muon1_Run2024E
-    - Muon1_Run2024F
-    - Muon1_Run2024G
-    - Muon1_Run2024H
-    - Muon1_Run2024I_v1
-    - Muon1_Run2024I_v2
+    - EGamma0_Run2026A_v1
+    - EGamma0_Run2026B_v1
+    - EGamma0_Run2026C_v1
+    - EGamma0_Run2026D_v1
+    - EGamma1_Run2026A_v1
+    - EGamma1_Run2026B_v1
+    - EGamma1_Run2026C_v1
+    - EGamma1_Run2026D_v1
+    - EGamma2_Run2026A_v1
+    - EGamma2_Run2026B_v1
+    - EGamma2_Run2026C_v1
+    - EGamma2_Run2026D_v1
+    - EGamma3_Run2026A_v1
+    - EGamma3_Run2026B_v1
+    - EGamma3_Run2026C_v1
+    - EGamma3_Run2026D_v1
+    - EGamma4_Run2026A_v1
+    - EGamma4_Run2026B_v1
+    - EGamma4_Run2026C_v1
+    - EGamma4_Run2026D_v1
+    - EGamma5_Run2026A_v1
+    - EGamma5_Run2026B_v1
+    - EGamma5_Run2026C_v1
+    - EGamma5_Run2026D_v1
+    - Muon0_Run2026A_v1
+    - Muon0_Run2026B_v1
+    - Muon0_Run2026C_v1
+    - Muon0_Run2026D_v1
+    - Muon1_Run2026A_v1
+    - Muon1_Run2026B_v1
+    - Muon1_Run2026C_v1
+    - Muon1_Run2026D_v1
+    - Muon2_Run2026A_v1
+    - Muon2_Run2026B_v1
+    - Muon2_Run2026C_v1
+    - Muon2_Run2026D_v1
+    - Muon3_Run2026A_v1
+    - Muon3_Run2026B_v1
+    - Muon3_Run2026C_v1
+    - Muon3_Run2026D_v1
 
 custom_CI:
   name: "custom for CI and test purposes"
@@ -384,4 +392,4 @@ custom_CI_Data:
   name: "CI -- Data"
   color: "kAzure+10"
   datasets:
-    - Muon0_Run2024C
+    - Muon0_Run2026A_v1
