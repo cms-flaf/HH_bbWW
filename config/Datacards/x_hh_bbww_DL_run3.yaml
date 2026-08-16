@@ -65,6 +65,29 @@ binning:
   min_mass_bkg_neff: 4.0
   bkg_per_mass_bin: 5.0
   significance_mode: asimov
+
+  # Per-process floors on the DNN slice boundaries themselves. min_bkg_neff above gates
+  # only the *summed* background, which turns out never to bind: over the 232 eE/muMu SR
+  # slices the summed N_eff never once fell below 4, while DY individually sat below it in
+  # 42% of them. A background that has fluctuated negative is simply invisible inside a
+  # healthy total -- muMu/SR/res2b at m500 selected a window holding DY = -5.87 +- 8.92
+  # because the sum there was +39.9 +- 9.0 -- and that slice cannot be made into a datacard
+  # at all, since resolveNegativeBins rejects a negative integral outright.
+  #
+  # min_dnn_bkg_each is the min_mass_bkg_each analogue, and does the real work: requiring
+  # every non-negligible background to be positive in every slice removes all 7 such slices
+  # in Run3_Early for -0.16% of the total combined Asimov Z (39.103 -> 39.042). The worst
+  # single category is muMu/res2b at m500, -2.3%: the binner had been choosing left edge 68
+  # (Z 0.834, DY -5.87) over 67 (Z 0.775, DY +7.31), i.e. the downward fluctuation was
+  # actively preferred because it lowers B in S/sqrt(B + sigma_B^2).
+  #
+  # min_dnn_bkg_neff is the stronger version, requiring those backgrounds to be *measured*
+  # rather than merely positive, and is left off: at a threshold of 4 it costs 35% of the
+  # Asimov Z in muMu/res2b at m500, because the whole signal-like region of that category
+  # holds only N_eff 5.2 of DY in total and cannot be split three ways above the threshold.
+  # Backgrounds below min_bkg_frac of the category total are exempt from both.
+  min_dnn_bkg_each: 0.01
+  min_dnn_bkg_neff: 0.0
 processes:
   - process: data_obs
     is_data: true
@@ -113,6 +136,66 @@ processes:
   - process: ST
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
+
+  # Single merged background template for the boosted slices, all three channels.
+  #
+  # Why: DY has no usable MC statistics in the b-tagged same-flavour categories.
+  # Measured on Run3_Early (v2605a), summed over the four sub-eras, DY's effective
+  # MC count (yield/error)^2 has a median of 5.8 across the 232 eE/muMu SR slices
+  # and sits below the binning's own min_bkg_neff of 4 in 42% of them, with several
+  # slices going negative outright. TT, ST and VV are all fine on their own (median
+  # N_eff 471 / 211 / 97, never below 4). So this is a DY problem, not a binning
+  # granularity problem -- there is no 4-slice DNN binning of eE/muMu in which DY is
+  # individually well measured, and merging DNN slices to chase it only buys a
+  # positive number that is still statistically meaningless.
+  #
+  # Why all four rather than only the small ones: over the 64 boosted slices,
+  # merging DY+ST+VV alone leaves 2 negative bins (eE/SR/boosted_dnn1 at m500);
+  # including TT leaves none anywhere. Those last 2 bins are consistent with zero
+  # and have 10x their size in positive donors, but the mass axis is binned by equal
+  # signal quantiles, so every bin of an n<=5 bin slice holds >= 1/n >= 20% of the
+  # signal and is therefore "relevant" under signalFractionForRelevantBins: 0.2 --
+  # and resolveNegativeBins rejects a negative relevant bin unconditionally,
+  # regardless of allow_negative_bins_within_error. Merging TT in as well avoids
+  # relying on that interaction at all: no negative bins, nothing to tolerate.
+  #
+  # Cost, stated plainly: boosted has one background rate instead of four, so TT
+  # cannot float independently there and the template's composition is frozen at the
+  # MC prediction. Accepted because boosted holds 2-80 background events per slice
+  # with no dedicated control region, and because autoMCStats (threshold 20, mode 1)
+  # was already pooling these bins' MC-stat uncertainty across processes.
+  #
+  # `subprocesses` naming other datacard processes replaces them here, so TT, DY, ST
+  # and VV keep their configuration above and simply do not enter the boosted bins.
+  #
+  # eMu is included as well. DY is restricted to eE/muMu in its own entry above and
+  # was therefore missing from eMu's boosted background entirely -- not because it is
+  # negligible there: over the 32 eMu boosted slices DY is 0.5% to 32% of the total
+  # background (median 6.5%), with N_eff 1.2-22 (median 5.9, a third of slices below
+  # 4). Merging is what lets it be counted, since the merged shape is assembled from
+  # subprocess histograms by path and does not consult DY's own channel list. So eMu
+  # boosted gains a real background it was previously missing, its DY never has to
+  # stand on its own statistics, and all three channels now describe their boosted
+  # background the same way. Folding DY in leaves zero negative bins in all 32 eMu
+  # slices. DY remains absent from eMu res2b/recovery, which are unchanged.
+  #
+  # Caveat: QCD_scale_TT/DY/ST/VV each match this process through its subprocesses
+  # (Uncertainty.appliesTo) and so apply to the whole merged yield rather than to
+  # their own constituent's share. TT dominates boosted, so QCD_scale_TT is roughly
+  # right; the other three over-cover. Net effect is a ~4.4% XS uncertainty where a
+  # yield-weighted treatment would give ~3% -- conservative, and small next to the
+  # MC-statistical noise this merge exists to remove.
+  #
+  # No negative-bin tolerance is set below on purpose: there are no negative bins to
+  # tolerate, and this template builds under the unmodified resolveNegativeBins.
+  - process: TotalBkg
+    subprocesses:
+      - TT
+      - DY
+      - ST
+      - VV
+    categories:
+      - SR/boosted
   # - W
   # - Other
 uncertainties:
@@ -153,6 +236,37 @@ uncertainties:
   #     - Run3_2023BPix
 
   - name: CMS_pileup
+    type: shape
+
+  # BTV shape calibration, registered in config/Run3_*/weights.yaml. Correlated
+  # across the four Run 3 eras -- the BTV per-era split of the *stats* sources needs
+  # meta-era support that dc_make does not have yet (see docs/stat_inference.md).
+  # In boosted categories the variation is neutralised at weight level, so these are
+  # dropped there automatically by the canIgnore threshold.
+  - name: CMS_btag_LF
+    type: shape
+  - name: CMS_btag_HF
+    type: shape
+  - name: CMS_btag_lfstats1
+    type: shape
+  - name: CMS_btag_lfstats2
+    type: shape
+  - name: CMS_btag_hfstats1
+    type: shape
+  - name: CMS_btag_hfstats2
+    type: shape
+  - name: CMS_btag_cferr1
+    type: shape
+  - name: CMS_btag_cferr2
+    type: shape
+
+  # AK8 calibration, registered in config/Run3_*/weights.yaml. Neutralised at
+  # weight level for resolved events, so canIgnore drops these outside boosted.
+  - name: CMS_bbww_ak8_Hbb
+    type: shape
+  - name: CMS_bbww_ak8_Hcc
+    type: shape
+  - name: CMS_bbww_ak8_tau21
     type: shape
 
   - name: CMS_scale_j
