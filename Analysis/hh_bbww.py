@@ -290,7 +290,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         ]
 
         for mp in masspoints:
-            self.Define(
+            self.df = self.df.Define(
                 f"predicted_class_M{mp}", 
                 f"""std::vector<double> scores = {{
                         TwoStageDNN_M{mp}_Signal,
