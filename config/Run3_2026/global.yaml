@@ -1,4 +1,4 @@
-triggerFile: config/Run3_2024/triggers.yaml
+triggerFile: config/Run3_2026/triggers.yaml
 nano_version: v15
 met_type: PuppiMET
 nanoAODVersions:
