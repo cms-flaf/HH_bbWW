@@ -480,71 +480,71 @@ QCDRegions:
   - SR_SL_M900
   - SR_SL_M1000
 
-  - CR_SL_TT_M300
-  - CR_SL_TT_M400
-  - CR_SL_TT_M500
-  - CR_SL_TT_M550
-  - CR_SL_TT_M600
-  - CR_SL_TT_M650
-  - CR_SL_TT_M700
-  - CR_SL_TT_M800
-  - CR_SL_TT_M900
-  - CR_SL_TT_M1000
+  # - CR_SL_TT_M300
+  # - CR_SL_TT_M400
+  # - CR_SL_TT_M500
+  # - CR_SL_TT_M550
+  # - CR_SL_TT_M600
+  # - CR_SL_TT_M650
+  # - CR_SL_TT_M700
+  # - CR_SL_TT_M800
+  # - CR_SL_TT_M900
+  # - CR_SL_TT_M1000
 
-  - CR_SL_ST_M300
-  - CR_SL_ST_M400
-  - CR_SL_ST_M500
-  - CR_SL_ST_M550
-  - CR_SL_ST_M600
-  - CR_SL_ST_M650
-  - CR_SL_ST_M700
-  - CR_SL_ST_M800
-  - CR_SL_ST_M900
-  - CR_SL_ST_M1000
+  # - CR_SL_ST_M300
+  # - CR_SL_ST_M400
+  # - CR_SL_ST_M500
+  # - CR_SL_ST_M550
+  # - CR_SL_ST_M600
+  # - CR_SL_ST_M650
+  # - CR_SL_ST_M700
+  # - CR_SL_ST_M800
+  # - CR_SL_ST_M900
+  # - CR_SL_ST_M1000
 
-  - CR_SL_WJets_M300
-  - CR_SL_WJets_M400
-  - CR_SL_WJets_M500
-  - CR_SL_WJets_M550
-  - CR_SL_WJets_M600
-  - CR_SL_WJets_M650
-  - CR_SL_WJets_M700
-  - CR_SL_WJets_M800
-  - CR_SL_WJets_M900
-  - CR_SL_WJets_M1000
+  # - CR_SL_WJets_M300
+  # - CR_SL_WJets_M400
+  # - CR_SL_WJets_M500
+  # - CR_SL_WJets_M550
+  # - CR_SL_WJets_M600
+  # - CR_SL_WJets_M650
+  # - CR_SL_WJets_M700
+  # - CR_SL_WJets_M800
+  # - CR_SL_WJets_M900
+  # - CR_SL_WJets_M1000
 
-  - CR_SL_DY_M300
-  - CR_SL_DY_M400
-  - CR_SL_DY_M500
-  - CR_SL_DY_M550
-  - CR_SL_DY_M600
-  - CR_SL_DY_M650
-  - CR_SL_DY_M700
-  - CR_SL_DY_M800
-  - CR_SL_DY_M900
-  - CR_SL_DY_M1000
+  # - CR_SL_DY_M300
+  # - CR_SL_DY_M400
+  # - CR_SL_DY_M500
+  # - CR_SL_DY_M550
+  # - CR_SL_DY_M600
+  # - CR_SL_DY_M650
+  # - CR_SL_DY_M700
+  # - CR_SL_DY_M800
+  # - CR_SL_DY_M900
+  # - CR_SL_DY_M1000
 
-  - CR_SL_H_M300
-  - CR_SL_H_M400
-  - CR_SL_H_M500
-  - CR_SL_H_M550
-  - CR_SL_H_M600
-  - CR_SL_H_M650
-  - CR_SL_H_M700
-  - CR_SL_H_M800
-  - CR_SL_H_M900
-  - CR_SL_H_M1000
+  # - CR_SL_H_M300
+  # - CR_SL_H_M400
+  # - CR_SL_H_M500
+  # - CR_SL_H_M550
+  # - CR_SL_H_M600
+  # - CR_SL_H_M650
+  # - CR_SL_H_M700
+  # - CR_SL_H_M800
+  # - CR_SL_H_M900
+  # - CR_SL_H_M1000
 
-  - CR_SL_VV_M300
-  - CR_SL_VV_M400
-  - CR_SL_VV_M500
-  - CR_SL_VV_M550
-  - CR_SL_VV_M600
-  - CR_SL_VV_M650
-  - CR_SL_VV_M700
-  - CR_SL_VV_M800
-  - CR_SL_VV_M900
-  - CR_SL_VV_M1000
+  # - CR_SL_VV_M300
+  # - CR_SL_VV_M400
+  # - CR_SL_VV_M500
+  # - CR_SL_VV_M550
+  # - CR_SL_VV_M600
+  # - CR_SL_VV_M650
+  # - CR_SL_VV_M700
+  # - CR_SL_VV_M800
+  # - CR_SL_VV_M900
+  # - CR_SL_VV_M1000
 
 histTuple_selectors:
   - QCDRegions
