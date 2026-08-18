@@ -58,6 +58,94 @@ from there, not from `global.yaml`'s own variable lists.
     always builds the `Run3_Early` combination of all four eras regardless of `--period`.
     `--period` is only used to construct a valid FLAF `Setup`.
 
+### Where the shape uncertainties come from
+
+A `type: shape` entry in the configuration's `uncertainties:` list is only a *declaration*
+— it names a histogram the merger must already have written. What actually produces that
+histogram is the corresponding entry in `config/Run3_<era>/weights.yaml`, whose `name:`
+field is the datacard nuisance name plus a `_{}` placeholder for `Up`/`Down`. Adding a
+nuisance to the datacard configuration without adding it there fails with
+`Cannot find histogram ...`; adding it to `weights.yaml` without an `expression:` is worse,
+because the variation is then produced but is byte-identical to the nominal shape, giving a
+nuisance that constrains nothing and looks fine.
+
+#### b-tagging shape calibration
+
+The BTV shape calibration contributes eight nuisances — `CMS_btag_LF`, `CMS_btag_HF`,
+`CMS_btag_{lf,hf}stats{1,2}` and `CMS_btag_cferr{1,2}` — registered under `norm:` in each
+era's `weights.yaml`. Two things about them are deliberate:
+
+*Boosted events are excluded at weight level.* `GetWeight` in `Analysis/hh_bbww.py` folds
+`weight_bTagShape_Central` into the resolved branch only of its `boosted ? ... : ...`
+expression; boosted events carry `weight_FatJetSF_Central` instead. The variation
+expressions therefore read `(boosted ? 1.0f : weight_bTagShape_<src>{scale}_rel) *
+final_weight`, so a boosted event's varied weight equals its nominal weight and
+`DatacardMaker`'s `canIgnore` threshold drops the nuisance from boosted categories on its
+own. Do not reach for `unc_to_not_consider_boosted` for this — that mechanism is commented
+out in `FLAF/Analysis/HistMergerFromHists.py` and is live only in the offline
+`ShapeOrLogNormal.py`.
+
+*The four `*stats*` sources are decorrelated per era, the other four are not.* That
+follows the BTV prescription: `LF`, `HF` and the two `cferr` sources describe a common
+calibration and stay correlated; the `{lf,hf}stats{1,2}` sources are statistical and get
+one nuisance per era.
+
+How the split is expressed is worth understanding, because it is not a datacard-only
+change. The nuisance name is also the histogram name — `DatacardMaker` reads
+`<process>_<name>_<Up|Down>` — so **an era-specific nuisance has to be named by the
+producer**. Each era's `weights.yaml` writes `name: CMS_btag_lfstats1_2022_{}` and the
+datacard declares one entry per era scoped with `eras:`. A source that stays correlated
+keeps a single unsuffixed name in all four files. There is no separate "decorrelate" switch:
+whether a source is split is visible from what the merger writes.
+
+Two consequences to keep in mind. Renaming here is a **merge-stage** change only —
+`HistTupleProducer` keys off the `weights.yaml` *keys* (`bTagShape_lfstats1`, `JER`), and
+`name:` is read in exactly one place, `FLAF/Analysis/HistMergerFromHists.py`, so
+re-producing the histograms does not mean re-producing the shifted trees. And the two
+halves cannot drift silently: suffix the producer without the datacard, or the reverse,
+and the build stops with `Cannot find histogram ...`.
+
+On the `dc_make` side this needs two things, both of which treat a real era as a
+one-element meta-era so configurations without `era_groups:` are untouched.
+`DatacardMaker.uncAppliesTo` registers the nuisance on the meta-era bin when any
+sub-era matches — `Uncertainty.appliesTo` compares against the meta-era name and would
+otherwise drop the entry silently, which is why the `CMS_pileup_<era>` block in the
+datacard configuration used to be commented out. `getCombinedShape` then varies only the
+matching sub-eras and takes the rest at nominal, which is what the lnN path has always
+done in `_getSubEraLnNVariedShapes`.
+
+lnN uncertainties needed neither change and can be split with no producer involvement at
+all: `lumi_13p6TeV` is two entries, `eras: [Run3_2022, Run3_2022EE]` and
+`eras: [Run3_2023, Run3_2023BPix]`, because the luminosity calibration is a per-year
+measurement rather than a per-era one.
+
+Note also that `config/Run3_2024/weights.yaml` has **no** btag entries on purpose:
+`config/Run3_2024/global.yaml` overrides btag to `HistTuple: none`, so the
+`weight_bTagShape_*_rel` columns do not exist for that era.
+
+#### AK8 (fatbjet) calibration
+
+`Corrections/fatjet.py` supplies the mirror image for boosted events: three sources
+`Hbb`, `Hcc` and `tau21` (`FatJetCorrProducer.fatjet_Sources`), registered as
+`CMS_bbww_ak8_{Hbb,Hcc,tau21}`. Because `GetWeight` puts `weight_FatJetSF_Central` in the
+*boosted* branch, the guard runs the other way — `(boosted ?
+weight_FatJetSF_<src>{scale}_rel : 1.0f) * final_weight` — so it is the resolved events
+that are neutralised, and `canIgnore` drops these nuisances from resolved categories.
+
+Two differences from the btag block are worth knowing when reading the resulting
+nuisances rather than fixing them:
+
+- There is no renormalisation step. btagShape has `UpdateBtagWeight` restoring the
+  per-(channel, nJet) yield; the AK8 SFs have no equivalent and need none, so these
+  nuisances legitimately carry a normalisation component.
+- `Hbb` applies only to `hadronFlavour == 5` and `Hcc` only to `== 4`
+  (`FatJetCorrProvider::sourceApplies`, `Corrections/fatjet.h`). `Hcc` is therefore tiny
+  for most processes and will fall under the `canIgnore` threshold in many categories.
+
+The calibration files are per-era and cover the four 2022/2023 eras only, so as with btag
+there is nothing to register for `Run3_2024`. They are decorrelated per era for the same
+reason the btag `*stats*` sources are: four separate files means four independent fits.
+
 ### Where the binning is decided
 
 By a **preprocessing step the datacard configuration declares**, not by anything in the
