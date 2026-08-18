@@ -318,13 +318,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 """
             )
 
-            self.DefineAndAppend(f"SR_SL_M{mp}", f"return predicted_class_M{mp} == 0;")
-            self.DefineAndAppend(f"CR_SL_TT_M{mp}", f"return predicted_class_M{mp} == 1;")
-            self.DefineAndAppend(f"CR_SL_ST_M{mp}", f"return predicted_class_M{mp} == 2;")
-            self.DefineAndAppend(f"CR_SL_WJets_M{mp}", f"return predicted_class_M{mp} == 3;")
-            self.DefineAndAppend(f"CR_SL_DY_M{mp}", f"return predicted_class_M{mp} == 4;")
-            self.DefineAndAppend(f"CR_SL_H_M{mp}", f"return predicted_class_M{mp} == 5;")
-            self.DefineAndAppend(f"CR_SL_VV_M{mp}", f"return predicted_class_M{mp} == 6;")
+            self.DefineAndAppend(f"SR_SL_M{mp}", f"return predicted_class_M{mp} == 0 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_TT_M{mp}", f"return predicted_class_M{mp} == 1 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_ST_M{mp}", f"return predicted_class_M{mp} == 2 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_WJets_M{mp}", f"return predicted_class_M{mp} == 3 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_DY_M{mp}", f"return predicted_class_M{mp} == 4 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_H_M{mp}", f"return predicted_class_M{mp} == 5 && Iso && event_selection;")
+            self.DefineAndAppend(f"CR_SL_VV_M{mp}", f"return predicted_class_M{mp} == 6 && Iso && event_selection;")
 
         
     def calculateMT(self):
