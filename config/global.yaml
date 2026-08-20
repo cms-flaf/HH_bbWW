@@ -430,9 +430,9 @@ channelSelection:
 channels_to_consider:
   - e
   - mu
-  - eE
-  - eMu
-  - muMu
+  # - eE
+  # - eMu
+  # - muMu
 
 channelDefinition:
   e: 1  # Second lepton doesn't exist
@@ -469,16 +469,17 @@ QCDRegions:
   - SR_mbb
 
   # SL signal and control regions
-  - SR_SL_M300
-  - SR_SL_M400
-  - SR_SL_M500
-  - SR_SL_M550
-  - SR_SL_M600
-  - SR_SL_M650
-  - SR_SL_M700
-  - SR_SL_M800
-  - SR_SL_M900
-  - SR_SL_M1000
+  # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
+  # - SR_SL_M300
+  # - SR_SL_M400
+  # - SR_SL_M500
+  # - SR_SL_M550
+  # - SR_SL_M600
+  # - SR_SL_M650
+  # - SR_SL_M700
+  # - SR_SL_M800
+  # - SR_SL_M900
+  # - SR_SL_M1000
 
   # - CR_SL_TT_M300
   # - CR_SL_TT_M400
@@ -590,7 +591,7 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
-histTuple_flavor: TwoStageDNN_Outputs
+histTuple_flavor: default
 histTuple_flavors:
   binary_DNN_outputs:
     fullResolution_variables: [ ]
@@ -1091,7 +1092,7 @@ histTuple_flavors:
     fullResolution_variables: [ ]
 
     variables:
-      - DeepHME_mass
+      # - DeepHME_mass
 
       - TwoStageDNN_M300_binary
       - TwoStageDNN_M400_binary
@@ -1104,103 +1105,103 @@ histTuple_flavors:
       - TwoStageDNN_M900_binary
       - TwoStageDNN_M1000_binary
 
-      - TwoStageDNN_M300_Signal
-      - TwoStageDNN_M400_Signal
-      - TwoStageDNN_M500_Signal
-      - TwoStageDNN_M550_Signal
-      - TwoStageDNN_M600_Signal
-      - TwoStageDNN_M650_Signal
-      - TwoStageDNN_M700_Signal
-      - TwoStageDNN_M800_Signal
-      - TwoStageDNN_M900_Signal
-      - TwoStageDNN_M1000_Signal
+      # - TwoStageDNN_M300_Signal
+      # - TwoStageDNN_M400_Signal
+      # - TwoStageDNN_M500_Signal
+      # - TwoStageDNN_M550_Signal
+      # - TwoStageDNN_M600_Signal
+      # - TwoStageDNN_M650_Signal
+      # - TwoStageDNN_M700_Signal
+      # - TwoStageDNN_M800_Signal
+      # - TwoStageDNN_M900_Signal
+      # - TwoStageDNN_M1000_Signal
 
-      - TwoStageDNN_M300_TT
-      - TwoStageDNN_M400_TT
-      - TwoStageDNN_M500_TT
-      - TwoStageDNN_M550_TT
-      - TwoStageDNN_M600_TT
-      - TwoStageDNN_M650_TT
-      - TwoStageDNN_M700_TT
-      - TwoStageDNN_M800_TT
-      - TwoStageDNN_M900_TT
-      - TwoStageDNN_M1000_TT
+      # - TwoStageDNN_M300_TT
+      # - TwoStageDNN_M400_TT
+      # - TwoStageDNN_M500_TT
+      # - TwoStageDNN_M550_TT
+      # - TwoStageDNN_M600_TT
+      # - TwoStageDNN_M650_TT
+      # - TwoStageDNN_M700_TT
+      # - TwoStageDNN_M800_TT
+      # - TwoStageDNN_M900_TT
+      # - TwoStageDNN_M1000_TT
 
-      - TwoStageDNN_M300_ST
-      - TwoStageDNN_M400_ST
-      - TwoStageDNN_M500_ST
-      - TwoStageDNN_M550_ST
-      - TwoStageDNN_M600_ST
-      - TwoStageDNN_M650_ST
-      - TwoStageDNN_M700_ST
-      - TwoStageDNN_M800_ST
-      - TwoStageDNN_M900_ST
-      - TwoStageDNN_M1000_ST
+      # - TwoStageDNN_M300_ST
+      # - TwoStageDNN_M400_ST
+      # - TwoStageDNN_M500_ST
+      # - TwoStageDNN_M550_ST
+      # - TwoStageDNN_M600_ST
+      # - TwoStageDNN_M650_ST
+      # - TwoStageDNN_M700_ST
+      # - TwoStageDNN_M800_ST
+      # - TwoStageDNN_M900_ST
+      # - TwoStageDNN_M1000_ST
 
-      - TwoStageDNN_M300_DY
-      - TwoStageDNN_M400_DY
-      - TwoStageDNN_M500_DY
-      - TwoStageDNN_M550_DY
-      - TwoStageDNN_M600_DY
-      - TwoStageDNN_M650_DY
-      - TwoStageDNN_M700_DY
-      - TwoStageDNN_M800_DY
-      - TwoStageDNN_M900_DY
-      - TwoStageDNN_M1000_DY
+      # - TwoStageDNN_M300_DY
+      # - TwoStageDNN_M400_DY
+      # - TwoStageDNN_M500_DY
+      # - TwoStageDNN_M550_DY
+      # - TwoStageDNN_M600_DY
+      # - TwoStageDNN_M650_DY
+      # - TwoStageDNN_M700_DY
+      # - TwoStageDNN_M800_DY
+      # - TwoStageDNN_M900_DY
+      # - TwoStageDNN_M1000_DY
 
-      - TwoStageDNN_M300_WJets
-      - TwoStageDNN_M400_WJets
-      - TwoStageDNN_M500_WJets
-      - TwoStageDNN_M550_WJets
-      - TwoStageDNN_M600_WJets
-      - TwoStageDNN_M650_WJets
-      - TwoStageDNN_M700_WJets
-      - TwoStageDNN_M800_WJets
-      - TwoStageDNN_M900_WJets
-      - TwoStageDNN_M1000_WJets
+      # - TwoStageDNN_M300_WJets
+      # - TwoStageDNN_M400_WJets
+      # - TwoStageDNN_M500_WJets
+      # - TwoStageDNN_M550_WJets
+      # - TwoStageDNN_M600_WJets
+      # - TwoStageDNN_M650_WJets
+      # - TwoStageDNN_M700_WJets
+      # - TwoStageDNN_M800_WJets
+      # - TwoStageDNN_M900_WJets
+      # - TwoStageDNN_M1000_WJets
 
-      - TwoStageDNN_M300_H
-      - TwoStageDNN_M400_H
-      - TwoStageDNN_M500_H
-      - TwoStageDNN_M550_H
-      - TwoStageDNN_M600_H
-      - TwoStageDNN_M650_H
-      - TwoStageDNN_M700_H
-      - TwoStageDNN_M800_H
-      - TwoStageDNN_M900_H
-      - TwoStageDNN_M1000_H
+      # - TwoStageDNN_M300_H
+      # - TwoStageDNN_M400_H
+      # - TwoStageDNN_M500_H
+      # - TwoStageDNN_M550_H
+      # - TwoStageDNN_M600_H
+      # - TwoStageDNN_M650_H
+      # - TwoStageDNN_M700_H
+      # - TwoStageDNN_M800_H
+      # - TwoStageDNN_M900_H
+      # - TwoStageDNN_M1000_H
 
-      - TwoStageDNN_M300_VV
-      - TwoStageDNN_M400_VV
-      - TwoStageDNN_M500_VV
-      - TwoStageDNN_M550_VV
-      - TwoStageDNN_M600_VV
-      - TwoStageDNN_M650_VV
-      - TwoStageDNN_M700_VV
-      - TwoStageDNN_M800_VV
-      - TwoStageDNN_M900_VV
-      - TwoStageDNN_M1000_VV
+      # - TwoStageDNN_M300_VV
+      # - TwoStageDNN_M400_VV
+      # - TwoStageDNN_M500_VV
+      # - TwoStageDNN_M550_VV
+      # - TwoStageDNN_M600_VV
+      # - TwoStageDNN_M650_VV
+      # - TwoStageDNN_M700_VV
+      # - TwoStageDNN_M800_VV
+      # - TwoStageDNN_M900_VV
+      # - TwoStageDNN_M1000_VV
 
-      - name: binary_DNN_m300_vs_HME
-        vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
-      - name: binary_DNN_m400_vs_HME
-        vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
-      - name: binary_DNN_m500_vs_HME
-        vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
-      - name: binary_DNN_m550_vs_HME
-        vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
-      - name: binary_DNN_m600_vs_HME
-        vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
-      - name: binary_DNN_m650_vs_HME
-        vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
-      - name: binary_DNN_m700_vs_HME
-        vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
-      - name: binary_DNN_m800_vs_HME
-        vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
-      - name: binary_DNN_m900_vs_HME
-        vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
-      - name: binary_DNN_m1000_vs_HME
-        vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
+      # - name: binary_DNN_m300_vs_HME
+      #   vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
+      # - name: binary_DNN_m400_vs_HME
+      #   vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
+      # - name: binary_DNN_m500_vs_HME
+      #   vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
+      # - name: binary_DNN_m550_vs_HME
+      #   vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
+      # - name: binary_DNN_m600_vs_HME
+      #   vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
+      # - name: binary_DNN_m650_vs_HME
+      #   vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
+      # - name: binary_DNN_m700_vs_HME
+      #   vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
+      # - name: binary_DNN_m800_vs_HME
+      #   vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
+      # - name: binary_DNN_m900_vs_HME
+      #   vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1000_vs_HME
+      #   vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
