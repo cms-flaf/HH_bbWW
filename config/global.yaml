@@ -430,9 +430,9 @@ channelSelection:
 channels_to_consider:
   - e
   - mu
-  # - eE
-  # - eMu
-  # - muMu
+  - eE
+  - eMu
+  - muMu
 
 channelDefinition:
   e: 1  # Second lepton doesn't exist
@@ -450,6 +450,19 @@ categories:
   - boosted_W
   - boosted_HW
   - baseline
+
+# This is for SR/CR definitions using multiclass DNN in defineControlRegions
+masspints:
+  - 300
+  - 400
+  - 500
+  - 550
+  - 600
+  - 650
+  - 700
+  - 800
+  - 900
+  - 1000
 
 QCDRegions:
   # - OS_Iso
