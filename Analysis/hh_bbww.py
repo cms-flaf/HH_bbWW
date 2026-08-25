@@ -279,61 +279,62 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Single_lep_trg && " "!tightlep && " "!mbb_SR",
         )
 
-    def defineControlRegions(self):
+    def defineControlRegions(self, stage):
         self.DefineAndAppend("SR", f"ll_mass < 70 && OS_Iso")
         self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
 
-        # Individual mass signal regions
-        masspoints = self.config["masspoints"]
-        for mp in masspoints:
-            self.df = self.df.Define(
-                f"predicted_class_M{mp}",
-                f"""std::vector<double> scores = {{
-                        TwoStageDNN_M{mp}_Signal,
-                        TwoStageDNN_M{mp}_TT,
-                        TwoStageDNN_M{mp}_ST,
-                        TwoStageDNN_M{mp}_WJets,
-                        TwoStageDNN_M{mp}_DY,
-                        TwoStageDNN_M{mp}_H,
-                        TwoStageDNN_M{mp}_VV
-                    }};
-                    auto it = std::max_element(scores.begin(), scores.end());
-                    size_t cls = it - scores.begin();
-                    return cls;
-                """,
-            )
+        if stage == "HistTuple":
+            # Individual mass signal regions
+            masspoints = self.config["masspoints"]
+            for mp in masspoints:
+                self.df = self.df.Define(
+                    f"predicted_class_M{mp}",
+                    f"""std::vector<double> scores = {{
+                            TwoStageDNN_M{mp}_Signal,
+                            TwoStageDNN_M{mp}_TT,
+                            TwoStageDNN_M{mp}_ST,
+                            TwoStageDNN_M{mp}_WJets,
+                            TwoStageDNN_M{mp}_DY,
+                            TwoStageDNN_M{mp}_H,
+                            TwoStageDNN_M{mp}_VV
+                        }};
+                        auto it = std::max_element(scores.begin(), scores.end());
+                        size_t cls = it - scores.begin();
+                        return cls;
+                    """,
+                )
 
-            self.DefineAndAppend(
-                f"SR_SL_M{mp}",
-                f"return predicted_class_M{mp} == 0 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_TT_M{mp}",
-                f"return predicted_class_M{mp} == 1 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_ST_M{mp}",
-                f"return predicted_class_M{mp} == 2 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_WJets_M{mp}",
-                f"return predicted_class_M{mp} == 3 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_DY_M{mp}",
-                f"return predicted_class_M{mp} == 4 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_H_M{mp}",
-                f"return predicted_class_M{mp} == 5 && Iso && event_selection;",
-            )
-            self.DefineAndAppend(
-                f"CR_SL_VV_M{mp}",
-                f"return predicted_class_M{mp} == 6 && Iso && event_selection;",
-            )
+                self.DefineAndAppend(
+                    f"SR_SL_M{mp}",
+                    f"return predicted_class_M{mp} == 0 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_TT_M{mp}",
+                    f"return predicted_class_M{mp} == 1 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_ST_M{mp}",
+                    f"return predicted_class_M{mp} == 2 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_WJets_M{mp}",
+                    f"return predicted_class_M{mp} == 3 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_DY_M{mp}",
+                    f"return predicted_class_M{mp} == 4 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_H_M{mp}",
+                    f"return predicted_class_M{mp} == 5 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_VV_M{mp}",
+                    f"return predicted_class_M{mp} == 6 && Iso && event_selection;",
+                )
 
     def calculateMT(self):
         self.df = self.df.Define(
@@ -1788,7 +1789,7 @@ def addDeepHMERelErr(df):
     return df
 
 
-def PrepareDfForHistograms(dfForHistograms, isData):
+def PrepareDfForHistograms(dfForHistograms, isData, stage):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.calculateMT()
@@ -1802,7 +1803,7 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineQCDRegions()
-    dfForHistograms.defineControlRegions()
+    dfForHistograms.defineControlRegions(stage)
     dfForHistograms.defineCategories()
     dfForHistograms.df = defineTopCandP4(dfForHistograms.df)
     dfForHistograms.df = defineLepWCandP4(dfForHistograms.df)
