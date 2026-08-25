@@ -452,7 +452,7 @@ categories:
   - baseline
 
 # This is for SR/CR definitions using multiclass DNN in defineControlRegions
-masspints:
+masspoints:
   - 300
   - 400
   - 500
