@@ -25,7 +25,8 @@ processes:
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
     param_values: [ 300 ]
     is_signal: true
-  - custom_CI_Background
+  - custom_CI_Background_TT
+  - custom_CI_Background_DY
 uncertainties:
   - name: lumi_13p6TeV
     type: lnN
