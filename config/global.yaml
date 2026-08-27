@@ -5,19 +5,27 @@ analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
 
 bundles:
+  # Code and configuration: hashed, so that editing any of it produces a different bundle
+  # instead of jobs silently running whatever was packed the first time.
   core:
     period_specific: false
+    hashed: true
     patterns:
       - FLAF
       - AnaProd
       - Analysis
       - config
       - env.sh
-      - soft/flaf_env
       - Corrections
       - DeepHME
       - Studies
       - include
+  # The installed environment: large, and only ever changes on a reinstall, so it is kept
+  # out of the hashed bundle.
+  soft:
+    period_specific: false
+    patterns:
+      - soft/flaf_env
   cmssw:
     period_specific: false
     patterns:
@@ -34,9 +42,13 @@ bundles:
     patterns:
       - data/{version}/AnaTupleFileListBuilderTask/{period}
       - data/{version}/AnaTupleFileListTask/{period}
+    # Both producers, or the bundle is packed as soon as the builder is done, while the
+    # per-dataset lists of AnaTupleFileListTask are still being written.
     task_requires:
-      module: FLAF.AnaProd.tasks
-      class: AnaTupleFileListBuilderTask
+      - module: FLAF.AnaProd.tasks
+        class: AnaTupleFileListBuilderTask
+      - module: FLAF.AnaProd.tasks
+        class: AnaTupleFileListTask
   inference:
     period_specific: false
     patterns:

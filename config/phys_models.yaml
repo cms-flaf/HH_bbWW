@@ -26,7 +26,8 @@ OnlyData:
 TestModel:
   name: "Test model for CI"
   backgrounds:
-    - custom_CI_Background
+    - custom_CI_Background_TT
+    - custom_CI_Background_DY
   signals: # WARNING: for 2024 no signal sample available, using a file from bbtt signals..
     - custom_CI_Signal
   data:
