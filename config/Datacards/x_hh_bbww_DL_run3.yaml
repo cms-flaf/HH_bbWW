@@ -35,6 +35,11 @@ categories:
 # be worth keeping depends on this analysis's sample sizes and selection.
 binning:
   n_dnn_slices: 4
+  # Names the categories the DNN slicing produces, and labels the sliced axis in each
+  # slice directory's title. Pinned rather than left at StatInference's neutral default
+  # so the datacard bins keep the names the rebinned shapes already on EOS carry.
+  category_pattern: "{base_category}_dnn{slice_idx}"
+  slice_var: DNN
   max_mass_bins: 10
   min_dnn_bkg_sum: 1.0
   min_mass_bkg_each: 0.01
