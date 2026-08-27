@@ -12,9 +12,12 @@ These commands run inside CMSSW/Combine, so prefix them with `cmsEnv` (or open o
 cmsEnv /bin/zsh        # a CMSSW+Combine subshell
 ```
 
-## 1. Rebin, make datacards and run limits
+## 1. Make datacards and run limits
 
-One law chain takes the merged histograms all the way to the overlay limit plots:
+One law chain takes the merged histograms all the way to the overlay limit plots. It
+consumes whatever 1D shapes it is pointed at and does no rebinning of its own — see
+[Where the binning is decided](#where-the-binning-is-decided) for the step that produces
+the sliced shapes this analysis uses:
 
 ```sh
 law run PlotResonantLimitsTask \
@@ -28,8 +31,7 @@ It runs, in order:
 
 | Task | Does |
 | --- | --- |
-| `HistRebinTask` | rebins the 2D DNN×HME shapes into significance-sliced 1D categories |
-| `CreateDatacardsTask` | builds the datacards from those shapes |
+| `CreateDatacardsTask` | builds the datacards from the merged shapes |
 | `ResonantLimitsTask` | runs combine and combines the per-era cards per mass point |
 | `PlotResonantLimitsTask` | draws the plots declared in the configuration's `limit_plots` |
 
@@ -57,25 +59,38 @@ from there, not from `global.yaml`'s own variable lists.
 
 ### Where the binning is decided
 
-`HistRebinTask` runs `StatInference/dc_make/hist_rebin_2d.py`, which derives the DNN slice
-boundaries and the HME mass-bin edges from the shapes themselves. Everything it does is
-controlled by the annotated `binning:` block of the configuration above — slice count,
-mass-bin budget, and the minimum signal/background yields and effective-entry floors a
-bin must satisfy. Each base category `SR/res2b` becomes the datacard bins
-`SR/res2b_dnn0…dnn3`.
+Not by the law chain. `StatInference/bin_opt_2d/rebin_2d.py` is a **standalone pre-step**
+that derives the DNN slice boundaries and the HME mass-bin edges from the shapes
+themselves, writing rebinned shapes plus the `binning.json` that records what it chose.
+Each base category `SR/res2b` becomes the datacard bins `SR/res2b_dnn0…dnn3`.
 
-This is separate from `StatInference/bin_opt/`, which is an offline, combine-driven search
-over candidate binnings feeding the `hist_bins` option. This analysis does not use it, and
-leaves `hist_bins` unset.
+Its knobs live in `StatInference/bin_opt_2d/binning.yaml` — slice count, bin budget, and
+the minimum signal/background yields and effective-entry floors a bin must satisfy.
+`StatInference/bin_opt_2d/call_rebin_2d.sh` is a worked example:
+
+```sh
+bash StatInference/bin_opt_2d/call_rebin_2d.sh
+```
+
+It writes the same `<era>/<variable>/<variable>.root` layout `HistMergerTask` produces, so
+the chain reads its output by pointing `--hists-version` at that production — nothing
+downstream knows a rebinning happened. To reproduce a binning exactly rather than
+re-deriving it, pass the recorded `--binning .../binning.json`.
+
+The datacard configuration then lists the sliced names in `categories:` and repeats the
+`category_pattern` used to write them, which is how the per-category limits group the
+slices of one base category back together.
+
+There is also `StatInference/bin_opt/`, an offline combine-driven search over candidate
+binnings feeding the `hist_bins` option. This analysis does not use it, and leaves
+`hist_bins` unset.
 
 ### Running on the 1D DNN shapes instead
 
-The `binning:` block is also the switch that decides which kind of input the chain reads.
 [`config/Datacards/x_hh_bbww_DL_run3_1D.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/x_hh_bbww_DL_run3_1D.yaml)
 is the same analysis reading the per-mass 1D DNN score variables
-(`Hists_merged/<era>/DNN_M<mass>_Signal/`). It declares no `binning:` block, so
-`HistRebinTask` drops out of the graph entirely and `CreateDatacardsTask` reads the merged
-histograms directly; the datacard bins are then the categories exactly as listed
+(`Hists_merged/<era>/DNN_M<mass>_Signal/`) straight from the merged tree, with no rebin
+step in front of it at all. Its datacard bins are the categories exactly as listed
 (`SR/res2b`, not `SR/res2b_dnn0`), coarsened by its own `hist_bins:` edge list.
 
 ```sh

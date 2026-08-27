@@ -1221,6 +1221,7 @@ histTuple_flavors:
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
-  # hist_bins is unset: HistRebinTask already reduces the 2D DNN-vs-HME shapes to
-  # significance-sliced 1D categories, so no further rebinning is needed at datacard time.
+  # hist_bins is unset: the shapes this config points at have already been reduced to
+  # significance-sliced 1D categories by StatInference/bin_opt_2d/rebin_2d.py, so there is
+  # no further rebinning to do at datacard time.
   # param_values: [ 300 ]

@@ -12,9 +12,8 @@ QCDRegions:
 
 StatInference:
   config: config/Datacards/CI_card.yaml
-  # hist_bins is unset, as in global.yaml: HistRebinTask already reduces the 2D
-  # DNN-vs-HME shapes to significance-sliced 1D categories, so no further rebinning is
-  # needed at datacard time.
+  # hist_bins is unset, as in global.yaml: CI_card.yaml reads an already-1D DNN score,
+  # so there is nothing to rebin at datacard time.
   param_values: [ 300 ]
 
 # Do not remove DNN variables, they are needed for the datacard creation.

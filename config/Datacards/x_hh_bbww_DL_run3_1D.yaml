@@ -1,13 +1,10 @@
 analysis: hh_bbww
 type: resonant
 # The 1D counterpart of x_hh_bbww_DL_run3.yaml: it reads the per-mass 1D DNN score
-# variables (Hists_merged/<era>/DNN_M<mass>_Signal/) instead of the 2D DNN-vs-HME ones,
-# and so has no in-chain rebinning step. Everything below `hist_bins` is identical to the
-# 2D configuration, so the two can be compared like for like.
-#
-# Because there is no `binning:` block, CreateDatacardsTask reads the merged histograms
-# directly rather than depending on HistRebinTask, and the datacard bins are the
-# categories exactly as listed below.
+# variables (Hists_merged/<era>/DNN_M<mass>_Signal/) directly, rather than the sliced
+# shapes bin_opt_2d/rebin_2d.py produces from the 2D DNN-vs-HME plane. Everything below
+# `hist_bins` is identical to the 2D configuration, so the two can be compared like for
+# like.
 model:
   parameters: [ MX ]
   param_dependent_bkg: true

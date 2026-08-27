@@ -3,7 +3,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
 signalFractionForRelevantBins: 0.2
 eras:
   - Run3_2022
@@ -18,22 +18,12 @@ categories:
   - OS_Iso/res2b
   - OS_Iso/recovery
 
-# The CI runs with --test, i.e. --nEvents 1000 per dataset, so every yield is ~1e-3 of
-# nominal. The production gates (min_signal 0.5, min_slice_bkg_sum 1.0, the N_eff floors)
-# would drop every category before a single shape was written, so they are all off here
-# and the rebinning collapses to one DNN slice with one mass bin -- enough to exercise
-# the chain end to end without asking a thousand events to support a real binning.
-binning:
-  n_slices: 1
-  max_bins_per_slice: 1
-  min_slice_bkg_sum: 0.0
-  min_bin_bkg_each: 0.0
-  min_signal: 0.0
-  min_slice_bkg_neff: 0.0
-  min_bkg_frac: 0.0
-  min_bin_bkg_neff: 0.0
-  bkg_per_bin: 0.0
-  significance_mode: asimov
+# Reads the 1D per-mass DNN score (DNN_M300_Signal), not the 2D DNN-vs-HME plane the
+# production configuration uses. The datacard chain consumes 1D shapes; turning the 2D
+# ones into 1D is a standalone pre-step (StatInference/bin_opt_2d/rebin_2d.py) that the
+# chain does not run, and at --test statistics (--nEvents 1000, so every yield is ~1e-3
+# of nominal) its production gates would drop every category before a single shape was
+# written. So the CI covers the datacard and limit steps, and not the binning.
 processes:
   - process: data_obs
     is_data: true
