@@ -32,12 +32,12 @@ def analysis_setup(setup):
     analysis = importlib.import_module(f"{analysis_import}")
 
 
-def GetDfw(df, setup, dataset_name):
+def GetDfw(df, setup, dataset_name, stage=None):
     global_params = setup.global_params
     isData = dataset_name == "data"
     period = global_params["era"]
     dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period)
-    new_dfw = analysis.PrepareDfForHistograms(dfw, isData)
+    new_dfw = analysis.PrepareDfForHistograms(dfw, isData, stage)
     return new_dfw
 
 

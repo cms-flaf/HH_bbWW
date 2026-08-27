@@ -42,7 +42,12 @@ processes:
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
     param_values: [ 300 ]
     is_signal: true
-  - custom_CI_Background
+  # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
+  # and plotted by the integration test, but it is not valid input for a limit here: it is an
+  # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
+  # events for them to cancel — the single-bin histogram came out -1669 +/- 2817, compatible
+  # with zero at 0.6 sigma but negative, which makes the datacard job flaky by construction.
+  - custom_CI_Background_TT
 uncertainties:
   - name: lumi_13p6TeV
     type: lnN
