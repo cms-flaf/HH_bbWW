@@ -21,7 +21,7 @@ channels:
   - muMu
   - eMu
   - eE
-# Base categories only. HistRebinTask cuts each into `binning.n_dnn_slices`
+# Base categories only. HistRebinTask cuts each into `binning.n_slices`
 # DNN-significance slices, each carrying its own rebinned HME shape, and the datacard
 # bins (SR/res2b_dnn0, ...) are derived from the two -- so the bin list cannot fall out
 # of step with the slice count.
@@ -34,44 +34,44 @@ categories:
 # slice count). Stated here rather than left to code defaults because what a slice has to
 # be worth keeping depends on this analysis's sample sizes and selection.
 binning:
-  n_dnn_slices: 4
+  n_slices: 4
   # Names the categories the DNN slicing produces, and labels the sliced axis in each
   # slice directory's title. Pinned rather than left at StatInference's neutral default
   # so the datacard bins keep the names the rebinned shapes already on EOS carry.
   category_pattern: "{base_category}_dnn{slice_idx}"
   slice_var: DNN
-  max_mass_bins: 10
-  min_dnn_bkg_sum: 1.0
-  min_mass_bkg_each: 0.01
+  max_bins_per_slice: 10
+  min_slice_bkg_sum: 1.0
+  min_bin_bkg_each: 0.01
   min_signal: 0.5
 
   # Guards against statistically starved backgrounds (DY in the b-tagged muMu/eE
   # slices, where a couple of high-weight aMC@NLO events carry the whole yield)
-  # dictating the binning. min_bkg_neff: effective MC entries the summed background
+  # dictating the binning. min_slice_bkg_neff: effective MC entries the summed background
   # must have for a DNN boundary to be selectable. min_bkg_frac: backgrounds below
-  # this fraction of the total are exempt from min_mass_bkg_each, so a minor process
+  # this fraction of the total are exempt from min_bin_bkg_each, so a minor process
   # cannot veto every split and collapse a slice to one mass bin.
-  min_bkg_neff: 4.0
+  min_slice_bkg_neff: 4.0
   min_bkg_frac: 0.05
 
-  # min_bkg_neff above gates only the DNN slice boundaries. These gate the mass bins
+  # min_slice_bkg_neff above gates only the DNN slice boundaries. These gate the mass bins
   # inside each slice, which is where essentially every fit bin lives:
-  # min_mass_bkg_neff applies the same effective-entry floor per mass bin, and
-  # bkg_per_mass_bin caps the bin count at B_slice/bkg_per_mass_bin instead of always
-  # using max_mass_bins.
+  # min_bin_bkg_neff applies the same effective-entry floor per mass bin, and
+  # bkg_per_bin caps the bin count at B_slice/bkg_per_bin instead of always
+  # using max_bins_per_slice.
   #
   # A 4-variant scan on the Run3_Early combined limit set these values. With the mass
-  # bins ungated (min_mass_bkg_neff=0, bkg_per_mass_bin=0, mode="sb") the median
+  # bins ungated (min_bin_bkg_neff=0, bkg_per_bin=0, mode="sb") the median
   # per-bin background N_eff was 2.8 and 63% of fit bins sat below 4, and slices
   # holding ~1.5 background events were still split into 10 bins. Turning all three on
   # costs ~12% in mean expected limit (~20-25% above 800 GeV) -- that is the optimistic
   # bias the ungated binning was buying by placing edges on MC fluctuations. Isolated
   # effects: N_eff gate 0.994, bin budget 1.087, Asimov FOM 1.036.
-  min_mass_bkg_neff: 4.0
-  bkg_per_mass_bin: 5.0
+  min_bin_bkg_neff: 4.0
+  bkg_per_bin: 5.0
   significance_mode: asimov
 
-  # Per-process floors on the DNN slice boundaries themselves. min_bkg_neff above gates
+  # Per-process floors on the DNN slice boundaries themselves. min_slice_bkg_neff above gates
   # only the *summed* background, which turns out never to bind: over the 232 eE/muMu SR
   # slices the summed N_eff never once fell below 4, while DY individually sat below it in
   # 42% of them. A background that has fluctuated negative is simply invisible inside a
@@ -79,20 +79,20 @@ binning:
   # because the sum there was +39.9 +- 9.0 -- and that slice cannot be made into a datacard
   # at all, since resolveNegativeBins rejects a negative integral outright.
   #
-  # min_dnn_bkg_each is the min_mass_bkg_each analogue, and does the real work: requiring
+  # min_slice_bkg_each is the min_bin_bkg_each analogue, and does the real work: requiring
   # every non-negligible background to be positive in every slice removes all 7 such slices
   # in Run3_Early for -0.16% of the total combined Asimov Z (39.103 -> 39.042). The worst
   # single category is muMu/res2b at m500, -2.3%: the binner had been choosing left edge 68
   # (Z 0.834, DY -5.87) over 67 (Z 0.775, DY +7.31), i.e. the downward fluctuation was
   # actively preferred because it lowers B in S/sqrt(B + sigma_B^2).
   #
-  # min_dnn_bkg_neff is the stronger version, requiring those backgrounds to be *measured*
+  # min_slice_bkg_each_neff is the stronger version, requiring those backgrounds to be *measured*
   # rather than merely positive, and is left off: at a threshold of 4 it costs 35% of the
   # Asimov Z in muMu/res2b at m500, because the whole signal-like region of that category
   # holds only N_eff 5.2 of DY in total and cannot be split three ways above the threshold.
   # Backgrounds below min_bkg_frac of the category total are exempt from both.
-  min_dnn_bkg_each: 0.01
-  min_dnn_bkg_neff: 0.0
+  min_slice_bkg_each: 0.01
+  min_slice_bkg_each_neff: 0.0
 processes:
   - process: data_obs
     is_data: true
@@ -147,7 +147,7 @@ processes:
   # Why: DY has no usable MC statistics in the b-tagged same-flavour categories.
   # Measured on Run3_Early (v2605a), summed over the four sub-eras, DY's effective
   # MC count (yield/error)^2 has a median of 5.8 across the 232 eE/muMu SR slices
-  # and sits below the binning's own min_bkg_neff of 4 in 42% of them, with several
+  # and sits below the binning's own min_slice_bkg_neff of 4 in 42% of them, with several
   # slices going negative outright. TT, ST and VV are all fine on their own (median
   # N_eff 471 / 211 / 97, never below 4). So this is a DY problem, not a binning
   # granularity problem -- there is no 4-slice DNN binning of eE/muMu in which DY is
