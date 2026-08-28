@@ -91,9 +91,17 @@ from `era_groups:` is binned on its members' summed statistics, and its output k
 sub-eras separate (`Run3_Early/{Run3_2022,Run3_2022EE,…}`) so the per-era uncertainties
 survive to be combined in the datacard maker.
 
-`rebin_2d.py` is also runnable by hand, which is the quickest way to inspect a binning
-without going through the chain; `StatInference/bin_opt_2d/call_rebin_2d.sh` is a worked
-example.
+`rebin_2d.py` is a plain executable, so a binning can be inspected without going through
+the chain by calling it with the same four arguments the task passes:
+
+```sh
+python3 StatInference/bin_opt_2d/rebin_2d.py \
+  --input  "$ANALYSIS_BIG_DATA_PATH/VERSION_OF_THE_MERGED_HISTS/Hists_merged" \
+  --output /tmp/$USER/rebin_Run3_Early \
+  --era    Run3_Early \
+  --config config/Datacards/x_hh_bbww_DL_run3.yaml \
+  --binning-config config/Datacards/binning_2d.yaml
+```
 
 The datacard configuration then lists the sliced names in `categories:` and repeats the
 `category_pattern` used to write them, which is how the per-category limits group the
