@@ -5,11 +5,24 @@ model:
   param_dependent_bkg: true
   input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
 signalFractionForRelevantBins: 0.2
+# Every era listed here gets its own binning, its own datacards and its own limit.
+#
+# The four sub-eras are off for now. None of them builds standalone: on a single era's
+# statistics a handful of DY shapes go negative beyond tolerance in the sparsest DNN
+# slices, and resolveNegativeBins rejects them. Measured over 4 mass points, of ~500
+# background shapes each -- 2022: 5 rejected, 2022EE: 5, 2023: 2, 2023BPix: 6, and
+# Run3_Early: 0. It does not track luminosity; it tracks where DY's negative-weight
+# events land. Turning them back on wants either min_slice_bkg_each_neff on in
+# config/Datacards/binning_2d.yaml, so those slices are never cut, or a looser
+# max_n_sigma_for_negative_bins for DY.
+#
+# They stay in era_groups below regardless: Run3_Early is the combination of all four
+# datasets, which is a statement about the data, not about which limits we set.
 eras:
-  - Run3_2022
-  - Run3_2022EE
-  - Run3_2023
-  - Run3_2023BPix
+  # - Run3_2022
+  # - Run3_2022EE
+  # - Run3_2023
+  # - Run3_2023BPix
   - Run3_Early
 era_groups:
   Run3_Early:
@@ -21,10 +34,6 @@ channels:
   - muMu
   - eMu
   - eE
-# Base categories only. HistRebinTask cuts each into `binning.n_slices`
-# DNN-significance slices, each carrying its own rebinned HME shape, and the datacard
-# bins (SR/res2b_dnn0, ...) are derived from the two -- so the bin list cannot fall out
-# of step with the slice count.
 # The datacard bins, exactly as they exist in the input shapes. These are what
 # StatInference/bin_opt_2d/rebin_2d.py wrote when it cut each base category into DNN
 # slices -- the chain does no slicing of its own, it reads the directories it is given.
@@ -45,6 +54,19 @@ categories:
 # How to take those names apart again, to group the slices of one base category for the
 # per-category limits. Must match the category_pattern rebin_2d.py wrote them with.
 category_pattern: "{base_category}_dnn{slice_idx}"
+
+# Applied to the merged histograms before the datacards are built, by
+# PreprocessShapesTask. The chain knows nothing about what this does -- it supplies
+# --input, --output, --era and --config, and the script writes
+# "<era>/<variable>/<variable>.root". Here it cuts the 2D DNN-vs-HME shapes into
+# per-slice 1D ones; the knobs that steer that are in binning_2d.yaml, and the binning it
+# derives is written beside the shapes it produced. Remove this block and the chain reads
+# the merged histograms unchanged.
+preprocess:
+  script: StatInference/bin_opt_2d/rebin_2d.py
+  args:
+    - --binning-config
+    - config/Datacards/binning_2d.yaml
 
 processes:
   - process: data_obs

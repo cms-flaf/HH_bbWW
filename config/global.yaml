@@ -1221,7 +1221,6 @@ histTuple_flavors:
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
-  # hist_bins is unset: the shapes this config points at have already been reduced to
-  # significance-sliced 1D categories by StatInference/bin_opt_2d/rebin_2d.py, so there is
-  # no further rebinning to do at datacard time.
+  # hist_bins is unset: the shapes reaching the datacard step are already at their final
+  # binning, cut by the `preprocess:` step the datacard configuration declares.
   # param_values: [ 300 ]

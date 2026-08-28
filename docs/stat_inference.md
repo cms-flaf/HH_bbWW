@@ -14,10 +14,10 @@ cmsEnv /bin/zsh        # a CMSSW+Combine subshell
 
 ## 1. Make datacards and run limits
 
-One law chain takes the merged histograms all the way to the overlay limit plots. It
-consumes whatever 1D shapes it is pointed at and does no rebinning of its own — see
-[Where the binning is decided](#where-the-binning-is-decided) for the step that produces
-the sliced shapes this analysis uses:
+One law chain takes the merged histograms all the way to the overlay limit plots. The
+datacard step itself consumes 1D shapes and does no rebinning of its own; the shapes this
+analysis feeds it are cut from the 2D DNN-vs-HME plane by a configurable preprocessing
+step the chain runs first — see [Where the binning is decided](#where-the-binning-is-decided):
 
 ```sh
 law run PlotResonantLimitsTask \
@@ -31,7 +31,8 @@ It runs, in order:
 
 | Task | Does |
 | --- | --- |
-| `CreateDatacardsTask` | builds the datacards from the merged shapes |
+| `PreprocessShapesTask` | runs the configuration's `preprocess:` step, if it declares one |
+| `CreateDatacardsTask` | builds the datacards from the resulting shapes |
 | `ResonantLimitsTask` | runs combine and combines the per-era cards per mass point |
 | `PlotResonantLimitsTask` | draws the plots declared in the configuration's `limit_plots` |
 
@@ -59,23 +60,40 @@ from there, not from `global.yaml`'s own variable lists.
 
 ### Where the binning is decided
 
-Not by the law chain. `StatInference/bin_opt_2d/rebin_2d.py` is a **standalone pre-step**
-that derives the DNN slice boundaries and the HME mass-bin edges from the shapes
-themselves, writing rebinned shapes plus the `binning.json` that records what it chose.
-Each base category `SR/res2b` becomes the datacard bins `SR/res2b_dnn0…dnn3`.
+By a **preprocessing step the datacard configuration declares**, not by anything in the
+chain's own logic. `PreprocessShapesTask` runs whatever `preprocess:` names, supplying
+`--input`, `--output`, `--era` and `--config`; it knows nothing about what the step does.
+A configuration with no `preprocess:` block skips the task entirely and the datacards are
+built from the merged histograms unchanged, so an analysis that needs no preprocessing is
+unaffected.
 
-Its knobs live in `StatInference/bin_opt_2d/binning.yaml` — slice count, bin budget, and
-the minimum signal/background yields and effective-entry floors a bin must satisfy.
-`StatInference/bin_opt_2d/call_rebin_2d.sh` is a worked example:
+This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the DNN slice
+boundaries and the HME mass-bin edges from the shapes themselves. Each base category
+`SR/res2b` becomes the datacard bins `SR/res2b_dnn0…dnn3`.
 
-```sh
-bash StatInference/bin_opt_2d/call_rebin_2d.sh
+```yaml
+preprocess:
+  script: StatInference/bin_opt_2d/rebin_2d.py
+  args:
+    - --binning-config
+    - config/Datacards/binning_2d.yaml
 ```
 
-It writes the same `<era>/<variable>/<variable>.root` layout `HistMergerTask` produces, so
-the chain reads its output by pointing `--hists-version` at that production — nothing
-downstream knows a rebinning happened. To reproduce a binning exactly rather than
-re-deriving it, pass the recorded `--binning .../binning.json`.
+The two halves live in different places on purpose. The **knobs** — slice count, bin
+budget, and the minimum signal/background yields and effective-entry floors a bin must
+satisfy — are analysis configuration, versioned with the card in
+[`config/Datacards/binning_2d.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/binning_2d.yaml).
+The **derived** `binning.json` is a product, not configuration, and is written into the
+task's output on EOS beside the shapes it produced.
+
+Every era in `eras:` is binned on its own statistics and gets its own limit; a group era
+from `era_groups:` is binned on its members' summed statistics, and its output keeps the
+sub-eras separate (`Run3_Early/{Run3_2022,Run3_2022EE,…}`) so the per-era uncertainties
+survive to be combined in the datacard maker.
+
+`rebin_2d.py` is also runnable by hand, which is the quickest way to inspect a binning
+without going through the chain; `StatInference/bin_opt_2d/call_rebin_2d.sh` is a worked
+example.
 
 The datacard configuration then lists the sliced names in `categories:` and repeats the
 `category_pattern` used to write them, which is how the per-category limits group the
