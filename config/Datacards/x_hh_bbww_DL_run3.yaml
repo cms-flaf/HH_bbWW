@@ -437,10 +437,13 @@ impact_plots:
       # parameters_per_page as well (25 works) or the plot is one unreadable page -- the
       # task refuses the combination rather than drawing it.
       mc_stats: false
-    # The fits are one combine job per nuisance per direction, which is where all the time
-    # goes and which parallelises perfectly, so they go to HTCondor. The knob belongs to
-    # PullsAndImpacts rather than to the plot task, hence the namespaced form; anything
-    # listed here is appended to the dhi command verbatim.
-    dhi_args:
-      - --PullsAndImpacts-workflow
-      - htcondor
+    # The fits could go to HTCondor -- they are one combine job per nuisance per
+    # direction and parallelise perfectly -- via
+    #
+    #   dhi_args: [ --PullsAndImpacts-workflow, htcondor ]
+    #
+    # but not yet from here. dhi's condor submission bundles CMSSW and its own software,
+    # which needs DHI_BASE, DHI_SOFTWARE_FLAG_FILES and CMSSW_BASE; env.sh sets none of
+    # them and neither does FLAF's cmssw_env, so submission dies in BundleCMSSW's
+    # complete(). Only the cmsEnv subshell (FLAF/cmsEnv.sh) has the full environment, and
+    # routing the dhi command through it is unfinished work.
