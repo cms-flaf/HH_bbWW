@@ -208,10 +208,13 @@ a typo is refused rather than ignored. `hh_model` is pinned to `NO_STR`: this is
 resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt`, `CV`
 and `C2V`, against a workspace other than the one the chain built.
 
-!!! warning "One mass point costs about 150 fits"
-    `PullsAndImpacts` is a per-parameter workflow — roughly two combine fits per nuisance
-    per mass. List masses in `impact_plots` explicitly rather than asking for the scan,
-    and expect a long run. Pass `--redraw` to redraw without refitting.
+!!! warning "What a mass costs depends on `method`"
+    With `method: robust` — what this analysis uses — dhi runs **one** fit per mass and
+    reads every impact off the inverted Hessian, so all three masses take minutes.
+    `method: default` instead fits each nuisance separately, roughly two combine jobs per
+    nuisance per mass (~160 here), and only that case is worth sending to a batch system.
+    `create_branch_map` in `dhi/tasks/pulls_impacts.py` is where the difference lives.
+    Pass `--redraw` to redraw without refitting.
 
 !!! danger "`method: robust` can silently drop a nuisance"
     robustHesse removes parameters it cannot invert, logging `Dropping <name> from the
