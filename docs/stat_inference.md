@@ -159,13 +159,50 @@ Hints:
 
 ## 3. Pulls & impacts
 
+Declared in the datacard configuration's `impact_plots` block and drawn by
+`PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<mass>/` on `fs_default`
+beside the limit plots:
+
 ```sh
-PlotPullsAndImpacts --version dev --datacards "PATH_TO_CARDS/<one_card>.txt" \
-  --hh-model NO_STR --parameter-values r=1 --parameter-ranges r,-100,100 \
-  --method robust --PlotPullsAndImpacts-order-by-impact True --mc-stats True \
-  --PullsAndImpacts-custom-args="--expectSignal=1"
+law run PlotPullsAndImpactsTask \
+  --version dev \
+  --hists-version VERSION_OF_THE_MERGED_HISTS \
+  --period Run3_2022
 ```
 
-!!! warning "One mass point at a time"
-    Run pulls & impacts on a **single** datacard, not a glob. Use `--print-status 0` to find the
-    output file and `--remove-output 4,a,y` to clear previous outputs.
+```yaml
+impact_plots:
+  - name: combined
+    masses: [ 500 ]
+    plot_params:
+      method: robust
+      order_by_impact: true
+      mc_stats: false
+```
+
+Each entry becomes one dhi `PlotPullsAndImpacts` per mass it lists, run against the
+combined card `ResonantLimitsTask` writes at
+`data/<version>/Datacards/combined/combined_<mass>.txt` — one card per mass with every era
+in it. `plot_params` accepts any `PlotPullsAndImpacts` parameter and is checked against
+them, so a typo is refused rather than ignored. `hh_model` is pinned to `NO_STR`: this is
+a resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt`, `CV`
+and `C2V`.
+
+!!! warning "One mass point costs about 150 fits"
+    `PullsAndImpacts` is a per-parameter workflow — roughly two combine fits per nuisance
+    per mass. List masses in `impact_plots` explicitly rather than asking for the scan,
+    and expect a long run. Pass `--redraw` to redraw without refitting.
+
+!!! danger "`method: robust` can silently drop a nuisance"
+    robustHesse removes parameters it cannot invert, logging `Dropping <name> from the
+    hessian` and then exiting successfully. The dropped nuisance is simply **absent** from
+    the plot and the merged JSON, with nothing marking its absence — on the Run3_Early
+    cards this happens to `CMS_res_j`. The task diffs the fitted parameters against the
+    card's own nuisance lines afterwards and warns, naming what went missing; take that
+    warning seriously before reading a ranking as complete.
+
+!!! warning "`mc_stats` needs `parameters_per_page`"
+    The combined cards carry a few hundred `autoMCStats` bins, so `mc_stats: true` puts
+    ~460 parameters on the plot. `parameters_per_page` defaults to `-1`, meaning a single
+    page, and the result is an unreadable hairline strip rather than an error — so the
+    task refuses the combination. Set `parameters_per_page: 25` alongside it.

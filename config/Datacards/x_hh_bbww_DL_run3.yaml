@@ -404,3 +404,24 @@ limit_plots:
     external_limits:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style
+
+# Nuisance pulls and impacts, drawn by PlotPullsAndImpactsTask from the combined card
+# ResonantLimitsTask writes for each mass.
+#
+# Masses are listed one at a time on purpose. PullsAndImpacts is a per-parameter
+# workflow -- about two combine fits per nuisance per mass, so ~150 fits for a single
+# point at this card's 76 nuisances. Add a mass here when you want its ranking, rather
+# than asking for the whole scan.
+impact_plots:
+  - name: combined
+    masses: [ 500 ]
+    plot_params:
+      # robustHesse rather than the default: it is what converges on these cards. It
+      # also drops any parameter it cannot invert, silently -- the task diffs the fitted
+      # parameters against the card afterwards and says which went missing.
+      method: robust
+      order_by_impact: true
+      # mc_stats would add a few hundred autoMCStats bins. If you turn it on, set
+      # parameters_per_page as well (25 works) or the plot is one unreadable page --
+      # the task refuses the combination rather than drawing it.
+      mc_stats: false
