@@ -3,7 +3,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
+  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
 signalFractionForRelevantBins: 0.2
 eras:
   - Run3_2022
@@ -14,16 +14,27 @@ channels:
   - muMu
   - eMu
   - eE
+# The datacard bins, which are what CI_binning_2d.yaml's single slice produces: one
+# bin per channel and base category, named by the pattern below.
 categories:
-  - OS_Iso/res2b
-  - OS_Iso/recovery
+  - OS_Iso/res2b_dnn0
+  - OS_Iso/recovery_dnn0
 
-# Reads the 1D per-mass DNN score (DNN_M300_Signal), not the 2D DNN-vs-HME plane the
-# production configuration uses. The datacard chain consumes 1D shapes; turning the 2D
-# ones into 1D is a standalone pre-step (StatInference/bin_opt_2d/rebin_2d.py) that the
-# chain does not run, and at --test statistics (--nEvents 1000, so every yield is ~1e-3
-# of nominal) its production gates would drop every category before a single shape was
-# written. So the CI covers the datacard and limit steps, and not the binning.
+# How to take those names apart again. Must match CI_binning_2d.yaml's category_pattern.
+category_pattern: "{base_category}_dnn{slice_idx}"
+
+# The CI reads the 2D DNN-vs-HME plane, as the production configuration does, and cuts
+# it with the same script -- so the chain the CI exercises is the chain that runs for
+# real, PreprocessShapesTask included. What differs is only the binning it is given:
+# CI_binning_2d.yaml collapses the plane into one bin with every gate off, because at
+# --test statistics (--nEvents 1000, so every yield is ~1e-3 of nominal) the production
+# floors would reject every category, and a per-bin distribution that is mostly empty or
+# negative is not something combine will fit.
+preprocess:
+  script: StatInference/bin_opt_2d/rebin_2d.py
+  args:
+    - --binning-config
+    - config/Datacards/CI_binning_2d.yaml
 processes:
   - process: data_obs
     is_data: true
