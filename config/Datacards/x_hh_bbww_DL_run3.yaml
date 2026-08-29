@@ -409,43 +409,43 @@ limit_plots:
 # <version>/ImpactPlots/<name>/<era>/<mass>/.
 #
 # This entry has no `glob:`, so it uses the combined card ResonantLimitsTask writes --
-# every era and every category in one fit, which is the ranking that describes the
-# result. To rank one category instead, give an entry a glob addressing its card, the
-# same way limit_plots does, e.g.
+# every era and every category in one fit. To rank one category instead, give an entry a
+# glob addressing its card, e.g.
 #
 #   - name: res2b
 #     glob: "${ERA}/categories/SR_res2b/*.txt"
-#     masses: [ 300, 600 ]
 #
 # The glob and the mass must select exactly one card: PullsAndImpacts fits a single
-# workspace, one combine job per parameter.
-#
-# What a mass costs depends entirely on `method`. With `robust` (below) dhi runs a single
-# fit per mass and reads every impact off the inverted Hessian -- minutes for all three.
-# With `method: default` it is instead one combine job per nuisance per direction, ~160
-# per mass at this card's 79 nuisances, and that is the case worth sending to a batch
-# system. Masses are listed either way rather than taken from the model.
+# workspace.
 impact_plots:
   - name: combined
     masses: [ 300, 600, 800 ]
+    # The Asimov dataset is built at this signal strength. It has to be near the limit to
+    # mean anything: dhi's default is r=1, which at 300 (limit ~6.8) is an almost
+    # invisible signal so the ranking is really the background-only one, and at 800
+    # (limit ~0.065) is ten times more signal than can be excluded, which pins r and
+    # collapses every impact towards zero. "limit" takes the expected limit at each mass
+    # from the limits already merged for these cards; a number sets it explicitly.
+    #
+    # It reaches combine as --expectSignal through PullsAndImpacts' custom_args. It cannot
+    # go through dhi's `parameter_values`: for a resonant search hh_model is NO_STR, and
+    # POITask then hard-codes the joined parameter values to '""' and the output postfix
+    # to r=1.0, so the value would be dropped without a word.
+    #
+    # WARNING: the fit's output path does not depend on it -- custom_args is significant
+    # for task identity but not for the store path -- so changing this value does not move
+    # the outputs. Clear <version>/PullsAndImpacts, MergePullsAndImpacts and
+    # PlotPullsAndImpacts under inference/data/store before re-running with a different
+    # one, or law will report the old fit as complete.
+    poi_value: limit
     plot_params:
-      # robustHesse rather than the default: it is what converges on these cards. It also
-      # drops any parameter it cannot invert, silently -- the task diffs the fitted
-      # parameters against the card afterwards and says which went missing.
-      method: robust
+      # One combine job per nuisance per direction. `robust` would instead take a single
+      # fit and invert the Hessian, which is far cheaper but drops any parameter it cannot
+      # invert -- it silently lost all four CMS_scale_j_* on these cards. Per-parameter
+      # fits are what a ranking should be built from.
+      method: default
       order_by_impact: true
       # mc_stats would add a few hundred autoMCStats bins. If you turn it on, set
       # parameters_per_page as well (25 works) or the plot is one unreadable page -- the
       # task refuses the combination rather than drawing it.
       mc_stats: false
-    # With `method: robust` there is one fit per mass, so there is nothing to parallelise
-    # and this runs locally in minutes. A batch system only matters under
-    # `method: default`, whose per-parameter fits are independent; the knob for that would
-    # be
-    #
-    #   dhi_args: [ --PullsAndImpacts-workflow, htcondor ]
-    #
-    # which does not work from here yet. dhi's condor submission bundles CMSSW and its own
-    # software, needing DHI_BASE, DHI_SOFTWARE_FLAG_FILES and CMSSW_BASE; env.sh sets none
-    # of them and FLAF's cmssw_env has only CMSSW_BASE, so submission dies in BundleCMSSW's
-    # complete(). Only the cmsEnv subshell (FLAF/cmsEnv.sh) has the full environment.

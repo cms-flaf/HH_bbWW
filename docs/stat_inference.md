@@ -173,12 +173,29 @@ law run PlotPullsAndImpactsTask \
 ```yaml
 impact_plots:
   - name: combined
-    masses: [ 500 ]
+    masses: [ 300, 600, 800 ]
+    poi_value: limit
     plot_params:
-      method: robust
+      method: default
       order_by_impact: true
       mc_stats: false
 ```
+
+`poi_value` is the signal strength the Asimov dataset is built at, and it has to be near
+the limit to mean anything. dhi's default is `r=1`, which on this scan is an almost
+invisible signal at 300 (limit ~6.8) and ten times more than can be excluded at 800
+(limit ~0.065) — the first gives a background-only ranking, the second pins `r` and
+collapses every impact to ~0. `limit` reads the expected limit for each mass from the
+limits already merged for those cards; a number sets it directly.
+
+!!! danger "Changing `poi_value` does not move the outputs"
+    It reaches combine as `--expectSignal` through `PullsAndImpacts`' `custom_args`, which
+    is significant for task identity but **not** part of the store path — every value
+    writes to the same file. Clear `PullsAndImpacts`, `MergePullsAndImpacts` and
+    `PlotPullsAndImpacts` for that version under `inference/data/store` before re-running
+    with a different one, or law reports the old fit as complete and you get the previous
+    ranking. It cannot go through dhi's `parameter_values` either: with `hh_model=NO_STR`,
+    `POITask` hard-codes both the joined values and the postfix, dropping it silently.
 
 Each entry becomes one dhi `PlotPullsAndImpacts` per era and mass, and the plots land in
 `<version>/ImpactPlots/<name>/<era>/<mass>/`.
