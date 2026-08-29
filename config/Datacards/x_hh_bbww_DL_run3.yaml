@@ -438,6 +438,13 @@ impact_plots:
     # PlotPullsAndImpacts under inference/data/store before re-running with a different
     # one, or law will report the old fit as complete.
     poi_value: limit
+    # Migrad fails on a few of these fits from a bad seed gradient -- at 300 it was
+    # CMS_eff_m_id_iso_2023 -- and dhi aborts the whole merge rather than the branch, so
+    # 80 converged fits produce nothing. MINIMIZER_no_analytic, which dhi suggests, tends
+    # to move the failure to another parameter; falling back to Simplex converges it.
+    # Anything here reaches combine through PullsAndImpacts' custom_args.
+    fit_args:
+      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
     plot_params:
       # One combine job per nuisance per direction. `robust` would instead take a single
       # fit and invert the Hessian, which is far cheaper but drops any parameter it cannot
