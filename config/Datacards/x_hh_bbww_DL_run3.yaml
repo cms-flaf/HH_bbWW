@@ -437,3 +437,10 @@ impact_plots:
       # parameters_per_page as well (25 works) or the plot is one unreadable page -- the
       # task refuses the combination rather than drawing it.
       mc_stats: false
+    # The fits are one combine job per nuisance per direction, which is where all the time
+    # goes and which parallelises perfectly, so they go to HTCondor. The knob belongs to
+    # PullsAndImpacts rather than to the plot task, hence the namespaced form; anything
+    # listed here is appended to the dhi command verbatim.
+    dhi_args:
+      - --PullsAndImpacts-workflow
+      - htcondor
