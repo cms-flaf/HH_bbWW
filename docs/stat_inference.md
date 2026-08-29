@@ -180,13 +180,33 @@ impact_plots:
       mc_stats: false
 ```
 
-Each entry becomes one dhi `PlotPullsAndImpacts` per mass it lists, run against the
-combined card `ResonantLimitsTask` writes at
-`data/<version>/Datacards/combined/combined_<mass>.txt` — one card per mass with every era
-in it. `plot_params` accepts any `PlotPullsAndImpacts` parameter and is checked against
-them, so a typo is refused rather than ignored. `hh_model` is pinned to `NO_STR`: this is
-a resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt`, `CV`
-and `C2V`.
+Each entry becomes one dhi `PlotPullsAndImpacts` per era and mass, and the plots land in
+`<version>/ImpactPlots/<name>/<era>/<mass>/`.
+
+With no `glob:`, an entry uses the combined card `ResonantLimitsTask` writes at
+`data/<version>/Datacards/combined/combined_<mass>.txt` — every era and category in one
+fit, which is the ranking that describes the result. It is drawn once and labelled
+`combined`.
+
+To rank a single category instead, give the entry a `glob:`, resolved against that era's
+datacard directory with `${ERA}` substituted, the same idiom `limit_plots` uses:
+
+```yaml
+  - name: res2b
+    glob: "${ERA}/categories/SR_res2b/*.txt"
+    masses: [ 300, 600 ]
+```
+
+The glob and the mass must select **exactly one** card: `PullsAndImpacts` fits a single
+workspace, one combine job per parameter, so it cannot be handed a set. If it matches none
+or several, the error names the directory and lists what is in it. Note dhi draws one plot
+per card — it cannot split a card into per-category panels — so per-category rankings come
+from pointing at the per-category cards, which the chain already writes.
+
+`plot_params` accepts any `PlotPullsAndImpacts` parameter and is checked against them, so
+a typo is refused rather than ignored. `hh_model` is pinned to `NO_STR`: this is a
+resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt`, `CV`
+and `C2V`, against a workspace other than the one the chain built.
 
 !!! warning "One mass point costs about 150 fits"
     `PullsAndImpacts` is a per-parameter workflow — roughly two combine fits per nuisance

@@ -405,23 +405,35 @@ limit_plots:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style
 
-# Nuisance pulls and impacts, drawn by PlotPullsAndImpactsTask from the combined card
-# ResonantLimitsTask writes for each mass.
+# Nuisance pulls and impacts, drawn by PlotPullsAndImpactsTask into
+# <version>/ImpactPlots/<name>/<era>/<mass>/.
 #
-# Masses are listed one at a time on purpose. PullsAndImpacts is a per-parameter
-# workflow -- about two combine fits per nuisance per mass, so ~150 fits for a single
-# point at this card's 76 nuisances. Add a mass here when you want its ranking, rather
-# than asking for the whole scan.
+# This entry has no `glob:`, so it uses the combined card ResonantLimitsTask writes --
+# every era and every category in one fit, which is the ranking that describes the
+# result. To rank one category instead, give an entry a glob addressing its card, the
+# same way limit_plots does, e.g.
+#
+#   - name: res2b
+#     glob: "${ERA}/categories/SR_res2b/*.txt"
+#     masses: [ 300, 600 ]
+#
+# The glob and the mass must select exactly one card: PullsAndImpacts fits a single
+# workspace, one combine job per parameter.
+#
+# Masses are listed explicitly on purpose. That per-parameter workflow costs about two
+# combine fits per nuisance per mass -- ~160 fits per point at this card's 79 nuisances,
+# so ~480 for the three below. Add a mass when you want its ranking; do not reach for the
+# whole scan.
 impact_plots:
   - name: combined
-    masses: [ 500 ]
+    masses: [ 300, 600, 800 ]
     plot_params:
-      # robustHesse rather than the default: it is what converges on these cards. It
-      # also drops any parameter it cannot invert, silently -- the task diffs the fitted
+      # robustHesse rather than the default: it is what converges on these cards. It also
+      # drops any parameter it cannot invert, silently -- the task diffs the fitted
       # parameters against the card afterwards and says which went missing.
       method: robust
       order_by_impact: true
       # mc_stats would add a few hundred autoMCStats bins. If you turn it on, set
-      # parameters_per_page as well (25 works) or the plot is one unreadable page --
-      # the task refuses the combination rather than drawing it.
+      # parameters_per_page as well (25 works) or the plot is one unreadable page -- the
+      # task refuses the combination rather than drawing it.
       mc_stats: false
