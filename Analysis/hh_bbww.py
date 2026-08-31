@@ -192,6 +192,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCategories(self):
         self.DefineAndAppend("baseline", f"return true;")
+        self.DefineAndAppend("baseline_resolved", f"(SelectedFatJet_pt.size() == 0")
+        self.DefineAndAppend("baseline_boosted", f"(SelectedFatJet_pt.size() >= 1")
 
         # Test boosted -> res2b -> recovery
         self.DefineAndAppend(
