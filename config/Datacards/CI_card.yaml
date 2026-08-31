@@ -14,9 +14,27 @@ channels:
   - muMu
   - eMu
   - eE
+# The datacard bins, which are what CI_binning_2d.yaml's single slice produces: one
+# bin per channel and base category, named by the pattern below.
 categories:
-  - OS_Iso/res2b
-  - OS_Iso/recovery
+  - OS_Iso/res2b_dnn0
+  - OS_Iso/recovery_dnn0
+
+# How to take those names apart again. Must match CI_binning_2d.yaml's category_pattern.
+category_pattern: "{base_category}_dnn{slice_idx}"
+
+# The CI reads the 2D DNN-vs-HME plane, as the production configuration does, and cuts
+# it with the same script -- so the chain the CI exercises is the chain that runs for
+# real, PreprocessShapesTask included. What differs is only the binning it is given:
+# CI_binning_2d.yaml collapses the plane into one bin with every gate off, because at
+# --test statistics (--nEvents 1000, so every yield is ~1e-3 of nominal) the production
+# floors would reject every category, and a per-bin distribution that is mostly empty or
+# negative is not something combine will fit.
+preprocess:
+  script: StatInference/bin_opt_2d/rebin_2d.py
+  args:
+    - --binning-config
+    - config/Datacards/CI_binning_2d.yaml
 processes:
   - process: data_obs
     is_data: true

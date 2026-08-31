@@ -477,15 +477,6 @@ masspoints:
   - 1000
 
 QCDRegions:
-  # - OS_Iso
-  # - SS_Iso
-  # - OS_AntiIso
-  # - SS_AntiIso
-  # - ZVeto_OS_Iso
-  # - ZPeak_OS_Iso
-  # - mbbCR_Tight
-  # - mbbCR_AntiTight
-
   - OS_Iso
   - SR
   - TT_CR
@@ -1230,5 +1221,6 @@ histTuple_flavors:
 
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
-  hist_bins: config/Datacards/CI_binning.json
+  # hist_bins is unset: the shapes reaching the datacard step are already at their final
+  # binning, cut by the `preprocess:` step the datacard configuration declares.
   # param_values: [ 300 ]
