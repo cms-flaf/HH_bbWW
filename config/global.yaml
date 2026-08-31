@@ -462,6 +462,8 @@ categories:
   - boosted_W
   - boosted_HW
   - baseline
+  - baseline_boosted
+  - baseline_resolved
 
 # This is for SR/CR definitions using multiclass DNN in defineControlRegions
 masspoints:
