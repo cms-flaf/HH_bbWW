@@ -99,8 +99,12 @@ uncertainties:
 
   # Top pT reweighting (https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting).
   # One correction for every era, so it stays correlated: no `eras:` field, which is
-  # what makes it apply everywhere. Up/Down bracket applying the correction twice and
-  # not at all. Histograms come from the TopPtReweight entry in weights.yaml.
+  # what makes it apply everywhere. The reweighting is not in the nominal: as
+  # (Down, Central, Up) the weight is (SF, 1, SF), so the nominal is unreweighted and
+  # both variations are the reweighted prediction. The nuisance therefore interpolates
+  # between "not applied" and "applied" and the sign of its pull carries no meaning --
+  # the morphing is quadratic, so its impact will read one-sided in a ranking.
+  # Histograms come from the TopPtReweight entry in weights.yaml.
   - name: CMS_bbww_top_pt
     type: shape
     processes:
