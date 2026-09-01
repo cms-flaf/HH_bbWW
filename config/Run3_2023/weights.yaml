@@ -1,38 +1,65 @@
 norm:
   PileUp_Lumi_MC:
     expression: weight_base_pu{scale}_rel  * final_weight
-    name: CMS_pileup_{}
+    name: CMS_pileup_2023_{}
+
   MuonID_SF_Iso_ID:
     expression: weight_lep1_MuonID_SF_TightPFIso_TightID{scale}_rel * weight_lep2_MuonID_SF_TightPFIso_TightID{scale}_rel * final_weight
-    name: CMS_eff_m_id_iso_{}
+    name: CMS_eff_m_id_iso_2023_{}
   MuonID_SF_ID:
     expression: weight_lep1_MuonID_SF_TightID_Trk{scale}_rel * weight_lep2_MuonID_SF_TightID_Trk{scale}_rel * final_weight
-    name: CMS_eff_m_id_{}
-  # MuonID_TightID:
-  #   expression: weight_lep1_MuonID_SF_TightID_Trk{scale}_rel * weight_lep2_MuonID_SF_TightID_Trk{scale}_rel * final_weight
-  #   name: MuonID_TightID_{}
-  # MuonID_TightIDIso:
-  #   expression: weight_lep1_MuonID_SF_LoosePFIso{scale}_rel * weight_lep2_MuonID_SF_LoosePFIso{scale}_rel * final_weight
-  #   name: MuonID_TightIDIso_{}
+    name: CMS_eff_m_id_2023_{}
+
   EleID_TightIDIso:
     expression: weight_lep1_EleSF_wp80iso_EleID{scale}_rel * weight_lep2_EleSF_wp80iso_EleID{scale}_rel * final_weight
-    name: EleID_TightIDIso_{}
-  EleID_TightIDNoIso:
-    expression: weight_lep1_EleSF_wp80noiso_EleID{scale}_rel * weight_lep2_EleSF_wp80noiso_EleID{scale}_rel * final_weight
-    name: EleID_TightIDNoIso_{}
+    name: EleID_TightIDIso_2023_{}
 
   SingleEleTrg:
     expression: weight_lep1_TrgSF_singleEleWpTight_singleEle{scale}_rel * weight_lep2_TrgSF_singleEleWpTight_singleEle{scale}_rel * final_weight
-    name: SingleEleTrg_{}
+    name: SingleEleTrg_2023_{}
   SingleMuonTrg:
     expression: weight_lep1_TrgSF_singleIsoMu_IsoMu24{scale}_rel * weight_lep2_TrgSF_singleIsoMu_IsoMu24{scale}_rel * final_weight
-    name: SingleMuonTrg_{}
+    name: SingleMuonTrg_2023_{}
 
+  bTagShape_lf:
+    expression: "(boosted ? 1.0f : weight_bTagShape_lf{scale}_rel) * final_weight"
+    name: CMS_btag_LF_{}
+  bTagShape_hf:
+    expression: "(boosted ? 1.0f : weight_bTagShape_hf{scale}_rel) * final_weight"
+    name: CMS_btag_HF_{}
+  bTagShape_lfstats1:
+    expression: "(boosted ? 1.0f : weight_bTagShape_lfstats1{scale}_rel) * final_weight"
+    name: CMS_btag_lfstats1_2023_{}
+  bTagShape_lfstats2:
+    expression: "(boosted ? 1.0f : weight_bTagShape_lfstats2{scale}_rel) * final_weight"
+    name: CMS_btag_lfstats2_2023_{}
+  bTagShape_hfstats1:
+    expression: "(boosted ? 1.0f : weight_bTagShape_hfstats1{scale}_rel) * final_weight"
+    name: CMS_btag_hfstats1_2023_{}
+  bTagShape_hfstats2:
+    expression: "(boosted ? 1.0f : weight_bTagShape_hfstats2{scale}_rel) * final_weight"
+    name: CMS_btag_hfstats2_2023_{}
+  bTagShape_cferr1:
+    expression: "(boosted ? 1.0f : weight_bTagShape_cferr1{scale}_rel) * final_weight"
+    name: CMS_btag_cferr1_{}
+  bTagShape_cferr2:
+    expression: "(boosted ? 1.0f : weight_bTagShape_cferr2{scale}_rel) * final_weight"
+    name: CMS_btag_cferr2_{}
+
+  fatJetSF_Hbb:
+    expression: "(boosted ? weight_FatJetSF_Hbb{scale}_rel : 1.0f) * final_weight"
+    name: CMS_bbww_ak8_Hbb_2023_{}
+  fatJetSF_Hcc:
+    expression: "(boosted ? weight_FatJetSF_Hcc{scale}_rel : 1.0f) * final_weight"
+    name: CMS_bbww_ak8_Hcc_2023_{}
+  fatJetSF_tau21:
+    expression: "(boosted ? weight_FatJetSF_tau21{scale}_rel : 1.0f) * final_weight"
+    name: CMS_bbww_ak8_tau21_2023_{}
 
 shape:
   JER:
-    name: CMS_res_j_{}
+    name: CMS_res_j_2023_{}
   JES_Total:
-    name: CMS_scale_j_{}
+    name: CMS_scale_j_2023_{}
   EleES:
-    name: CMS_scale_e_{}
+    name: CMS_scale_e_2023_{}
