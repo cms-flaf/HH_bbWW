@@ -306,22 +306,23 @@ uncertainties:
     eras:
       - Run3_2023BPix
 
-  - name: CMS_scale_j
+  - name: CMS_scale_j_2022
     type: shape
-  # JER is measured per era, so it is decorrelated -- one source, one measurement
-  # per era, no ambiguity.
-  #
-  # JES (CMS_scale_j above) is the one source left correlated, and not because the
-  # question is open: `Total` is the quadrature sum of a family that JME prescribes
-  # be correlated (FlavorQCD, RelativeBal, HF, BBEC1, EC2, Absolute) and a per-year
-  # family (BBEC1_, Absolute_, EC2_, HF_, RelativeSample_ -- Corrections/jet.py).
-  # Whichever correlation is assigned to Total, one family is wrong: correlating it
-  # lets the fit constrain the year-dependent pieces coherently across four eras,
-  # decorrelating it averages FlavorQCD down as if it were four measurements. It is
-  # kept correlated because FlavorQCD dominates for a bb final state and diluting it
-  # is the worse error. The real fix is switching JetCorrProducer to the regrouped
-  # sources -- note `use_regrouped` is never passed (Corrections/Corrections.py), so
-  # that needs a code change and a full anaTuple re-production, not a config flip.
+    eras:
+      - Run3_2022
+  - name: CMS_scale_j_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_scale_j_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_scale_j_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
   - name: CMS_res_j_2022
     type: shape
     eras:
