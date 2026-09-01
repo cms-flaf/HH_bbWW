@@ -114,9 +114,8 @@ Two consequences worth knowing:
 - The two files must change together. Splitting `weights.yaml` without splitting the
   datacard configuration leaves the card asking for a histogram nobody writes any more
   (`Cannot find histogram ... CMS_scale_j_Up`), and it fails at datacard time rather than
-  at merge time — which is how the 1D card sat broken while the 2D one worked. Cross-check
-  every card's `type: shape` entries against the producers of each era it declares before
-  merging a correlation change.
+  at merge time. Cross-check every card's `type: shape` entries against the producers of
+  each era it declares before merging a correlation change.
 
 For a meta-era such as `Run3_Early`, a nuisance scoped to one sub-era still applies: it
 varies that sub-era's contribution to the summed shape while the others contribute their
@@ -254,26 +253,6 @@ slices of one base category back together.
 There is also `StatInference/bin_opt/`, an offline combine-driven search over candidate
 binnings feeding the `hist_bins` option. This analysis does not use it, and leaves
 `hist_bins` unset.
-
-### Running on the 1D DNN shapes instead
-
-[`config/Datacards/x_hh_bbww_DL_run3_1D.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/x_hh_bbww_DL_run3_1D.yaml)
-is the same analysis reading the per-mass 1D DNN score variables
-(`Hists_merged/<era>/DNN_M<mass>_Signal/`) straight from the merged tree, with no rebin
-step in front of it at all. Its datacard bins are the categories exactly as listed
-(`SR/res2b`, not `SR/res2b_dnn0`), coarsened by its own `hist_bins:` edge list.
-
-```sh
-law run PlotResonantLimitsTask \
-  --version limits_1D \
-  --hists-version VERSION_OF_THE_MERGED_HISTS \
-  --period Run3_2022 \
-  --user-custom config/user_custom_1D.yaml
-```
-
-!!! warning "Give the 1D run its own `--version`"
-    The datacard and limit output paths do not encode which configuration produced them,
-    so reusing a 2D run's version overwrites its cards.
 
 ### Datacards on their own
 
