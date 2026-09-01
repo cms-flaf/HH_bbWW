@@ -492,6 +492,19 @@ uncertainties:
     eras:
       - Run3_2023BPix
 
+  # Parton shower ISR/FSR. No `eras:` and no `processes:` -- one correlated nuisance
+  # each, applied to every process including signal, because it is one Pythia shower
+  # setting varied in every sample. Shape-only: the inclusive yield is normalised away
+  # in the producer, so what reaches the card is acceptance alone.
+  #
+  # Expect ps_fsr to be resolved to lnN or dropped in some categories by autolnNThr /
+  # ignorelnNThr. For a shape-only nuisance that is correct: a category whose acceptance
+  # barely moves should drop out.
+  - name: ps_isr
+    type: shape
+  - name: ps_fsr
+    type: shape
+
 
   # For multiple values, Konstantin says do [ down, up ]
   - name: QCD_scale_TT
