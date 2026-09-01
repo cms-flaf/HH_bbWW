@@ -576,6 +576,37 @@ def defineMCSpecificObservables(dfw):
             dfw.colToSave.append(var)
 
 
+def defineGenTopVariables(dfw):
+    """Gen-level top pT, for the top pT reweighting of ttbar.
+
+    The reweighting needs the `isLastCopy` parton-level top -- after radiation and
+    before decay (https://twiki.cern.ch/twiki/bin/view/CMS/TopPtReweighting, which is
+    explicit that a reco- or particle-level proxy gives an invalid reweighting). That
+    means GenPart, which is available here but is *not* written to the anaTuple, so the
+    pT has to be reduced and saved now. The LHEPart collection that MCObservables does
+    save is taken before radiation and is not a substitute.
+
+    Saved as one vector branch of every last-copy top in the event, rather than a
+    t/tbar pair of scalars, so the weight is defined for whatever top multiplicity a
+    sample has. TopPtCorrProducer takes the geometric mean over it, which for the ttbar
+    pair is the sqrt(SF(t) * SF(tbar)) the TWiki prescribes.
+
+    Defined for every MC sample rather than for ttbar alone: it is a short vector per
+    event, and deciding which samples are "ttbar" belongs in the correction config, not
+    here. The branch is empty where no last-copy top exists -- every non-ttbar sample --
+    and TopPtCorrProducer returns a weight of 1 there.
+    """
+    dfw.Define(
+        "genPart_isLastCopy",
+        "(GenPart_statusFlags & (1 << GenStatusFlags::kIsLastCopy)) != 0",
+    )
+    dfw.DefineAndAppend(
+        "genTop_pt",
+        "GenPart_pt[((GenPart_pdgId == 6) || (GenPart_pdgId == -6))"
+        " && genPart_isLastCopy]",
+    )
+
+
 def addAllVariables(
     dfw,
     syst_name,
@@ -627,6 +658,7 @@ def addAllVariables(
     defineMETVariables(dfw, global_params["met_type"])
     if not isData:
         defineMCSpecificObservables(dfw)
+        defineGenTopVariables(dfw)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
