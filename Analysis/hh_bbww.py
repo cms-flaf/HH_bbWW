@@ -288,7 +288,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
 
-        if stage == "HistTuple":
+        SL_CR_active = False
+        for QCDReg in self.config["QCDRegions"]:
+            if QCDReg.startswith("SL_SR") or QCDReg.startswith("SL_CR"):
+                SL_CR_active = True
+        if stage == "HistTuple" and SL_CR_active:
             # Individual mass signal regions
             masspoints = self.config["masspoints"]
             for mp in masspoints:

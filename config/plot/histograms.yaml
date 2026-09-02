@@ -397,7 +397,7 @@ fatbjet_tau4:
 
 fatbjet_msoftdrop:
   x_bins: "50|0:200"
-  x_title: fatbjet mass [GeV]
+  x_title: fatbjet msoftdrop [GeV]
   y_title: Events
   use_log_y: False
   max_y_sf: 1.5
