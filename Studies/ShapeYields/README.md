@@ -43,6 +43,20 @@ pandas without reshaping.
 page is a slide. Cell shade is log magnitude within the slice; negative content is boxed
 and printed in red.
 
+## The uncv2 run
+
+Kept beside the shapes it was read from:
+
+```
+/eos/user/d/daebi/HH_bbWW/uncv2/ShapeYields/
+```
+
+`yields.csv` (54,225 rows) and one 87-page PDF per era -- the four sub-eras and their
+sum. Checked against the datacard shapes `CreateDatacardsTask` wrote for uncv2 at
+m300/m500/m900: 160 histograms per mass agree to 2.4e-16, and the 44 per mass absent from
+the datacard file are exactly the boosted TT/DY/ST/VV that the merged `TotalBkg` replaces,
+less DY in eMu.
+
 ## What it does not do
 
 It applies no thresholds and passes no judgement on which bins are acceptable. It does not
