@@ -149,6 +149,47 @@ def applies(restriction, value):
     return restriction is None or value in restriction
 
 
+def merged_scopes(cfg):
+    """Where a merged template pulls its subprocesses in, ignoring their own restrictions.
+
+    The datacard maker assembles a `subprocesses` template from its constituents'
+    histograms by path, and does not consult a constituent's own `channels` list on the
+    way. So a process excluded from a channel by its own entry is nonetheless part of the
+    merged background there, and reporting it as absent understates the background that
+    is actually fitted.
+
+    This is not hypothetical: DY declares `channels: [eE, muMu]`, and applying that
+    uniformly left eMu boosted short of the datacard's TotalBkg by up to 13.5% at m500 --
+    eE and muMu agreed exactly, eMu did not.
+
+    Returns [(subprocess names, channels, categories)] for each merged entry, where the
+    two restrictions are the merged entry's own and None means it places none.
+    """
+    return [
+        (set(entry["subprocesses"]), entry.get("channels"), entry.get("categories"))
+        for entry in cfg.get("processes", [])
+        if entry.get("subprocesses")
+    ]
+
+
+def process_applies(name, chs, cats, channel, category, base, scopes):
+    """Whether a process contributes to the background the datacard fits here.
+
+    Either on its own terms, or as a constituent of a merged template that reaches into
+    this channel and category.
+    """
+    if applies(chs, channel) and (applies(cats, base) or applies(cats, category)):
+        return True
+    for names, m_chs, m_cats in scopes:
+        if name not in names:
+            continue
+        if applies(m_chs, channel) and (
+            applies(m_cats, base) or applies(m_cats, category)
+        ):
+            return True
+    return False
+
+
 def scale_note(cfg):
     """How the datacard maker will rescale these histograms, if it will.
 
@@ -202,6 +243,7 @@ def gather(input_dir, cfg, knobs, eras, masses, channels, categories, param_name
     naming = CategoryNaming(knobs["category_pattern"])
     pattern = cfg["model"]["input_file_pattern"]
     group_name = knobs["era_group"]
+    scopes = merged_scopes(cfg)
 
     rows = []
     for era in eras:
@@ -217,9 +259,9 @@ def gather(input_dir, cfg, knobs, eras, masses, channels, categories, param_name
                     for category in categories:
                         base, idx = naming.split(category)
                         for label, hist_name, is_sig, chs, cats in procs:
-                            if not applies(chs, channel):
-                                continue
-                            if not applies(cats, base) and not applies(cats, category):
+                            if not process_applies(
+                                label, chs, cats, channel, category, base, scopes
+                            ):
                                 continue
                             got = read_hist(f, f"{channel}/{category}/{hist_name}")
                             if got is None:

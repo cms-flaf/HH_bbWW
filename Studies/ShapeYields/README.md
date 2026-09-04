@@ -51,11 +51,35 @@ Kept beside the shapes it was read from:
 /eos/user/d/daebi/HH_bbWW/uncv2/ShapeYields/
 ```
 
-`yields.csv` (54,225 rows) and one 87-page PDF per era -- the four sub-eras and their
-sum. Checked against the datacard shapes `CreateDatacardsTask` wrote for uncv2 at
-m300/m500/m900: 160 histograms per mass agree to 2.4e-16, and the 44 per mass absent from
-the datacard file are exactly the boosted TT/DY/ST/VV that the merged `TotalBkg` replaces,
-less DY in eMu.
+`yields.csv` (54,995 rows) and one 87-page PDF per era -- the four sub-eras and their sum.
+
+## Checking it
+
+`verify_against_datacards.py` compares the CSV against the datacard shapes
+`CreateDatacardsTask` wrote, in both directions: every nominal histogram in the datacard
+must be reproducible from the CSV, and every background in the CSV must be consumed by the
+datacard. It exits non-zero on any unmatched histogram or any bin difference above
+tolerance.
+
+```
+python3 Studies/ShapeYields/verify_against_datacards.py \
+    --csv Studies/ShapeYields/output/uncv2/yields.csv \
+    --datacards data/uncv2/Datacards/Run3_Early \
+    --config config/Datacards/x_hh_bbww_DL_run3.yaml \
+    --era Run3_Early
+```
+
+On uncv2: 1684 histograms over all ten masses, worst relative bin difference 3.9e-16,
+nothing unmatched in either direction.
+
+Both directions matter. Checking only "is every datacard histogram reproducible" lets the
+merged `TotalBkg` categories be skipped as explained by the merge, and that is exactly
+where a real defect hid -- see the note in `merged_scopes()`.
+
+What the check does and does not establish: it establishes that this tool reads and sums
+the shapes the way the datacard chain does. It cannot establish that the shapes are
+physically right, since both sides read the same files -- an error upstream in the
+rebinning would be reproduced identically by both.
 
 ## What it does not do
 
