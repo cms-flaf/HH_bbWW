@@ -9,28 +9,71 @@ content and MC-statistical error, per process, per channel, per era.
 
 Nominal shapes only. The Up/Down variations are in the same files and are left alone.
 
-## Running it
+## Quick start
+
+Run from the repository root. All three work as written.
+
+**Everything, for one production.** Reads the shapes off EOS -- a few minutes, that read is
+what takes the time -- and writes the CSV plus one PDF per era:
 
 ```
 python3 Studies/ShapeYields/shape_yields.py \
-    --input /eos/user/d/daebi/HH_bbWW/<version>/Hists_preprocessed/Run3_Early \
+    --input /eos/user/d/daebi/HH_bbWW/uncv2/Hists_preprocessed/Run3_Early \
     --config config/Datacards/x_hh_bbww_DL_run3.yaml \
     --binning-config config/Datacards/binning_2d.yaml \
-    --output Studies/ShapeYields/output/<version>
+    --output Studies/ShapeYields/output/uncv2
 ```
+
+For another production, swap `uncv2` in the `--input` and `--output` paths.
+
+**One page for a slide.** Once a CSV exists, `--from-csv` redraws from it without touching
+EOS, so this is instant:
+
+```
+python3 Studies/ShapeYields/shape_yields.py \
+    --from-csv Studies/ShapeYields/output/uncv2/yields.csv \
+    --config config/Datacards/x_hh_bbww_DL_run3.yaml \
+    --binning-config config/Datacards/binning_2d.yaml \
+    --era Run3_Early --mass 500 --channel muMu \
+    --output /tmp/slide
+```
+
+That gives one page per base category; add `--category SR/res2b_dnn1` to narrow to one.
+Point `--from-csv` at `/eos/user/d/daebi/HH_bbWW/uncv2/ShapeYields/yields.csv` and you can
+skip the first command entirely.
+
+**Confirm the numbers.** Compares the CSV against the datacards, exits non-zero on any
+disagreement:
+
+```
+python3 Studies/ShapeYields/verify_against_datacards.py \
+    --csv Studies/ShapeYields/output/uncv2/yields.csv \
+    --datacards data/uncv2/Datacards/Run3_Early \
+    --config config/Datacards/x_hh_bbww_DL_run3.yaml \
+    --era Run3_Early
+```
+
+## The options
 
 `--input` is the era-group directory, holding one sub-directory per source era. The four
 sub-eras are read individually and their sum is reported alongside them as `Run3_Early`,
 which is the thing the datacards are built from.
 
-`--era`, `--mass`, `--channel` and `--category` are all repeatable and all narrow the run.
-Give them to cut a single page for a slide instead of the whole set:
+`--era`, `--mass`, `--channel` and `--category` are repeatable and each narrows the run.
+`--category` takes the sliced name, e.g. `SR/res2b_dnn1`.
 
-```
-    --era Run3_Early --mass 500 --channel muMu --category SR/res2b_dnn1
-```
+`--from-csv` redraws from an existing `yields.csv` instead of reading the shapes, with the
+selectors still applying. Use it for anything to do with how the page looks, or to cut a
+subset: reading the files is the slow part, and the numbers do not change once written.
 
 `--no-pdf` writes only the CSV.
+
+`--binning-config` supplies `category_pattern` and `slice_var`; without it both fall back to
+the datacard configuration's own.
+
+`--era-group` names the group whose members are read and whose sum is reported. It defaults
+to the single entry of the configuration's `eras:`, so it is only needed if that list ever
+holds more than one.
 
 ## What comes out
 
@@ -45,7 +88,7 @@ and printed in red.
 
 ## The uncv2 run
 
-Kept beside the shapes it was read from:
+Already made, kept beside the shapes it was read from:
 
 ```
 /eos/user/d/daebi/HH_bbWW/uncv2/ShapeYields/
@@ -60,14 +103,6 @@ Kept beside the shapes it was read from:
 must be reproducible from the CSV, and every background in the CSV must be consumed by the
 datacard. It exits non-zero on any unmatched histogram or any bin difference above
 tolerance.
-
-```
-python3 Studies/ShapeYields/verify_against_datacards.py \
-    --csv Studies/ShapeYields/output/uncv2/yields.csv \
-    --datacards data/uncv2/Datacards/Run3_Early \
-    --config config/Datacards/x_hh_bbww_DL_run3.yaml \
-    --era Run3_Early
-```
 
 On uncv2: 1684 histograms over all ten masses, worst relative bin difference 3.9e-16,
 nothing unmatched in either direction.
@@ -90,13 +125,20 @@ independent of the code that wrote them.
 
 Everything but the file layout comes from the datacard configuration: the processes and
 their channel/category restrictions, the masses, the channels, the categories, and the
-`input_file_pattern` the paths are built from. Two kinds of process are deliberately
-absent. `data_obs` is Asimov (`is_asimov_data`), so it carries nothing the summed
-background does not, and the `Total bkg` row is that sum. `TotalBkg` -- the merged boosted
-template -- is assembled by the datacard maker and is not a histogram in these files; its
-four constituents are, and they are reported individually, so the boosted pages show what
-went into the merge rather than the merge.
+`input_file_pattern` the paths are built from.
 
-Signal rows are the raw histograms, before the `scale` the datacard applies to unfold the
-H->bb and H->WW branching fractions. They will not match a datacard `rate` line for that
-reason; the background rows will.
+`data_obs` is deliberately absent: the observation is Asimov (`is_asimov_data`), so it
+carries nothing the summed background does not, and the `Total bkg` row is that sum.
+
+The merged `TotalBkg` template is assembled by the datacard maker and is not a histogram in
+these files. Its four constituents are, and they are reported individually, so the boosted
+pages show what goes into the merge rather than the merge itself. Note the rule that
+implies, since it is easy to get wrong: the maker collects those constituents by path and
+ignores a constituent's own `channels` list, so DY -- restricted to `[eE, muMu]` by its own
+entry -- is nevertheless part of the eMu boosted background, and is reported there. It
+stays out of eMu res2b and recovery, which the merge does not claim.
+
+Signal rows are the raw histograms. Whether those are also the datacard rates depends on
+whether the configuration declares a process `scale`, which the maker applies when it reads
+the histogram; each page's footer states which case it is. The committed configuration
+declares none, and there signal matches the datacard rate exactly.
