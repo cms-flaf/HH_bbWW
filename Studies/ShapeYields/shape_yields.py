@@ -43,7 +43,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-
 # --- palette -----------------------------------------------------------------------
 #
 # Magnitude is a sequential encoding, so it is one hue light->dark (blue). The ramp is
@@ -646,9 +645,9 @@ def draw_pages(rows, pdf, cfg, knobs, param_name, note):
     index = {}
     for r in rows:
         key = (r["era"], r["mass"], r["channel"], r["base_category"])
-        index.setdefault(key, {}).setdefault((r["slice_idx"], r["category"]), {}).setdefault(
-            r["process"], []
-        ).append(r)
+        index.setdefault(key, {}).setdefault(
+            (r["slice_idx"], r["category"]), {}
+        ).setdefault(r["process"], []).append(r)
 
     signal_procs = {r["process"] for r in rows if r["is_signal"]}
     present = {r["process"] for r in rows if not r["is_signal"]}
@@ -722,7 +721,9 @@ def main():
     )
     p.add_argument("--output", required=True, help="Directory for yields.csv/.pdf.")
     p.add_argument("--era", action="append", default=None, help="Repeatable.")
-    p.add_argument("--mass", action="append", type=int, default=None, help="Repeatable.")
+    p.add_argument(
+        "--mass", action="append", type=int, default=None, help="Repeatable."
+    )
     p.add_argument("--channel", action="append", default=None, help="Repeatable.")
     p.add_argument(
         "--category",
@@ -761,7 +762,9 @@ def main():
     source_eras = cfg.get("era_groups", {}).get(group, [group])
 
     knobs = {
-        "category_pattern": cfg.get("category_pattern", "{base_category}_dnn{slice_idx}"),
+        "category_pattern": cfg.get(
+            "category_pattern", "{base_category}_dnn{slice_idx}"
+        ),
         "slice_var": "DNN",
         "era_group": group,
     }
@@ -781,7 +784,8 @@ def main():
     # the ones wanted, so leaving the group out of the default silently drops a fifth of
     # the file -- and the one era the datacards are actually built from.
     eras = args.era or (
-        source_eras + [group] if args.from_csv and group not in source_eras
+        source_eras + [group]
+        if args.from_csv and group not in source_eras
         else source_eras
     )
 

@@ -186,7 +186,10 @@ def main():
                     )
 
     print(f"compared {n_cmp} histograms over masses {masses}")
-    print(f"worst relative bin difference: {worst:.3e}" + (f"  at {worst_at}" if worst_at else ""))
+    print(
+        f"worst relative bin difference: {worst:.3e}"
+        + (f"  at {worst_at}" if worst_at else "")
+    )
     if problems:
         print(f"\n{len(problems)} problem(s):")
         for line in problems[:60]:
