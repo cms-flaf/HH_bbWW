@@ -196,9 +196,9 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                     continue
 
                 # Fakes = data -MC for Anti tight region only
-                if channel == "e":
+                if channel in ("e", "eE","eMu"):
                     anti_key = ((channel, "AR_AntiTightId", cat), (uncName, scale))
-                if channel == "mu":
+                if channel in ("mu", "muMu"):
                     anti_key = ((channel, "OS_AntiIso", cat), (uncName, scale))
                 hist_anti = _get_data_minus_mc(
                     all_histograms, backgrounds, anti_key, data_process_name
