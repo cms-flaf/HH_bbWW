@@ -5,19 +5,27 @@ analysis_cache_import: Analysis.tasks:AnalysisCacheTask:AnalysisCacheMergeTask
 phys_model: Run3_Model
 
 bundles:
+  # Code and configuration: hashed, so that editing any of it produces a different bundle
+  # instead of jobs silently running whatever was packed the first time.
   core:
     period_specific: false
+    hashed: true
     patterns:
       - FLAF
       - AnaProd
       - Analysis
       - config
       - env.sh
-      - soft/flaf_env
       - Corrections
       - DeepHME
       - Studies
       - include
+  # The installed environment: large, and only ever changes on a reinstall, so it is kept
+  # out of the hashed bundle.
+  soft:
+    period_specific: false
+    patterns:
+      - soft/flaf_env
   cmssw:
     period_specific: false
     patterns:
@@ -34,9 +42,13 @@ bundles:
     patterns:
       - data/{version}/AnaTupleFileListBuilderTask/{period}
       - data/{version}/AnaTupleFileListTask/{period}
+    # Both producers, or the bundle is packed as soon as the builder is done, while the
+    # per-dataset lists of AnaTupleFileListTask are still being written.
     task_requires:
-      module: FLAF.AnaProd.tasks
-      class: AnaTupleFileListBuilderTask
+      - module: FLAF.AnaProd.tasks
+        class: AnaTupleFileListBuilderTask
+      - module: FLAF.AnaProd.tasks
+        class: AnaTupleFileListTask
   inference:
     period_specific: false
     patterns:
@@ -327,7 +339,7 @@ payload_producers:
       - 1000
     dependencies:
     n_cpus: 4
-    max_runtime: 8.0
+    max_runtime: 32.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '64MB'
@@ -451,7 +463,22 @@ categories:
   - boosted_H
   - boosted_W
   - boosted_HW
-  - baseline
+  # - baseline
+  # - baseline_boosted
+  # - baseline_resolved
+
+# This is for SR/CR definitions using multiclass DNN in defineControlRegions
+masspoints:
+  - 300
+  - 400
+  - 500
+  - 550
+  - 600
+  - 650
+  - 700
+  - 800
+  - 900
+  - 1000
 
 QCDRegions:
   - OS_Iso
@@ -470,6 +497,85 @@ fake_estimation:
   #method: fake_factor
 
 # SL signal and control regions
+  # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
+  # - SR_SL_M300
+  # - SR_SL_M400
+  # - SR_SL_M500
+  # - SR_SL_M550
+  # - SR_SL_M600
+  # - SR_SL_M650
+  # - SR_SL_M700
+  # - SR_SL_M800
+  # - SR_SL_M900
+  # - SR_SL_M1000
+
+  # - CR_SL_TT_M300
+  # - CR_SL_TT_M400
+  # - CR_SL_TT_M500
+  # - CR_SL_TT_M550
+  # - CR_SL_TT_M600
+  # - CR_SL_TT_M650
+  # - CR_SL_TT_M700
+  # - CR_SL_TT_M800
+  # - CR_SL_TT_M900
+  # - CR_SL_TT_M1000
+
+  # - CR_SL_ST_M300
+  # - CR_SL_ST_M400
+  # - CR_SL_ST_M500
+  # - CR_SL_ST_M550
+  # - CR_SL_ST_M600
+  # - CR_SL_ST_M650
+  # - CR_SL_ST_M700
+  # - CR_SL_ST_M800
+  # - CR_SL_ST_M900
+  # - CR_SL_ST_M1000
+
+  # - CR_SL_WJets_M300
+  # - CR_SL_WJets_M400
+  # - CR_SL_WJets_M500
+  # - CR_SL_WJets_M550
+  # - CR_SL_WJets_M600
+  # - CR_SL_WJets_M650
+  # - CR_SL_WJets_M700
+  # - CR_SL_WJets_M800
+  # - CR_SL_WJets_M900
+  # - CR_SL_WJets_M1000
+
+  # - CR_SL_DY_M300
+  # - CR_SL_DY_M400
+  # - CR_SL_DY_M500
+  # - CR_SL_DY_M550
+  # - CR_SL_DY_M600
+  # - CR_SL_DY_M650
+  # - CR_SL_DY_M700
+  # - CR_SL_DY_M800
+  # - CR_SL_DY_M900
+  # - CR_SL_DY_M1000
+
+  # - CR_SL_H_M300
+  # - CR_SL_H_M400
+  # - CR_SL_H_M500
+  # - CR_SL_H_M550
+  # - CR_SL_H_M600
+  # - CR_SL_H_M650
+  # - CR_SL_H_M700
+  # - CR_SL_H_M800
+  # - CR_SL_H_M900
+  # - CR_SL_H_M1000
+
+  # - CR_SL_VV_M300
+  # - CR_SL_VV_M400
+  # - CR_SL_VV_M500
+  # - CR_SL_VV_M550
+  # - CR_SL_VV_M600
+  # - CR_SL_VV_M650
+  # - CR_SL_VV_M700
+  # - CR_SL_VV_M800
+  # - CR_SL_VV_M900
+  # - CR_SL_VV_M1000
+
+  # SL signal and control regions
   # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
   # - SR_SL_M300
   # - SR_SL_M400
@@ -1160,19 +1266,11 @@ histTuple_flavors:
 
   TwoStageDNN_Outputs:
     # DNN Outputs (Shapes)
-    fullResolution_variables:
-      - TwoStageDNN_M300_binary
-      - TwoStageDNN_M400_binary
-      - TwoStageDNN_M500_binary
-      - TwoStageDNN_M550_binary
-      - TwoStageDNN_M600_binary
-      - TwoStageDNN_M650_binary
-      - TwoStageDNN_M700_binary
-      - TwoStageDNN_M800_binary
-      - TwoStageDNN_M900_binary
-      - TwoStageDNN_M1000_binary
+    fullResolution_variables: [ ]
+
     variables:
       # - DeepHME_mass
+
       - TwoStageDNN_M300_binary
       - TwoStageDNN_M400_binary
       - TwoStageDNN_M500_binary
@@ -1282,8 +1380,8 @@ histTuple_flavors:
       # - name: binary_DNN_m1000_vs_HME
       #   vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
 
-
 StatInference:
   config: config/Datacards/x_hh_bbww_DL_run3.yaml
-  hist_bins: config/Datacards/CI_binning.json
+  # hist_bins is unset: the shapes reaching the datacard step are already at their final
+  # binning, cut by the `preprocess:` step the datacard configuration declares.
   # param_values: [ 300 ]

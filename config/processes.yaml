@@ -3,10 +3,12 @@
     module: FLAF.Processors.MCStitching
     class: MCStitcher
     config: FLAF/config/Processors/stitching_DY_amcatnlo_Vpt_NpNLO.yaml
-    stages: [ AnaCache, AnaTuple ]
+    # A stitcher writes its denominator into the anaCache at AnaTuple and has to be present
+    # at AnaTupleMerge to combine it again; only these two stages are ever looked up.
+    stages: [ AnaTuple, AnaTupleMerge ]
     dependency_level:
-      AnaCache: dataset
-      AnaTuple: process
+      AnaTuple: file
+      AnaTupleMerge: process
 
 .DY_processors_allFlavors: &DY_processors_allFlavors
   - name: Stitcher

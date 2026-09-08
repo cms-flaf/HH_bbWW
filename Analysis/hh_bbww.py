@@ -149,7 +149,7 @@ def GetEleWeight(lep_index):
 
 def GetMuWeight(lep_index):
     # Medium pT Muon SF
-    weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_LoosePFIso_TightIDCentral : 1.0)"
+    weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_MuonID_SF_TightID_TrkCentral * weight_lep{lep_index}_MuonID_SF_TightPFIso_TightIDCentral : 1.0)"
 
     # High pT Muon SF
     # weight_Mu = f"(lep{lep_index}_legType == static_cast<int>(Leg::mu) ? weight_lep{lep_index}_HighPt_MuonID_SF_HighPtIDCentral * weight_lep{lep_index}_HighPt_MuonID_SF_RecoCentral * weight_lep{lep_index}_HighPt_MuonID_SF_TightIDCentral : 1.0)"
@@ -192,6 +192,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
     def defineCategories(self):
         self.DefineAndAppend("baseline", f"return true;")
+        self.DefineAndAppend("baseline_resolved", f"(SelectedFatJet_pt.size() == 0)")
+        self.DefineAndAppend("baseline_boosted", f"(SelectedFatJet_pt.size() >= 1)")
 
         # Test boosted -> res2b -> recovery
         self.DefineAndAppend(
@@ -298,7 +300,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Single_lep_trg && " "!tightlep && " "!mbb_SR",
         )
 
-    def defineControlRegions(self):
+    def defineControlRegions(self, stage):
         self.DefineAndAppend(
             "Zpeak",
             f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) < 10)",
@@ -307,13 +309,63 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "Zveto",
             f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) > 10)",
         )
-        self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
+        self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")      
         self.DefineAndAppend("SR", f"ll_mass < 70 && OS_Iso")
         self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
         self.DefineAndAppend("AR_AntiTightId",f"(Zveto || OppFlavor) && OS && Iso && AntitightID_event_selection ")
+
+        if stage == "HistTuple":
+            # Individual mass signal regions
+            masspoints = self.config["masspoints"]
+            for mp in masspoints:
+                self.df = self.df.Define(
+                    f"predicted_class_M{mp}",
+                    f"""std::vector<double> scores = {{
+                            TwoStageDNN_M{mp}_Signal,
+                            TwoStageDNN_M{mp}_TT,
+                            TwoStageDNN_M{mp}_ST,
+                            TwoStageDNN_M{mp}_WJets,
+                            TwoStageDNN_M{mp}_DY,
+                            TwoStageDNN_M{mp}_H,
+                            TwoStageDNN_M{mp}_VV
+                        }};
+                        auto it = std::max_element(scores.begin(), scores.end());
+                        size_t cls = it - scores.begin();
+                        return cls;
+                    """,
+                )
+
+                self.DefineAndAppend(
+                    f"SR_SL_M{mp}",
+                    f"return predicted_class_M{mp} == 0 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_TT_M{mp}",
+                    f"return predicted_class_M{mp} == 1 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_ST_M{mp}",
+                    f"return predicted_class_M{mp} == 2 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_WJets_M{mp}",
+                    f"return predicted_class_M{mp} == 3 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_DY_M{mp}",
+                    f"return predicted_class_M{mp} == 4 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_H_M{mp}",
+                    f"return predicted_class_M{mp} == 5 && Iso && event_selection;",
+                )
+                self.DefineAndAppend(
+                    f"CR_SL_VV_M{mp}",
+                    f"return predicted_class_M{mp} == 6 && Iso && event_selection;",
+                )
 
     def calculateMT(self):
         self.df = self.df.Define(
@@ -1773,7 +1825,7 @@ def addDeepHMERelErr(df):
     return df
 
 
-def PrepareDfForHistograms(dfForHistograms, isData):
+def PrepareDfForHistograms(dfForHistograms, isData, stage):
     dfForHistograms.defineLeptonChannel()
     dfForHistograms.df = defineAllP4(dfForHistograms.df)
     dfForHistograms.calculateMT()
@@ -1787,7 +1839,7 @@ def PrepareDfForHistograms(dfForHistograms, isData):
     dfForHistograms.defineTriggers()
     dfForHistograms.defineLeptonPreselection()
     dfForHistograms.defineQCDRegions()
-    dfForHistograms.defineControlRegions()
+    dfForHistograms.defineControlRegions(stage)
     dfForHistograms.defineCategories()
     dfForHistograms.df = defineTopCandP4(dfForHistograms.df)
     dfForHistograms.df = defineLepWCandP4(dfForHistograms.df)
