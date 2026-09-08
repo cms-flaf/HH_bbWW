@@ -87,6 +87,10 @@ def DefineWeightForHistograms(
         if df_is_central:
             central_df_weights_computed = True
 
+        fake_factor_expr = "(AR_AntiTightId ? 1.0 : 1.0)"
+        if "fake_factor" in corrections.to_apply:
+            dfw.df = corrections.fake_factor.define_branches(dfw.df, lepton_legs)
+            fake_factor_expr = "(AR_AntiTightId ? weight_lep1_FakeFactor : 1.0)"
     categories = global_params["categories"]
     boosted_categories = global_params.get("boosted_categories", [])
     process_group = global_params["process_group"]

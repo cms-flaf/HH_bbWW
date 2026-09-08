@@ -231,9 +231,23 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(
             "subleadleppT", "(lep2_legType < 1 || (lep1_pt > 10 && lep2_pt > 10))"
         )
+        # self.df = self.df.Define(
+        #     "tightlep",
+        #     "((lep1_legType == 2 && lep1_Muon_tightId == 1) || (lep1_legType == 1 && lep1_Electron_mvaIso_WP80 == 1)) && (lep2_legType < 1 || ((lep2_legType == 2 && lep2_Muon_tightId == 1 ) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP80 == 1)))",
+        # )
+
+        self.df = self.df.Define(
+            "lep1_tight", "((lep1_legType == 2 && lep1_Muon_tightId == 1) ||(lep1_legType == 1 && lep1_Electron_mvaIso_WP80 == 1))",
+        )
+        self.df = self.df.Define(
+            "lep2_tight", "(lep2_legType < 1) || ((lep2_legType == 2 && lep2_Muon_tightId == 1) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP80 == 1))",
+        )
         self.df = self.df.Define(
             "tightlep",
-            "((lep1_legType == 2 && lep1_Muon_tightId == 1) || (lep1_legType == 1 && lep1_Electron_mvaIso_WP80 == 1)) && (lep2_legType < 1 || ((lep2_legType == 2 && lep2_Muon_tightId == 1 ) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP80 == 1)))",
+            "(lep1_tight && lep2_tight )",
+        )
+        self.df = self.df.Define(
+            "Antitightlep", "(!lep1_tight || !lep2_tight)"
         )
         self.df = self.df.Define(
             "tightlep_Iso",
@@ -249,11 +263,15 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             (HLT_singleIsoMu && lep2_legType == 2 && lep2_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep2_legType == 1 && lep2_HasMatching_singleEleWpTight)
             """,
         )
+
         self.df = self.df.Define(
             "event_selection",
             "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
         )
-
+        self.df = self.df.Define(
+            "AntitightID_event_selection",
+            "leadingleppT &&  subleadleppT && Single_lep_trg && Antitightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
+        )
     def defineQCDRegions(self):
         self.DefineAndAppend(
             "OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)"
@@ -265,6 +283,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("SS_Iso", f"SS && Iso && event_selection")
         self.DefineAndAppend("OS_AntiIso", f"OS && AntiIso && event_selection")
         self.DefineAndAppend("SS_AntiIso", f"SS && AntiIso && event_selection")
+
         self.DefineAndAppend(
             "mbb_SR",
             f"bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino > 70 && bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino < 150",
@@ -280,11 +299,21 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         )
 
     def defineControlRegions(self):
+        self.DefineAndAppend(
+            "Zpeak",
+            f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) < 10)",
+        )
+        self.DefineAndAppend(
+            "Zveto",
+            f"(lep1_legType == lep2_legType ) && (abs(ll_mass - 91.1876) > 10)",
+        )
+        self.DefineAndAppend("OppFlavor", f"(lep1_legType != lep2_legType)")
         self.DefineAndAppend("SR", f"ll_mass < 70 && OS_Iso")
         self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
+        self.DefineAndAppend("AR_AntiTightId",f"(Zveto || OppFlavor) && OS && Iso && AntitightID_event_selection ")
 
     def calculateMT(self):
         self.df = self.df.Define(
@@ -510,9 +539,14 @@ def AddDNNVariablesDL(df, isData=False):
     df = df.Define(
         "dphi_fix", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))"
     )
+    # dphi between lepton and MET using VectorUtil
+    df = df.Define(
+        "dphi", "abs(ROOT::Math::VectorUtil::DeltaPhi(lep1_p4, PuppiMET_p4))"
+    )
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
-
+    #transverse mass SL
+    df = df.Define("mT_SL", "sqrt(2.0 * lep1_pt * PuppiMET_pt * (1.0 - cos(dphi)))")
     df = df.Define("nExtraLeps", "nExtraMuon + nExtraElectron")
 
     df = df.Define(
@@ -848,7 +882,7 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
 
     df = df.Define(
         f"bb_mass",
-        """ 
+        """
             if (fatbjet_isValid)
                 return static_cast<float>(fatbjet_p4.M());
             else if (bjet1_isValid && bjet2_isValid)
@@ -869,9 +903,9 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
     df = df.Define(
         "hadW_p4",
         """
-            if (wjet1_isValid && wjet2_isValid && !WJets_Boosted) 
+            if (wjet1_isValid && wjet2_isValid && !WJets_Boosted)
                 return wjet1_p4 + wjet2_p4;
-            else if (fatwjet_isValid) 
+            else if (fatwjet_isValid)
                 return fatwjet_p4;
             else if (wjet1_isValid && wjet2_isValid)
                 return wjet1_p4 + wjet2_p4;
@@ -1023,7 +1057,7 @@ def defineTopCandP4(df):
             {{
                 if (fatwjet_isValid && fatbjet_isValid)
                 {{
-                    
+
                     if (bjet1_isValid && bjet2_isValid)
                     {{
                         std::vector<LorentzVectorM> bcands = {{bjet1_p4, bjet2_p4, fatbjet_p4}};
@@ -1046,7 +1080,7 @@ def defineTopCandP4(df):
                                 bcand_from_had_top_idx = i;
                             }}
                         }}
-                        
+
                         if (wjet1_isValid && wjet2_isValid && !WJets_Boosted)
                             tops[0] = {{bcands[bcand_from_had_top_idx], wjet1_p4, wjet2_p4}};
                         else
