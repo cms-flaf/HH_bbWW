@@ -7,19 +7,13 @@ if __name__ == "__main__":
 from FLAF.Common.HistHelper import *
 from FLAF.Common.Utilities import *
 
-
 # ============================================================
 # OLD FAKE FACTOR METHOD (UNCHANGED)
 # ============================================================
 
+
 def Fakes_Estimation_BBWW(
-    histograms,
-    all_samples_list,
-    channel,
-    category,
-    uncName,
-    scale,
-    data_process_name
+    histograms, all_samples_list, channel, category, uncName, scale, data_process_name
 ):
 
     key_Anti = ((channel, "AR_AntiTightId", category), (uncName, scale))
@@ -44,9 +38,7 @@ def Fakes_Estimation_BBWW(
     hist_fakes_Up = hist_fakes_Central.Clone()
     hist_fakes_Down = hist_fakes_Central.Clone()
 
-    n_yield = hist_fakes_Central.Integral(
-        0, hist_fakes_Central.GetNbinsX() + 1
-    )
+    n_yield = hist_fakes_Central.Integral(0, hist_fakes_Central.GetNbinsX() + 1)
 
     return hist_fakes_Central, hist_fakes_Up, hist_fakes_Down, n_yield, 0.0
 
@@ -59,7 +51,7 @@ def AddFakesInHistDict_BBWW(
     uncName,
     all_samples_list,
     scales,
-    data_process_name=None
+    data_process_name=None,
 ):
 
     if "Fakes" not in all_histograms:
@@ -87,7 +79,7 @@ def AddFakesInHistDict_BBWW(
                     cat,
                     uncName,
                     scale,
-                    data_process_name
+                    data_process_name,
                 )
 
                 all_histograms["Fakes"][key] = hist
@@ -95,8 +87,8 @@ def AddFakesInHistDict_BBWW(
                 if uncName == "Central":
                     print(f"[FF] {channel} {cat} {var} yield={yield_est}")
 
-def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
 
+def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
 
     if data_process_name not in histograms:
         raise KeyError(f"Missing data process {data_process_name}")
@@ -130,6 +122,7 @@ def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
 # ============================================================
 # SAFE FLATTENING (OPTIONAL)
 # ============================================================
+
 
 def flatten_2d_to_1d(hist2d, combined_bins, name="flat"):
 
@@ -169,9 +162,12 @@ def flatten_2d_to_1d(hist2d, combined_bins, name="flat"):
             bin_counter += 1
 
     return h1
+
+
 # ============================================================
 # MAIN FAKE BUILDER (AUTO 1D / 2D MODE)
 # ============================================================
+
 
 def AddFakesInHistDict_BBWW_TransferFactor(
     var,
@@ -181,7 +177,7 @@ def AddFakesInHistDict_BBWW_TransferFactor(
     uncName,
     backgrounds,
     scales,
-    data_process_name
+    data_process_name,
 ):
     if "Fakes" not in all_histograms:
         all_histograms["Fakes"] = {}
@@ -205,18 +201,12 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                 if channel == "mu":
                     anti_key = ((channel, "OS_AntiIso", cat), (uncName, scale))
                 hist_anti = _get_data_minus_mc(
-                    all_histograms,
-                    backgrounds,
-                    anti_key,
-                    data_process_name
+                    all_histograms, backgrounds, anti_key, data_process_name
                 )
                 # Compute Data - MC in the tight region as well
                 signal_key = ((channel, "OS_Iso", cat), (uncName, scale))
                 hist_signal = _get_data_minus_mc(
-                    all_histograms,
-                    backgrounds,
-                    signal_key,
-                    data_process_name
+                    all_histograms, backgrounds, signal_key, data_process_name
                 )
 
                 hist_signal = hist_signal.Clone(f"Fake_{channel}_{cat}")
@@ -225,6 +215,6 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                 hist_anti = hist_anti.Clone(f"Fake_{channel}_{cat}_anti")
                 hist_anti.SetDirectory(0)
 
-                #saving Fakes in both tight and AntiTight
+                # saving Fakes in both tight and AntiTight
                 all_histograms["Fakes"][anti_key] = hist_anti
                 all_histograms["Fakes"][signal_key] = hist_signal

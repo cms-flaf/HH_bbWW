@@ -239,18 +239,18 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         # )
 
         self.df = self.df.Define(
-            "lep1_tight", "((lep1_legType == 2 && lep1_Muon_tightId == 1) ||(lep1_legType == 1 && lep1_Electron_mvaIso_WP80 == 1))",
+            "lep1_tight",
+            "((lep1_legType == 2 && lep1_Muon_tightId == 1) ||(lep1_legType == 1 && lep1_Electron_mvaIso_WP80 == 1))",
         )
         self.df = self.df.Define(
-            "lep2_tight", "(lep2_legType < 1) || ((lep2_legType == 2 && lep2_Muon_tightId == 1) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP80 == 1))",
+            "lep2_tight",
+            "(lep2_legType < 1) || ((lep2_legType == 2 && lep2_Muon_tightId == 1) || (lep2_legType == 1 && lep2_Electron_mvaIso_WP80 == 1))",
         )
         self.df = self.df.Define(
             "tightlep",
             "(lep1_tight && lep2_tight )",
         )
-        self.df = self.df.Define(
-            "Antitightlep", "(!lep1_tight || !lep2_tight)"
-        )
+        self.df = self.df.Define("Antitightlep", "(!lep1_tight || !lep2_tight)")
         self.df = self.df.Define(
             "tightlep_Iso",
             """
@@ -274,6 +274,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             "AntitightID_event_selection",
             "leadingleppT &&  subleadleppT && Single_lep_trg && Antitightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
         )
+
     def defineQCDRegions(self):
         self.DefineAndAppend(
             "OS", "(lep2_legType < 1) || (lep1_charge*lep2_charge < 0)"
@@ -315,7 +316,10 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
-        self.DefineAndAppend("AR_AntiTightId",f"(Zveto || OppFlavor) && OS && Iso && AntitightID_event_selection ")
+        self.DefineAndAppend(
+            "AR_AntiTightId",
+            f"(Zveto || OppFlavor) && OS && Iso && AntitightID_event_selection ",
+        )
 
         if stage == "HistTuple":
             # Individual mass signal regions
@@ -597,7 +601,7 @@ def AddDNNVariablesDL(df, isData=False):
     )
     # fixed transverse mass
     df = df.Define("mT_fix", "sqrt(2.0 * pT_fix * PuppiMET_pt * (1.0 - cos(dphi_fix)))")
-    #transverse mass SL
+    # transverse mass SL
     df = df.Define("mT_SL", "sqrt(2.0 * lep1_pt * PuppiMET_pt * (1.0 - cos(dphi)))")
     df = df.Define("nExtraLeps", "nExtraMuon + nExtraElectron")
 
