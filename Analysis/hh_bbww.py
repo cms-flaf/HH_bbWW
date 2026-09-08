@@ -664,6 +664,28 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
     # If one exists, category is Hbb_Boosted
 
     df = df.Define(
+        "LeadFatJet_Sel",
+        "1.0",
+    )
+    df = df.Define("LeadFatJet_idx", "CreateIndexes(Sum(LeadFatJet_Sel))")
+    df = df.Define(
+        "LeadFatJet_idxSorted",
+        "Take(ReorderObjects(SelectedFatJet_pt[LeadFatJet_Sel], LeadFatJet_idx), min((int)LeadFatJet_idx.size(), 1))",
+    )
+    for var in fatjet_vars:
+        df = df.Define(
+            f"LeadFatJet_{var}",
+            f"Take(SelectedFatJet_{var}[LeadFatJet_Sel], LeadFatJet_idxSorted)",
+        )
+    df = df.Define("Nleadfatjets", "LeadFatJet_pt.size()")
+    df = df.Define("leadfatjet_isValid", "(Nleadfatjets > 0)")
+    for var in fatjet_vars:
+        df = df.Define(
+            f"leadfatjet_{var}",
+            f"leadfatjet_isValid ? LeadFatJet_{var}[0] : std::decay_t<decltype(LeadFatJet_{var})>::value_type()",
+        )
+
+    df = df.Define(
         "FatBJet_Sel",
         "SelectedFatJet_particleNetWithMass_HbbvsQCD > 0.92 && SelectedFatJet_msoftdrop > 30",
     )
