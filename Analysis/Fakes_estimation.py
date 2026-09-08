@@ -196,7 +196,7 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                     continue
 
                 # Fakes = data -MC for Anti tight region only
-                if channel in ("e", "eE","eMu"):
+                if channel in ("e", "eE", "eMu"):
                     anti_key = ((channel, "AR_AntiTightId", cat), (uncName, scale))
                 if channel in ("mu", "muMu"):
                     anti_key = ((channel, "OS_AntiIso", cat), (uncName, scale))
