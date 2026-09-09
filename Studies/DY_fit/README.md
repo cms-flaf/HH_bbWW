@@ -51,7 +51,7 @@ python3 -u plot_fit_slices.py --fit fit_m650.json --data-dir $DATA \
 cases; configuration errors such as a misaligned tiling window exit 1 without
 a JSON).  Fixed configurations: `--degree 4 --thr 0.1` (no scan),
 `--degree 4 --auto-thr` (scan thr only).  Without `--preset v2` the legacy
-`pub` behaviour is used (see *Presets* and *Status*).  Explicit
+`v1` behaviour is used (see *Presets* and *Status*).  Explicit
 `--dnn-min/--dnn-max/--hme-min/--hme-max` override the automatic fit window
 (bounding box of the cells with content > 0); with `--norm tiling` the
 explicit edges must lie on fine-bin edges and must not cut through any cell
@@ -143,11 +143,11 @@ otherwise the cold fit also runs and the lower objective wins (`start_kind`,
 
 | `--preset` | `--norm` | `--stat` | warm start | acceptance GoF |
 |------------|----------|----------|------------|----------------|
-| `pub` (default) | `window_gl` | `chi2_neyman` | off | per-cell χ², `TMath::Prob(χ², n_obs − npar)` |
+| `v1` (default) | `window_gl` | `chi2_neyman` | off | per-cell χ², `TMath::Prob(χ², n_obs − npar)` |
 | `v2` | `tiling` | `poisson_eff` | on | super-cell Pearson χ² |
 
 Explicit `--norm`, `--stat`, `--warm-start`/`--no-warm-start` override the
-preset; any combination runs and the GoF follows `--stat`.  `pub` reproduces
+preset; any combination runs and the GoF follows `--stat`.  `v1` reproduces
 the August-2026 published fits bit-for-bit and prints a warning about their
 yield bias; every fit JSON carries a `caveats` list describing the known
 deficiencies of its configuration (see *Outputs* and *Status*).
@@ -164,7 +164,7 @@ deficiencies of its configuration (see *Outputs* and *Status*).
 | `chi2`, `ndf`, `chi2ndf`, `p_value`, `converged`, `hesse_ok` | acceptance GoF (super-cell values for `poisson_eff`) and fit status |
 | `sum_mu`, `sum_data`, `yield_closure` | Σμ over the observed cells, Σ MC content, and their ratio |
 | `norm`, `stat`, `preset`, `warm_start`, `start_kind`, `objective`, `objective_warm`, `objective_cold` | fit configuration and −2lnL (or χ²) at the minimum (warm and cold attempts when both ran) |
-| `caveats` | list of strings: known deficiencies of the configuration (Neyman χ² yield blindness and `--n-quad` dependence for `pub`; uncalibrated acceptance test for `v2`); copied into the templates' `meta_json` |
+| `caveats` | list of strings: known deficiencies of the configuration (Neyman χ² yield blindness and `--n-quad` dependence for `v1`; uncalibrated acceptance test for `v2`); copied into the templates' `meta_json` |
 | `max_exp_arg`, `clip_hit` | largest exponent seen at the quadrature nodes and whether the ±50 clip was hit (density unreliable off the fine grid if true) |
 | `fine_binning` | `x_edges`, `y_edges` of the fine grid (`tiling` only); every in-window fine bin belongs to an observation (a window that leaves bins uncovered or cuts a cell is an error) |
 | `gof`, `gof_deviance`, `weight_map_stats`, `gof_supercells_build` | GoF details (`poisson_eff` only): `gof = {stat, chi2, ndf, chi2ndf, p, n_supercells, neff_min, band_nx, empty_term, supercells: [{band, ix0, ix1, ylo, yhi, n_cells, C, E2, M, pull, …}]}` |
@@ -210,7 +210,7 @@ metadata.
 
 ## Status (2026-09-08)
 
-- `--preset pub` reproduces the August-2026 published fits bit-for-bit.  Those
+- `--preset v1` reproduces the August-2026 published fits bit-for-bit.  Those
   fits carry a **yield bias**: Σμ/ΣMC per mass (`yield_closure`) ranges from
   0.29–0.97 over the ten masses.  Cause: the Neyman χ² with σ = the observed
   cell error on thousands of single-MC-event cells is blind to the yield, and
