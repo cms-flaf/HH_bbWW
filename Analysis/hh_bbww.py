@@ -665,7 +665,7 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
 
     df = df.Define(
         "LeadFatJet_Sel",
-        "1.0",
+        "true",
     )
     df = df.Define("LeadFatJet_idx", "CreateIndexes(Sum(LeadFatJet_Sel))")
     df = df.Define(
