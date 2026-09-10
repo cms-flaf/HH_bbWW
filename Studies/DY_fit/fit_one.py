@@ -24,7 +24,7 @@ parameters plus the chosen ``degree`` and ``thr_min``.
 If ``--degree N`` is set, thr is fixed to ``--thr`` (use ``--auto-thr`` to
 still scan thr at that degree).
 
-**Presets** (``--preset``, default ``pub``): ``pub`` reproduces the published
+**Presets** (``--preset``, default ``v1``): ``v1`` reproduces the published
 fits bit-for-bit (window-GL normalisation, Neyman χ², cold starts).  ``v2``
 switches on ``--norm tiling`` (fine-bin tiling normalisation → ∑μ == N),
 ``--stat poisson_eff`` (Bohm–Zech scaled Poisson −2lnL with effective MC
@@ -76,7 +76,7 @@ _SIGMA_N0 = None
 
 STATS = ("chi2_neyman", "poisson_eff")
 NORMS = ("window_gl", "tiling")
-PRESETS = ("pub", "v2")
+PRESETS = ("v1", "v2")
 
 
 class CellObs(object):
@@ -1682,9 +1682,9 @@ def parse_args(argv=None):
     p.add_argument(
         "--preset",
         choices=PRESETS,
-        default="pub",
+        default="v1",
         help=(
-            "pub (default): published behaviour (window_gl, chi2_neyman, cold). "
+            "v1 (default): the August-2026 published behaviour (window_gl, chi2_neyman, cold). "
             "v2: --norm tiling --stat poisson_eff --warm-start unless those "
             "flags are given explicitly."
         ),
@@ -1830,9 +1830,9 @@ def main(argv=None):
             "chi2_supercell: acceptance GoF not yet calibrated on the real MC "
             "weight mixture (2026-09 toy study); the PASS/FAIL verdict is provisional"
         )
-    if preset == "pub":
+    if preset == "v1":
         print(
-            "[fit_one] WARNING: preset pub reproduces the August-2026 fits, whose "
+            "[fit_one] WARNING: preset v1 reproduces the August-2026 fits, whose "
             "Neyman chi2 is blind to the yield (closure 0.29-0.97) and whose "
             "window_gl templates depend on --n-quad; use --preset v2 for the "
             "corrected statistic (see README, Status)",
