@@ -28,6 +28,7 @@ TestModel:
   backgrounds:
     - custom_CI_Background_TT
     - custom_CI_Background_DY
+    - custom_CI_Background_W
   signals: # WARNING: for 2024 no signal sample available, using a file from bbtt signals..
     - custom_CI_Signal
   data:

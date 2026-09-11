@@ -20,3 +20,14 @@
     dependency_level:
       AnaTuple: file
       AnaTupleMerge: process
+
+.W_processors_allFlavors: &W_processors_allFlavors
+  - name: Stitcher
+    module: FLAF.Processors.MCStitching
+    class: MCStitcher
+    config: FLAF/config/Processors/stitching_W_amcatnlo_Vpt_NpNLO.yaml
+    stages: [ AnaTuple, AnaTupleMerge ]
+    verbose: 1
+    dependency_level:
+      AnaTuple: file
+      AnaTupleMerge: process
