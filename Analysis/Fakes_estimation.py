@@ -90,14 +90,6 @@ def AddFakesInHistDict_BBWW(
 
 def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
     # debug
-    print("\n[DEBUG] Available histogram processes:")
-    for process in histograms:
-        print(f"  - {process}")
-
-    print(f"[DEBUG] Requested data process: {data_process_name}")
-    print(f"[DEBUG] Requested key: {key}")
-    # end debug
-
     if data_process_name not in histograms:
         raise KeyError(f"Missing data process {data_process_name}")
     # if key not in histograms[data_process_name]:
