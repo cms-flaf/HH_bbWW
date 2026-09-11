@@ -89,49 +89,10 @@ def AddFakesInHistDict_BBWW(
 
 
 def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
-    # debug
     if data_process_name not in histograms:
         raise KeyError(f"Missing data process {data_process_name}")
-    # if key not in histograms[data_process_name]:
-    #     raise KeyError(f"Missing key {key} in data")
-    # for debugging
     if key not in histograms[data_process_name]:
-        print("\n" + "=" * 100)
-        print("[DEBUG] MISSING KEY IN DATA")
-        print("=" * 100)
-        print(f"[DEBUG] data_process_name = {data_process_name}")
-        print(f"[DEBUG] Requested key       = {key}")
-        print(f"[DEBUG] Requested key_dir   = {key[0]}")
-        print(f"[DEBUG] Requested unc tuple = {key[1]}")
-
-        print("\n[DEBUG] ALL DATA KEYS:")
-        for i, k in enumerate(histograms[data_process_name].keys()):
-            print(f"  [{i}] {k}")
-
-        print("\n[DEBUG] DATA KEYS WITH SAME UNCERTAINTY:")
-        for k in histograms[data_process_name].keys():
-            if k[1] == key[1]:
-                print(f"  {k}")
-
-        print("\n[DEBUG] DATA KEYS WITH SAME CHANNEL:")
-        for k in histograms[data_process_name].keys():
-            if k[0][0] == key[0][0]:
-                print(f"  {k}")
-
-        print("\n[DEBUG] DATA KEYS WITH SAME CHANNEL + CATEGORY:")
-        for k in histograms[data_process_name].keys():
-            if k[0][0] == key[0][0] and k[0][2] == key[0][2]:
-                print(f"  {k}")
-
-        print("\n[DEBUG] DATA KEYS WITH SAME REGION:")
-        for k in histograms[data_process_name].keys():
-            if k[0][1] == key[0][1]:
-                print(f"  {k}")
-
-        print("=" * 100 + "\n")
-
         raise KeyError(f"Missing key {key} in data")
-    # end debugging
     hist = histograms[data_process_name][key].Clone()
     hist.SetDirectory(0)
     skip_background_samples = {"QCD_PT"}
@@ -234,14 +195,6 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                     continue
 
                 # Fakes = data -MC for Anti tight region only
-                # debug
-                print("\n[DEBUG] Fake estimation request:")
-                print(f"  var     = {var}")
-                print(f"  channel = {channel}")
-                print(f"  cat     = {cat}")
-                print(f"  uncName = {uncName}")
-                print(f"  scale   = {scale}")
-                # debug
                 if channel in ("e", "eE", "eMu"):
                     anti_key = ((channel, "AR_AntiTightId", cat), (uncName, scale))
                 if channel in ("mu", "muMu"):
