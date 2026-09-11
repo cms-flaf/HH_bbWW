@@ -137,11 +137,23 @@ DY_HighMass:
 
 W:
   name: "W"
-  color: "kGreen"  # eliminates need for plot.yaml
+  color: "kGreen"
+  processors: *W_processors_allFlavors
   datasets:
     - WtoLNu_0J_amcatnloFXFX
     - WtoLNu_1J_amcatnloFXFX
     - WtoLNu_2J_amcatnloFXFX
+    - WtoLNu_amcatnloFXFX
+    - WtoLNu_PTLNu_40to100_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_40to100_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_100to200_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_100to200_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_200to400_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_200to400_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_400to600_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_400to600_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_600_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_600_2J_amcatnloFXFX
 
 VV_inclusive:
   name: "VV"
@@ -508,6 +520,13 @@ custom_CI_Background_DY:
   processors: *DY_processors_allFlavors
   datasets:
     - DYto2L_M_50_amcatnloFXFX
+
+custom_CI_Background_W:
+  name: "CI -- Background W"
+  color: "kAzure+7"
+  processors: *W_processors_allFlavors
+  datasets:
+    - WtoLNu_amcatnloFXFX
 
 custom_CI_Signal:
   name: "CI -- Signal"
