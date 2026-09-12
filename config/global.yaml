@@ -128,6 +128,11 @@ corrections:
     njets_branch: Njets # Use nCentralJets, not raw nJet
     ntags_branch: nBTaggedJets
     pt_ll_gen: ll_pt_gen
+  top_pt:
+    stages: [ AnalysisCache, HistTuple ]
+    processes: [ TT, TT_Inclusive ]
+    top_pt_branches: [ genTop_pt ]
+    parameterization: nnlo_nlo
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"

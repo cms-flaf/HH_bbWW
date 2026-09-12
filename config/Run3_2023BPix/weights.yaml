@@ -83,6 +83,11 @@ norm:
     expression: "(boosted ? weight_FatJetSF_tau21{scale}_rel : 1.0f) * final_weight"
     name: CMS_bbww_ak8_tau21_2023BPix_{}
 
+  TopPtReweight:
+    requires: top_pt
+    expression: weight_top_pt_{scale}_rel * final_weight
+    name: CMS_bbww_top_pt_{}
+
 shape:
   JER:
     name: CMS_res_j_2023BPix_{}
