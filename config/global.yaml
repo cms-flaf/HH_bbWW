@@ -216,7 +216,7 @@ payload_producers:
       - M1000_Other
     dependencies:
     n_cpus: 4
-    max_runtime: 8.0
+    max_runtime: 32.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
@@ -429,6 +429,8 @@ custom_subcategories: [ ]
 # Signal overlay scaling in HistPlotTask: a fixed factor (e.g. 100), or "bkg" to
 # normalise each signal's integral to the summed background (shape comparison).
 signal_plot_scale: bkg
+# signal_plot_scale: 2.3  # 0.3*(138/18) = 2.3
+# Run2_limit = 0.3 for M600, Run2_Lumi = 138, 2023 lumi_2023 = 18
 
 # This is for Analysis Selection
 channelSelection:
@@ -480,11 +482,98 @@ masspoints:
 
 QCDRegions:
   - OS_Iso
+  - OS_AntiIso
   - SR
   - TT_CR
   - DY_CR
   - W_CR
   - SR_mbb
+  - AR_AntiTightId
+
+# Fake estimation
+fake_estimation:
+  enabled: true
+  method: transfer_factor
+  # method: fake_factor
+
+# SL signal and control regions
+  # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
+  # - SR_SL_M300
+  # - SR_SL_M400
+  # - SR_SL_M500
+  # - SR_SL_M550
+  # - SR_SL_M600
+  # - SR_SL_M650
+  # - SR_SL_M700
+  # - SR_SL_M800
+  # - SR_SL_M900
+  # - SR_SL_M1000
+
+  # - CR_SL_TT_M300
+  # - CR_SL_TT_M400
+  # - CR_SL_TT_M500
+  # - CR_SL_TT_M550
+  # - CR_SL_TT_M600
+  # - CR_SL_TT_M650
+  # - CR_SL_TT_M700
+  # - CR_SL_TT_M800
+  # - CR_SL_TT_M900
+  # - CR_SL_TT_M1000
+
+  # - CR_SL_ST_M300
+  # - CR_SL_ST_M400
+  # - CR_SL_ST_M500
+  # - CR_SL_ST_M550
+  # - CR_SL_ST_M600
+  # - CR_SL_ST_M650
+  # - CR_SL_ST_M700
+  # - CR_SL_ST_M800
+  # - CR_SL_ST_M900
+  # - CR_SL_ST_M1000
+
+  # - CR_SL_WJets_M300
+  # - CR_SL_WJets_M400
+  # - CR_SL_WJets_M500
+  # - CR_SL_WJets_M550
+  # - CR_SL_WJets_M600
+  # - CR_SL_WJets_M650
+  # - CR_SL_WJets_M700
+  # - CR_SL_WJets_M800
+  # - CR_SL_WJets_M900
+  # - CR_SL_WJets_M1000
+
+  # - CR_SL_DY_M300
+  # - CR_SL_DY_M400
+  # - CR_SL_DY_M500
+  # - CR_SL_DY_M550
+  # - CR_SL_DY_M600
+  # - CR_SL_DY_M650
+  # - CR_SL_DY_M700
+  # - CR_SL_DY_M800
+  # - CR_SL_DY_M900
+  # - CR_SL_DY_M1000
+
+  # - CR_SL_H_M300
+  # - CR_SL_H_M400
+  # - CR_SL_H_M500
+  # - CR_SL_H_M550
+  # - CR_SL_H_M600
+  # - CR_SL_H_M650
+  # - CR_SL_H_M700
+  # - CR_SL_H_M800
+  # - CR_SL_H_M900
+  # - CR_SL_H_M1000
+
+  # - CR_SL_VV_M300
+  # - CR_SL_VV_M400
+  # - CR_SL_VV_M500
+  # - CR_SL_VV_M550
+  # - CR_SL_VV_M600
+  # - CR_SL_VV_M650
+  # - CR_SL_VV_M700
+  # - CR_SL_VV_M800
+  # - CR_SL_VV_M900
+  # - CR_SL_VV_M1000
 
   # SL signal and control regions
   # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
@@ -609,11 +698,85 @@ scales:
 deepTauVersion: 2p1
 met_type: "PuppiMET"
 
-histTuple_flavor: default
+# histTuple_flavor: default
+histTuple_flavor: fakes_studies
+histTuple_fullResolution_variables:
 histTuple_flavors:
+  fakes_studies:
+    fullResolution_variables:
+      - mT_fix
+      - mT_SL
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+      - DeepHME_mass
+    variables:
+      - lep1_pt
+      - lep1_eta
+      - lep1_phi
+      - lep1_Electron_mvaIso
+      - PuppiMET_pt
+      - PuppiMET_phi
+      - bjet1_pt
+      - bjet1_eta
+      - bjet1_phi
+      - bjet1_mass
+      - bjet1_btagPNetB
+      - bjet2_pt
+      - bjet2_eta
+      - bjet2_phi
+      - bjet2_mass
+      - bjet2_btagPNetB
+      - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
+      - HT
+      - MT
+      - ll_mass
+      - lep1_Muon_pfRelIso04_all
+      - lep1_Electron_pfRelIso03_all
+      - mT_fix
+      - mT_SL
+      # High Level Single Lepton
+      - DeepHME_mass
+      - DeepHME_mass_error
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+      - name: binary_DNN_m300_vs_HME
+        vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
+      - name: binary_DNN_m400_vs_HME
+        vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
+      - name: binary_DNN_m500_vs_HME
+        vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
+      - name: binary_DNN_m550_vs_HME
+        vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
+      - name: binary_DNN_m600_vs_HME
+        vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
+      - name: binary_DNN_m650_vs_HME
+        vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
+      - name: binary_DNN_m700_vs_HME
+        vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
+      - name: binary_DNN_m800_vs_HME
+        vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
+      - name: binary_DNN_m900_vs_HME
+        vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
+      - name: binary_DNN_m1000_vs_HME
+        vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
   binary_DNN_outputs:
     fullResolution_variables: [ ]
-
     variables:
       - TwoStageDNN_M300_binary
       - TwoStageDNN_M400_binary
@@ -625,7 +788,7 @@ histTuple_flavors:
       - TwoStageDNN_M800_binary
       - TwoStageDNN_M900_binary
       - TwoStageDNN_M1000_binary
-
+      - DeepHME_mass
       - name: binary_DNN_m300_vs_HME
         vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
       - name: binary_DNN_m400_vs_HME
@@ -652,13 +815,12 @@ histTuple_flavors:
       - lep1_pt
       - lep1_eta
       - lep1_phi
+      - lep1_Electron_mvaIso
       - lep1_mass
-
-      - lep2_pt
-      - lep2_eta
-      - lep2_phi
-      - lep2_mass
-
+      # - lep2_pt
+      # - lep2_eta
+      # - lep2_phi
+      # - lep2_mass
       - bjet1_pt
       - bjet1_phi
       - bjet1_eta
@@ -722,8 +884,6 @@ histTuple_flavors:
       - MT
       - MT2_ll
       - MT2_bb
-      - MT2_blbl1
-      - MT2_blbl2
       - ll_mass
       - bb_CosTheta
       - nExtraTau
@@ -803,7 +963,6 @@ histTuple_flavors:
     fullResolution_variables:
       # Add one default fullres for CI to validate it works
       - lep1_pt
-
     variables:
       - lep1_pt
       - lep1_eta
