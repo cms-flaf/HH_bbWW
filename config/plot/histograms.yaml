@@ -2089,7 +2089,7 @@ binary_DNN_m1000_vs_HME:
       - { y_bin: [ 950, 1000 ], x_bins: "50|0:1" }
       - { y_bin: [ 1000, 1050 ], x_bins: "50|0:1" }
       - { y_bin: [ 1050, 1100 ], x_bins: "50|0:1" }
-      - { y_bin: [ 1100, 1150 ], x_bins: "50x|0:1" }
+      - { y_bin: [ 1100, 1150 ], x_bins: "50|0:1" }
   x_rebin: True
   x_title: "Binary DNN M1000 in HMEbins"
   y_title: "Events"
