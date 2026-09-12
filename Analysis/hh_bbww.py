@@ -288,7 +288,11 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
 
-        if stage == "HistTuple":
+        SL_CR_active = False
+        for QCDReg in self.config["QCDRegions"]:
+            if QCDReg.startswith("SL_SR") or QCDReg.startswith("SL_CR"):
+                SL_CR_active = True
+        if stage == "HistTuple" and SL_CR_active:
             # Individual mass signal regions
             masspoints = self.config["masspoints"]
             for mp in masspoints:
@@ -658,6 +662,28 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
     # First step is to decide Hbb boosted
     # Take FatJets, mask by BTag and msoftdrop, sort by BTag Score
     # If one exists, category is Hbb_Boosted
+
+    df = df.Define(
+        "LeadFatJet_Sel",
+        "SelectedFatJet_pt > 0",
+    )
+    df = df.Define("LeadFatJet_idx", "CreateIndexes(Sum(LeadFatJet_Sel))")
+    df = df.Define(
+        "LeadFatJet_idxSorted",
+        "Take(ReorderObjects(SelectedFatJet_pt[LeadFatJet_Sel], LeadFatJet_idx), min((int)LeadFatJet_idx.size(), 1))",
+    )
+    for var in fatjet_vars:
+        df = df.Define(
+            f"LeadFatJet_{var}",
+            f"Take(SelectedFatJet_{var}[LeadFatJet_Sel], LeadFatJet_idxSorted)",
+        )
+    df = df.Define("Nleadfatjets", "LeadFatJet_pt.size()")
+    df = df.Define("leadfatjet_isValid", "(Nleadfatjets > 0)")
+    for var in fatjet_vars:
+        df = df.Define(
+            f"leadfatjet_{var}",
+            f"leadfatjet_isValid ? LeadFatJet_{var}[0] : std::decay_t<decltype(LeadFatJet_{var})>::value_type()",
+        )
 
     df = df.Define(
         "FatBJet_Sel",
