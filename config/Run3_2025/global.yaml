@@ -37,6 +37,17 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
+  # Parton-shower ISR/FSR -- keep in sync with config/global.yaml. This era declares its
+  # own complete `corrections:` block, and config is concatenated text parsed once, so a
+  # duplicate key replaces the top-level block wholesale instead of merging into it.
+  # Without this copy, weight_base_isr*_rel is never defined and PS_ISR/PS_FSR in this
+  # era's weights.yaml reference a column that does not exist.
+  parton_shower:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    branch: PSWeight
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:

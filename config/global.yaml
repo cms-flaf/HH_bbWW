@@ -103,6 +103,25 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
+  # Parton-shower ISR/FSR. Stages mirror pu because the mechanism is the same one: the
+  # weights are defined at AnaTuple, where the inclusive sums of
+  # weight_gen * weight_pu_Central * weight_ps_<var> are accumulated into the anaCache
+  # denominators, and AnaTupleMerge reads the persisted branches back to build
+  # weight_base_isr{Up,Down}_rel / weight_base_fsr{Up,Down}_rel. Dividing each variation
+  # by its own denominator is what makes the nuisance shape-only.
+  #
+  # AnaTupleMerge must stay disabled: the merged tuple holds PS_Weight, not PSWeight, so
+  # an enabled producer there would hit its missing-input path. It raises rather than
+  # shadowing the persisted values, but the config is what should prevent it.
+  #
+  # No `processes:` -- applied to all MC including signal, which is what makes ps_isr
+  # and ps_fsr single correlated nuisances. It is one Pythia shower setting.
+  parton_shower:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    branch: PSWeight
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
