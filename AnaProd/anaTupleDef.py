@@ -585,9 +585,19 @@ def defineGenInfoVariables(dfw, dataset_cfg):
     GenPart. Consumers prefer the stored branch and fall back to GenPart only where it
     is absent, so both see the same value.
 
-    TT stores TTInfo_top_pt = {top, anti-top}: the pT of the two last-copy tops from the
-    strict ttbar identification in FLAF/include/GenProcess/TT.h. identify() throws on
-    anything but a ttbar topology, so only genuine SM ttbar processes may declare it.
+    TT stores two-element vectors ordered {top, anti-top}, one per PtEtaPhiM component:
+
+    * TTInfo_top_* for the last-copy tops;
+    * TTInfo_b_* for the b quark each top decays to, as its direct daughter -- without a
+      mass, which NanoAOD stores as zero for b quarks;
+    * TTInfo_lep_* for the charged lepton from each top's W, zero where that W decays to
+      hadrons, plus TTInfo_lep_gen_kind with its GenLepton::Kind (-1 when hadronic).
+
+    Tops and b quarks come from the strict ttbar identification in
+    FLAF/include/GenProcess/TT.h. The lepton is resolved through FLAF/include/GenLepton.h
+    and takes the gen lepton's last-copy four-momentum, as the H->VV leptonic legs do.
+    identify() throws on anything but a ttbar topology, so only genuine SM ttbar processes
+    may declare it.
     """
     gen_info = dataset_cfg.get("process_cfg", {}).get("genInfo", [])
     unknown = set(gen_info) - {"TT"}
@@ -608,11 +618,34 @@ def defineGenInfoVariables(dfw, dataset_cfg):
         dfw.Define(
             "TTInfo",
             "gen_process::tt::identify(GenPart_pdgId, GenPart_statusFlags,"
-            " GenPart_genPartIdxMother, GenPart_pt)",
+            " GenPart_genPartIdxMother, GenPart_pt, GenPart_eta, GenPart_phi,"
+            " GenPart_mass)",
         )
+        for slot in [0, 1]:
+            dfw.Define(
+                f"TTInfo_lep{slot}_p4",
+                "reco_tau::gen_truth::lastCopyP4ByGenPartIndex(genLeptons,"
+                f" TTInfo.lep_index[{slot}])",
+            )
+        p4s = {
+            "top": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
+            "b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
+            "lep": ("TTInfo_lep0_p4", "TTInfo_lep1_p4"),
+        }
+        for obj, (from_top, from_antitop) in p4s.items():
+            for var in PtEtaPhiM:
+                if obj == "b" and var == "mass":
+                    continue  # NanoAOD stores GenPart_mass = 0 for b quarks.
+                dfw.DefineAndAppend(
+                    f"TTInfo_{obj}_{var}",
+                    f"ROOT::VecOps::RVec<float>{{static_cast<float>({from_top}.{var}()),"
+                    f" static_cast<float>({from_antitop}.{var}())}}",
+                )
         dfw.DefineAndAppend(
-            "TTInfo_top_pt",
-            "ROOT::VecOps::RVec<float>{TTInfo.top_pt[0], TTInfo.top_pt[1]}",
+            "TTInfo_lep_gen_kind",
+            "ROOT::VecOps::RVec<int>{"
+            "reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[0]),"
+            " reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[1])}",
         )
 
 
