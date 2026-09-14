@@ -577,27 +577,10 @@ def defineMCSpecificObservables(dfw):
 
 
 def defineGenInfoVariables(dfw, dataset_cfg):
-    """Gen-level information a process declares with `genInfo`, stored as branches.
+    """Store the gen-level information the process declares with `genInfo`.
 
-    FLAF's convention (docs/concepts/stitching.md): a process lists the gen-level
-    information it needs under `genInfo`, and the analysis anaTuple definition turns that
-    into `<Kind>Info_*` branches, because the stages after AnaTuple no longer carry
-    GenPart. Consumers prefer the stored branch and fall back to GenPart only where it
-    is absent, so both see the same value.
-
-    TT stores two-element vectors ordered {top, anti-top}, one per PtEtaPhiM component:
-
-    * TTInfo_top_* for the last-copy tops;
-    * TTInfo_b_* for the b quark each top decays to, as its direct daughter -- without a
-      mass, which NanoAOD stores as zero for b quarks;
-    * TTInfo_lep_* for the charged lepton from each top's W, zero where that W decays to
-      hadrons, plus TTInfo_lep_gen_kind with its GenLepton::Kind (-1 when hadronic).
-
-    Tops and b quarks come from the strict ttbar identification in
-    FLAF/include/GenProcess/TT.h. The lepton is resolved through FLAF/include/GenLepton.h
-    and takes the gen lepton's last-copy four-momentum, as the H->VV leptonic legs do.
-    identify() throws on anything but a ttbar topology, so only genuine SM ttbar processes
-    may declare it.
+    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
+    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
     """
     gen_info = dataset_cfg.get("process_cfg", {}).get("genInfo", [])
     unknown = set(gen_info) - {"TT"}
@@ -635,7 +618,7 @@ def defineGenInfoVariables(dfw, dataset_cfg):
         for obj, (from_top, from_antitop) in p4s.items():
             for var in PtEtaPhiM:
                 if obj == "b" and var == "mass":
-                    continue  # NanoAOD stores GenPart_mass = 0 for b quarks.
+                    continue  # always zero in NanoAOD
                 dfw.DefineAndAppend(
                     f"TTInfo_{obj}_{var}",
                     f"ROOT::VecOps::RVec<float>{{static_cast<float>({from_top}.{var}()),"

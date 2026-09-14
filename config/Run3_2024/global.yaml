@@ -48,10 +48,7 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
-  # Top pT reweighting -- keep in sync with config/global.yaml. This era declares its own
-  # complete `corrections:` block, and config is concatenated text parsed once, so a
-  # duplicate key replaces the top-level block wholesale instead of merging into it.
-  # Without this copy the correction silently does not exist in this era.
+  # Top pT reweighting -- keep in sync with config/global.yaml.
   top_pt:
     stages: [ AnaTuple, AnaTupleMerge ]
     processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
