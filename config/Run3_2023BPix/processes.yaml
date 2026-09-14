@@ -85,7 +85,9 @@ DY_LO:
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
+  processors: *TT_processors
   datasets:
+    - TT
     - TTto2L2Nu
     - TTtoLNu2Q
     - TTto4Q
