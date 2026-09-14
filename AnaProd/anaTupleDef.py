@@ -567,7 +567,13 @@ def defineSignalVariables(dfw):
             )
 
 
-def defineMCSpecificObservables(dfw):
+def defineGenVariables(dfw, dataset_cfg):
+    """Gen-level variables, defined before the event selection.
+
+    The MC observables and the information the process declares with `genInfo`.
+    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
+    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
+    """
     for var in MCObservables:
         if isinstance(var, tuple):
             var_orig_name, var_new_name = var
@@ -575,13 +581,6 @@ def defineMCSpecificObservables(dfw):
         else:
             dfw.colToSave.append(var)
 
-
-def defineGenInfoVariables(dfw, dataset_cfg):
-    """Store the gen-level information the process declares with `genInfo`.
-
-    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
-    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
-    """
     gen_info = dataset_cfg.get("process_cfg", {}).get("genInfo", [])
     unknown = set(gen_info) - {"TT"}
     if unknown:
@@ -681,9 +680,6 @@ def addAllVariables(
     defineFatJetVariables(dfw, isData)
     defineForwardJetVariables(dfw, isData)
     defineMETVariables(dfw, global_params["met_type"])
-    if not isData:
-        defineMCSpecificObservables(dfw)
-        defineGenInfoVariables(dfw, dataset_cfg)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
