@@ -147,6 +147,35 @@ corrections:
     njets_branch: Njets # Use nCentralJets, not raw nJet
     ntags_branch: nBTaggedJets
     pt_ll_gen: ll_pt_gen
+  # Top pT reweighting of SM ttbar, as a shape weight staged like parton_shower: the
+  # weights are defined at AnaTuple, where the inclusive sums of weight_gen times the
+  # registry product are accumulated into the anaCache denominators, and AnaTupleMerge
+  # reads the persisted branches back to build weight_base_top_pt{Up,Down}_rel. Dividing
+  # each variation by its own denominator is what makes it shape-only.
+  #
+  # `branch` names the per-event pT of the last-copy top and anti-top. The analysis stores
+  # it for every process declaring `genInfo: [ TT ]`. Where it is not stored yet -- the
+  # anaCache denominator is summed before the analysis variables are defined -- the
+  # producer evaluates the same gen_process::tt::identify from GenPart instead, so both
+  # see one value.
+  #
+  # `processes:` is load-bearing, not only bookkeeping: identify() throws on anything but
+  # a ttbar topology, and single top, ttH and the signals carry last-copy tops too. List
+  # every SM ttbar process, including the CI one, so the integration test exercises it.
+  #
+  # AnaTupleMerge must stay disabled: the weights are read back from the tuple there, and
+  # an enabled producer raises rather than defining them a second time.
+  #
+  # Deliberately not used in weights.yaml or the datacards yet: its effect is to be
+  # studied before it is committed to.
+  top_pt:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
+    branch: TTInfo_top_pt
+    parameterization: nnlo_nlo
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"

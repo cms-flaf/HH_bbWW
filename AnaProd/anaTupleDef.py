@@ -576,6 +576,46 @@ def defineMCSpecificObservables(dfw):
             dfw.colToSave.append(var)
 
 
+def defineGenInfoVariables(dfw, dataset_cfg):
+    """Gen-level information a process declares with `genInfo`, stored as branches.
+
+    FLAF's convention (docs/concepts/stitching.md): a process lists the gen-level
+    information it needs under `genInfo`, and the analysis anaTuple definition turns that
+    into `<Kind>Info_*` branches, because the stages after AnaTuple no longer carry
+    GenPart. Consumers prefer the stored branch and fall back to GenPart only where it
+    is absent, so both see the same value.
+
+    TT stores TTInfo_top_pt = {top, anti-top}: the pT of the two last-copy tops from the
+    strict ttbar identification in FLAF/include/GenProcess/TT.h. identify() throws on
+    anything but a ttbar topology, so only genuine SM ttbar processes may declare it.
+    """
+    gen_info = dataset_cfg.get("process_cfg", {}).get("genInfo", [])
+    unknown = set(gen_info) - {"TT"}
+    if unknown:
+        raise RuntimeError(
+            f"genInfo {sorted(unknown)} for process '{dataset_cfg.get('process_name')}' "
+            "is not implemented in anaTupleDef."
+        )
+    if "TT" in gen_info:
+        import os
+
+        from FLAF.Common.Utilities import DeclareHeader
+
+        flaf_dir = os.path.dirname(
+            os.path.dirname(os.path.abspath(CommonBaseline.__file__))
+        )
+        DeclareHeader(os.path.join(flaf_dir, "include", "GenProcess", "TT.h"))
+        dfw.Define(
+            "TTInfo",
+            "gen_process::tt::identify(GenPart_pdgId, GenPart_statusFlags,"
+            " GenPart_genPartIdxMother, GenPart_pt)",
+        )
+        dfw.DefineAndAppend(
+            "TTInfo_top_pt",
+            "ROOT::VecOps::RVec<float>{TTInfo.top_pt[0], TTInfo.top_pt[1]}",
+        )
+
+
 def addAllVariables(
     dfw,
     syst_name,
@@ -627,6 +667,7 @@ def addAllVariables(
     defineMETVariables(dfw, global_params["met_type"])
     if not isData:
         defineMCSpecificObservables(dfw)
+        defineGenInfoVariables(dfw, dataset_cfg)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(
