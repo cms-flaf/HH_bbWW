@@ -153,7 +153,7 @@ corrections:
     stages: [ AnaTuple, AnaTupleMerge ]
     processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
     branch: TTInfo_top_pt
-    parameterization: nnlo_nlo
+    parameterization: data_nlo
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
