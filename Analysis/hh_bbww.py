@@ -292,7 +292,20 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         for QCDReg in self.config["QCDRegions"]:
             if QCDReg.startswith("SL_SR") or QCDReg.startswith("SL_CR"):
                 SL_CR_active = True
+
         if stage == "HistTuple" and SL_CR_active:
+            self.df = self.df.Define(
+                "num_extra_tau",
+                f"""if (ExtraTau_idDeepTau2018v2p5VSjet.size() > 0)
+                    {{
+                        auto counter = [](int tag_value){{ return tag_value >= 4; }};
+                        int num_taus_above_tag = std::count_if(ExtraTau_idDeepTau2018v2p5VSjet.begin(), ExtraTau_idDeepTau2018v2p5VSjet.end(), counter);
+                    }}
+                    return 0;
+                """,
+            )
+            self.df = self.df.Define("tau_veto", f"num_extra_tau == 0;")
+
             # Individual mass signal regions
             masspoints = self.config["masspoints"]
             for mp in masspoints:
@@ -315,31 +328,31 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
                 self.DefineAndAppend(
                     f"SR_SL_M{mp}",
-                    f"return predicted_class_M{mp} == 0 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 0 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_TT_M{mp}",
-                    f"return predicted_class_M{mp} == 1 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 1 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_ST_M{mp}",
-                    f"return predicted_class_M{mp} == 2 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 2 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_WJets_M{mp}",
-                    f"return predicted_class_M{mp} == 3 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 3 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_DY_M{mp}",
-                    f"return predicted_class_M{mp} == 4 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 4 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_H_M{mp}",
-                    f"return predicted_class_M{mp} == 5 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 5 && Iso && event_selection && tau_veto;",
                 )
                 self.DefineAndAppend(
                     f"CR_SL_VV_M{mp}",
-                    f"return predicted_class_M{mp} == 6 && Iso && event_selection;",
+                    f"return predicted_class_M{mp} == 6 && Iso && event_selection && tau_veto;",
                 )
 
     def calculateMT(self):
