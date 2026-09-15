@@ -48,15 +48,6 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
-  # Top pT reweighting -- keep in sync with config/global.yaml.
-  top_pt:
-    stages: [ AnaTuple, AnaTupleMerge ]
-    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
-    branch: TTInfo_top_pt
-    parameterization: nnlo_nlo
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
