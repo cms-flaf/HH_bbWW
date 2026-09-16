@@ -218,10 +218,6 @@ MCObservables = [
     "LHE_Vpt",
 ]
 
-# Kept on the central tree only: the PDF members are a variation of the nominal shape, so
-# the shifted trees cannot use them, and the vector is ~100 floats per event.
-central_only_columns = ["LHEPdf_Weight"]
-
 _warned_missing_observables = set()
 
 PtEtaPhiM = ["pt", "eta", "phi", "mass"]
