@@ -50,6 +50,7 @@ DY_LO:
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
     - TTtoLNu2Q
@@ -396,6 +397,7 @@ custom_CI:
 custom_CI_Background_TT:
   name: "CI -- Background t#bar{t}"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
 

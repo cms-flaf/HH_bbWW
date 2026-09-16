@@ -86,6 +86,7 @@ TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
   processors: *TT_processors
+  genInfo: [ TT ]
   datasets:
     - TT
     - TTto2L2Nu
@@ -95,6 +96,7 @@ TT:
 TT_Inclusive:
   name: "t#bar{t} Inclusive"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TT
 
@@ -503,6 +505,7 @@ QCD_PT:
 custom_CI_Background_TT:
   name: "CI -- Background t#bar{t}"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
 

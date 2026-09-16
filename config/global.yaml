@@ -143,10 +143,20 @@ corrections:
   #   pt_ll: ll_pt
   dy_hhbbtautau:
     stages: [ AnalysisCache, HistTuple ]
-    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned ]
+    processes: [ DY_M_10to50, DYto2L_InclusivePlusBinned, custom_CI_Background_DY ]
     njets_branch: Njets # Use nCentralJets, not raw nJet
     ntags_branch: nBTaggedJets
     pt_ll_gen: ll_pt_gen
+  # Top pT reweighting of SM ttbar as a shape weight, staged like parton_shower.
+  # Not used in weights.yaml or the datacards yet.
+  top_pt:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
+    branch: TTInfo_top_pt
+    parameterization: data_nlo
+    enabled:
+      AnaTuple: true
+      AnaTupleMerge: false
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
