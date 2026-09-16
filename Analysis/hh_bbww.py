@@ -295,14 +295,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         if stage == "HistTuple" and SL_CR_active:
             self.df = self.df.Define(
-                "num_extra_tau",
-                f"""if (ExtraTau_idDeepTau2018v2p5VSjet.size() > 0)
-                    {{
-                        auto counter = [](int tag_value){{ return tag_value >= 4; }};
-                        int num_taus_above_tag = std::count_if(ExtraTau_idDeepTau2018v2p5VSjet.begin(), ExtraTau_idDeepTau2018v2p5VSjet.end(), counter);
-                    }}
-                    return 0;
-                """,
+                "num_extra_tau", "return Sum(ExtraTau_idDeepTau2018v2p5VSjet >= 4);"
             )
             self.df = self.df.Define("tau_veto", f"num_extra_tau == 0;")
 
