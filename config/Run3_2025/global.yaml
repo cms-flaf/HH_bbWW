@@ -48,25 +48,6 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
-  # PDF members, one shape-weight scale each (0..n_members-1), so every member gets its
-  # own anaCache denominator and its own weight_base_pdf<k>_rel. PDF4LHC15 takes the
-  # spread across members of each bin, so they are combined at the datacard stage later;
-  # nothing applies them yet -- no weights.yaml entry and no datacard entry.
-  #
-  # Disabled at AnaTuple: the denominator pass defines the members regardless, and this
-  # keeps the ~100 columns out of the anaTuple. At AnaTupleMerge they are rebuilt from
-  # the stored vector, which is LHEPdf_Weight there and LHEPdfWeight at AnaTuple.
-  #
-  # n_members covers the longest vector (103 for the backgrounds' Hessian+alphaS set);
-  # signal carries 101, so its last two members are no-ops with a relative weight of 1.
-  pdf:
-    stages: [ AnaTuple, AnaTupleMerge ]
-    branch: LHEPdfWeight
-    merged_branch: LHEPdf_Weight
-    n_members: 103
-    enabled:
-      AnaTuple: false
-      AnaTupleMerge: true
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
