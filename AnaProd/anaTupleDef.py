@@ -1,5 +1,3 @@
-import sys
-
 import AnaProd.baseline as AnaBaseline
 import FLAF.Common.BaselineSelection as CommonBaseline
 from Corrections.Corrections import Corrections
@@ -217,8 +215,6 @@ MCObservables = [
     "LHE_Nuds",
     "LHE_Vpt",
 ]
-
-_warned_missing_observables = set()
 
 PtEtaPhiM = ["pt", "eta", "phi", "mass"]
 
@@ -584,19 +580,9 @@ def defineGenVariables(dfw, dataset_cfg):
     TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
     (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
     """
-    columns = {str(c) for c in dfw.df.GetColumnNames()}
     for var in MCObservables:
         if isinstance(var, tuple):
             var_orig_name, var_new_name = var
-            if var_orig_name not in columns:
-                if var_orig_name not in _warned_missing_observables:
-                    _warned_missing_observables.add(var_orig_name)
-                    print(
-                        f"WARNING: '{var_orig_name}' is not in this dataset; "
-                        f"'{var_new_name}' is not stored.",
-                        file=sys.stderr,
-                    )
-                continue
             dfw.DefineAndAppend(var_new_name, var_orig_name)
         else:
             dfw.colToSave.append(var)
