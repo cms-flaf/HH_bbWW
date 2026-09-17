@@ -1,5 +1,12 @@
-Run3_Model:
-  name: "Base model for Run 3"
+# The bbWW signal is X->HH, produced privately for the masses central production does not cover
+# (DSProd, models/X_HH/setups/Run3_XHHbbWW.yaml). Radion (spin 0) and BulkGraviton (spin 2) are
+# distinct hypotheses, so they are distinct models: a single model carrying both would be fitted as
+# one combined signal. Neither has a signal in Run3_2024 and later, where no resonant
+# sample has been produced yet: their meta-processes are declared there with an empty dataset list,
+# as the central X->YH ones are, so those eras keep loading and the setup-loading test keeps
+# covering them.
+Run3_Model_Radion:
+  name: "Base model for Run 3, spin-0 (Radion) signal"
   backgrounds:
     - TT
     - DY
@@ -9,10 +16,27 @@ Run3_Model:
     - SingleHiggs
     # - QCD_PT
   signals:
-    - XtoHHto2B2W_SingleLepton
-    - XtoHHto2B2W_DoubleLepton
+    - GluGluToRadion_SingleLepton
+    - GluGluToRadion_DoubleLepton
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
+    # bbtautau is still X->YH-backed and spin 0, so it belongs with the Radion hypothesis only
     - XtoHHto2Tau2B
+  data:
+    - Data_Full
+
+Run3_Model_BulkGraviton:
+  name: "Base model for Run 3, spin-2 (BulkGraviton) signal"
+  backgrounds:
+    - TT
+    - DY
+    - ST
+    - VV
+    - W
+    - SingleHiggs
+    # - QCD_PT
+  signals:
+    - GluGluToBulkGraviton_SingleLepton
+    - GluGluToBulkGraviton_DoubleLepton
   data:
     - Data_Full
 

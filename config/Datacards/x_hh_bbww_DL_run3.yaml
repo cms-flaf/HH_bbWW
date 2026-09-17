@@ -73,9 +73,15 @@ processes:
     is_data: true
     is_asimov_data: true
 
-  - process: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
-    hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
-    param_values: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000 ]
+  # The spin-0 (Radion) X->HH signal, i.e. the signal of `Run3_Model_Radion`. A spin-2 card is this
+  # file with GluGluToBulkGraviton2L in place of GluGluToRadion2L, without the XtoHHto2Tau2B process
+  # and its `^XtoHHto2Tau2B_` entries (bbtautau is X->YH-backed and spin 0, so it is not in
+  # `Run3_Model_BulkGraviton`), and wants its own binning.
+  - process: GluGluToRadion2L_${MX}
+    hist_name: GluGluToRadion2L_${MX}
+    # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
+    # grid before these cards can be built
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
     is_signal: true
     allow_zero_integral: true
 
@@ -665,26 +671,29 @@ uncertainties:
   # which is what makes them apply everywhere. Values from
   # https://gitlab.cern.ch/hh/naming-conventions#experimental-uncertainties
   #
-  # XtoHHto2B2W_1L is the single-lepton signal and is not a process of this dilepton
+  # GluGluToRadion1L is the single-lepton signal and is not a process of this dilepton
   # card; it belongs in these lists when the SL card gains them. Single Higgs and VH
   # likewise, once they are added as processes.
+  #
+  # BR_hww covers the whole signal although the sample is 2B2V: about 4.5 % of it is
+  # H->ZZ->2l2nu, which this nuisance over-covers and BR_hzz does not cover at all.
   #
   # The process patterns are regexes (a `processes:` entry beginning with ^ is matched
   # with re.match, anything else compared literally). They have to be: by the time an
   # uncertainty is matched, the signal's ${MX} has been resolved to the mass being built,
-  # so the process is XtoHHto2B2W_2L_700 and a literal "XtoHHto2B2W_2L_${MX}" matches
+  # so the process is GluGluToRadion2L_700 and a literal "GluGluToRadion2L_${MX}" matches
   # nothing at all -- silently, since an uncertainty that applies to no process is simply
   # never added.
   - name: BR_hbb
     type: lnN
     processes:
-      - ^XtoHHto2B2W_2L_
+      - ^GluGluToRadion2L_
       - ^XtoHHto2Tau2B_
     value: [ -0.0126, 0.0124 ]
   - name: BR_hww
     type: lnN
     processes:
-      - ^XtoHHto2B2W_2L_
+      - ^GluGluToRadion2L_
     value: [ -0.0152, 0.0153 ]
   - name: BR_htt
     type: lnN
