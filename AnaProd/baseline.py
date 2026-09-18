@@ -32,6 +32,9 @@ def selectHWW(df, selected_channels):
     # variables (dxy, dz, sip3d, superclusterEta) are stored in the anaTuple
     # instead, so any of these cuts can be re-applied downstream if needed.
     #
+    # MVA ID reference:
+    # https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentificationRun3
+    #
     # ( (abs(Electron_superclusterEta) < 1.4442) || (abs(Electron_superclusterEta) > 1.5560) ) &&
     # (
     #     ( (abs(Electron_superclusterEta) <= 1.479) && (abs(Electron_dxy) < 0.05) && (abs(Electron_dz) < 0.1) ) ||
