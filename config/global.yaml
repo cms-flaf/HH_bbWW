@@ -157,6 +157,14 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
+  pdf:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    branch: LHEPdfWeight
+    merged_branch: LHEPdf_Weight
+    n_members: 103
+    enabled:
+      AnaTuple: false
+      AnaTupleMerge: true
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
