@@ -12,11 +12,48 @@ from FLAF.Common.Utilities import *
 # ============================================================
 
 
+def _zero_like(histograms, samples, key, exclude=()):
+    """Return a zero-filled clone (same binning) of the first available histogram
+    for `key` among `samples`, skipping anything in `exclude`. Returns None if none
+    of the samples have this key, i.e. there is truly nothing to base a template on."""
+    for sample in samples:
+        if sample in exclude:
+            continue
+        if sample not in histograms:
+            continue
+        if key not in histograms[sample]:
+            continue
+        hist = histograms[sample][key].Clone()
+        hist.SetDirectory(0)
+        hist.Reset()
+        return hist
+    return None
+
+
 def Fakes_Estimation_BBWW(
     histograms, all_samples_list, channel, category, uncName, scale, data_process_name
 ):
 
     key_Anti = ((channel, "AR_AntiTightId", category), (uncName, scale))
+
+    if (
+        data_process_name not in histograms
+        or key_Anti not in histograms[data_process_name]
+    ):
+        zero_hist = _zero_like(
+            histograms, all_samples_list, key_Anti, exclude={data_process_name, "QCD"}
+        )
+        if zero_hist is None:
+            print(
+                f"[WARN] Missing data for {channel} {category} ({uncName}, {scale}), "
+                "and no histogram available to build a zero template, skipping this key"
+            )
+            return None, None, None, 0.0, 0.0
+        print(
+            f"[WARN] Missing data for {channel} {category} ({uncName}, {scale}), "
+            "using zero-filled Fakes histogram"
+        )
+        return zero_hist, zero_hist.Clone(), zero_hist.Clone(), 0.0, 0.0
 
     hist = histograms[data_process_name][key_Anti].Clone()
     hist.SetDirectory(0)
@@ -82,6 +119,9 @@ def AddFakesInHistDict_BBWW(
                     data_process_name,
                 )
 
+                if hist is None:
+                    continue
+
                 all_histograms["Fakes"][key] = hist
 
                 if uncName == "Central":
@@ -89,15 +129,28 @@ def AddFakesInHistDict_BBWW(
 
 
 def _get_data_minus_mc(histograms, backgrounds_list, key, data_process_name):
-    if data_process_name not in histograms:
-        raise KeyError(f"Missing data process {data_process_name}")
-    if key not in histograms[data_process_name]:
-        raise KeyError(f"Missing key {key} in data")
-    hist = histograms[data_process_name][key].Clone()
-    hist.SetDirectory(0)
-    skip_background_samples = {"QCD_PT"}
     if not backgrounds_list:
         raise ValueError("Empty background list passed to fake estimation")
+    skip_background_samples = {"QCD_PT"}
+
+    if data_process_name not in histograms or key not in histograms[data_process_name]:
+        zero_hist = _zero_like(
+            histograms,
+            backgrounds_list,
+            key,
+            exclude=skip_background_samples | {data_process_name},
+        )
+        if zero_hist is None:
+            print(
+                f"[WARN] Missing data for key {key}, and no histogram available to "
+                "build a zero template, skipping this key"
+            )
+            return None
+        print(f"[WARN] Missing data for key {key}, using zero-filled Fakes histogram")
+        return zero_hist
+
+    hist = histograms[data_process_name][key].Clone()
+    hist.SetDirectory(0)
     for sample in backgrounds_list:
 
         if sample in skip_background_samples:
@@ -207,6 +260,13 @@ def AddFakesInHistDict_BBWW_TransferFactor(
                 hist_signal = _get_data_minus_mc(
                     all_histograms, backgrounds, signal_key, data_process_name
                 )
+
+                if hist_anti is None or hist_signal is None:
+                    print(
+                        f"[WARN] Skipping Fakes for {channel} {cat} "
+                        f"({uncName}, {scale}): missing data histogram"
+                    )
+                    continue
 
                 hist_signal = hist_signal.Clone(f"Fake_{channel}_{cat}")
                 hist_signal.SetDirectory(0)
