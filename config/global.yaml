@@ -165,6 +165,13 @@ corrections:
     enabled:
       AnaTuple: false
       AnaTupleMerge: true
+  qcd_scale:
+    stages: [ AnaTuple, AnaTupleMerge ]
+    branch: LHEScaleWeight
+    merged_branch: LHEScale_Weight
+    enabled:
+      AnaTuple: false
+      AnaTupleMerge: true
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
