@@ -47,7 +47,7 @@ Production_Model:
     - ttV
     # - VV_inclusive
     - W
-    - DY_LO
+    # - DY_LO
     - SingleHiggs
   signals:
     - XtoHHto2B2W_SingleLepton
