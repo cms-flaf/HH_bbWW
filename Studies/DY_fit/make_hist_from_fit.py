@@ -311,6 +311,24 @@ def load_fit_jsons(fit, fit_dir):
         if not r.get("converged", True):
             print("[skip] %s: not converged" % p)
             continue
+        if "stat" not in r:
+            # A JSON written by the August-2026 package: the only configuration
+            # it could produce is the Neyman chi2 with the window-GL normalisation.
+            r["caveats"] = list(r.get("caveats") or []) + [
+                "legacy fit JSON (no stat/norm fields): Neyman chi2 with sigma = "
+                "observed cell error, blind to the yield on single-MC-event cells, "
+                "and window_gl normalisation (template yield depends on --n-quad)"
+            ]
+        pv = r.get("p_value")
+        if pv is not None and pv < 0.05:
+            print("[warn] %s: p_value = %.3g < 0.05 (fit did not pass)" % (p, pv))
+        if r.get("clip_hit"):
+            print(
+                "[warn] %s: clip_hit (the +-50 exponent clip was reached at a "
+                "quadrature node; the density is not reliable off the fine grid)" % p
+            )
+        for c in r.get("caveats") or []:
+            print("[caveat] %s: %s" % (p, c))
         out.append((p, r))
     return out
 
@@ -481,6 +499,7 @@ def main():
             d.cd()
             for h in hists.values():
                 h.Write()
+            func_spec = result.get("function") or {}
             meta = ROOT.TObjString(
                 json.dumps(
                     {
@@ -494,6 +513,18 @@ def main():
                         "from_hist_name": bin_meta.get("from_hist_name"),
                         "shape_variations": args.shape_variations,
                         "n_quad": args.n_quad,
+                        # Fit provenance (v2 fits: norm "tiling", stat, y_eps)
+                        "norm": result.get("norm") or func_spec.get("norm"),
+                        "n_quad_fine": func_spec.get("n_quad_fine"),
+                        "y_eps": func_spec.get("y_eps", result.get("y_eps")),
+                        "stat": result.get("stat"),
+                        "fit_mode": result.get("fit_mode"),
+                        "preset": result.get("preset"),
+                        "gof_stat": (result.get("gof") or {}).get("stat"),
+                        "p_value": result.get("p_value"),
+                        "objective": result.get("objective"),
+                        "clip_hit": result.get("clip_hit"),
+                        "caveats": result.get("caveats"),
                         "n_hists": len(hists),
                         "thr_min": thr,
                         "acceptable_unc_thr": thr,

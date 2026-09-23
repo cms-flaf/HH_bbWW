@@ -294,9 +294,193 @@ class ContinuousDensity2D(object):
         self.param_names = ["N"]
         self.initial_params = [1.0]
         self.npar = 1
+        # Opt-in fine-bin tiling normalisation (``set_tiling_norm``).  When
+        # set, ``_integral_s_window`` returns the tiling window integral
+        # instead of the single n_quad×n_quad GL rule over the whole window.
+        self._tiling_norm = None
 
     def _shape_at_arr(self, x, y, shape_par):
         raise NotImplementedError
+
+    # ------------------------------------------------------------------
+    # Linear-exponent basis hooks (exp-poly type models override these so
+    # the tiling path can use one cached basis matrix per pack).
+    # ------------------------------------------------------------------
+    def _basis_signature(self):
+        """Hashable id of the exponent basis (None → no linear basis)."""
+        return None
+
+    def _basis_matrix(self, x, y):
+        """(n_points × n_terms) matrix B with exponent arg = B @ shape_par."""
+        raise NotImplementedError
+
+    def exp_arg_at_arr(self, x, y, shape_par):
+        """UNclipped exponent argument at points (None if no linear basis)."""
+        if self._basis_signature() is None:
+            return None
+        xf = np.asarray(x, dtype=float).ravel()
+        yf = np.asarray(y, dtype=float).ravel()
+        B = self._basis_matrix(xf, yf)
+        return B @ np.asarray([float(v) for v in shape_par], dtype=float)
+
+    # ------------------------------------------------------------------
+    # Fine-bin TILING normalisation (opt-in; the window integral is the sum
+    # of per-fine-bin GL integrals, so ∑_cells μ == N exactly).
+    # ------------------------------------------------------------------
+    def prepare_fine_tiling(
+        self,
+        x_edges_fine,
+        y_edges_fine,
+        xmin=None,
+        xmax=None,
+        ymin=None,
+        ymax=None,
+        n_quad_fine=2,
+    ):
+        """Tensor GL nodes on every fine bin whose centre lies in the window.
+
+        Returns a dict ``pack`` with flat arrays ``node_x``, ``node_y``,
+        ``node_w`` (weights include the bin half-widths: ∑w over a bin = its
+        area), ``fine_index`` (node → in-window fine-bin id), ``n_fine_in``,
+        the fine-bin ids ``ix``/``iy``, a ``fine_pos`` (nx_fine × ny_fine)
+        lookup (fine bin → pack id or -1) and a per-model ``basis_cache``.
+        """
+        xe = np.asarray(x_edges_fine, dtype=float)
+        ye = np.asarray(y_edges_fine, dtype=float)
+        xmin = self.xmin if xmin is None else float(xmin)
+        xmax = self.xmax if xmax is None else float(xmax)
+        ymin = self.ymin if ymin is None else float(ymin)
+        ymax = self.ymax if ymax is None else float(ymax)
+        xc = 0.5 * (xe[1:] + xe[:-1])
+        yc = 0.5 * (ye[1:] + ye[:-1])
+        ix_in = np.nonzero((xc >= xmin) & (xc <= xmax))[0]
+        iy_in = np.nonzero((yc >= ymin) & (yc <= ymax))[0]
+        IX, IY = np.meshgrid(ix_in, iy_in, indexing="ij")
+        IX = IX.ravel().astype(np.intp)
+        IY = IY.ravel().astype(np.intp)
+        n_fine_in = int(IX.shape[0])
+        nq = max(int(n_quad_fine), 1)
+        nodes, weights = leggauss(nq)
+        xlo, xhi = xe[IX], xe[IX + 1]
+        ylo, yhi = ye[IY], ye[IY + 1]
+        xmid = 0.5 * (xlo + xhi)
+        xhalf = 0.5 * (xhi - xlo)
+        ymid = 0.5 * (ylo + yhi)
+        yhalf = 0.5 * (yhi - ylo)
+        node_x = xmid[:, None, None] + xhalf[:, None, None] * nodes[None, :, None]
+        node_y = ymid[:, None, None] + yhalf[:, None, None] * nodes[None, None, :]
+        node_x = np.broadcast_to(node_x, (n_fine_in, nq, nq)).ravel().copy()
+        node_y = np.broadcast_to(node_y, (n_fine_in, nq, nq)).ravel().copy()
+        node_w = (
+            (weights[:, None] * weights[None, :])[None, :, :]
+            * (xhalf * yhalf)[:, None, None]
+        ).ravel()
+        fine_index = np.repeat(np.arange(n_fine_in, dtype=np.intp), nq * nq)
+        fine_pos = -np.ones((len(xe) - 1, len(ye) - 1), dtype=np.intp)
+        fine_pos[IX, IY] = np.arange(n_fine_in, dtype=np.intp)
+        return {
+            "node_x": node_x,
+            "node_y": node_y,
+            "node_w": node_w,
+            "fine_index": fine_index,
+            "n_fine_in": n_fine_in,
+            "n_nodes": int(node_x.shape[0]),
+            "ix": IX,
+            "iy": IY,
+            "fine_pos": fine_pos,
+            "x_edges": xe,
+            "y_edges": ye,
+            "n_quad_fine": nq,
+            "window": (xmin, xmax, ymin, ymax),
+            "basis_cache": {},
+        }
+
+    def _tiling_basis(self, pack):
+        """Cached (nodes × terms) basis matrix for this model on ``pack``."""
+        sig = self._basis_signature()
+        if sig is None:
+            return None
+        cache = pack.setdefault("basis_cache", {})
+        B = cache.get(sig)
+        if B is None:
+            B = self._basis_matrix(pack["node_x"], pack["node_y"])
+            cache[sig] = B
+        return B
+
+    def exp_arg_on_nodes(self, shape_par, pack):
+        """UNclipped exponent argument on all tiling nodes (None if no basis)."""
+        B = self._tiling_basis(pack)
+        if B is None:
+            return None
+        return B @ np.asarray([float(v) for v in shape_par], dtype=float)
+
+    def shape_on_nodes(self, shape_par, pack):
+        """Shape s on all tiling nodes — evaluated ONCE per call."""
+        arg = self.exp_arg_on_nodes(shape_par, pack)
+        if arg is None:
+            return np.asarray(
+                self._shape_at_arr(pack["node_x"], pack["node_y"], shape_par),
+                dtype=float,
+            ).ravel()
+        np.clip(arg, -50.0, 50.0, out=arg)
+        return np.exp(arg)
+
+    def integrals_fine(self, shape_par, pack):
+        """∬_fine-bin s for every in-window fine bin (length n_fine_in)."""
+        s = self.shape_on_nodes(shape_par, pack)
+        return np.bincount(
+            pack["fine_index"], weights=s * pack["node_w"], minlength=pack["n_fine_in"]
+        )
+
+    def max_exp_arg(self, shape_par, pack):
+        """Max UNclipped exponent argument over the tiling nodes (diagnostic)."""
+        arg = self.exp_arg_on_nodes(shape_par, pack)
+        if arg is None:
+            return None
+        return float(np.max(arg))
+
+    def expected_cells_batch_tiling(self, par, pack, fine_to_obs, n_obs=None):
+        """μ_obs = N · ∑_{fine∈obs} I_fine / ∑_{fine mapped} I_fine.
+
+        ``fine_to_obs`` maps every in-window fine bin to an observation index
+        (-1 = unmapped, excluded from the window integral).  When every fine
+        bin is mapped, ∑_obs μ_obs == N exactly.
+        """
+        N = float(par[0])
+        sp = [float(par[i]) for i in range(1, self.npar)]
+        f2o = np.asarray(fine_to_obs, dtype=np.intp)
+        mask = f2o >= 0
+        if n_obs is None:
+            n_obs = int(f2o[mask].max()) + 1 if np.any(mask) else 0
+        I_fine = self.integrals_fine(sp, pack)
+        I_W = float(np.sum(I_fine[mask]))
+        if not (I_W > 0.0 and math.isfinite(I_W)):
+            return np.zeros(int(n_obs), dtype=float)
+        mu = np.bincount(f2o[mask], weights=I_fine[mask], minlength=int(n_obs))
+        return N * mu / I_W
+
+    def set_tiling_norm(self, pack, include=None):
+        """Normalise the density by the fine-bin tiling window integral.
+
+        ``include`` is an optional boolean mask over the pack's in-window fine
+        bins (False = excluded/unmapped, mirroring the fit's I_W).
+        """
+        self._tiling_norm = None
+        self._Is_cache_key = None
+        self._Is_cache_val = None
+        if pack is None:
+            return
+        inc = (
+            np.ones(pack["n_fine_in"], dtype=bool)
+            if include is None
+            else np.asarray(include, dtype=bool)
+        )
+        self._tiling_norm = {"pack": pack, "include": inc}
+
+    def _window_integral_tiling(self, shape_par):
+        tn = self._tiling_norm
+        I_fine = self.integrals_fine(shape_par, tn["pack"])
+        return float(np.sum(I_fine[tn["include"]]))
 
     def _shape_at(self, x, y, shape_par):
         return float(
@@ -324,9 +508,12 @@ class ContinuousDensity2D(object):
         key = tuple(float(c) for c in shape_par)
         if key == self._Is_cache_key and self._Is_cache_val is not None:
             return self._Is_cache_val
-        val = self._integral_s_rect(
-            shape_par, self.xmin, self.xmax, self.ymin, self.ymax
-        )
+        if self._tiling_norm is not None:
+            val = self._window_integral_tiling(shape_par)
+        else:
+            val = self._integral_s_rect(
+                shape_par, self.xmin, self.xmax, self.ymin, self.ymax
+            )
         self._Is_cache_key = key
         self._Is_cache_val = val
         return val
@@ -552,6 +739,21 @@ class ExpPoly2D(ContinuousDensity2D):
         np.clip(arg, -50.0, 50.0, out=arg)
         return np.exp(arg)
 
+    def _basis_signature(self):
+        return (
+            "ExpPoly2D",
+            tuple(self._terms),
+            self.xmin,
+            self.xmax,
+            self.ymin,
+            self.ymax,
+        )
+
+    def _basis_matrix(self, x, y):
+        xn = (np.asarray(x, dtype=float) - self._x0) / self._xhalf
+        yn = (np.asarray(y, dtype=float) - self._y0) / self._yhalf
+        return np.stack([(xn**i) * (yn**j) for i, j in self._terms], axis=1)
+
     def to_spec(self):
         return {
             "model": "exppoly2d",
@@ -598,6 +800,23 @@ class ExpPolyCheb2D(ContinuousDensity2D):
         np.clip(arg, -50.0, 50.0, out=arg)
         return np.exp(arg)
 
+    def _basis_signature(self):
+        return (
+            "ExpPolyCheb2D",
+            tuple(self._terms),
+            self.xmin,
+            self.xmax,
+            self.ymin,
+            self.ymax,
+        )
+
+    def _basis_matrix(self, x, y):
+        xn = np.clip((np.asarray(x, dtype=float) - self._x0) / self._xhalf, -1.0, 1.0)
+        yn = np.clip((np.asarray(y, dtype=float) - self._y0) / self._yhalf, -1.0, 1.0)
+        Tx = _chebyshev_T_powers(xn, self.degree)
+        Ty = _chebyshev_T_powers(yn, self.degree)
+        return np.stack([Tx[i] * Ty[j] for i, j in self._terms], axis=1)
+
     def to_spec(self):
         return {
             "model": "exppoly_cheb2d",
@@ -617,7 +836,17 @@ class ExpPolyLogY2D(ContinuousDensity2D):
       t = log( (y - ymin + eps) / (ymax - ymin + eps) ) renormalised.
     """
 
-    def __init__(self, xmin, xmax, ymin, ymax, degree=4, key=None, n_quad=4):
+    def __init__(
+        self,
+        xmin,
+        xmax,
+        ymin,
+        ymax,
+        degree=4,
+        key=None,
+        n_quad=4,
+        y_eps=1e-3,
+    ):
         super(ExpPolyLogY2D, self).__init__(
             xmin, xmax, ymin, ymax, n_quad=n_quad, key=key
         )
@@ -631,8 +860,13 @@ class ExpPolyLogY2D(ContinuousDensity2D):
         for i, j in self._terms:
             inits.append(-1.0 if (i == 0 and j == 1) else 0.0)
         self.initial_params = inits
-        # log map: u = log1p((y-ymin)/span) / log1p(1) → [0,1] then → [-1,1]
-        self._y_eps = 1e-3
+        # log map: u = log1p((y-ymin+eps)/eps) / log1p((ymax-ymin+eps)/eps)
+        # → [0,1] then → [-1,1].  ``y_eps`` (GeV) sets how much of the yn
+        # range the first HME bins occupy (legacy 1e-3).
+        y_eps = float(y_eps)
+        if not (y_eps > 0.0 and math.isfinite(y_eps)):
+            raise ValueError("ExpPolyLogY2D: y_eps must be > 0 (got %r)" % y_eps)
+        self._y_eps = y_eps
         self._log_span = math.log1p((self.ymax - self.ymin + self._y_eps) / self._y_eps)
 
     def _yn_log(self, y):
@@ -651,6 +885,22 @@ class ExpPolyLogY2D(ContinuousDensity2D):
         np.clip(arg, -50.0, 50.0, out=arg)
         return np.exp(arg)
 
+    def _basis_signature(self):
+        return (
+            "ExpPolyLogY2D",
+            tuple(self._terms),
+            self._y_eps,
+            self.xmin,
+            self.xmax,
+            self.ymin,
+            self.ymax,
+        )
+
+    def _basis_matrix(self, x, y):
+        xn = (np.asarray(x, dtype=float) - self._x0) / self._xhalf
+        yn = self._yn_log(y)
+        return np.stack([(xn**i) * (yn**j) for i, j in self._terms], axis=1)
+
     def to_spec(self):
         return {
             "model": "exppoly_logy2d",
@@ -660,6 +910,7 @@ class ExpPolyLogY2D(ContinuousDensity2D):
             "npar": self.npar,
             "terms": [list(t) for t in self._terms],
             "n_quad": self.n_quad,
+            "y_eps": self._y_eps,
         }
 
 
@@ -877,13 +1128,14 @@ def make_density_2d(
     dx=None,
     dy=None,
     key=None,
+    y_eps=1e-3,
 ):
     """Factory for continuous 2D density models.
 
     Names (case-insensitive):
       exppoly | expploy2d | poly
       cheb | exppoly_cheb
-      logy | exppoly_logy
+      logy | exppoly_logy      (``y_eps``: log-map offset in GeV)
       logbern | bern
       mix | mixture
       sep | separable
@@ -897,7 +1149,14 @@ def make_density_2d(
         )
     if n in ("logy", "exppoly_logy", "exppolylogy2d", "loghme"):
         return ExpPolyLogY2D(
-            xmin, xmax, ymin, ymax, degree=degree, n_quad=n_quad, key=key
+            xmin,
+            xmax,
+            ymin,
+            ymax,
+            degree=degree,
+            n_quad=n_quad,
+            key=key,
+            y_eps=y_eps,
         )
     if n in ("logbern", "bern", "logbern2d", "bernstein"):
         return LogBern2D(
@@ -941,7 +1200,23 @@ def rebuild_exppoly2d(result):
 
 
 def rebuild_density_2d(result):
-    """Rebuild continuous density from fit JSON."""
+    """Rebuild continuous density from fit JSON.
+
+    For ``function.norm == "tiling"`` JSONs the fine-bin tiling pack is
+    rebuilt from ``fine_binning`` and attached (``set_tiling_norm``), so every
+    normalised evaluation (``integrate_bins``, ``eval_on_grid``, …) uses the
+    same window integral as the fit.  Legacy JSONs (no ``y_eps``/``norm``
+    tiling) rebuild identically to before.
+    """
+    model = _rebuild_density_2d_bare(result)
+    spec = result.get("function") or {}
+    if spec.get("norm") == "tiling":
+        pack, include = _tiling_pack_for_result(result, model)
+        model.set_tiling_norm(pack, include)
+    return model
+
+
+def _rebuild_density_2d_bare(result):
     spec = result.get("function") or {}
     model_name = spec.get("model") or result.get("model") or "exppoly2d"
     n_quad = int(spec.get("n_quad") or result.get("n_quad") or 4)
@@ -959,7 +1234,21 @@ def rebuild_density_2d(result):
     if m in ("exppoly_cheb2d", "cheb", "exppolycheb2d"):
         return ExpPolyCheb2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
     if m in ("exppoly_logy2d", "logy", "exppolylogy2d"):
-        return ExpPolyLogY2D(xmin, xmax, ymin, ymax, degree=deg, key=key, n_quad=n_quad)
+        y_eps = spec.get("y_eps")
+        if y_eps is None:
+            y_eps = result.get("y_eps")
+        if y_eps is None:
+            y_eps = 1e-3  # legacy JSONs: the historical hard-coded value
+        return ExpPolyLogY2D(
+            xmin,
+            xmax,
+            ymin,
+            ymax,
+            degree=deg,
+            key=key,
+            n_quad=n_quad,
+            y_eps=float(y_eps),
+        )
     if m in ("logbern2d", "logbern", "bernstein"):
         return LogBern2D(
             xmin,
@@ -1005,14 +1294,114 @@ def eval_model_grid(result, x_c, y_c, params=None):
 
 
 def integrate_model_bins(result, x_edges, y_edges, params=None, n_quad=8):
-    """Integrate continuous N*pdf over each (x,y) bin rectangle."""
+    """Integrate continuous N*pdf over each (x,y) bin rectangle.
+
+    ``function.norm == "tiling"`` fits (fit_one ``--norm tiling``) are
+    normalised by the fine-bin tiling window integral I_W (same as the fit):
+    if the template edges coincide with the fine edges stored in the JSON the
+    per-fine-bin integrals are reused directly (template sums to N exactly
+    inside the window); otherwise each template bin is integrated with
+    GL(n_quad) over its intersection with the fit window and divided by I_W.
+    The density is zero outside the fit window in tiling mode (the pdf is
+    defined on the window only; the legacy path extrapolates and yields NaN
+    below the HME window, which callers ``nan_to_num`` → 0).
+    """
     model = rebuild_density_2d(result)
+    spec = result.get("function") or {}
+    if spec.get("norm") == "tiling":
+        par = list(params if params is not None else result["parameters"])
+        return _integrate_model_bins_tiling(model, par, x_edges, y_edges, n_quad)
     if n_quad is not None:
         model.n_quad = max(int(n_quad), 2)
         model._nodes, model._weights = leggauss(model.n_quad)
         model._Is_cache_key = None
     par = list(params if params is not None else result["parameters"])
     return model.integrate_bins(par, x_edges, y_edges)
+
+
+_TILING_PACK_CACHE = {}
+
+
+def _tiling_pack_for_result(result, model):
+    """(pack, include-mask) for a norm=tiling fit JSON (cached per binning)."""
+    fb = result.get("fine_binning") or {}
+    xe = fb.get("x_edges")
+    ye = fb.get("y_edges")
+    if xe is None or ye is None:
+        raise ValueError("norm=tiling fit JSON lacks fine_binning.x_edges/y_edges")
+    spec = result.get("function") or {}
+    nqf = int(spec.get("n_quad_fine") or 2)
+    key = (
+        tuple(float(v) for v in xe),
+        tuple(float(v) for v in ye),
+        model.xmin,
+        model.xmax,
+        model.ymin,
+        model.ymax,
+        nqf,
+    )
+    pack = _TILING_PACK_CACHE.get(key)
+    if pack is None:
+        if len(_TILING_PACK_CACHE) >= 8:
+            _TILING_PACK_CACHE.clear()
+        pack = model.prepare_fine_tiling(
+            xe, ye, model.xmin, model.xmax, model.ymin, model.ymax, n_quad_fine=nqf
+        )
+        _TILING_PACK_CACHE[key] = pack
+    include = np.ones(pack["n_fine_in"], dtype=bool)
+    for ix, iy in fb.get("unmapped") or []:
+        p = int(pack["fine_pos"][int(ix), int(iy)])
+        if p >= 0:
+            include[p] = False
+    return pack, include
+
+
+def _integrate_model_bins_tiling(model, par, x_edges, y_edges, n_quad):
+    tn = model._tiling_norm
+    if tn is None:
+        raise ValueError("model has no tiling normalisation attached")
+    pack, include = tn["pack"], tn["include"]
+    N = float(par[0])
+    sp = [float(par[i]) for i in range(1, model.npar)]
+    I_fine = model.integrals_fine(sp, pack)
+    I_W = float(np.sum(I_fine[include]))
+    xe = np.asarray(x_edges, dtype=float)
+    ye = np.asarray(y_edges, dtype=float)
+    nx, ny = len(xe) - 1, len(ye) - 1
+    Z = np.zeros((nx, ny), dtype=float)
+    if not (I_W > 0.0 and math.isfinite(I_W)):
+        return Z
+    same = (
+        len(xe) == len(pack["x_edges"])
+        and len(ye) == len(pack["y_edges"])
+        and np.allclose(xe, pack["x_edges"])
+        and np.allclose(ye, pack["y_edges"])
+    )
+    if same:
+        vals = np.where(include, N * I_fine / I_W, 0.0)
+        Z[pack["ix"], pack["iy"]] = vals
+        return Z
+    # Generic binning: GL(n_quad) over (bin ∩ window) / I_W
+    wxmin, wxmax, wymin, wymax = pack["window"]
+    old = (model.n_quad, model._nodes, model._weights)
+    try:
+        if n_quad is not None and int(n_quad) != model.n_quad:
+            model.n_quad = max(int(n_quad), 2)
+            model._nodes, model._weights = leggauss(model.n_quad)
+        for ix in range(nx):
+            xlo = max(float(xe[ix]), wxmin)
+            xhi = min(float(xe[ix + 1]), wxmax)
+            if not xhi > xlo:
+                continue
+            for iy in range(ny):
+                ylo = max(float(ye[iy]), wymin)
+                yhi = min(float(ye[iy + 1]), wymax)
+                if not yhi > ylo:
+                    continue
+                Z[ix, iy] = N * model._integral_s_rect(sp, xlo, xhi, ylo, yhi) / I_W
+    finally:
+        model.n_quad, model._nodes, model._weights = old
+    return Z
 
 
 # --------------------------------------------------------------------------- cov eigenmodes

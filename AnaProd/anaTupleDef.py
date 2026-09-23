@@ -31,6 +31,12 @@ ElectronObservables = [
     "mvaIso",
     "mvaNoIso",
     "miniPFRelIso_all",
+    # Dropped from the Electron_sel baseline, kept here so the gap veto and the
+    # impact-parameter cuts can be re-applied downstream.
+    "dxy",
+    "dz",
+    "sip3d",
+    "superclusterEta",
 ]
 
 TauObservables = [
@@ -567,13 +573,68 @@ def defineSignalVariables(dfw):
             )
 
 
-def defineMCSpecificObservables(dfw):
+def defineGenVariables(dfw, dataset_cfg):
+    """Gen-level variables, defined before the event selection.
+
+    The MC observables and the information the process declares with `genInfo`.
+    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
+    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
+    """
     for var in MCObservables:
         if isinstance(var, tuple):
             var_orig_name, var_new_name = var
             dfw.DefineAndAppend(var_new_name, var_orig_name)
         else:
             dfw.colToSave.append(var)
+
+    gen_info = dataset_cfg.get("process_cfg", {}).get("genInfo", [])
+    unknown = set(gen_info) - {"TT"}
+    if unknown:
+        raise RuntimeError(
+            f"genInfo {sorted(unknown)} for process '{dataset_cfg.get('process_name')}' "
+            "is not implemented in anaTupleDef."
+        )
+    if "TT" in gen_info:
+        import os
+
+        from FLAF.Common.Utilities import DeclareHeader
+
+        flaf_dir = os.path.dirname(
+            os.path.dirname(os.path.abspath(CommonBaseline.__file__))
+        )
+        DeclareHeader(os.path.join(flaf_dir, "include", "GenProcess", "TT.h"))
+        dfw.Define(
+            "TTInfo",
+            "gen_process::tt::identify(GenPart_pdgId, GenPart_statusFlags,"
+            " GenPart_genPartIdxMother, GenPart_pt, GenPart_eta, GenPart_phi,"
+            " GenPart_mass)",
+        )
+        for slot in [0, 1]:
+            dfw.Define(
+                f"TTInfo_lep{slot}_p4",
+                "reco_tau::gen_truth::lastCopyP4ByGenPartIndex(genLeptons,"
+                f" TTInfo.lep_index[{slot}])",
+            )
+        p4s = {
+            "top": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
+            "b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
+            "lep": ("TTInfo_lep0_p4", "TTInfo_lep1_p4"),
+        }
+        for obj, (from_top, from_antitop) in p4s.items():
+            for var in PtEtaPhiM:
+                if obj == "b" and var == "mass":
+                    continue  # always zero in NanoAOD
+                dfw.DefineAndAppend(
+                    f"TTInfo_{obj}_{var}",
+                    f"ROOT::VecOps::RVec<float>{{static_cast<float>({from_top}.{var}()),"
+                    f" static_cast<float>({from_antitop}.{var}())}}",
+                )
+        dfw.DefineAndAppend(
+            "TTInfo_lep_gen_kind",
+            "ROOT::VecOps::RVec<int>{"
+            "reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[0]),"
+            " reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[1])}",
+        )
 
 
 def addAllVariables(
@@ -625,8 +686,6 @@ def addAllVariables(
     defineFatJetVariables(dfw, isData)
     defineForwardJetVariables(dfw, isData)
     defineMETVariables(dfw, global_params["met_type"])
-    if not isData:
-        defineMCSpecificObservables(dfw)
 
     if trigger_class is not None:
         hltBranches = dfw.Apply(

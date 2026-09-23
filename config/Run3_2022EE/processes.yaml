@@ -87,6 +87,8 @@ DY_LO:
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
+  processors: *TT_processors
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
     - TTtoLNu2Q
@@ -95,6 +97,7 @@ TT:
 TT_Inclusive:
   name: "t#bar{t} Inclusive"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TT
 
@@ -140,10 +143,22 @@ DY_HighMass:
 W:
   name: "W"
   color: "kGreen"
+  processors: *W_processors_allFlavors
   datasets:
     - WtoLNu_0J_amcatnloFXFX
     - WtoLNu_1J_amcatnloFXFX
     - WtoLNu_2J_amcatnloFXFX
+    - WtoLNu_amcatnloFXFX
+    - WtoLNu_PTLNu_40to100_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_40to100_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_100to200_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_100to200_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_200to400_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_200to400_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_400to600_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_400to600_2J_amcatnloFXFX
+    - WtoLNu_PTLNu_600_1J_amcatnloFXFX
+    - WtoLNu_PTLNu_600_2J_amcatnloFXFX
 
 VV_inclusive:
   name: "VV"
@@ -642,6 +657,7 @@ QCD_PT:
 custom_CI_Background_TT:
   name: "CI -- Background t#bar{t}"
   color: "kGreen-3"
+  genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
 
@@ -651,6 +667,13 @@ custom_CI_Background_DY:
   processors: *DY_processors_allFlavors
   datasets:
     - DYto2L_M_50_amcatnloFXFX
+
+custom_CI_Background_W:
+  name: "CI -- Background W"
+  color: "kAzure+7"
+  processors: *W_processors_allFlavors
+  datasets:
+    - WtoLNu_amcatnloFXFX
 
 custom_CI_Signal:
   name: "CI -- Signal"
