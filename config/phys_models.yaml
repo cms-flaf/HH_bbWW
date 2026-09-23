@@ -5,6 +5,8 @@ Run3_Model:
     - DY
     - ST
     - VV
+    - VVV
+    - ttV
     - W
     - SingleHiggs
     # - QCD_PT
@@ -40,6 +42,8 @@ Production_Model:
     - DY
     - ST
     - VV
+    - VVV
+    - ttV
     # - VV_inclusive
     - W
     - DY_LO
