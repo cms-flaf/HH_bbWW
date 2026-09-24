@@ -186,6 +186,13 @@ defaultColToSave = [
     "PuppiMET_sumEt",
     "nJet",
     "PV_npvs",
+    "SoftActivityJetHT",
+    "SoftActivityJetHT2",
+    "SoftActivityJetHT5",
+    "SoftActivityJetHT10",
+    "SoftActivityJetNjets2",
+    "SoftActivityJetNjets5",
+    "SoftActivityJetNjets10",
 ]
 
 # Add this functionality eventually
