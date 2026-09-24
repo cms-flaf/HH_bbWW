@@ -70,6 +70,17 @@ nEventsPerFile:
   signals: 100000
   backgrounds: 100000
 
+# The merged anaTuple keeps weight_base and weight_base_*_rel, which the histogram stage
+# reads, plus weight_xs, weight_gen and weight_lumi. Each shape producer's members are only
+# an input to building weight_base, so they are dropped here, named one by one: a new shape
+# producer has to be added to this list, it is not swept up by a pattern.
+anaTupleMerge_drop_columns:
+  - "^weight_pu_"
+  - "^weight_ps_"
+  - "^weight_top_pt_"
+  - "^weight_pdf_"
+  - "^weight_qcd_scale_"
+
 corrections:
   mu:
     stages: [ HistTuple, AnalysisCache ]
@@ -157,21 +168,23 @@ corrections:
     enabled:
       AnaTuple: true
       AnaTupleMerge: false
+  # pdf and qcd_scale are staged like pu: the members are built at AnaTuple from the
+  # NanoAOD branches and persisted, and AnaTupleMerge reads them back. The anaTuple no
+  # longer carries LHEPdf_Weight / LHEScale_Weight, so enabling either at AnaTupleMerge
+  # would find no input and silently make every member 1.
   pdf:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEPdfWeight
-    merged_branch: LHEPdf_Weight
     n_members: 103
     enabled:
-      AnaTuple: false
-      AnaTupleMerge: true
+      AnaTuple: true
+      AnaTupleMerge: false
   qcd_scale:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEScaleWeight
-    merged_branch: LHEScale_Weight
     enabled:
-      AnaTuple: false
-      AnaTupleMerge: true
+      AnaTuple: true
+      AnaTupleMerge: false
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
