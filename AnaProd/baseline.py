@@ -52,11 +52,25 @@ def selectHWW(df, selected_channels):
     # Lower the muon pt threshold to 5 to check for potential improvement, done while adding low pt tight ID SF
     # Raise back to pt 10 to make simple for now
     # We cannot use no-iso because of the trigger SFs not available
-
+    #
+    # The muon preselection follows the Muon POG recommendations, which only
+    # prescribe the ID and isolation working points within the acceptance. The
+    # impact-parameter cuts below are not POG recommendations and are dropped from
+    # the baseline. The underlying variables (dxy, dz, sip3d) are stored in the
+    # anaTuple instead, so any of these cuts can be re-applied downstream if needed.
+    #
+    # Muon POG reference:
+    # https://muon-wiki.docs.cern.ch/guidelines/recommendations/
+    #
+    # abs(Muon_dz) < 0.1 && abs(Muon_dxy) < 0.05 && Muon_sip3d <= 8 &&
     df = df.Define(
         "Muon_sel",
         """
-        v_ops::pt(Muon_p4) > 10 && abs(v_ops::eta(Muon_p4)) < 2.4 && abs(Muon_dz) < 0.1 && abs(Muon_dxy) < 0.05 && abs(Muon_dxy) < 0.05 && Muon_sip3d <= 8 && Muon_pfIsoId >= 1 && Muon_looseId""",
+        (v_ops::pt(Muon_p4) > 10) &&
+        (abs(v_ops::eta(Muon_p4)) < 2.4) &&
+        (Muon_pfIsoId >= 1) &&
+        Muon_looseId
+        """,
     )
     # Can lower pT to 5 later when applying the soft muon SFs
 
