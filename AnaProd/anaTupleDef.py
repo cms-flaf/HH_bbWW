@@ -190,10 +190,9 @@ defaultColToSave = [
 
 # Add this functionality eventually
 MCObservables = [
-    ("LHEPdfWeight", "LHEPdf_Weight"),
-    ("LHEReweightingWeight", "LHEReweighting_Weight"),
-    ("LHEScaleWeight", "LHEScale_Weight"),
-    ("PSWeight", "PS_Weight"),
+    # The LHE weight vectors are not copied: pdf and qcd_scale read them straight from
+    # NanoAOD at AnaTuple and persist weight_pdf_* / weight_qcd_scale_* instead, and
+    # parton_shower does the same with PSWeight. Nothing reads the renamed copies.
     "nLHEPart",
     "LHEPart_eta",
     "LHEPart_incomingpz",
