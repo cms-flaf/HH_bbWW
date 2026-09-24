@@ -847,9 +847,7 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
         "fatwjet_isValid ? FatWJet_mass[0] * FatWJet_particleNet_massCorr[0] : std::decay_t<decltype(FatWJet_mass)>::value_type()",
     )
 
-    # Njets is saved in the anaTuple since the baseline review; keep defining it here for older anaTuples
-    if "Njets" not in df.GetColumnNames():
-        df = df.Define("Njets", "centralJet_pt.size()")
+    df = df.Define("Njets", "centralJet_pt.size()")
     df = df.Define("AllTrue_Jet", "centralJet_pt > 0.0")
     # Create a mask removing Jets that are chosen as the BJets
     df = df.Define(
