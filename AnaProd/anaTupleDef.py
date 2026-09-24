@@ -186,6 +186,7 @@ defaultColToSave = [
     "PuppiMET_sumEt",
     "nJet",
     "PV_npvs",
+    "SoftActivityJetHT",
 ]
 
 # Add this functionality eventually
@@ -399,6 +400,7 @@ def defineCentralJetVariables(dfw, isData):
         dfw.DefineAndAppend(
             name, f"Take(v_ops::{var}(Jet_p4[Jet_sel]), centralJet_idxSorted)"
         )
+    dfw.DefineAndAppend("Njets", "static_cast<int>(centralJet_pt.size())")
 
     # save gen jets matched to selected reco jets
     if not isData:
