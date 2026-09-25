@@ -39,8 +39,8 @@ processes:
   - process: data_obs
     is_data: true
     is_asimov_data: true
-  - process: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_DL_${MX}
-    hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_DL_${MX}
+  - process: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
+    hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
     param_values: [ 300 ]
     is_signal: true
   # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
