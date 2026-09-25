@@ -12,6 +12,8 @@ Run3_Model_Radion:
     - DY
     - ST
     - VV
+    - VVV
+    - ttV
     - W
     - SingleHiggs
     # - QCD_PT
@@ -65,9 +67,11 @@ Production_Model:
     - DY
     - ST
     - VV
+    - VVV
+    - ttV
     # - VV_inclusive
     - W
-    - DY_LO
+    # - DY_LO
     - SingleHiggs
   signals:
     - XtoHHto2B2W_SingleLepton

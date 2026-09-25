@@ -31,6 +31,12 @@ ElectronObservables = [
     "mvaIso",
     "mvaNoIso",
     "miniPFRelIso_all",
+    # Dropped from the Electron_sel baseline, kept here so the gap veto and the
+    # impact-parameter cuts can be re-applied downstream.
+    "dxy",
+    "dz",
+    "sip3d",
+    "superclusterEta",
 ]
 
 TauObservables = [
@@ -180,14 +186,20 @@ defaultColToSave = [
     "PuppiMET_sumEt",
     "nJet",
     "PV_npvs",
+    "SoftActivityJetHT",
+    "SoftActivityJetHT2",
+    "SoftActivityJetHT5",
+    "SoftActivityJetHT10",
+    "SoftActivityJetNjets2",
+    "SoftActivityJetNjets5",
+    "SoftActivityJetNjets10",
 ]
 
 # Add this functionality eventually
 MCObservables = [
-    ("LHEPdfWeight", "LHEPdf_Weight"),
-    ("LHEReweightingWeight", "LHEReweighting_Weight"),
-    ("LHEScaleWeight", "LHEScale_Weight"),
-    ("PSWeight", "PS_Weight"),
+    # The LHE weight vectors are not copied: pdf and qcd_scale read them straight from
+    # NanoAOD at AnaTuple and persist weight_pdf_* / weight_qcd_scale_* instead, and
+    # parton_shower does the same with PSWeight. Nothing reads the renamed copies.
     "nLHEPart",
     "LHEPart_eta",
     "LHEPart_incomingpz",

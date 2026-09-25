@@ -179,23 +179,70 @@ VV:
     - ZZto2Nu2Q_powheg
     - ZZto4L_powheg
 
+VVV:
+  name: "VVV"
+  color: "kMagenta-7"
+  datasets:
+    - WWW_4F
+    - WWZ_4F
+    - WZZ
+    - ZZZ
+
+ttV:
+  name: "t#bar{t}V"
+  color: "kGreen+3"
+  datasets:
+    - TTLNu_1Jets
+    - TTLL_MLL_50
+    - TTLL_MLL_4to50
+    - TTNuNu
+    - TTZ_Zto2Q
+
 SingleHiggs:
   name: "Single Higgs"
+  color: "kRed"
+  sub_processes:
+    - ggH
+    - VBFH
+    - VH
+    - ttH
+
+ggH:
+  name: "ggH"
   color: "kRed"
   datasets:
     - GluGluHto2Tau_UncorrelatedDecay_UnFiltered
     - GluGluHto2B_M125
     - GluGluHto2Wto2L2Nu_M125
+
+VBFH:
+  name: "VBF H"
+  color: "kRed-7"
+  datasets:
     - VBFHto2Tau_UncorrelatedDecay_UnFiltered
     - VBFHto2B_M125
-    - ggZH_Hto2B_Zto2L
-    - ggZH_Hto2B_Zto2Q
+    - VBFHto2Wto2L2Nu_M125
+
+VH:
+  name: "VH"
+  color: "kRed+2"
+  datasets:
     - WminusH_Hto2B_WtoLNu
     - WminusH_Hto2B_Wto2Q
     - WminusHto2Tau_UncorrelatedDecay_UnFiltered
     - WplusH_Hto2B_WtoLNu
     - WplusH_Hto2B_Wto2Q
     - WplusHto2Tau_UncorrelatedDecay_UnFiltered
+    - ZH_Hto2B_Zto2L
+    - ZH_Hto2B_Zto2Q
+    - ZHto2Tau_UncorrelatedDecay_UnFiltered
+    - ggZH_Hto2B_Zto2L
+    - ggZH_Hto2B_Zto2Q
+
+ttH:
+  name: "t#bar{t}H"
+  color: "kRed-9"
+  datasets:
     - TTHtoNon2B_M125
     - TTHto2B_M125
 
