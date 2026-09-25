@@ -74,13 +74,13 @@ processes:
     is_asimov_data: true
 
   # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
-  # A spin-2 card is this file with GluGluToBulkGraviton2L in place of GluGluToRadion2L, and wants
-  # its own binning.
+  # A spin-2 card is this file with GluGluToBulkGraviton_bbWW_DL in place of
+  # GluGluToRadion_bbWW_DL, and wants its own binning.
   # bbtautau is commented out until the private X->HH->bbtautau samples exist; uncomment the
   # process below and its `^XtoHHto2Tau2B_` uncertainty entries with it. It is spin 0, so it does
   # not belong on a BulkGraviton card.
-  - process: GluGluToRadion2L_${MX}
-    hist_name: GluGluToRadion2L_${MX}
+  - process: GluGluToRadion_bbWW_DL_${MX}
+    hist_name: GluGluToRadion_bbWW_DL_${MX}
     # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
     # grid before these cards can be built
     param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
@@ -673,7 +673,7 @@ uncertainties:
   # which is what makes them apply everywhere. Values from
   # https://gitlab.cern.ch/hh/naming-conventions#experimental-uncertainties
   #
-  # GluGluToRadion1L is the single-lepton signal and is not a process of this dilepton
+  # GluGluToRadion_bbWW_SL is the single-lepton signal and is not a process of this dilepton
   # card; it belongs in these lists when the SL card gains them. Single Higgs and VH
   # likewise, once they are added as processes.
   #
@@ -683,19 +683,19 @@ uncertainties:
   # The process patterns are regexes (a `processes:` entry beginning with ^ is matched
   # with re.match, anything else compared literally). They have to be: by the time an
   # uncertainty is matched, the signal's ${MX} has been resolved to the mass being built,
-  # so the process is GluGluToRadion2L_700 and a literal "GluGluToRadion2L_${MX}" matches
+  # so the process is GluGluToRadion_bbWW_DL_700 and a literal "GluGluToRadion_bbWW_DL_${MX}" matches
   # nothing at all -- silently, since an uncertainty that applies to no process is simply
   # never added.
   - name: BR_hbb
     type: lnN
     processes:
-      - ^GluGluToRadion2L_
+      - ^GluGluToRadion_bbWW_DL_
       # - ^XtoHHto2Tau2B_  # uncomment with the bbtautau signal above
     value: [ -0.0126, 0.0124 ]
   - name: BR_hww
     type: lnN
     processes:
-      - ^GluGluToRadion2L_
+      - ^GluGluToRadion_bbWW_DL_
     value: [ -0.0152, 0.0153 ]
   # Uncomment with the bbtautau signal above.
   # - name: BR_htt

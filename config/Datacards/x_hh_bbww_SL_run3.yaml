@@ -22,9 +22,9 @@ processes:
     is_data: true
     is_asimov_data: true
   # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
-  # A spin-2 card is this file with GluGluToBulkGraviton1L in place of GluGluToRadion1L.
-  - process: GluGluToRadion1L_${MX}
-    hist_name: GluGluToRadion1L_${MX}
+  # A spin-2 card is this file with GluGluToBulkGraviton_bbWW_SL in place of GluGluToRadion_bbWW_SL.
+  - process: GluGluToRadion_bbWW_SL_${MX}
+    hist_name: GluGluToRadion_bbWW_SL_${MX}
     # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
     # grid before these cards can be built
     param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
