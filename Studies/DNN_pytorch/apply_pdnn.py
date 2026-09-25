@@ -8,6 +8,7 @@ import onnxruntime as ort
 
 # Import shared physics utilities and dataset loaders from model_helper
 from src.model_helper import (
+    fold_offset,
     load_physical_fold,
     update_mass_dependent_features,
 )
@@ -57,9 +58,14 @@ def main():
     extra_vars = cfg["extra_variables"]
     eps = 1e-15
 
-    # Run inference loop across all 4 parity folds
-    for train_parity in range(4):
-        val_parity = (train_parity + 2) % 4
+    # Run inference loop across the parity folds, with the buckets train_pdnn.py used
+    n_parity_folds = cfg.get("nParity", 4)
+    train_offset = fold_offset(cfg, "train_parity")
+    val_offset = fold_offset(cfg, "val_parity")
+    model_name_fmt = cfg.get("model_name", "pdnn_model_{regime}_nparity{fold}.onnx")
+    for i_fold in range(n_parity_folds):
+        train_parity = (i_fold + train_offset) % n_parity_folds
+        val_parity = (i_fold + val_offset) % n_parity_folds
 
         val_dir = os.path.join(output_folder, f"nParity{train_parity}_validation")
         output_root_filename = os.path.join(val_dir, "validation_applied_onnx.root")
@@ -103,7 +109,7 @@ def main():
 
         for regime in cfg["regimes"]:
             onnx_model_path = os.path.join(
-                val_dir, f"pdnn_model_{regime}_nparity{train_parity}.onnx"
+                val_dir, model_name_fmt.format(fold=i_fold, regime=regime)
             )
 
             if not os.path.exists(onnx_model_path):

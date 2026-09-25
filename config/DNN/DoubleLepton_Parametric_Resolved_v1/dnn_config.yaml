@@ -11,11 +11,13 @@ dedicated_mass: null  # Set to an integer (e.g., 500) if evaluating a single mas
 
 # Cross-Validation Parity Setup
 #
-# Fold `f` (0 <= f < nParity) owns the events satisfying
-#     (event_number + f + offset) % nParity == 0
-# for the offset of the split in question. The offsets below must be distinct
-# and cover 0..nParity-1, so that the folds of any single split partition the
-# events exactly once each; DNN_Application.py verifies this at runtime.
+# The events are split into nParity buckets by `event % nParity` -- the split
+# Studies/DNN/create_dataset.py writes as nParity{k}_Merged.root. Model `f` uses
+# bucket (f + offset) % nParity for each split below: it trains on bucket f,
+# chooses its epoch on f+1, is validated on f+2 and is applied to f+3.
+# DNN_Application.py inverts the app split: an event in bucket b is scored by
+# model (b - app offset) % nParity, and it refuses an app offset equal to the
+# train or test one.
 #
 # `offset` is a plain integer and is read as data. Do not put Python
 # expressions here -- they are no longer evaluated.

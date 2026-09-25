@@ -9,12 +9,18 @@ import torch.nn as nn
 # ==============================================================================
 # 1. Parity Expression & Feature Calculation Helpers
 # ==============================================================================
-def eval_parity_expr(expr_str, n_parity_val):
+def fold_offset(cfg, split):
     """
-    Evaluates parity string expressions from configuration file (e.g. '(nParity + 1) % 4')
-    by injecting 'nParity' into context.
+    The integer `offset` of one split (e.g. 'app_parity') in a model configuration.
+    Model `i` uses bucket (i + offset) % nParity for that split; the same schema
+    Analysis/DNN_Application.py reads from the deployed dnn_config.yaml.
     """
-    return eval(expr_str, {"nParity": n_parity_val, "np": np})
+    offset = (cfg.get(split) or {}).get("offset")
+    if isinstance(offset, bool) or not isinstance(offset, int):
+        raise ValueError(
+            f"'{split}' must give an integer 'offset'; got {cfg.get(split)!r}"
+        )
+    return offset
 
 
 def delta_r(eta1, phi1, eta2, phi2):

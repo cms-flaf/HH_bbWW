@@ -3,7 +3,7 @@
 Training and validation of the parametric multiclass DNN used in the dilepton channel. The
 production models in `config/DNN/DoubleLepton_Parametric_{Resolved,Boosted}_v1/` were trained
 here with `model_configs/looseBTag_multiclass_Radion_pDNN_v6.yaml`; their `dnn_config.yaml` is
-that file, carried over to the deployed schema (see [Config schema](#config-schema)).
+that file with the feature list flattened (see [Folds](#folds)).
 
 One network is trained per regime (`resolved`, `boosted`), with the signal mass hypothesis
 `X_mass` as an input. Mass-dependent features (`ll_dR_scaled`, `bb_dR_scaled`, …) are recomputed
@@ -56,19 +56,14 @@ network gets `len(class_names)` outputs, but `load_parametric_fold` assigns only
 (0 signal, 1 TT, 2 everything else), so the DY and ST outputs are never a target and output 2,
 labelled DY, holds all non-TT background.
 
-## Folds and config schema
+## Folds
 
-`create_dataset.py` writes the events with `event % nParity == k` to `nParity{k}_Merged.root`.
-In cycle `i`, `train_pdnn.py` trains on file `index(train_parity)`, uses file
-`index(test_parity)` for the LR schedule, early stopping and the choice of the saved epoch, and
-exports the model as `nparity{i}`. Only the `index` expressions are read; `func` is not used by
-training.
+`create_dataset.py` writes the events with `event % nParity == k` to bucket file
+`nParity{k}_Merged.root`. Each split in the config has an integer `offset`, and model `i` uses
+bucket `(i + offset) % nParity` for it: with the offsets 0/1/2/3 it trains on bucket `i`, uses
+bucket `i+1` for the LR schedule, early stopping and the choice of the saved epoch, is validated
+on `i+2`, and is meant for `i+3`. It is exported as `nparity{i}` (`model_name` with `{fold}`).
 
-The deployed `dnn_config.yaml` files use the schema `Analysis/DNN_Application.py` reads — an
-integer `offset` per split, and `model_name` formatted with `{fold}` — so a model copied into
-`config/DNN/` needs its config converted by hand. That schema follows `func`, not `index`: fold
-`f` is applied to `(event + f + 3) % 4 == 0`, i.e. `event % 4 == (1 - f) % 4`. With v6's `index`
-this is the intended application fold for models 1 and 3, but the *test* fold for models 0 and 2.
-
-`apply_pdnn.py` assumes 4 folds with the validation fold at `(train + 2) % 4`, whatever the config
-says.
+The deployed `config/DNN/*/dnn_config.yaml` uses the same schema, and
+`Analysis/DNN_Application.py` inverts the app split: an event in bucket `b` is scored by model
+`(b - app offset) % nParity`. A model copied into `config/DNN/` keeps its offsets unchanged.

@@ -16,7 +16,7 @@ from torch.utils.data import DataLoader
 
 # Import refactored helper functions, data loaders, and model architectures
 from src.model_helper import (
-    eval_parity_expr,
+    fold_offset,
     load_parametric_fold,
     load_physical_fold,
     update_mass_dependent_features,
@@ -64,14 +64,14 @@ def main():
     num_classes = len(class_names)
 
     # ONNX Model Naming Pattern
-    model_name_fmt = cfg.get("model_name", "pdnn_model_{regime}_nparity{nParity}.onnx")
+    model_name_fmt = cfg.get("model_name", "pdnn_model_{regime}_nparity{fold}.onnx")
 
-    # Parity settings
+    # Parity settings: model `i` uses bucket (i + offset) % nParity for each split,
+    # where bucket k holds the events with event % nParity == k. Analysis/DNN_Application.py
+    # inverts the app split with the same offsets.
     n_parity_folds = cfg.get("nParity", 4)
-    train_parity_expr = cfg.get("train_parity").get("index")
-    test_parity_expr = cfg.get("test_parity").get("index")
-    val_parity_expr = cfg.get("val_parity").get("index")
-    app_parity_expr = cfg.get("app_parity").get("index")
+    splits = ("train", "test", "val", "app")
+    offsets = {s: fold_offset(cfg, f"{s}_parity") for s in splits}
 
     if dedicated_mass is not None:
         eval_mass_points = [dedicated_mass]
@@ -95,11 +95,8 @@ def main():
 
     # Loop over cross-validation parities defined in YAML configuration
     for i_fold in range(n_parity_folds):
-        # Dynamically evaluate target parity indices using string expressions from config
-        train_parity = eval_parity_expr(train_parity_expr, i_fold)
-        test_parity = eval_parity_expr(test_parity_expr, i_fold)
-        val_parity = eval_parity_expr(val_parity_expr, i_fold)
-        app_parity = eval_parity_expr(app_parity_expr, i_fold)
+        bucket = {s: (i_fold + offsets[s]) % n_parity_folds for s in splits}
+        train_parity, test_parity, val_parity, app_parity = (bucket[s] for s in splits)
 
         out_dir = os.path.join(output_folder, f"nParity{train_parity}_validation")
         os.makedirs(out_dir, exist_ok=True)
@@ -376,7 +373,7 @@ def main():
             onnx_wrapper.eval()
 
             dummy_input = torch.randn(1, len(current_features), dtype=torch.float32)
-            onnx_filename = model_name_fmt.format(nParity=i_fold, regime=regime)
+            onnx_filename = model_name_fmt.format(fold=i_fold, regime=regime)
             onnx_path = os.path.join(out_dir, onnx_filename)
 
             torch.onnx.export(
