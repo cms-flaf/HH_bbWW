@@ -253,12 +253,9 @@ python3 StatInference/bin_opt_2d/rebin_2d.py \
   --binning-config config/Datacards/binning_hmebox.yaml
 ```
 
-The datacard configuration lists only the base categories in `categories:`. The datacard
-maker expands them against the `binning.json` written beside the shapes, so the number of
-bins per base category is set by the binning configuration alone. The card repeats the
-`category_pattern` used to write them, which is how the per-category limits group the bins
-of one base category back together. A card may instead list the written names explicitly,
-as `CI_card.yaml` does; mixing the two forms is an error.
+The datacard configuration then lists the written names in `categories:`
+(`SR/res2b_hmebox0`, …) and repeats the `category_pattern` used to write them, which is
+how the per-category limits group the bins of one base category back together.
 
 There is also `StatInference/bin_opt/`, an offline combine-driven search over candidate
 binnings feeding the `hist_bins` option. This analysis does not use it, and leaves

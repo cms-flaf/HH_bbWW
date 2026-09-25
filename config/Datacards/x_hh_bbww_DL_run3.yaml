@@ -35,14 +35,13 @@ channels:
   - muMu
   - eMu
   - eE
-# The base categories. The datacard bins each one becomes are not listed here:
-# StatInference/dc_make/maker.py expands these against the binning.json that
-# rebin_2d.py wrote beside the shapes, so the slice count lives in the binning
-# configuration alone. With the HME box that is one bin per base category.
+# The datacard bins, exactly as they exist in the input shapes. These are what
+# StatInference/bin_opt_2d/rebin_2d.py wrote when it cut an HME box out of each base
+# category -- one bin per base category -- and the chain reads the directories it is given.
 categories:
-  - SR/res2b
-  - SR/boosted
-  - SR/recovery
+  - SR/res2b_hmebox0
+  - SR/boosted_hmebox0
+  - SR/recovery_hmebox0
 
 # How to take the written names apart again, to group the bins of one base category for
 # the per-category limits. Must match the category_pattern rebin_2d.py wrote them with.

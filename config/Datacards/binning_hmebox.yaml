@@ -49,11 +49,10 @@ dp_min_bin_gain: 0.002
 
 # --- both ---
 # Backgrounds below this fraction of the category total are exempt from the per-process
-# floors. With the default exempt_scope "box" the fraction is judged over the whole
-# window, so a box holding DY just under 5% frees it from min_bin_bkg_each_neff in every
-# bin, including bins where it is far more than 5% (muMu boosted MX=400: DY N_eff 0.17 over
-# the box). exempt_scope: bin closes this; it is left at the default here because the
-# numbers above were measured with it.
+# floors. For the box the fraction is judged over the whole window, so a box holding DY
+# just under 5% frees it from min_bin_bkg_each_neff in every bin, including bins where it
+# is far more than 5% (muMu boosted MX=400: DY N_eff 0.17 over the box). Judging it bin by
+# bin would close this; the numbers above were measured without that.
 min_bkg_frac: 0.05
 min_signal: 0.5
 significance_mode: asimov
