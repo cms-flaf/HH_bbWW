@@ -33,12 +33,17 @@ These build automatically as part of `source env.sh`; you do not set them up by 
 
 ## Production model
 
-The production [physics model](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/)
+The default [physics model](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/)
 for HH→bb̄WW is `Run3_Model_Radion` (set in `config/global.yaml`) — the spin-0 hypothesis. The
 spin-2 one is `Run3_Model_BulkGraviton`: Radion and BulkGraviton are separate models because a
 single model carrying both would be fitted as one combined signal. Both take their bb̄WW signal from
-the X→HH samples, which exist for Run3_2022 through Run3_2023BPix; later eras have no resonant
-sample produced yet, so both models load there with no signal in them. For fast local tests, use `TestModel`
+the privately produced X→HH samples, and neither selects the central X→YH samples. bb̄ττ
+(`XtoHHto2Tau2B`) is commented out in the Radion model and in the dilepton datacard until the
+private X→HH→bb̄ττ samples exist. The samples that do exist cover Run3_2022 through Run3_2023BPix;
+later eras have no resonant sample produced yet, so both models load there with no signal in them.
+An anaTuple production is not a fit, so it uses `Production_Model` (set in `config/user_custom.yaml`,
+see the repository README), which carries both spins' X→HH bb̄WW signals and the same commented
+bb̄ττ line. For fast local tests, use `TestModel`
 in your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/) instead.
 It holds two backgrounds — `custom_CI_Background_TT`, one t̄t dataset, and
 `custom_CI_Background_DY`, one DY dataset carrying the same DY stitcher the era configures —

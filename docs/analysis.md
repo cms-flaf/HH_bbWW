@@ -36,8 +36,11 @@ The bb̄WW signal is `GluGluTo{Radion,BulkGraviton}` at 40 mass points from 250 
 of `Run3_2022` through `Run3_2023BPix`, with the single-lepton (`2B2JLNu`) and dilepton (`2B2L2Nu`)
 final states as separate datasets. In 2023 and 2023BPix the whole grid comes from the custom
 production (DSProd, read from private storage with `fs_nanoAOD:` + `dirName:`); in 2022 and 2022EE
-18 points per final state do and the other 22 are central `Run3Summer22` datasets. Which signal a
-run sees is the [physics model](setup.md#production-model), one per spin.
+18 points per final state do and the other 22 are central `Run3Summer22` datasets. The central
+X→YH samples are not selected. bb̄ττ is not part of this grid yet: `XtoHHto2Tau2B` stays commented
+until the private X→HH→bb̄ττ samples exist. Which signal a
+run sees is the [physics model](setup.md#production-model), one per spin; an anaTuple production
+uses `Production_Model`, which carries both spins.
 
 Two networks consume that grid, and they do not cover the same part of it:
 

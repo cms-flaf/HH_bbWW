@@ -1,10 +1,11 @@
-# The bbWW signal is X->HH, produced privately for the masses central production does not cover
-# (DSProd, models/X_HH/setups/Run3_XHHbbWW.yaml). Radion (spin 0) and BulkGraviton (spin 2) are
-# distinct hypotheses, so they are distinct models: a single model carrying both would be fitted as
-# one combined signal. Neither has a signal in Run3_2024 and later, where no resonant
-# sample has been produced yet: their meta-processes are declared there with an empty dataset list,
-# as the central X->YH ones are, so those eras keep loading and the setup-loading test keeps
-# covering them.
+# The bbWW signal is the privately produced X->HH samples
+# (DSProd, models/X_HH/setups/Run3_XHHbbWW.yaml). The central X->YH samples (XtoYHto*) are not
+# selected. Radion (spin 0) and BulkGraviton (spin 2) are distinct hypotheses, so they are distinct
+# models: a single model carrying both would be fitted as one combined signal. Production_Model
+# carries both, because an anaTuple production is not a fit. Neither spin has a signal in
+# Run3_2024 and later, where no resonant sample has been produced yet: their meta-processes are
+# declared there with an empty dataset list, so those eras keep loading and the setup-loading test
+# keeps covering them. bbtautau stays commented until the private X->HH->bbtautau samples exist.
 Run3_Model_Radion:
   name: "Base model for Run 3, spin-0 (Radion) signal"
   backgrounds:
@@ -21,8 +22,8 @@ Run3_Model_Radion:
     - GluGluToRadion_SingleLepton
     - GluGluToRadion_DoubleLepton
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
-    # bbtautau is still X->YH-backed and spin 0, so it belongs with the Radion hypothesis only
-    - XtoHHto2Tau2B
+    # X->HH->bbtautau is not produced yet. The central X->YH bbtautau sample is not a substitute.
+    # - XtoHHto2Tau2B
   data:
     - Data_Full
 
@@ -33,6 +34,8 @@ Run3_Model_BulkGraviton:
     - DY
     - ST
     - VV
+    - VVV
+    - ttV
     - W
     - SingleHiggs
     # - QCD_PT
@@ -74,14 +77,14 @@ Production_Model:
     # - DY_LO
     - SingleHiggs
   signals:
-    - XtoHHto2B2W_SingleLepton
-    - XtoHHto2B2W_DoubleLepton
+    # X->HH bbWW only. The central X->YH processes (XtoHHto2B2W_*) stay defined but are not selected.
     - GluGluToRadion_DoubleLepton
     - GluGluToRadion_SingleLepton
     - GluGluToBulkGraviton_DoubleLepton
     - GluGluToBulkGraviton_SingleLepton
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
-    - XtoHHto2Tau2B
+    # X->HH->bbtautau is not produced yet. The central X->YH bbtautau sample is not a substitute.
+    # - XtoHHto2Tau2B
   data:
     - Data_Full
 
@@ -103,11 +106,10 @@ DNNTraining_Model:
     - SingleHiggs
     # - QCD_PT
   signals:
-    - XtoHHto2B2W_SingleLepton
-    - XtoHHto2B2W_DoubleLepton
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
-    - XtoHHto2Tau2B
-    # Include Radion for DNN Training
+    # X->HH->bbtautau is not produced yet. The central X->YH bbtautau sample is not a substitute.
+    # - XtoHHto2Tau2B
+    # Radion X->HH only. The central X->YH processes (XtoHHto2B2W_*) are not selected.
     - GluGluToRadion_DoubleLepton
     - GluGluToRadion_SingleLepton
   data:
