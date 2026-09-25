@@ -73,8 +73,9 @@ processes:
     is_data: true
     is_asimov_data: true
 
-  # The spin-0 (Radion) X->HH signal, i.e. the signal of `Run3_Model_Radion`. A spin-2 card is this
-  # file with GluGluToBulkGraviton2L in place of GluGluToRadion2L, and wants its own binning.
+  # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
+  # A spin-2 card is this file with GluGluToBulkGraviton2L in place of GluGluToRadion2L, and wants
+  # its own binning.
   # bbtautau is commented out until the private X->HH->bbtautau samples exist; uncomment the
   # process below and its `^XtoHHto2Tau2B_` uncertainty entries with it. It is spin 0, so it does
   # not belong on a BulkGraviton card.

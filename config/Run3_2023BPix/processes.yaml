@@ -201,8 +201,8 @@ ttV:
     - TTNuNu
     - TTZ_Zto2Q
 
-SingleHiggs:
-  name: "Single Higgs"
+H:
+  name: "H"
   color: "kRed"
   sub_processes:
     - ggH

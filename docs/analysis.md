@@ -38,9 +38,9 @@ final states as separate datasets. In 2023 and 2023BPix the whole grid comes fro
 production (DSProd, read from private storage with `fs_nanoAOD:` + `dirName:`); in 2022 and 2022EE
 18 points per final state do and the other 22 are central `Run3Summer22` datasets. The central
 X→YH samples are not selected. bb̄ττ is not part of this grid yet: `XtoHHto2Tau2B` stays commented
-until the private X→HH→bb̄ττ samples exist. Which signal a
-run sees is the [physics model](setup.md#production-model), one per spin; an anaTuple production
-uses `Production_Model`, which carries both spins.
+until the private X→HH→bb̄ττ samples exist. `Run3_Model` and `Production_Model` both carry every
+hypothesis through histogram production; a fit picks one later, in the datacard. See the
+[physics model](setup.md#production-model).
 
 Two networks consume that grid, and they do not cover the same part of it:
 

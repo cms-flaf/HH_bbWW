@@ -1,13 +1,14 @@
 # The bbWW signal is the privately produced X->HH samples
 # (DSProd, models/X_HH/setups/Run3_XHHbbWW.yaml). The central X->YH samples (XtoYHto*) are not
-# selected. Radion (spin 0) and BulkGraviton (spin 2) are distinct hypotheses, so they are distinct
-# models: a single model carrying both would be fitted as one combined signal. Production_Model
-# carries both, because an anaTuple production is not a fit. Neither spin has a signal in
-# Run3_2024 and later, where no resonant sample has been produced yet: their meta-processes are
-# declared there with an empty dataset list, so those eras keep loading and the setup-loading test
-# keeps covering them. bbtautau stays commented until the private X->HH->bbtautau samples exist.
-Run3_Model_Radion:
-  name: "Base model for Run 3, spin-0 (Radion) signal"
+# selected. Run3_Model carries every signal hypothesis: anaTuple and histogram production branch
+# per dataset, and the merged histogram is named by the expanded process
+# (GluGluToRadion2L_300, GluGluToBulkGraviton1L_1000, ...), so two hypotheses are not added into
+# one histogram. Which hypothesis a fit uses is the datacard's process list, not a second physics
+# model. No resonant sample is produced in Run3_2024 and later: the meta-processes are declared
+# there with an empty dataset list, so those eras keep loading. bbtautau stays commented until
+# the private X->HH->bbtautau samples exist.
+Run3_Model:
+  name: "Base model for Run 3"
   backgrounds:
     - TT
     - DY
@@ -16,32 +17,16 @@ Run3_Model_Radion:
     - VVV
     - ttV
     - W
-    - SingleHiggs
+    - H
     # - QCD_PT
   signals:
     - GluGluToRadion_SingleLepton
     - GluGluToRadion_DoubleLepton
+    - GluGluToBulkGraviton_SingleLepton
+    - GluGluToBulkGraviton_DoubleLepton
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
     # X->HH->bbtautau is not produced yet. The central X->YH bbtautau sample is not a substitute.
     # - XtoHHto2Tau2B
-  data:
-    - Data_Full
-
-Run3_Model_BulkGraviton:
-  name: "Base model for Run 3, spin-2 (BulkGraviton) signal"
-  backgrounds:
-    - TT
-    - DY
-    - ST
-    - VV
-    - VVV
-    - ttV
-    - W
-    - SingleHiggs
-    # - QCD_PT
-  signals:
-    - GluGluToBulkGraviton_SingleLepton
-    - GluGluToBulkGraviton_DoubleLepton
   data:
     - Data_Full
 
@@ -75,7 +60,7 @@ Production_Model:
     # - VV_inclusive
     - W
     # - DY_LO
-    - SingleHiggs
+    - H
   signals:
     # X->HH bbWW only. The central X->YH processes (XtoHHto2B2W_*) stay defined but are not selected.
     - GluGluToRadion_DoubleLepton
@@ -103,7 +88,7 @@ DNNTraining_Model:
     - ST
     - VV
     - W
-    - SingleHiggs
+    - H
     # - QCD_PT
   signals:
     # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses

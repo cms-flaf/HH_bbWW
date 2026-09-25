@@ -21,8 +21,8 @@ processes:
   - process: data_obs
     is_data: true
     is_asimov_data: true
-  # The spin-0 (Radion) X->HH signal, i.e. the signal of `Run3_Model_Radion`. A spin-2 card is
-  # this file with GluGluToBulkGraviton1L in place of GluGluToRadion1L.
+  # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
+  # A spin-2 card is this file with GluGluToBulkGraviton1L in place of GluGluToRadion1L.
   - process: GluGluToRadion1L_${MX}
     hist_name: GluGluToRadion1L_${MX}
     # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
