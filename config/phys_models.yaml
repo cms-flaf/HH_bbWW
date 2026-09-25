@@ -48,31 +48,6 @@ TestModel:
   data:
     - custom_CI_Data
 
-Production_Model:
-  name: "Model for anatuple production"
-  backgrounds:
-    - TT
-    - DY
-    - ST
-    - VV
-    - VVV
-    - ttV
-    # - VV_inclusive
-    - W
-    # - DY_LO
-    - H
-  signals:
-    # X->HH bbWW only. The central X->YH processes (XtoHHto2B2W_*) stay defined but are not selected.
-    - GluGluToRadion_DoubleLepton
-    - GluGluToRadion_SingleLepton
-    - GluGluToBulkGraviton_DoubleLepton
-    - GluGluToBulkGraviton_SingleLepton
-    # - XtoHHto2B2Tau # 2023 is missing some 2B2Tau masses
-    # X->HH->bbtautau is not produced yet. The central X->YH bbtautau sample is not a substitute.
-    # - XtoHHto2Tau2B
-  data:
-    - Data_Full
-
 DNNTest_Model:
   name: "Model two stage dnn test"
   backgrounds: [ ]

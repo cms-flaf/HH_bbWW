@@ -41,9 +41,9 @@ named by its expanded process (`GluGluToRadion2L_300`, `GluGluToBulkGraviton1L_1
 hypotheses are not added into one histogram. Which hypothesis a fit uses is chosen later, by the
 datacard's process list. bb̄ττ (`XtoHHto2Tau2B`) is commented out until the private X→HH→bb̄ττ
 samples exist. The samples that do exist cover Run3_2022 through Run3_2023BPix; later eras have no
-resonant sample produced yet, so the model loads there with no signal in it. An anaTuple production
-uses `Production_Model` (set in `config/user_custom.yaml`, see the repository README), which carries
-the same signals. The single-Higgs background group is `H` (ggH, VBFH, VH and tt̄H summed into that
+resonant sample produced yet, so the model loads there with no signal in it. AnaTuple production
+uses this same model (`phys_model: Run3_Model` in `config/user_custom.yaml`; see the repository
+README). The single-Higgs background group is `H` (ggH, VBFH, VH and tt̄H summed into that
 one histogram). For fast local tests, use `TestModel`
 in your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/) instead.
 It holds two backgrounds — `custom_CI_Background_TT`, one t̄t dataset, and
