@@ -66,9 +66,9 @@ training.
 
 The deployed `dnn_config.yaml` files use the schema `Analysis/DNN_Application.py` reads — an
 integer `offset` per split, and `model_name` formatted with `{fold}` — so a model copied into
-`config/DNN/` needs its config converted by hand. That schema follows `func`, not `index`: fold
-`f` is applied to `(event + f + 3) % 4 == 0`, i.e. `event % 4 == (1 - f) % 4`. With v6's `index`
-this is the intended application fold for models 1 and 3, but the *test* fold for models 0 and 2.
+`config/DNN/` needs its config converted by hand: the `index` expression `(nParity + k) % 4`
+becomes `offset: k`. Fold `f` is applied to `event % nParity == (f + offset) % nParity`, the same
+bucket `index` gives.
 
 `apply_pdnn.py` assumes 4 folds with the validation fold at `(train + 2) % 4`, whatever the config
 says.

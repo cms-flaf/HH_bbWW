@@ -213,8 +213,9 @@ class DNNProducer:
         Builds the per-fold application masks, one boolean array per fold.
 
         Fold `f` is applied to events satisfying
-        ``(event_number + f + offset) % nParity == 0``, where ``offset`` comes
-        from the ``app_parity`` section of the model configuration. The masks
+        ``event_number % nParity == (f + offset) % nParity``, where ``offset``
+        comes from the ``app_parity`` section of the model configuration -- the
+        same bucket training assigns to model `f` for that split. The masks
         are required to partition the events: every event must be claimed by
         exactly one fold, or the ensemble below would silently drop or
         double-count it.
@@ -270,9 +271,9 @@ class DNNProducer:
                 )
                 masks.append(np.asarray(value) == 0)
         else:
+            bucket = event_number % nParity
             masks = [
-                ((event_number + fold_idx + offset) % nParity) == 0
-                for fold_idx in range(nParity)
+                bucket == (fold_idx + offset) % nParity for fold_idx in range(nParity)
             ]
 
         # The folds must tile the events exactly once each. This single check
