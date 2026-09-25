@@ -11,20 +11,20 @@ tree_name: "AppliedTree"
 dedicated_mass: null  # Set to an integer (e.g., 500) if evaluating a single mass point
 
 # Cross-Validation Parity Setup
-# Model `i` uses bucket (i + offset) % nParity for each split, where bucket k holds
-# the events with event % nParity == k: it trains on bucket i, chooses its epoch on
-# i+1, is validated on i+2 and is applied to i+3. The same schema as the deployed
-# config/DNN/*/dnn_config.yaml.
 nParity: 4
-model_name: pdnn_model_{regime}_nparity{fold}.onnx
+model_name: pdnn_model_{regime}_nparity{nParity}.onnx
 train_parity:
-  offset: 0
+  index: (nParity) % 4
+  func: (event + {nParity}) % 4
 test_parity:
-  offset: 1
+  index: (nParity + 1) % 4
+  func: (event + {nParity} + 1) % 4
 val_parity:
-  offset: 2
+  index: (nParity + 2) % 4
+  func: (event + {nParity} + 2) % 4
 app_parity:
-  offset: 3
+  index: (nParity + 3) % 4
+  func: (event + {nParity} + 3) % 4
 
 # Class Output Mapping
 class_names: [ "Signal", "TT", "DY", "ST", "Other" ]

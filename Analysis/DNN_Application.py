@@ -210,40 +210,87 @@ class DNNProducer:
         nParity: int,
     ) -> list[np.ndarray]:
         """
-        One boolean mask per model: the events that model scores.
+        Builds the per-fold application masks, one boolean array per fold.
 
-        Training splits the events into buckets by ``event_number % nParity`` (the
-        files Studies/DNN/create_dataset.py writes as nParity{k}_Merged.root), and
-        model ``f`` uses bucket ``(f + offset) % nParity`` for each split in the
-        model configuration: it trains on ``train_parity``, chooses its epoch on
-        ``test_parity`` and is meant for ``app_parity``. Inverting the app split,
-        an event in bucket ``b`` is scored by model ``(b - app offset) % nParity``,
-        so every event gets exactly one model by construction.
+        Fold `f` is applied to events satisfying
+        ``event_number % nParity == (f + offset) % nParity``, where ``offset``
+        comes from the ``app_parity`` section of the model configuration -- the
+        same bucket training assigns to model `f` for that split. The masks
+        are required to partition the events: every event must be claimed by
+        exactly one fold, or the ensemble below would silently drop or
+        double-count it.
         """
-        offsets = {}
-        for split in ("train_parity", "test_parity", "app_parity"):
-            cfg = dnnConfig.get(split)
-            offset = cfg.get("offset") if isinstance(cfg, dict) else None
-            if isinstance(offset, bool) or not isinstance(offset, int):
-                raise RuntimeError(
-                    f"[pDNNProducer] Channel '{channel}': '{split}' must give an integer "
-                    f"'offset'; got {cfg!r}."
-                )
-            offsets[split] = offset % nParity
+        app_parity_cfg = dnnConfig.get("app_parity")
+        if app_parity_cfg is None:
+            raise RuntimeError(
+                f"[pDNNProducer] Missing required 'app_parity' section in channel '{channel}' configuration!"
+            )
 
-        # A model must never score the bucket it trained on or chose its epoch on.
-        for split in ("train_parity", "test_parity"):
-            if offsets["app_parity"] == offsets[split]:
+        offset = (
+            app_parity_cfg.get("offset")
+            if isinstance(app_parity_cfg, dict)
+            else app_parity_cfg
+        )
+
+        if isinstance(offset, bool) or not isinstance(offset, int):
+            # Legacy configurations expressed the fold assignment as a Python
+            # snippet under 'func'. Support it, but evaluate it with no builtins
+            # and only the fold variables in scope -- a model directory is data,
+            # and data must not be able to execute arbitrary code.
+            legacy_expr = (
+                app_parity_cfg.get("func")
+                if isinstance(app_parity_cfg, dict)
+                else app_parity_cfg
+            )
+            if not isinstance(legacy_expr, str):
                 raise RuntimeError(
-                    f"[pDNNProducer] Channel '{channel}': app_parity and {split} both use "
-                    f"offset {offsets[split]}, so every model would score its own "
-                    f"{split} bucket."
+                    f"[pDNNProducer] Channel '{channel}': 'app_parity' must provide an integer "
+                    f"'offset' (or a legacy 'func' string); got {app_parity_cfg!r}."
                 )
 
-        # Reduce first, then subtract: `event` is unsigned and would wrap below zero.
-        bucket = (event_number % nParity).astype(np.int64)
-        model = (bucket - offsets["app_parity"]) % nParity
-        return [model == fold_idx for fold_idx in range(nParity)]
+            print(
+                f"[WARNING] Channel '{channel}': 'app_parity' uses the deprecated 'func' "
+                "expression. Replace it with an integer 'offset' -- see the comment in "
+                "dnn_config.yaml."
+            )
+
+            masks = []
+            for fold_idx in range(nParity):
+                try:
+                    formatted = legacy_expr.format(fold=fold_idx, nParity=nParity)
+                except (KeyError, IndexError) as exc:
+                    raise RuntimeError(
+                        f"[pDNNProducer] Channel '{channel}': cannot substitute fold index into "
+                        f"app_parity func {legacy_expr!r} ({exc!r}). It must contain '{{fold}}'."
+                    ) from exc
+
+                value = eval(
+                    formatted,
+                    {"__builtins__": {}},
+                    {"event_number": event_number, "nParity": nParity},
+                )
+                masks.append(np.asarray(value) == 0)
+        else:
+            bucket = event_number % nParity
+            masks = [
+                bucket == (fold_idx + offset) % nParity for fold_idx in range(nParity)
+            ]
+
+        # The folds must tile the events exactly once each. This single check
+        # catches a wrong modulus, a fold offset that does not vary with the
+        # fold index, and an event_number that does not match the training one.
+        coverage = np.sum(np.stack(masks, axis=0), axis=0)
+        if not np.all(coverage == 1):
+            unclaimed = int(np.count_nonzero(coverage == 0))
+            multiclaimed = int(np.count_nonzero(coverage > 1))
+            raise RuntimeError(
+                f"[pDNNProducer] Channel '{channel}': the {nParity} application folds do not "
+                f"partition the events ({unclaimed} events claimed by no fold, {multiclaimed} "
+                f"claimed by more than one). Check 'nParity' and the 'app_parity' offset in the "
+                f"model configuration."
+            )
+
+        return masks
 
     def ApplyDNN(self, branches: ak.Array) -> ak.Array:
         """
