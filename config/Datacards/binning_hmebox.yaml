@@ -1,5 +1,6 @@
-# Binning for the 2D -> 1D transformation, read by rebin_2d.py: strategy y_window, with
-# y the HME mass and x the DNN score -- an HME box with the DNN binned inside it.
+# Binning for the 2D -> 1D transformation, read by rebin_2d.py: strategy window on the y
+# axis, which holds the HME mass (x is the DNN score) -- an HME box with the DNN binned
+# inside it.
 #
 # For each (mass, channel, base category) rebin_2d.py picks one contiguous HME window
 # around the resonance, discards everything outside it, and bins the DNN score inside. Box
@@ -19,7 +20,8 @@
 # _neff means effective MC entries rather than yield. Keys not set here take
 # BINNING_DEFAULTS in rebin_2d.py.
 
-strategy: y_window
+strategy: window
+window_axis: y
 # One slice by construction: the box is the whole selection. slice_var labels the axis the
 # box is cut on; the DNN is the binned axis.
 n_slices: 1
