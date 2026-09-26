@@ -34,19 +34,19 @@ processes:
   - process: data_obs
     is_data: true
     is_asimov_data: true
-  - process: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
-    hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion2L_${MX}
+  # The one-lepton CI signal (custom_CI_Signal_SL); the two-lepton one is DL-only.
+  - process: XtoHHto2B2W_1L_${MX}
+    hist_name: XtoHHto2B2W_1L_${MX}
     param_values: [ 300 ]
     is_signal: true
-    # The two-lepton signal sample in the one-lepton selection: little of it survives
-    # at --test statistics, and a card is still written with none.
-    allow_zero_integral: true
   # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
   # and plotted by the integration test, but it is not valid input for a limit here: it is an
   # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
   # events for them to cancel — the single-bin histogram came out -1669 +/- 2817, compatible
   # with zero at 0.6 sigma but negative, which makes the datacard job flaky by construction.
-  - custom_CI_Background_TT
+  # TTto2L2Nu only in the CI, so the one-lepton region can be empty at --test statistics.
+  - process: custom_CI_Background_TT
+    allow_zero_integral: true
 uncertainties:
   # Split per year rather than per era: the luminosity calibration is a per-year
   # measurement, so 2022 and 2022EE share a nuisance and 2023 and 2023BPix share
