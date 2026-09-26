@@ -1,35 +1,19 @@
-# Binning for the 2D -> 1D transformation, read by rebin_2d.py: strategy window on the y
-# axis, which holds the HME mass (x is the DNN score) -- an HME box with the DNN binned
-# inside it.
+# rebin_2d.py binning for the DL card: an HME window (y) around the resonance, with the
+# DNN score (x) binned inside it; events outside the window are dropped. Each base
+# category becomes one datacard bin, SR/res2b -> SR/res2b_hmebox0.
 #
-# For each (mass, channel, base category) rebin_2d.py picks one contiguous HME window
-# around the resonance, discards everything outside it, and bins the DNN score inside. Box
-# and DNN binning are chosen together: a window is scored by the best DNN binning it
-# admits, not by its own integrated significance, which would just widen it to swallow
-# signal and ignore the shape the fit uses. Each base category becomes a single datacard
-# bin, SR/res2b -> SR/res2b_hmebox0.
-#
-# Against a 2D DNN-slice binning (StatInference branch Binning_2D_DP, strategy dp) this
-# improves the expected limit by 5.3% on the geometric mean over MX = 500, 600, 800, 1000
-# (combined: +6.7%, +1.7%, -0.5%, +13.0%), with ~32% fewer fit bins. Boxes keep 60-99%
-# of the signal, median ~89%. It is not overfitting (optimism bootstrap: 0.9% of Z^2 for
-# the box, 1.4% for the 2D) and not the DNN bin count (capped at 3 DNN bins the box still
-# gains 2.6%); the study scripts for these checks ran against that branch.
-#
-# Naming rule below: no infix means the summed background, _each means per background,
-# _neff means effective MC entries rather than yield. Keys not set here take
+# Against a 2D DNN-slice binning this improved the expected limit by 5.3% (geometric
+# mean over MX = 500-1000) with ~32% fewer fit bins. Keys not set here take
 # BINNING_DEFAULTS in rebin_2d.py.
 
 strategy: window
 window_axis: y
-# One slice by construction: the box is the whole selection. slice_var labels the axis the
-# box is cut on; the DNN is the binned axis.
 n_slices: 1
 slice_var: HME
-# The datacard configuration reading these shapes must declare the same pattern.
+# must match the datacard configuration's category_pattern
 category_pattern: "{base_category}_hmebox{slice_idx}"
 
-# --- the box (the whole HME window) ---
+# --- the window ---
 min_slice_bkg_sum: 1.0
 min_slice_bkg_neff: 4.0
 min_slice_bkg_each: 0.01
@@ -37,24 +21,16 @@ min_slice_bkg_each_neff: 0.0
 
 # --- the DNN bins inside it ---
 max_bins_per_slice: 10
-# Summed background to aim for per DNN bin; binning_2d.yaml uses 5.0.
 bkg_per_bin: 1.0
 min_bin_bkg_neff: 4.0
 min_bin_bkg_each: 0.01
-# Every non-exempt background must be measured, not merely positive, in every fit bin.
-# This floor, not the bin budget, is what keeps the low-statistics DY out of bins it cannot
-# support.
+# every non-negligible background measured in every bin (keeps DY out of empty bins)
 min_bin_bkg_each_neff: 2.0
-# A DNN bin must raise the category's Z^2 by 0.2% of its achievable total, or it is given
-# back.
 dp_min_bin_gain: 0.002
 
 # --- both ---
-# Backgrounds below this fraction of the category total are exempt from the per-process
-# floors. For the box the fraction is judged over the whole window, so a box holding DY
-# just under 5% frees it from min_bin_bkg_each_neff in every bin, including bins where it
-# is far more than 5% (muMu boosted MX=400: DY N_eff 0.17 over the box). Judging it bin by
-# bin would close this; the numbers above were measured without that.
+# Negligible backgrounds are judged over the whole window, so one just under 5% of the
+# window is exempt from the per-bin floors even where it is larger.
 min_bkg_frac: 0.05
 min_signal: 0.5
 significance_mode: asimov

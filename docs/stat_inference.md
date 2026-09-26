@@ -211,10 +211,10 @@ built from the merged histograms unchanged, so an analysis that needs no preproc
 unaffected.
 
 This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the binning
-from the shapes themselves. The DL card uses its `window` strategy with `window_axis: y`: for each mass, channel
-and base category it picks one HME window around the resonance, drops everything outside it,
-and bins the DNN score inside. The window and the DNN bins are chosen together, and each base
-category `SR/res2b` becomes the single datacard bin `SR/res2b_hmebox0`.
+from the shapes themselves. The DL card uses its `window` strategy (`window_axis: y`): for
+each mass, channel and base category, one HME window around the resonance with the DNN
+score binned inside it; events outside the window are dropped. Each base category
+`SR/res2b` becomes the single datacard bin `SR/res2b_hmebox0`.
 
 ```yaml
 preprocess:
@@ -224,10 +224,9 @@ preprocess:
     - config/Datacards/binning_hmebox.yaml
 ```
 
-The alternative, `config/Datacards/binning_2d.yaml`, cuts each base category into DNN slices
-(`SR/res2b_dnn0…dnn3`) with HME bins inside each. The HME box gives a ~5% better expected
-limit with about a third fewer fit bins; the numbers are in the comment at the top of
-`binning_hmebox.yaml`.
+The alternative, `config/Datacards/binning_2d.yaml`, cuts each base category into DNN
+slices (`SR/res2b_dnn0…dnn3`) with HME bins inside each; the window gives a ~5% better
+expected limit with about a third fewer fit bins.
 
 The two halves live in different places on purpose. The **knobs** — strategy, slice count,
 bin budget, and the minimum signal/background yields and effective-entry floors a bin must

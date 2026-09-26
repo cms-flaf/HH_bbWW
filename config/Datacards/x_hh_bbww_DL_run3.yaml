@@ -14,8 +14,7 @@ signalFractionForRelevantBins: 0.2
 # Run3_Early: 0. It does not track luminosity; it tracks where DY's negative-weight
 # events land. Turning them back on wants either min_slice_bkg_each_neff on in
 # config/Datacards/binning_2d.yaml, so those slices are never cut, or a looser
-# max_n_sigma_for_negative_bins for DY. (Measured with the DNN-slice binning,
-# binning_2d.yaml; not re-measured with the HME box.)
+# max_n_sigma_for_negative_bins for DY. (Measured with binning_2d.yaml.)
 #
 # They stay in era_groups below regardless: Run3_Early is the combination of all four
 # datasets, which is a statement about the data, not about which limits we set.
@@ -35,26 +34,21 @@ channels:
   - muMu
   - eMu
   - eE
-# The datacard bins, exactly as they exist in the input shapes. These are what
-# StatInference/bin_opt_2d/rebin_2d.py wrote when it cut an HME box out of each base
-# category -- one bin per base category -- and the chain reads the directories it is given.
+# The datacard bins rebin_2d.py writes: one HME window per base category.
 categories:
   - SR/res2b_hmebox0
   - SR/boosted_hmebox0
   - SR/recovery_hmebox0
 
-# How to take the written names apart again, to group the bins of one base category for
-# the per-category limits. Must match the category_pattern rebin_2d.py wrote them with.
+# Must match the category_pattern the bins were written with.
 category_pattern: "{base_category}_hmebox{slice_idx}"
 
 # Applied to the merged histograms before the datacards are built, by
 # PreprocessShapesTask. The chain knows nothing about what this does -- it supplies
 # --input, --output, --era and --config, and the script writes
-# "<era>/<variable>/<variable>.root". Here it cuts an HME window out of the 2D
-# DNN-vs-HME shapes and bins the DNN inside it; the knobs that steer that are in
-# binning_hmebox.yaml, and the binning it derives is written beside the shapes it
-# produced. binning_2d.yaml is the DNN-slice alternative. Remove this block and the chain
-# reads the merged histograms unchanged.
+# "<era>/<variable>/<variable>.root". Here it cuts an HME window out of the 2D shapes and
+# bins the DNN inside it (binning_hmebox.yaml; binning_2d.yaml is the DNN-slice
+# alternative). Remove this block and the chain reads the merged histograms unchanged.
 preprocess:
   script: StatInference/bin_opt_2d/rebin_2d.py
   args:
@@ -152,10 +146,8 @@ processes:
   # No negative-bin tolerance is set below on purpose: there are no negative bins to
   # tolerate, and this template builds under the unmodified resolveNegativeBins.
   #
-  # All the numbers above were measured with the DNN-slice binning (binning_2d.yaml).
-  # With the HME box, removing the merge measured free to slightly better (limit ratio
-  # eE 0.983, muMu 0.999, boosted-only card 0.974) and left no rejected shapes; it is
-  # kept here unchanged so that this switch changes the binning alone.
+  # The numbers above are from binning_2d.yaml. With the HME box, dropping the merge
+  # measured free to slightly better; it is kept so this change is the binning alone.
   - process: TotalBkg
     subprocesses:
       - TT
