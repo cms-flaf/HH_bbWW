@@ -30,6 +30,34 @@ The HH mass is reconstructed with **DeepHME** (the bb̄WW counterpart to SVfit i
 of the observable computation and requires no special command — it runs as part of the standard
 producer chain.
 
+## Resonant mass grid
+
+The bb̄WW signal is `GluGluTo{Radion,BulkGraviton}` at 40 mass points from 250 GeV to 5 TeV in each
+of `Run3_2022` through `Run3_2023BPix`, with the single-lepton (`2B2JLNu`) and dilepton (`2B2L2Nu`)
+final states as separate datasets. In 2023 and 2023BPix the whole grid comes from the custom
+production (DSProd, read from private storage with `fs_nanoAOD:` + `dirName:`); in 2022 and 2022EE
+18 points per final state do and the other 22 are central `Run3Summer22` datasets. The central
+X→YH samples are not selected. bb̄ττ is not part of this grid yet: `XtoHHto2Tau2B` stays commented
+until the private X→HH→bb̄ττ samples exist. `Run3_Model` carries every hypothesis through
+anaTuple and histogram production; a fit picks one later, in the datacard. See the
+[physics model](setup.md#production-model).
+
+Two networks consume that grid, and they do not cover the same part of it:
+
+- the **dilepton DNN** is parametric — one model per fold, evaluated at whatever masses
+  `DNN.columns` in `config/global.yaml` asks for. It is configured over the produced points up to
+  1.5 TeV, and the datacard `param_values` in `config/Datacards/x_hh_bbww_{DL,SL}_run3.yaml` follow
+  the same 25 points. The four lowest of them, 250 to 280 GeV, are below the lowest
+  `signal_mass_points` of the models currently in `config/DNN/DoubleLepton_Parametric_*_v1`, so
+  those scores extrapolate and stay provisional until the network is retrained over this grid.
+- the **single-lepton two-stage DNN** carries one trained model per mass point in
+  `config/DNN/SingleLepton_IndependentMasses/`, so its grid, and the `masspoints:` list of SL signal
+  regions built from its scores, stay at the ten points those models were trained for until
+  retrained ones exist.
+
+Every mass point named in a `variables:` list also needs its binning in `config/plot/histograms.yaml`
+— a variable with no matching entry there stops `HistProducerFromNTuple` with a `KeyError`.
+
 ## Categories
 
 HH→bb̄WW is analysed in **resolved** and **boosted** categories (low- and high-p_T HH topologies).
