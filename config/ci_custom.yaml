@@ -13,15 +13,9 @@ QCDRegions:
   - SR_SL_M300
 
 StatInference:
-  # TEMPORARY: the CI builds the single-lepton card, which exercises the per-mass input
-  # categories (StatInference#24). One invocation can build one datacard configuration
-  # until the combination support lands (StatInference PR "SL_DL_Cards"); then both run,
-  # and the double-lepton card below comes back.
-  config: config/Datacards/CI_card_SL.yaml
-  # config: config/Datacards/CI_card.yaml
-  # hist_bins is unset, as in global.yaml: CI_card.yaml declares a `preprocess:` step,
-  # so the shapes reaching the datacard maker are already at their final binning -- one
-  # bin per channel and category, per CI_binning_2d.yaml. CI_card_SL.yaml sets its own.
+  # Both CI cards, SL and DL, and their combination.
+  config: config/Datacards/CI_card_combined.yaml
+  # hist_bins is unset: both CI cards rebin in their `preprocess:` step (CI_binning_2d.yaml).
   param_values: [ 300 ]
 
 # Do not remove DNN variables, they are needed for the datacard creation.

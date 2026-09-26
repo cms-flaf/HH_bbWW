@@ -3,11 +3,8 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  # The two-stage SL DNN: a multiclass per mass hypothesis assigns each event to the
-  # signal region or to a background-class region, and the binary signal-vs-background
-  # score of the same hypothesis is the fitted discriminant. 1D -- there is no HME axis
-  # in these shapes.
-  input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
+  # The two-stage SL DNN's binary score (x) against the HME mass (y), as DL's DNN vs HME.
+  input_file_pattern: ${ERA}/binary_DNN_m${MX}_vs_HME/binary_DNN_m${MX}_vs_HME.root
 signalFractionForRelevantBins: 0.2
 # One limit on all four datasets combined, as for DL. The sub-eras stay in era_groups
 # because Run3_Early is their combination; they are not built standalone.
@@ -22,23 +19,25 @@ era_groups:
 channels:
   - e
   - mu
-# The datacard categories, named as DL's are. No rebinning step yet: the shapes are read
-# as produced (the binary DNN score, 100 bins), so this card exercises input_categories on
-# its own. The HME-box binning and the SL+DL combination follow in later PRs.
+# The datacard bins rebin_2d.py writes: one HME window per base category, as in DL.
 categories:
-  - SR/res2b
-  - SR/boosted
-  - SR/recovery
-# Where each category is read from. The file for mass MX holds a signal region for every
-# mass hypothesis (SR_SL_M300 ... SR_SL_M1000), since every event is classified by every
-# mass's multiclass; the one that belongs to the MX limit is SR_SL_M${MX}. The category
-# keeps one name for every mass -- the bin, the per-category cards, the scoping below --
-# and only the read is redirected. Listing the SR_SL_M* directories as categories instead
-# would put all ten into every card as separate bins: every file has all of them.
+  - SR/res2b_hmebox0
+  - SR/boosted_hmebox0
+  - SR/recovery_hmebox0
+category_pattern: "{base_category}_hmebox{slice_idx}"
+# Each file holds a signal region for every mass hypothesis; only SR_SL_M${MX} belongs to
+# the MX limit. Keyed by base category, since that is what the rebinning reads.
 input_categories:
   SR/res2b: SR_SL_M${MX}/res2b
   SR/boosted: SR_SL_M${MX}/boosted
   SR/recovery: SR_SL_M${MX}/recovery
+
+# The DL binning: an HME window with the DNN binned inside it.
+preprocess:
+  script: StatInference/bin_opt_2d/rebin_2d.py
+  args:
+    - --binning-config
+    - config/Datacards/binning_hmebox.yaml
 
 processes:
   - process: data_obs

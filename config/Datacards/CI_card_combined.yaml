@@ -1,0 +1,14 @@
+# The CI's SL+DL combination: both CI cards, each built under its own member name, and
+# their cards combined per mass, as x_hh_bbww_run3_combined.yaml does in production.
+members:
+  DL:
+    config: config/Datacards/CI_card.yaml
+  SL:
+    config: config/Datacards/CI_card_SL.yaml
+
+# The members' own eras.
+eras:
+  - Run3_2022
+  - Run3_2022EE
+  - Run3_2023
+  - Run3_2023BPix

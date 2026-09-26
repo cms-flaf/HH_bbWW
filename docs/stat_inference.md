@@ -271,6 +271,25 @@ cmsEnv python3 StatInference/dc_make/create_datacards.py \
   --config config/Datacards/x_hh_bbww_DL_run3.yaml
 ```
 
+### SL+DL combined limits
+
+`config/Datacards/x_hh_bbww_run3_combined.yaml` lists the single- and double-lepton
+cards as `members`. The same chain builds each member under `<version>/SL/` and
+`<version>/DL/`, then combines their cards per mass into `<version>/combined/`. The
+channels are disjoint, and nuisances with the same name are correlated:
+
+```sh
+law run PlotResonantLimitsTask \
+  --version dev \
+  --period Run3_2022 \
+  --workflow local \
+  --datacard-config config/Datacards/x_hh_bbww_run3_combined.yaml
+```
+
+Both channels fit the same signal (bbWW 1L and 2L, and bbττ) under one strength, and
+both bin with the HME window (`binning_hmebox.yaml`). The SL card reads each mass's own
+signal region, `SR_SL_M${MX}`, through `input_categories`.
+
 ## 2. Run limits on existing datacards
 
 For cards you already have on disk, the dhi task can be called directly:
