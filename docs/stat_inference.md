@@ -211,7 +211,7 @@ built from the merged histograms unchanged, so an analysis that needs no preproc
 unaffected.
 
 This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the binning
-from the shapes themselves. The DL card uses its `hme_box` strategy: for each mass, channel
+from the shapes themselves. The DL card uses its `y_window` strategy: for each mass, channel
 and base category it picks one HME window around the resonance, drops everything outside it,
 and bins the DNN score inside. The window and the DNN bins are chosen together, and each base
 category `SR/res2b` becomes the single datacard bin `SR/res2b_hmebox0`.

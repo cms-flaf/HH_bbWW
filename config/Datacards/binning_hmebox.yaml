@@ -1,5 +1,5 @@
-# Binning for the 2D -> 1D transformation, read by rebin_2d.py: an HME box with the DNN
-# binned inside it.
+# Binning for the 2D -> 1D transformation, read by rebin_2d.py: strategy y_window, with
+# y the HME mass and x the DNN score -- an HME box with the DNN binned inside it.
 #
 # For each (mass, channel, base category) rebin_2d.py picks one contiguous HME window
 # around the resonance, discards everything outside it, and bins the DNN score inside. Box
@@ -8,18 +8,18 @@
 # signal and ignore the shape the fit uses. Each base category becomes a single datacard
 # bin, SR/res2b -> SR/res2b_hmebox0.
 #
-# Against the 2D DNN-slice binning with strategy dp this improves the expected
-# limit by 5.3% on the geometric mean over MX = 500, 600, 800, 1000 (combined: +6.7%,
-# +1.7%, -0.5%, +13.0%), with ~32% fewer fit bins. Boxes keep 60-99% of the signal,
-# median ~89%. Studies/BinningScan/box_vs_dp_anatomy.py and bootstrap_bias.py are the
-# checks that this is not overfitting (optimism bootstrap: 0.9% of Z^2 for the box, 1.4%
-# for the 2D) and not the DNN bin count (capped at 3 DNN bins the box still gains 2.6%).
+# Against a 2D DNN-slice binning (StatInference branch Binning_2D_DP, strategy dp) this
+# improves the expected limit by 5.3% on the geometric mean over MX = 500, 600, 800, 1000
+# (combined: +6.7%, +1.7%, -0.5%, +13.0%), with ~32% fewer fit bins. Boxes keep 60-99%
+# of the signal, median ~89%. It is not overfitting (optimism bootstrap: 0.9% of Z^2 for
+# the box, 1.4% for the 2D) and not the DNN bin count (capped at 3 DNN bins the box still
+# gains 2.6%); the study scripts for these checks ran against that branch.
 #
 # Naming rule below: no infix means the summed background, _each means per background,
 # _neff means effective MC entries rather than yield. Keys not set here take
 # BINNING_DEFAULTS in rebin_2d.py.
 
-strategy: hme_box
+strategy: y_window
 # One slice by construction: the box is the whole selection. slice_var labels the axis the
 # box is cut on; the DNN is the binned axis.
 n_slices: 1
