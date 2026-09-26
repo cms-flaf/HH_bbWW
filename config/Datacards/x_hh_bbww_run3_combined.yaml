@@ -1,0 +1,51 @@
+# The SL+DL combination. Each member is a full datacard configuration, built under
+# <version>/<member>/ from the same histogram production; their cards are combined per
+# mass into <version>/combined/. The channels are disjoint, and same-named nuisances are
+# correlated.
+#
+#   law run PlotResonantLimitsTask --version <out> --period Run3_2022 --workflow local \
+#     --datacard-config config/Datacards/x_hh_bbww_run3_combined.yaml
+members:
+  SL:
+    config: config/Datacards/x_hh_bbww_SL_run3.yaml
+  DL:
+    config: config/Datacards/x_hh_bbww_DL_run3.yaml
+
+# The members' own top-level eras.
+eras:
+  - Run3_Early
+campaigns:
+  Run3_Early: run3_early
+
+# "<member>:<glob>" names a member's cards, relative to its datacards directory for the
+# era; a list of globs is one curve, combined per mass.
+limit_plots:
+  - name: channels
+    datacards:
+      - { name: "SL+DL", glob: [ "SL:*.txt", "DL:*.txt" ] }
+      - { name: "e", glob: "SL:${ERA}/e/*.txt" }
+      - { name: "#mu", glob: "SL:${ERA}/mu/*.txt" }
+      - { name: "ee", glob: "DL:${ERA}/eE/*.txt" }
+      - { name: "e#mu", glob: "DL:${ERA}/eMu/*.txt" }
+      - { name: "#mu#mu", glob: "DL:${ERA}/muMu/*.txt" }
+    plot_params: &limit_plot_style
+      xsec: pb
+      y_log: true
+      x_min: 200
+      x_max: 1000
+      y_min: 0.001
+      y_max: 100
+  - name: categories
+    datacards:
+      - { name: "SL+DL", glob: [ "SL:*.txt", "DL:*.txt" ] }
+      - { name: "res 2b", glob: [ "SL:${ERA}/categories/SR_res2b/*.txt", "DL:${ERA}/categories/SR_res2b/*.txt" ] }
+      - { name: "recovery", glob: [ "SL:${ERA}/categories/SR_recovery/*.txt", "DL:${ERA}/categories/SR_recovery/*.txt" ] }
+      - { name: "boosted", glob: [ "SL:${ERA}/categories/SR_boosted/*.txt", "DL:${ERA}/categories/SR_boosted/*.txt" ] }
+    plot_params: *limit_plot_style
+  - name: sl_vs_dl
+    bands: true
+    datacards:
+      - { name: "SL", glob: "SL:*.txt" }
+      - { name: "DL", glob: "DL:*.txt" }
+      - { name: "SL+DL", glob: [ "SL:*.txt", "DL:*.txt" ] }
+    plot_params: *limit_plot_style

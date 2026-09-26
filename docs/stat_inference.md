@@ -210,22 +210,28 @@ A configuration with no `preprocess:` block skips the task entirely and the data
 built from the merged histograms unchanged, so an analysis that needs no preprocessing is
 unaffected.
 
-This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the DNN slice
-boundaries and the HME mass-bin edges from the shapes themselves. Each base category
-`SR/res2b` becomes the datacard bins `SR/res2b_dnn0…dnn3`.
+This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the binning
+from the shapes themselves. The DL card uses its `window` strategy (`window_axis: y`): for
+each mass, channel and base category, one HME window around the resonance with the DNN
+score binned inside it; events outside the window are dropped. Each base category
+`SR/res2b` becomes the single datacard bin `SR/res2b_hmebox0`.
 
 ```yaml
 preprocess:
   script: StatInference/bin_opt_2d/rebin_2d.py
   args:
     - --binning-config
-    - config/Datacards/binning_2d.yaml
+    - config/Datacards/binning_hmebox.yaml
 ```
 
-The two halves live in different places on purpose. The **knobs** — slice count, bin
-budget, and the minimum signal/background yields and effective-entry floors a bin must
+The alternative, `config/Datacards/binning_2d.yaml`, cuts each base category into DNN
+slices (`SR/res2b_dnn0…dnn3`) with HME bins inside each; the window gives a ~5% better
+expected limit with about a third fewer fit bins.
+
+The two halves live in different places on purpose. The **knobs** — strategy, slice count,
+bin budget, and the minimum signal/background yields and effective-entry floors a bin must
 satisfy — are analysis configuration, versioned with the card in
-[`config/Datacards/binning_2d.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/binning_2d.yaml).
+[`config/Datacards/binning_hmebox.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/binning_hmebox.yaml).
 The **derived** `binning.json` is a product, not configuration, and is written into the
 task's output on EOS beside the shapes it produced.
 
@@ -243,12 +249,12 @@ python3 StatInference/bin_opt_2d/rebin_2d.py \
   --output /tmp/$USER/rebin_Run3_Early \
   --era    Run3_Early \
   --config config/Datacards/x_hh_bbww_DL_run3.yaml \
-  --binning-config config/Datacards/binning_2d.yaml
+  --binning-config config/Datacards/binning_hmebox.yaml
 ```
 
-The datacard configuration then lists the sliced names in `categories:` and repeats the
-`category_pattern` used to write them, which is how the per-category limits group the
-slices of one base category back together.
+The datacard configuration then lists the written names in `categories:`
+(`SR/res2b_hmebox0`, …) and repeats the `category_pattern` used to write them, which is
+how the per-category limits group the bins of one base category back together.
 
 There is also `StatInference/bin_opt/`, an offline combine-driven search over candidate
 binnings feeding the `hist_bins` option. This analysis does not use it, and leaves
@@ -264,6 +270,25 @@ cmsEnv python3 StatInference/dc_make/create_datacards.py \
   --output PATH_TO_CARDS \
   --config config/Datacards/x_hh_bbww_DL_run3.yaml
 ```
+
+### SL+DL combined limits
+
+`config/Datacards/x_hh_bbww_run3_combined.yaml` lists the single- and double-lepton
+cards as `members`. The same chain builds each member under `<version>/SL/` and
+`<version>/DL/`, then combines their cards per mass into `<version>/combined/`. The
+channels are disjoint, and nuisances with the same name are correlated:
+
+```sh
+law run PlotResonantLimitsTask \
+  --version dev \
+  --period Run3_2022 \
+  --workflow local \
+  --datacard-config config/Datacards/x_hh_bbww_run3_combined.yaml
+```
+
+Both channels fit the same signal (bbWW 1L and 2L, and bbττ) under one strength, and
+both bin with the HME window (`binning_hmebox.yaml`). The SL card reads each mass's own
+signal region, `SR_SL_M${MX}`, through `input_categories`.
 
 ## 2. Run limits on existing datacards
 

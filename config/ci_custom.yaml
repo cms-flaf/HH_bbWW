@@ -9,12 +9,13 @@ phys_model: TestModel
 
 QCDRegions:
   - OS_Iso
+  # The single-lepton signal region of the MX=300 hypothesis, read by CI_card_SL.yaml.
+  - SR_SL_M300
 
 StatInference:
-  config: config/Datacards/CI_card.yaml
-  # hist_bins is unset, as in global.yaml: CI_card.yaml declares a `preprocess:` step,
-  # so the shapes reaching the datacard maker are already at their final binning -- one
-  # bin per channel and category, per CI_binning_2d.yaml.
+  # Both CI cards, SL and DL, and their combination.
+  config: config/Datacards/CI_card_combined.yaml
+  # hist_bins is unset: both CI cards rebin in their `preprocess:` step (CI_binning_2d.yaml).
   param_values: [ 300 ]
 
 # Do not remove DNN variables, they are needed for the datacard creation.
