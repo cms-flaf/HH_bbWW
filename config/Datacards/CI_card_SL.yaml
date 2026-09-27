@@ -44,7 +44,7 @@ processes:
   # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
   # events for them to cancel — the single-bin histogram came out -1669 +/- 2817, compatible
   # with zero at 0.6 sigma but negative, which makes the datacard job flaky by construction.
-  # TTto2L2Nu only in the CI, so the one-lepton region can be empty at --test statistics.
+  # The CI t#bar{t} is TTto2L2Nu + TTtoLNu2Q; at --test statistics a category can still be empty.
   - process: custom_CI_Background_TT
     allow_zero_integral: true
 uncertainties:

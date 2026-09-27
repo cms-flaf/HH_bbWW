@@ -564,6 +564,7 @@ custom_CI_Background_TT:
   genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
+    - TTtoLNu2Q
 
 custom_CI_Background_DY:
   name: "CI -- Background DY"
