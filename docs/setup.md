@@ -33,8 +33,18 @@ These build automatically as part of `source env.sh`; you do not set them up by 
 
 ## Production model
 
-The production [physics model](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/)
-for HH→bb̄WW is `Run3_Model` (set in `config/global.yaml`). For fast local tests, use `TestModel`
+The default [physics model](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/)
+for HH→bb̄WW is `Run3_Model` (set in `config/global.yaml`). It carries every X→HH signal hypothesis
+together — Radion and BulkGraviton, single lepton and dilepton — and does not select the central
+X→YH samples. AnaTuple and histogram production branch per dataset, and each merged histogram is
+named by its expanded process (`GluGluToRadion_bbWW_2L_300`,
+`GluGluToBulkGraviton_bbWW_1L_1000`, …), so the hypotheses are not added into one histogram. Which hypothesis a fit uses is chosen later, by the
+datacard's process list. bb̄ττ (`XtoHHto2Tau2B`) is commented out until the private X→HH→bb̄ττ
+samples exist. The samples that do exist cover Run3_2022 through Run3_2023BPix; later eras have no
+resonant sample produced yet, so the model loads there with no signal in it. AnaTuple production
+uses this same model (`phys_model: Run3_Model` in `config/user_custom.yaml`; see the repository
+README). The single-Higgs background group is `H` (ggH, VBFH, VH and tt̄H summed into that
+one histogram). For fast local tests, use `TestModel`
 in your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/) instead.
 It holds two backgrounds — `custom_CI_Background_TT`, one t̄t dataset, and
 `custom_CI_Background_DY`, one DY dataset carrying the same DY stitcher the era configures —

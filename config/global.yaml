@@ -238,45 +238,97 @@ payload_producers:
       parametric: True
     SL_Resolved: null
     SL_Boosted: null
+    # The grid below is the produced X->HH points up to 1.5 TeV. 250-280 sit below the lowest
+    # `signal_mass_points` of the models in config/DNN/DoubleLepton_Parametric_*_v1, so until the
+    # network is retrained over this grid those four points are an extrapolation, not an
+    # interpolation, and their scores are provisional.
     columns:
+      - M250_Signal
+      - M260_Signal
+      - M270_Signal
+      - M280_Signal
       - M300_Signal
+      - M320_Signal
+      - M350_Signal
+      - M360_Signal
       - M400_Signal
+      - M450_Signal
       - M500_Signal
       - M550_Signal
       - M600_Signal
       - M650_Signal
       - M700_Signal
+      - M750_Signal
       - M800_Signal
+      - M850_Signal
       - M900_Signal
       - M1000_Signal
+      - M1100_Signal
+      - M1200_Signal
+      - M1300_Signal
+      - M1400_Signal
+      - M1500_Signal
 
+      - M250_TT
+      - M260_TT
+      - M270_TT
+      - M280_TT
       - M300_TT
+      - M320_TT
+      - M350_TT
+      - M360_TT
       - M400_TT
+      - M450_TT
       - M500_TT
       - M550_TT
       - M600_TT
       - M650_TT
       - M700_TT
+      - M750_TT
       - M800_TT
+      - M850_TT
       - M900_TT
       - M1000_TT
+      - M1100_TT
+      - M1200_TT
+      - M1300_TT
+      - M1400_TT
+      - M1500_TT
 
+      - M250_Other
+      - M260_Other
+      - M270_Other
+      - M280_Other
       - M300_Other
+      - M320_Other
+      - M350_Other
+      - M360_Other
       - M400_Other
+      - M450_Other
       - M500_Other
       - M550_Other
       - M600_Other
       - M650_Other
       - M700_Other
+      - M750_Other
       - M800_Other
+      - M850_Other
       - M900_Other
       - M1000_Other
+      - M1100_Other
+      - M1200_Other
+      - M1300_Other
+      - M1400_Other
+      - M1500_Other
     dependencies:
     n_cpus: 4
     max_runtime: 8.0
     cmssw_env: False
     awkward_based: True
     uproot_stepsize: '50MB'
+  # Unlike the parametric DNN above, this one carries a trained model per mass point
+  # (config/DNN/SingleLepton_IndependentMasses/<category>/*_nParity*_M<mass>.onnx), so its
+  # grid cannot be widened to the produced X->HH points before those models exist.
   TwoStageDNN:
     producers_module_name: Analysis.DNN_Application
     producer_name: TwoStageDNNProducer
@@ -523,6 +575,8 @@ categories:
   # - baseline_resolved
 
 # This is for SR/CR definitions using multiclass DNN in defineControlRegions
+# The per-mass SL signal regions below are built from the TwoStageDNN scores, so this
+# grid follows the trained two-stage models, not the produced X->HH mass points.
 masspoints:
   - 300
   - 400
@@ -992,21 +1046,52 @@ histTuple_flavors:
       # - bjet_lepWfromH_minDphi
       - WW_pt
 
+      - DNN_M250_Signal
+      - DNN_M260_Signal
+      - DNN_M270_Signal
+      - DNN_M280_Signal
       - DNN_M300_Signal
+      - DNN_M320_Signal
+      - DNN_M350_Signal
+      - DNN_M360_Signal
       - DNN_M400_Signal
+      - DNN_M450_Signal
       - DNN_M500_Signal
       - DNN_M550_Signal
       - DNN_M600_Signal
       - DNN_M650_Signal
       - DNN_M700_Signal
+      - DNN_M750_Signal
       - DNN_M800_Signal
+      - DNN_M850_Signal
       - DNN_M900_Signal
       - DNN_M1000_Signal
+      - DNN_M1100_Signal
+      - DNN_M1200_Signal
+      - DNN_M1300_Signal
+      - DNN_M1400_Signal
+      - DNN_M1500_Signal
 
+      - name: DNN_m250_vs_HME
+        vars: [ DNN_M250_Signal, DeepHME_mass ]
+      - name: DNN_m260_vs_HME
+        vars: [ DNN_M260_Signal, DeepHME_mass ]
+      - name: DNN_m270_vs_HME
+        vars: [ DNN_M270_Signal, DeepHME_mass ]
+      - name: DNN_m280_vs_HME
+        vars: [ DNN_M280_Signal, DeepHME_mass ]
       - name: DNN_m300_vs_HME
         vars: [ DNN_M300_Signal, DeepHME_mass ]
+      - name: DNN_m320_vs_HME
+        vars: [ DNN_M320_Signal, DeepHME_mass ]
+      - name: DNN_m350_vs_HME
+        vars: [ DNN_M350_Signal, DeepHME_mass ]
+      - name: DNN_m360_vs_HME
+        vars: [ DNN_M360_Signal, DeepHME_mass ]
       - name: DNN_m400_vs_HME
         vars: [ DNN_M400_Signal, DeepHME_mass ]
+      - name: DNN_m450_vs_HME
+        vars: [ DNN_M450_Signal, DeepHME_mass ]
       - name: DNN_m500_vs_HME
         vars: [ DNN_M500_Signal, DeepHME_mass ]
       - name: DNN_m550_vs_HME
@@ -1017,12 +1102,26 @@ histTuple_flavors:
         vars: [ DNN_M650_Signal, DeepHME_mass ]
       - name: DNN_m700_vs_HME
         vars: [ DNN_M700_Signal, DeepHME_mass ]
+      - name: DNN_m750_vs_HME
+        vars: [ DNN_M750_Signal, DeepHME_mass ]
       - name: DNN_m800_vs_HME
         vars: [ DNN_M800_Signal, DeepHME_mass ]
+      - name: DNN_m850_vs_HME
+        vars: [ DNN_M850_Signal, DeepHME_mass ]
       - name: DNN_m900_vs_HME
         vars: [ DNN_M900_Signal, DeepHME_mass ]
       - name: DNN_m1000_vs_HME
         vars: [ DNN_M1000_Signal, DeepHME_mass ]
+      - name: DNN_m1100_vs_HME
+        vars: [ DNN_M1100_Signal, DeepHME_mass ]
+      - name: DNN_m1200_vs_HME
+        vars: [ DNN_M1200_Signal, DeepHME_mass ]
+      - name: DNN_m1300_vs_HME
+        vars: [ DNN_M1300_Signal, DeepHME_mass ]
+      - name: DNN_m1400_vs_HME
+        vars: [ DNN_M1400_Signal, DeepHME_mass ]
+      - name: DNN_m1500_vs_HME
+        vars: [ DNN_M1500_Signal, DeepHME_mass ]
 
       # two-stage dnn outputs
       - TwoStageDNN_M300_binary
@@ -1108,43 +1207,104 @@ histTuple_flavors:
     variables:
       - DeepHME_mass
 
+      - DNN_M250_Signal
+      - DNN_M260_Signal
+      - DNN_M270_Signal
+      - DNN_M280_Signal
       - DNN_M300_Signal
+      - DNN_M320_Signal
+      - DNN_M350_Signal
+      - DNN_M360_Signal
       - DNN_M400_Signal
+      - DNN_M450_Signal
       - DNN_M500_Signal
       - DNN_M550_Signal
       - DNN_M600_Signal
       - DNN_M650_Signal
       - DNN_M700_Signal
+      - DNN_M750_Signal
       - DNN_M800_Signal
+      - DNN_M850_Signal
       - DNN_M900_Signal
       - DNN_M1000_Signal
+      - DNN_M1100_Signal
+      - DNN_M1200_Signal
+      - DNN_M1300_Signal
+      - DNN_M1400_Signal
+      - DNN_M1500_Signal
 
+      - DNN_M250_TT
+      - DNN_M260_TT
+      - DNN_M270_TT
+      - DNN_M280_TT
       - DNN_M300_TT
+      - DNN_M320_TT
+      - DNN_M350_TT
+      - DNN_M360_TT
       - DNN_M400_TT
+      - DNN_M450_TT
       - DNN_M500_TT
       - DNN_M550_TT
       - DNN_M600_TT
       - DNN_M650_TT
       - DNN_M700_TT
+      - DNN_M750_TT
       - DNN_M800_TT
+      - DNN_M850_TT
       - DNN_M900_TT
       - DNN_M1000_TT
+      - DNN_M1100_TT
+      - DNN_M1200_TT
+      - DNN_M1300_TT
+      - DNN_M1400_TT
+      - DNN_M1500_TT
 
+      - DNN_M250_Other
+      - DNN_M260_Other
+      - DNN_M270_Other
+      - DNN_M280_Other
       - DNN_M300_Other
+      - DNN_M320_Other
+      - DNN_M350_Other
+      - DNN_M360_Other
       - DNN_M400_Other
+      - DNN_M450_Other
       - DNN_M500_Other
       - DNN_M550_Other
       - DNN_M600_Other
       - DNN_M650_Other
       - DNN_M700_Other
+      - DNN_M750_Other
       - DNN_M800_Other
+      - DNN_M850_Other
       - DNN_M900_Other
       - DNN_M1000_Other
+      - DNN_M1100_Other
+      - DNN_M1200_Other
+      - DNN_M1300_Other
+      - DNN_M1400_Other
+      - DNN_M1500_Other
 
+      - name: DNN_m250_vs_HME
+        vars: [ DNN_M250_Signal, DeepHME_mass ]
+      - name: DNN_m260_vs_HME
+        vars: [ DNN_M260_Signal, DeepHME_mass ]
+      - name: DNN_m270_vs_HME
+        vars: [ DNN_M270_Signal, DeepHME_mass ]
+      - name: DNN_m280_vs_HME
+        vars: [ DNN_M280_Signal, DeepHME_mass ]
       - name: DNN_m300_vs_HME
         vars: [ DNN_M300_Signal, DeepHME_mass ]
+      - name: DNN_m320_vs_HME
+        vars: [ DNN_M320_Signal, DeepHME_mass ]
+      - name: DNN_m350_vs_HME
+        vars: [ DNN_M350_Signal, DeepHME_mass ]
+      - name: DNN_m360_vs_HME
+        vars: [ DNN_M360_Signal, DeepHME_mass ]
       - name: DNN_m400_vs_HME
         vars: [ DNN_M400_Signal, DeepHME_mass ]
+      - name: DNN_m450_vs_HME
+        vars: [ DNN_M450_Signal, DeepHME_mass ]
       - name: DNN_m500_vs_HME
         vars: [ DNN_M500_Signal, DeepHME_mass ]
       - name: DNN_m550_vs_HME
@@ -1155,12 +1315,26 @@ histTuple_flavors:
         vars: [ DNN_M650_Signal, DeepHME_mass ]
       - name: DNN_m700_vs_HME
         vars: [ DNN_M700_Signal, DeepHME_mass ]
+      - name: DNN_m750_vs_HME
+        vars: [ DNN_M750_Signal, DeepHME_mass ]
       - name: DNN_m800_vs_HME
         vars: [ DNN_M800_Signal, DeepHME_mass ]
+      - name: DNN_m850_vs_HME
+        vars: [ DNN_M850_Signal, DeepHME_mass ]
       - name: DNN_m900_vs_HME
         vars: [ DNN_M900_Signal, DeepHME_mass ]
       - name: DNN_m1000_vs_HME
         vars: [ DNN_M1000_Signal, DeepHME_mass ]
+      - name: DNN_m1100_vs_HME
+        vars: [ DNN_M1100_Signal, DeepHME_mass ]
+      - name: DNN_m1200_vs_HME
+        vars: [ DNN_M1200_Signal, DeepHME_mass ]
+      - name: DNN_m1300_vs_HME
+        vars: [ DNN_M1300_Signal, DeepHME_mass ]
+      - name: DNN_m1400_vs_HME
+        vars: [ DNN_M1400_Signal, DeepHME_mass ]
+      - name: DNN_m1500_vs_HME
+        vars: [ DNN_M1500_Signal, DeepHME_mass ]
 
   TwoStageDNN_Outputs:
     # DNN Outputs (Shapes)

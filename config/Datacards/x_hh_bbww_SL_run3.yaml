@@ -21,10 +21,13 @@ processes:
   - process: data_obs
     is_data: true
     is_asimov_data: true
-  - process: XtoHHto2B2W_1L_${MX} # GluGluToRadion2L_${MX}
-    hist_name: XtoHHto2B2W_1L_${MX} # GluGluToRadion2L_${MX}
-    # param_values: [ 250, 260, 270, 280, 300, 350, 450, 550, 600, 650, 700, 800 ]
-    param_values: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000 ]
+  # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
+  # A spin-2 card is this file with GluGluToBulkGraviton_bbWW_1L in place of GluGluToRadion_bbWW_1L.
+  - process: GluGluToRadion_bbWW_1L_${MX}
+    hist_name: GluGluToRadion_bbWW_1L_${MX}
+    # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
+    # grid before these cards can be built
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
     is_signal: true
     # 125.0 H->bb BR 5.824e-01 https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR
     # 125.0 H->WW BR 2.137e-01
@@ -34,8 +37,10 @@ processes:
     # Z->ll 3.3658e-02
     # Z->invisible 20e-02
     # scale: 2 * 5.824e-01 * ( 2.137e-01 * 3 * 10.86e-02 * 3 * 10.86e-02 + 2 * 2.619E-02 * 3 * 3.3658e-02 * 20e-02)
-    # XtoHHto2B2W forces W decay, not allowing Zs
-    # Single Lepton case replaces second W->lv with a W->hadrons
+    # The single-lepton sample is 2B2JLNu. Its fragment leaves all W modes open and picks the
+    # semileptonic final state with ResonanceDecayFilter (daughters = 5,5,1,1,11,12); what matters
+    # here is that it enables only H->bb and H->WW, not H->ZZ as the dilepton one does, so no Z term
+    # enters. Single Lepton case replaces the second W->lv with a W->hadrons.
     scale: 2 * 5.824e-01 * ( 2.137e-01 * 2 * (3 * 10.86e-02 * 67.41e-02))
   - TT
   # - DY
