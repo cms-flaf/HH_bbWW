@@ -2,11 +2,11 @@
 
 ## How to run anaTuple production
 
-Current version `v2605a`
+Current version `v2609`
 
 1. Clone repository
    ```bash
-   git clone -b v2605a --recursive git@github.com:cms-flaf/HH_bbWW.git
+   git clone -b v2609 --recursive git@github.com:cms-flaf/HH_bbWW.git
    cd HH_bbWW
    git lfs pull
    source $PWD/env.sh
@@ -15,8 +15,8 @@ Current version `v2605a`
 
 1. Define `config/user_custom.yaml` file as following:
    ```yaml
-   fs_default: T3_CH_CERNBOX:/store/user/YOUR_USER_NAME/HH_bbWW/
-   fs_anaTuple: T3_US_FNALLPC:/store/user/lpcflaf/HH_bbWW/
+   fs_default: YOUR CERNBOX # davs://eoshome-k.cern.ch:8444/eos/user/k/kandroso/HH_bbWW/
+   fs_anaTuple: root://cmseos.fnal.gov//eos/uscms/store/user/lpcflaf/HH_bbWW/
 
    phys_model: Run3_Model
    analysis_config_area: config
@@ -30,6 +30,8 @@ Current version `v2605a`
    ssh USER@cms-flaf.cern.ch
    screen -S HH_bbWW_production
    ssh lxplus.cern.ch
+   kinit
+   aklog
    ```
 
 1. Load environment and setup grid certificate
@@ -40,5 +42,5 @@ Current version `v2605a`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2605a --period ERA --parallel-jobs 1000 --AnaTupleFileTask-tasks-per-job 10
+   law run AnaTupleMergeTask --version v2609 --period ERA --parallel-jobs 2000 --AnaTupleFileTask-tasks-per-job 10 --bundle
    ```
