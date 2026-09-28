@@ -6,6 +6,8 @@ compute_unc_variations: true
 compute_unc_histograms: true
 store_noncentral: true
 phys_model: TestModel
+# The trimmed variable set in global.yaml; `default` runs the CI pod out of memory.
+histTuple_flavor: CI
 
 QCDRegions:
   - OS_Iso
