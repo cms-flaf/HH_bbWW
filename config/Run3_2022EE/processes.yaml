@@ -723,13 +723,16 @@ QCD_PT:
 # The integration test runs one t#bar{t} and one DY dataset, each carrying the processors the
 # analysis really uses for that process in this era. That is what exercises a stitcher over the
 # whole anaTuple -> merge chain, where a gen-level input the anaTuple does not keep would
-# otherwise only surface in production. One dataset per process is enough: each stitching bin's
-# denominator is summed over the very events that later read it back, so a bin no event falls
-# into is never divided by.
+# otherwise only surface in production. One dataset per process is enough for the events that
+# count: a valid event falls into a bin its own dataset filled, so its denominator is never zero.
+# That does not hold for the placeholder rows the central tree carries for events selected in a
+# shifted variation alone (valid == false, every column zeroed): they can land in a bin nothing
+# filled.
 custom_CI_Background_TT:
   name: "CI -- Background t#bar{t}"
   color: "kGreen-3"
   genInfo: [ TT ]
+  processors: *TT_processors
   datasets:
     - TTto2L2Nu
 
