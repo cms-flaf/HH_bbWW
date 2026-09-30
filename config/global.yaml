@@ -81,6 +81,24 @@ anaTupleMerge_drop_columns:
   - "^weight_pdf_"
   - "^weight_qcd_scale_"
 
+# Columns no systematic shift changes. They are stored in the central tree only, and an event
+# selected only by a shift gets them from that shift, so its shifted-tree weight_base is its
+# real weight (FuseAnaTuples checks that every variation selecting an event agrees). Generator-
+# and event-level quantities only: generator information attached to a reconstructed object
+# (lepN_gen_*, centralJet_matchedGenJet_*, *_hadronFlavour) follows the selected object and
+# changes with the shift. HLT_* stays out: Analysis/hh_bbww.py defines every trigger column that
+# GetColumnNames() does not list, and a column taken from the central tree is not listed there.
+anaTuple_shift_invariant_columns:
+  - "^(run|luminosityBlock|event)$"
+  - "^(period|isData|X_mass|X_spin)$"
+  - "^weight_(gen|lumi|xs|xs_ds)$"
+  - "^weight_(pu|ps|pdf|qcd_scale|top_pt)_"
+  - "^Pileup_nTrueInt$"
+  - "^LHE_"
+  - "^LHEPart_"
+  - "^gen(HVV|Hbb|V[12]|V[12]prod[12]|b[12])_"
+  - "^TTInfo_"
+
 corrections:
   mu:
     stages: [ HistTuple, AnalysisCache ]
