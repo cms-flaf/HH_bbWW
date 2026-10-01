@@ -30,6 +30,20 @@ The HH mass is reconstructed with **DeepHME** (the bb̄WW counterpart to SVfit i
 of the observable computation and requires no special command — it runs as part of the standard
 producer chain.
 
+## Stored gen-level t̄t information
+
+Processes with `genInfo: [ TT ]` store, next to the usual observables:
+
+| Column | Content | Read by |
+|---|---|---|
+| `TTInfo_nLeptonicW` | number of leptonically decaying W bosons (0, 1 or 2; τ counts as leptonic) | the t̄t stitcher, at `AnaTupleFileTask` (denominators) and `AnaTupleMergeTask` |
+| `genTop_{pt,eta,phi,mass}` | last-copy top and anti-top, in this order | top-p<sub>T</sub> reweighting at `AnaTupleFileTask` (`genTop_pt`; configured for Run3_2022–2023BPix) |
+| `genTop_b_{pt,eta,phi}`, `genTop_lep_{pt,eta,phi,mass}` | the b quark and the W's charged lepton of each top | — |
+| `genTop_lep_gen_kind` | `GenLepton::Kind` of that lepton, -1 for a hadronic W | — |
+
+`TTInfo_*` columns must stay scalars: the anaTuple stores all columns that share a prefix as one
+collection, so an array under `TTInfo_` would turn the count into an array as well.
+
 ## Resonant mass grid
 
 The bb̄WW signal is `GluGluTo{Radion,BulkGraviton}` at 40 mass points from 250 GeV to 5 TeV in each
@@ -57,20 +71,6 @@ Two networks consume that grid, and they do not cover the same part of it:
 
 Every mass point named in a `variables:` list also needs its binning in `config/plot/histograms.yaml`
 — a variable with no matching entry there stops `HistProducerFromNTuple` with a `KeyError`.
-
-## Stored gen-level t̄t information
-
-Processes with `genInfo: [ TT ]` store, next to the usual observables:
-
-| Column | Content | Read by |
-|---|---|---|
-| `TTInfo_nLeptonicW` | number of leptonically decaying W bosons (0, 1 or 2; τ counts as leptonic) | the t̄t stitcher, at `AnaTupleFileTask` (denominators) and `AnaTupleMergeTask` |
-| `genTop_{pt,eta,phi,mass}` | last-copy top and anti-top, in this order | top-p<sub>T</sub> reweighting at `AnaTupleFileTask` (`genTop_pt`; configured for Run3_2022–2023BPix) |
-| `genTop_b_{pt,eta,phi}`, `genTop_lep_{pt,eta,phi,mass}` | the b quark and the W's charged lepton of each top | — |
-| `genTop_lep_gen_kind` | `GenLepton::Kind` of that lepton, -1 for a hadronic W | — |
-
-`TTInfo_*` columns must stay scalars: the anaTuple stores all columns that share a prefix as one
-collection, so an array under `TTInfo_` would turn the count into an array as well.
 
 ## Categories
 
