@@ -11,6 +11,16 @@ adds only what is specific to this analysis.
 
 ## Analysis-specific invariants
 
+### Shift-invariant columns
+
+- `anaTuple_shift_invariant_columns` in `config/global.yaml` lists only event-level generator and
+  event quantities. Generator information attached to reconstructed objects (`lepN_gen_*`,
+  `centralJet_matchedGenJet_*`, `*_hadronFlavour`) changes under shifts and must not be listed; nor
+  `HLT_*` while `Analysis/hh_bbww.py` checks trigger columns with `GetColumnNames()`.
+- Every input of the merge-stage `weight_base` (generator, luminosity, cross-section and shape
+  weights, the stitching variables) must be listed: shifted trees take `weight_base` from the central
+  tree, and a placeholder row only gets a real weight if all of its inputs are filled.
+
 ### Stitching processors
 
 - The shared anchors in `config/processes.yaml` (`.DY_processors`,

@@ -80,6 +80,22 @@ Two networks consume that grid, and they do not cover the same part of it:
 Every mass point named in a `variables:` list also needs its binning in `config/plot/histograms.yaml`
 — a variable with no matching entry there stops `HistProducerFromNTuple` with a `KeyError`.
 
+## Columns taken from the central tree
+
+`config/global.yaml` lists in `anaTuple_shift_invariant_columns` the anaTuple columns that no
+systematic shift changes: event numbers and dataset metadata, generator weights, the pileup, parton-
+shower, PDF, scale and top-p<sub>T</sub> weights, pileup truth, the LHE record and the generator truth
+of the signal (`gen*`) and of t̄t (`TTInfo_*`, `genTop_*`). FLAF stores them in the central tree only
+and fills them in for events that only a shift selected, after checking that every variation agrees.
+
+- Only event-level generator quantities belong there. Generator information attached to a
+  reconstructed object — `lepN_gen_*`, `centralJet_matchedGenJet_*`, the jet flavour labels — follows
+  the selected object and changes under JES, JER and the lepton scales; the fuse step stops with
+  `Column '…' is declared shift-invariant but differs in …` if one is listed.
+- `HLT_*` is left out: `Analysis/hh_bbww.py` defines a trigger column that `GetColumnNames()` does not
+  list, and a column taken from the central tree is not listed there.
+- Changing the list changes the anaTuple layout, so it goes with a new anaTuple production.
+
 ## Categories
 
 HH→bb̄WW is analysed in **resolved** and **boosted** categories (low- and high-p_T HH topologies).
