@@ -59,6 +59,14 @@ real process's processors and leaves the CI counterpart behind silently removes 
 The process names are also listed in `cms-flaf/FLAF_ci`, a **different repository**; renaming or
 adding one here needs that updated in step.
 
+### Era corrections
+
+- `config/Run3_2024/global.yaml`, 2025 and 2026 inherit `corrections:` with
+  `<<: *corrections_default` and override only `btag` and `dy_hhbbtautau`. Do not turn them back
+  into full copies: a correction added at top level then silently disappears from those eras,
+  which is how the 2024–2026 configs lost `pdf`, `qcd_scale` and `top_pt`. The merge is one
+  level deep, so an overridden entry must be complete.
+
 ### Cost
 
 `AnalysisCacheTask` (BtagShape) runs before `HistTupleProducerTask` even for simple variables and

@@ -81,7 +81,10 @@ anaTupleMerge_drop_columns:
   - "^weight_pdf_"
   - "^weight_qcd_scale_"
 
-corrections:
+# Anchored: Run3_2024 and later inherit this block with `<<: *corrections_default` and override
+# only the entries that differ there (btag, dy_hhbbtautau), so a correction added here reaches
+# every era.
+corrections: &corrections_default
   mu:
     stages: [ HistTuple, AnalysisCache ]
     columns:
