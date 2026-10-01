@@ -21,17 +21,16 @@ adds only what is specific to this analysis.
   `combineAnaCaches: processor Stitcher not provided for combining anaCaches`. This shipped
   undetected in the 2024–2026 configs because no CI process ran DY.
 - Every anchor also declares `dependency_level: {AnaTuple: file, AnaTupleMerge: process}`. The
-  merge has to see the whole process: where an inclusive sample sits next to the exclusive ones
-  (t̄t in Run3_2022 and Run3_2023BPix), a per-dataset merge normalises each to the full
-  cross-section and counts the overlap twice. `.TT_processors` lacked it up to and including the v2609 production.
-- A stitcher that runs at `AnaTupleMerge` can only read back what the anaTuple stores — there is no
-  GenPart at the merge. The TT stitcher selects on `TTInfo_nLeptonicW`, written in
-  `AnaProd/anaTupleDef.py` for processes with `genInfo: [ TT ]`. Without it every t̄t merge dies with
-  `use of undeclared identifier 'GenPart_pdgId'`, which is how the whole Run3_2022EE t̄t merge of
-  v2609 failed while CI stayed green: its t̄t process carried no stitcher.
+  merge has to see the whole process: where an inclusive sample sits next to exclusive ones, a
+  per-dataset merge normalises each to the full cross-section and counts the overlap twice.
+- t̄t is not stitched: `TT` takes only the three decay-channel samples (`TTto2L2Nu`, `TTtoLNu2Q`,
+  `TTto4Q`) in every era, which do not overlap. The inclusive `TT`/`TT_ext1` samples of Run3_2022
+  and Run3_2023BPix are not used — they carry no parton-shower weights (`PSWeight` has a single
+  entry), on which the `parton_shower` producer stops. A diff that brings them back needs the t̄t
+  stitcher back as well.
 - Every `TTInfo_*` column must stay a scalar. FuseAnaTuples stores all columns of one prefix as one
-  collection, so an array under `TTInfo_` would turn the count into one copy per entry and the
-  stitcher's selection would no longer compile. The per-top arrays therefore live in `genTop`.
+  collection, so an array under `TTInfo_` would turn the scalars into one copy per entry. The
+  per-top arrays therefore live in `genTop`.
 - Which anchor an era's DY process uses is deliberate — `allFlavors` for 2022–2023BPix, the
   single-flavour one for 2024 onwards. Do not propose harmonising them.
 

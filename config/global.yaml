@@ -165,7 +165,7 @@ corrections: &corrections_default
   # Not used in weights.yaml or the datacards yet.
   top_pt:
     stages: [ AnaTuple, AnaTupleMerge ]
-    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
+    processes: [ TT, custom_CI_Background_TT ]
     branch: genTop_pt
     parameterization: data_nlo
     enabled:

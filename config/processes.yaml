@@ -21,19 +21,6 @@
       AnaTuple: file
       AnaTupleMerge: process
 
-.TT_processors: &TT_processors
-  - name: Stitcher
-    module: FLAF.Processors.MCStitchingTT
-    class: TTStitcher
-    config: FLAF/config/Processors/stitching_TT_decayMode.yaml
-    stages: [ AnaTuple, AnaTupleMerge ]
-    # The merge has to see the whole process. Where an inclusive sample sits next to the
-    # decay-channel ones (Run3_2022, Run3_2023BPix), a per-dataset merge would normalise each
-    # of them to the full cross-section and count the overlapping bins twice.
-    dependency_level:
-      AnaTuple: file
-      AnaTupleMerge: process
-
 .W_processors_allFlavors: &W_processors_allFlavors
   - name: Stitcher
     module: FLAF.Processors.MCStitching

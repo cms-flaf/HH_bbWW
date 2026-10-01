@@ -36,7 +36,7 @@ Processes with `genInfo: [ TT ]` store, next to the usual observables:
 
 | Column | Content | Read by |
 |---|---|---|
-| `TTInfo_nLeptonicW` | number of leptonically decaying W bosons (0, 1 or 2; τ counts as leptonic) | the t̄t stitcher, at `AnaTupleFileTask` (denominators) and `AnaTupleMergeTask` |
+| `TTInfo_nLeptonicW` | number of leptonically decaying W bosons (0, 1 or 2; τ counts as leptonic) | — (t̄t is not stitched: `TT` uses only the three decay-channel samples) |
 | `genTop_{pt,eta,phi,mass}` | last-copy top and anti-top, in this order | top-p<sub>T</sub> reweighting at `AnaTupleFileTask` (`genTop_pt`; configured for Run3_2022–2023BPix) |
 | `genTop_b_{pt,eta,phi}`, `genTop_lep_{pt,eta,phi,mass}` | the b quark and the W's charged lepton of each top | — |
 | `genTop_lep_gen_kind` | `GenLepton::Kind` of that lepton, -1 for a hadronic W | — |
