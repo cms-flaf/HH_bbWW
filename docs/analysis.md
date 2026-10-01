@@ -63,7 +63,7 @@ Every mass point named in a `variables:` list also needs its binning in `config/
 `config/global.yaml` lists in `anaTuple_shift_invariant_columns` the anaTuple columns that no
 systematic shift changes: event numbers and dataset metadata, generator weights, the pileup, parton-
 shower, PDF, scale and top-p<sub>T</sub> weights, pileup truth, the LHE record and the generator truth
-of the signal (`gen*`) and of t̄t (`TTInfo_*`). FLAF stores them in the central tree only
+of the signal (`gen*`) and of t̄t (`TTInfo_*`, `genTop_*`). FLAF stores them in the central tree only
 and fills them in for events that only a shift selected, after checking that every variation agrees.
 
 - Only event-level generator quantities belong there. Generator information attached to a

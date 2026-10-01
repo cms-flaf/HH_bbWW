@@ -98,6 +98,7 @@ anaTuple_shift_invariant_columns:
   - "^LHEPart_"
   - "^gen(HVV|Hbb|V[12]|V[12]prod[12]|b[12])_"
   - "^TTInfo_"
+  - "^genTop_"
 
 corrections:
   mu:
