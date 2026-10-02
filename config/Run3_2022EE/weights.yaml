@@ -103,3 +103,5 @@ shape:
     name: CMS_scale_j_2022EE_{}
   EleES:
     name: CMS_scale_e_2022EE_{}
+  EleSmear:
+    name: CMS_res_e_2022EE_{}
