@@ -40,7 +40,10 @@ select the central X→YH samples. AnaTuple and histogram production branch per 
 named by its expanded process (`GluGluToRadion_bbWW_2L_300`,
 `GluGluToBulkGraviton_bbWW_1L_1000`, …), so the hypotheses are not added into one histogram. Which hypothesis a fit uses is chosen later, by the
 datacard's process list; the dilepton card fits `GluGluToRadion_bbTauTau` together with
-`GluGluToRadion_bbWW_2L`. The samples cover Run3_2022 through Run3_2023BPix; later eras have no
+`GluGluToRadion_bbWW_2L`. A signal added to a physics model must also be registered in
+`AnaProd/anaTupleDef.py`: in `signals_with_hvv` when its decay has an H→VV, whose gen-level
+candidate the anaTuple then stores, or in `signals_without_hvv` otherwise. The AnaTuple job of
+an unregistered signal stops at start-up. The samples cover Run3_2022 through Run3_2023BPix; later eras have no
 resonant sample produced yet, so the model loads there with no signal in it. AnaTuple production
 uses this same model (`phys_model: Run3_Model` in `config/user_custom.yaml`; see the repository
 README). The single-Higgs background group is `H` (ggH, VBFH, VH and tt̄H summed into that
