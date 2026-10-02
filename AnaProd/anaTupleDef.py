@@ -699,8 +699,10 @@ def addAllVariables(
         )
         dfw.colToSave.extend(hltBranches)
 
+    # defineSignalVariables needs a gen H->VV decay, which the bbtautau signals do not have.
     if isSignal and not (
         ("XtoHHto2B2Tau" in dataset_cfg["process_name"])
         or ("XtoHHto2Tau2B" in dataset_cfg["process_name"])
+        or ("_bbTauTau_" in dataset_cfg["process_name"])
     ):
         defineSignalVariables(dfw)
