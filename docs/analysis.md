@@ -30,6 +30,28 @@ The HH mass is reconstructed with **DeepHME** (the bb̄WW counterpart to SVfit i
 of the observable computation and requires no special command — it runs as part of the standard
 producer chain.
 
+## Stored gen-level t̄t information
+
+Processes with `genInfo: [ TT ]` store, next to the usual observables:
+
+| Column | Content | Read by |
+|---|---|---|
+| `TTInfo_nLeptonicW` | number of leptonically decaying W bosons (0, 1 or 2; τ counts as leptonic) | — (t̄t is not stitched: `TT` uses only the three decay-channel samples) |
+| `genTop_{pt,eta,phi,mass}` | last-copy top and anti-top, in this order | top-p<sub>T</sub> reweighting at `AnaTupleFileTask` (`genTop_pt`; configured for Run3_2022–2023BPix) |
+| `genTop_b_{pt,eta,phi}`, `genTop_lep_{pt,eta,phi,mass}` | the b quark and the W's charged lepton of each top | — |
+| `genTop_lep_gen_kind` | `GenLepton::Kind` of that lepton, -1 for a hadronic W | — |
+
+`TTInfo_*` columns must stay scalars: the anaTuple stores all columns that share a prefix as one
+collection, so an array under `TTInfo_` would turn the count into an array as well.
+
+## Corrections in Run3_2024 and later
+
+`config/Run3_2024/global.yaml` (and 2025, 2026) inherits the analysis-wide `corrections:` block
+through the anchor `*corrections_default` and overrides only `btag` (UParTAK4, no shape
+calibration yet) and `dy_hhbbtautau`. A correction added to `config/global.yaml` — the shape
+weights `pu`, `parton_shower`, `top_pt`, `pdf` and `qcd_scale` included — therefore applies to
+those eras too; an entry that has to differ there is overridden as a whole.
+
 ## Resonant mass grid
 
 The bb̄WW signal is `GluGluTo{Radion,BulkGraviton}` at 40 mass points from 250 GeV to 5 TeV in each

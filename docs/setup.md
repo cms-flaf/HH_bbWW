@@ -46,9 +46,9 @@ uses this same model (`phys_model: Run3_Model` in `config/user_custom.yaml`; see
 README). The single-Higgs background group is `H` (ggH, VBFH, VH and tt̄H summed into that
 one histogram). For fast local tests, use `TestModel`
 in your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/) instead.
-It holds two backgrounds — `custom_CI_Background_TT`, one t̄t dataset, and
-`custom_CI_Background_DY`, one DY dataset carrying the same DY stitcher the era configures —
-plus one signal and one data process. Each CI background mirrors the `processors:` of the real
+It holds three backgrounds — `custom_CI_Background_TT`, one t̄t dataset (t̄t is not stitched),
+`custom_CI_Background_DY` and `custom_CI_Background_W`, one DY and one W dataset carrying the
+stitchers the era configures — plus one signal and one data process. Each CI background mirrors the `processors:` of the real
 process it stands for, so the [stitching](https://cms-flaf.github.io/FLAF/concepts/stitching/)
 is exercised over the whole anaTuple → merge chain; keep them in step when you change the real
 ones.
