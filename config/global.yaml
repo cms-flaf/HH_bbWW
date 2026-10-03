@@ -130,28 +130,18 @@ corrections:
   gen: { stage: AnaTuple }
   pu:
     stages: [ AnaTuple, AnaTupleMerge ]
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   # Parton-shower ISR/FSR. Stages mirror pu because the mechanism is the same one: the
-  # weights are defined at AnaTuple, where the inclusive sums of
+  # weights are computed at AnaTuple, where the inclusive sums of
   # weight_gen * weight_pu_Central * weight_ps_<var> are accumulated into the anaCache
   # denominators, and AnaTupleMerge reads the persisted branches back to build
   # weight_base_isr{Up,Down}_rel / weight_base_fsr{Up,Down}_rel. Dividing each variation
   # by its own denominator is what makes the nuisance shape-only.
-  #
-  # AnaTupleMerge must stay disabled: the merged tuple holds PS_Weight, not PSWeight, so
-  # an enabled producer there would hit its missing-input path. It raises rather than
-  # shadowing the persisted values, but the config is what should prevent it.
   #
   # No `processes:` -- applied to all MC including signal, which is what makes ps_isr
   # and ps_fsr single correlated nuisances. It is one Pythia shower setting.
   parton_shower:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: PSWeight
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
@@ -184,26 +174,15 @@ corrections:
     processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
     branch: TTInfo_top_pt
     parameterization: data_nlo
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
-  # pdf and qcd_scale are staged like pu: the members are built at AnaTuple from the
-  # NanoAOD branches and persisted, and AnaTupleMerge reads them back. The anaTuple no
-  # longer carries LHEPdf_Weight / LHEScale_Weight, so enabling either at AnaTupleMerge
-  # would find no input and silently make every member 1.
+  # pdf and qcd_scale are staged like pu: the members are computed at AnaTuple from the
+  # NanoAOD branches and persisted, and AnaTupleMerge reads them back.
   pdf:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEPdfWeight
     n_members: 103
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   qcd_scale:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEScaleWeight
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
