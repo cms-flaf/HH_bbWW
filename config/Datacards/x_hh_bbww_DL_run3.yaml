@@ -568,7 +568,15 @@ uncertainties:
     type: shape
     eras:
       - Run3_2022
+  - name: CMS_res_e_2022
+    type: shape
+    eras:
+      - Run3_2022
   - name: CMS_scale_e_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_res_e_2022EE
     type: shape
     eras:
       - Run3_2022EE
@@ -576,7 +584,15 @@ uncertainties:
     type: shape
     eras:
       - Run3_2023
+  - name: CMS_res_e_2023
+    type: shape
+    eras:
+      - Run3_2023
   - name: CMS_scale_e_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_res_e_2023BPix
     type: shape
     eras:
       - Run3_2023BPix
