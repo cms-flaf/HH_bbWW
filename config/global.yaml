@@ -1154,6 +1154,31 @@ histTuple_flavors:
       - name: binary_DNN_m1000_vs_HME
         vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
 
+  # The integration CI's flavor: what its datacards read plus a few observables to plot.
+  # Every variable is booked per variation, channel and category, so `default` does not
+  # fit the CI pod's memory once a process has more than one dataset.
+  CI:
+    # One fullres variable, to keep that path tested.
+    fullResolution_variables:
+      - lep1_pt
+
+    variables:
+      - lep1_pt
+      - lep1_eta
+      - lep2_pt
+      - PuppiMET_pt
+      - bjet1_pt
+      - bjet1_btagPNetB
+      - ll_mass
+      - DeepHME_mass
+
+      # Limit inputs at the CI's MX=300: CI_card_SL.yaml reads the binary score,
+      # CI_card.yaml the DNN-vs-HME plane.
+      - TwoStageDNN_M300_binary
+      - DNN_M300_Signal
+      - name: DNN_m300_vs_HME
+        vars: [ DNN_M300_Signal, DeepHME_mass ]
+
   DL_DNN_Inputs:
     # DL DNN Inputs
     fullResolution_variables: [ ]
