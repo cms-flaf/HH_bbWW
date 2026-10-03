@@ -643,6 +643,37 @@ def defineGenVariables(dfw, dataset_cfg):
         )
 
 
+# The signal entries of the physics models, by whether their decay has an H->VV, which
+# defineSignalVariables reconstructs at gen level. A signal in neither set is refused.
+signals_with_hvv = {
+    "GluGluToRadion_bbWW_1L",
+    "GluGluToRadion_bbWW_2L",
+    "GluGluToBulkGraviton_bbWW_1L",
+    "GluGluToBulkGraviton_bbWW_2L",
+    "XtoHHto2B2W_SingleLepton_DNN",
+    "custom_CI_Signal",
+}
+signals_without_hvv = {
+    "GluGluToRadion_bbTauTau",
+    "GluGluToBulkGraviton_bbTauTau",
+}
+
+has_gen_hvv = None
+
+
+def Initialize(setup, dataset_name):
+    global has_gen_hvv
+    original = setup.original_process(setup.datasets[dataset_name]["process_name"])
+    has_gen_hvv = False
+    if setup.phys_model.listed_process_type(original) == "signals":
+        if original not in signals_with_hvv | signals_without_hvv:
+            raise RuntimeError(
+                f"Signal '{original}' of dataset '{dataset_name}' is in neither"
+                " signals_with_hvv nor signals_without_hvv."
+            )
+        has_gen_hvv = original in signals_with_hvv
+
+
 def addAllVariables(
     dfw,
     syst_name,
@@ -699,8 +730,9 @@ def addAllVariables(
         )
         dfw.colToSave.extend(hltBranches)
 
-    if isSignal and not (
-        ("XtoHHto2B2Tau" in dataset_cfg["process_name"])
-        or ("XtoHHto2Tau2B" in dataset_cfg["process_name"])
-    ):
+    if has_gen_hvv is None:
+        raise RuntimeError(
+            "anaTupleDef.Initialize(setup, dataset_name) was not called."
+        )
+    if has_gen_hvv:
         defineSignalVariables(dfw)
