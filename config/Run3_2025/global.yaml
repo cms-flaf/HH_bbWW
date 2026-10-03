@@ -34,9 +34,6 @@ corrections:
   gen: { stage: AnaTuple }
   pu:
     stages: [ AnaTuple, AnaTupleMerge ]
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   # Parton-shower ISR/FSR -- keep in sync with config/global.yaml. This era declares its
   # own complete `corrections:` block, and config is concatenated text parsed once, so a
   # duplicate key replaces the top-level block wholesale instead of merging into it.
@@ -45,9 +42,6 @@ corrections:
   parton_shower:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: PSWeight
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
