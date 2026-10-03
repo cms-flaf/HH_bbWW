@@ -490,45 +490,36 @@ VBFHHto2B2WtoLNu2Q:
 Data_Full:
   name: "Data"
   datasets:
+    # No Run2026C: it is the dedicated low-PU run, with no certified luminosity.
     - EGamma0_Run2026A_v1
     - EGamma0_Run2026B_v1
-    - EGamma0_Run2026C_v1
     - EGamma0_Run2026D_v1
     - EGamma1_Run2026A_v1
     - EGamma1_Run2026B_v1
-    - EGamma1_Run2026C_v1
     - EGamma1_Run2026D_v1
     - EGamma2_Run2026A_v1
     - EGamma2_Run2026B_v1
-    - EGamma2_Run2026C_v1
     - EGamma2_Run2026D_v1
     - EGamma3_Run2026A_v1
     - EGamma3_Run2026B_v1
-    - EGamma3_Run2026C_v1
     - EGamma3_Run2026D_v1
     - EGamma4_Run2026A_v1
     - EGamma4_Run2026B_v1
-    - EGamma4_Run2026C_v1
     - EGamma4_Run2026D_v1
     - EGamma5_Run2026A_v1
     - EGamma5_Run2026B_v1
-    - EGamma5_Run2026C_v1
     - EGamma5_Run2026D_v1
     - Muon0_Run2026A_v1
     - Muon0_Run2026B_v1
-    - Muon0_Run2026C_v1
     - Muon0_Run2026D_v1
     - Muon1_Run2026A_v1
     - Muon1_Run2026B_v1
-    - Muon1_Run2026C_v1
     - Muon1_Run2026D_v1
     - Muon2_Run2026A_v1
     - Muon2_Run2026B_v1
-    - Muon2_Run2026C_v1
     - Muon2_Run2026D_v1
     - Muon3_Run2026A_v1
     - Muon3_Run2026B_v1
-    - Muon3_Run2026C_v1
     - Muon3_Run2026D_v1
 
 custom_CI:
