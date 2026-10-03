@@ -583,8 +583,9 @@ def defineGenVariables(dfw, dataset_cfg):
     """Gen-level variables, defined before the event selection.
 
     The MC observables and the information the process declares with `genInfo`.
-    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
-    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
+    TT: the scalar TTInfo_nLeptonicW, and a genTop collection ordered {top, anti-top} with the
+    last-copy top, its b quark and its W's charged lepton (pt/eta/phi/mass, no b mass), plus
+    the lepton's GenLepton::Kind (-1 if hadronic).
     """
     for var in MCObservables:
         if isinstance(var, tuple):
@@ -615,28 +616,34 @@ def defineGenVariables(dfw, dataset_cfg):
             " GenPart_genPartIdxMother, GenPart_pt, GenPart_eta, GenPart_phi,"
             " GenPart_mass)",
         )
+        # What the TT stitcher selects on (FLAF/Processors/MCStitchingTT.py). It runs again at
+        # AnaTupleMerge, where GenPart is gone, and reads this count back from the anaTuple; it
+        # has no other way to get it there, so a missing branch fails the merge.
+        dfw.DefineAndAppend("TTInfo_nLeptonicW", "TTInfo.nLeptonicW()")
         for slot in [0, 1]:
             dfw.Define(
-                f"TTInfo_lep{slot}_p4",
+                f"genTop_lep{slot}_p4",
                 "reco_tau::gen_truth::lastCopyP4ByGenPartIndex(genLeptons,"
                 f" TTInfo.lep_index[{slot}])",
             )
+        # The per-top arrays must not share the TTInfo_ prefix with the scalar count:
+        # FuseAnaTuples stores all columns of one prefix as one collection.
         p4s = {
-            "top": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
-            "b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
-            "lep": ("TTInfo_lep0_p4", "TTInfo_lep1_p4"),
+            "genTop": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
+            "genTop_b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
+            "genTop_lep": ("genTop_lep0_p4", "genTop_lep1_p4"),
         }
-        for obj, (from_top, from_antitop) in p4s.items():
+        for prefix, (from_top, from_antitop) in p4s.items():
             for var in PtEtaPhiM:
-                if obj == "b" and var == "mass":
+                if prefix == "genTop_b" and var == "mass":
                     continue  # always zero in NanoAOD
                 dfw.DefineAndAppend(
-                    f"TTInfo_{obj}_{var}",
+                    f"{prefix}_{var}",
                     f"ROOT::VecOps::RVec<float>{{static_cast<float>({from_top}.{var}()),"
                     f" static_cast<float>({from_antitop}.{var}())}}",
                 )
         dfw.DefineAndAppend(
-            "TTInfo_lep_gen_kind",
+            "genTop_lep_gen_kind",
             "ROOT::VecOps::RVec<int>{"
             "reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[0]),"
             " reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[1])}",

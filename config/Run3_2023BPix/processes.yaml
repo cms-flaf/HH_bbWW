@@ -80,20 +80,11 @@ DY_LO:
 TT:
   name: "t#bar{t}"
   color: "kGreen-3"  # eliminates need for plot.yaml
-  processors: *TT_processors
   genInfo: [ TT ]
   datasets:
-    - TT
     - TTto2L2Nu
     - TTtoLNu2Q
     - TTto4Q
-
-TT_Inclusive:
-  name: "t#bar{t} Inclusive"
-  color: "kGreen-3"
-  genInfo: [ TT ]
-  datasets:
-    - TT
 
 ST:
   name: "ST"

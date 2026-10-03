@@ -100,7 +100,10 @@ anaTuple_shift_invariant_columns:
   - "^TTInfo_"
   - "^genTop_"
 
-corrections:
+# Anchored: Run3_2024 and later inherit this block with `<<: *corrections_default` and override
+# only the entries that differ there (btag, dy_hhbbtautau), so a correction added here reaches
+# every era.
+corrections: &corrections_default
   mu:
     stages: [ HistTuple, AnalysisCache ]
     columns:
@@ -171,8 +174,8 @@ corrections:
   # Not used in weights.yaml or the datacards yet.
   top_pt:
     stages: [ AnaTuple, AnaTupleMerge ]
-    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
-    branch: TTInfo_top_pt
+    processes: [ TT, custom_CI_Background_TT ]
+    branch: genTop_pt
     parameterization: data_nlo
   # pdf and qcd_scale are staged like pu: the members are computed at AnaTuple from the
   # NanoAOD branches and persisted, and AnaTupleMerge reads them back.
