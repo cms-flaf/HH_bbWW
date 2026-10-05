@@ -42,5 +42,7 @@ Current version `v2610`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2610 --period ERA --parallel-jobs 2000 --AnaTupleFileTask-tasks-per-job 10 --bundle
+   law run AnaTupleMergeTask --version v2610 --period ERA --parallel-jobs 2000 --bundle
    ```
+   `AnaTupleFileTask` composes its jobs from the estimated cost of each input file; passing
+   `--AnaTupleFileTask-tasks-per-job` turns that off and falls back to fixed-size groups.
