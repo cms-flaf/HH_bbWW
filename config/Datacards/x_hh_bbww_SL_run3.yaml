@@ -498,6 +498,10 @@ uncertainties:
     type: shape
     eras:
       - Run3_2023BPix
+  - name: CMS_res_e_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
 
   # No ps_isr / ps_fsr: the SL shapes were produced without the parton-shower variations.
   # Add them back here once they are.

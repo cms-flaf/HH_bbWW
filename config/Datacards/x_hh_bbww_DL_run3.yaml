@@ -74,11 +74,9 @@ processes:
     is_asimov_data: true
 
   # The spin-0 (Radion) X->HH signal. Run3_Model histograms every hypothesis; this card picks one.
-  # A spin-2 card is this file with GluGluToBulkGraviton_bbWW_2L in place of
-  # GluGluToRadion_bbWW_2L, and wants its own binning.
-  # bbtautau is commented out until the private X->HH->bbtautau samples exist; uncomment the
-  # process below and its `^XtoHHto2Tau2B_` uncertainty entries with it. It is spin 0, so it does
-  # not belong on a BulkGraviton card.
+  # A spin-2 card is this file with GluGluToBulkGraviton_bbWW_2L and GluGluToBulkGraviton_bbTauTau
+  # in place of GluGluToRadion_bbWW_2L and GluGluToRadion_bbTauTau (process names and the
+  # uncertainty patterns below), and wants its own binning.
   - process: GluGluToRadion_bbWW_2L_${MX}
     hist_name: GluGluToRadion_bbWW_2L_${MX}
     # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
@@ -87,13 +85,11 @@ processes:
     is_signal: true
     allow_zero_integral: true
 
-  # - process: XtoHHto2Tau2B_${MX}
-  #   hist_name: XtoHHto2Tau2B_${MX}
-  #   param_values: [ 300, 400, 500, 550, 600, 650, 700, 800, 900, 1000 ]
-  #   is_signal: true
-  #   allow_zero_integral: true
-  #   allow_negative_bins_within_error: true
-  #   max_n_sigma_for_negative_bins: 2
+  - process: GluGluToRadion_bbTauTau_${MX}
+    hist_name: GluGluToRadion_bbTauTau_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
 
   - process: TT
     allow_negative_bins_within_error: true
@@ -572,7 +568,15 @@ uncertainties:
     type: shape
     eras:
       - Run3_2022
+  - name: CMS_res_e_2022
+    type: shape
+    eras:
+      - Run3_2022
   - name: CMS_scale_e_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_res_e_2022EE
     type: shape
     eras:
       - Run3_2022EE
@@ -580,7 +584,15 @@ uncertainties:
     type: shape
     eras:
       - Run3_2023
+  - name: CMS_res_e_2023
+    type: shape
+    eras:
+      - Run3_2023
   - name: CMS_scale_e_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_res_e_2023BPix
     type: shape
     eras:
       - Run3_2023BPix
@@ -677,7 +689,7 @@ uncertainties:
   # card; it belongs in these lists when the SL card gains them. Single Higgs and VH
   # likewise, once they are added as processes.
   #
-  # BR_hww covers the whole signal although the sample is 2B2V: about 4.5 % of it is
+  # BR_hww covers the whole bbWW signal although the sample is 2B2V: about 4.5 % of it is
   # H->ZZ->2l2nu, which this nuisance over-covers and BR_hzz does not cover at all.
   #
   # The process patterns are regexes (a `processes:` entry beginning with ^ is matched
@@ -690,19 +702,18 @@ uncertainties:
     type: lnN
     processes:
       - ^GluGluToRadion_bbWW_2L_
-      # - ^XtoHHto2Tau2B_  # uncomment with the bbtautau signal above
+      - ^GluGluToRadion_bbTauTau_
     value: [ -0.0126, 0.0124 ]
   - name: BR_hww
     type: lnN
     processes:
       - ^GluGluToRadion_bbWW_2L_
     value: [ -0.0152, 0.0153 ]
-  # Uncomment with the bbtautau signal above.
-  # - name: BR_htt
-  #   type: lnN
-  #   processes:
-  #     - ^XtoHHto2Tau2B_
-  #   value: [ -0.0163, 0.0165 ]
+  - name: BR_htt
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbTauTau_
+    value: [ -0.0163, 0.0165 ]
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
