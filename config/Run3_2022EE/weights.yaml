@@ -105,3 +105,5 @@ shape:
     name: CMS_scale_e_2022EE_{}
   EleSmear:
     name: CMS_res_e_2022EE_{}
+  ScaRe:
+    name: CMS_ScaRe_mu_2022EE_{}
