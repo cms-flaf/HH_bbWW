@@ -156,8 +156,8 @@ ttV:
     - TTNuNu
     - TTZ_Zto2Q
 
-SingleHiggs:
-  name: "Single Higgs"
+H:
+  name: "H"
   color: "kRed"
   sub_processes:
     - ggH
@@ -247,6 +247,108 @@ XtoHHto2Tau2B:
     parameters: [ MASS ]
     process_name: XtoHHto2Tau2B_${MASS}
     name_pattern: Xto2Tau2B ${MASS} GeV (x50)
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
+GluGluToRadion_bbWW_2L:
+  name: "GluGluToRadion_bbWW_2L"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion_bbWW_2L_${MASS}
+    name_pattern: GluGluToRadion bbWW 2L mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kBlack", "kBlue", "kRed" ]
+    channels: [ "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
+GluGluToRadion_bbWW_1L:
+  name: "GluGluToRadion_bbWW_1L"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion_bbWW_1L_${MASS}
+    name_pattern: GluGluToRadion bbWW 1L mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu" ]
+  datasets: [ ]
+
+GluGluToBulkGraviton_bbWW_2L:
+  name: "GluGluToBulkGraviton_bbWW_2L"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton_bbWW_2L_${MASS}
+    name_pattern: GluGluToBulkGraviton bbWW 2L mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kBlack", "kBlue", "kRed" ]
+    channels: [ "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
+GluGluToBulkGraviton_bbWW_1L:
+  name: "GluGluToBulkGraviton_bbWW_1L"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton_bbWW_1L_${MASS}
+    name_pattern: GluGluToBulkGraviton bbWW 1L mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu" ]
+  datasets: [ ]
+
+GluGluToRadion_bbTauTau:
+  name: "GluGluToRadion_bbTauTau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Tau_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion_bbTauTau_${MASS}
+    name_pattern: GluGluToRadion bbTauTau mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
+GluGluToBulkGraviton_bbTauTau:
+  name: "GluGluToBulkGraviton_bbTauTau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Tau_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton_bbTauTau_${MASS}
+    name_pattern: GluGluToBulkGraviton bbTauTau mass ${MASS} GeV
     to_plot:
       - [ '300' ]
       - [ '600' ]
@@ -388,45 +490,36 @@ VBFHHto2B2WtoLNu2Q:
 Data_Full:
   name: "Data"
   datasets:
+    # No Run2026C: it is the dedicated low-PU run, with no certified luminosity.
     - EGamma0_Run2026A_v1
     - EGamma0_Run2026B_v1
-    - EGamma0_Run2026C_v1
     - EGamma0_Run2026D_v1
     - EGamma1_Run2026A_v1
     - EGamma1_Run2026B_v1
-    - EGamma1_Run2026C_v1
     - EGamma1_Run2026D_v1
     - EGamma2_Run2026A_v1
     - EGamma2_Run2026B_v1
-    - EGamma2_Run2026C_v1
     - EGamma2_Run2026D_v1
     - EGamma3_Run2026A_v1
     - EGamma3_Run2026B_v1
-    - EGamma3_Run2026C_v1
     - EGamma3_Run2026D_v1
     - EGamma4_Run2026A_v1
     - EGamma4_Run2026B_v1
-    - EGamma4_Run2026C_v1
     - EGamma4_Run2026D_v1
     - EGamma5_Run2026A_v1
     - EGamma5_Run2026B_v1
-    - EGamma5_Run2026C_v1
     - EGamma5_Run2026D_v1
     - Muon0_Run2026A_v1
     - Muon0_Run2026B_v1
-    - Muon0_Run2026C_v1
     - Muon0_Run2026D_v1
     - Muon1_Run2026A_v1
     - Muon1_Run2026B_v1
-    - Muon1_Run2026C_v1
     - Muon1_Run2026D_v1
     - Muon2_Run2026A_v1
     - Muon2_Run2026B_v1
-    - Muon2_Run2026C_v1
     - Muon2_Run2026D_v1
     - Muon3_Run2026A_v1
     - Muon3_Run2026B_v1
-    - Muon3_Run2026C_v1
     - Muon3_Run2026D_v1
 
 custom_CI:

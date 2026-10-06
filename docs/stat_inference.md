@@ -80,6 +80,13 @@ file, not at the anaTuple. Checking the anaTuple alone is not sufficient. Adding
 `shape:` source means regenerating the caches, so it belongs with an anaTuple production
 rather than a weights-only re-run.
 
+An event that only a shift moves into the selection (typically JES or JER) enters that shift's
+template with its real weight. The generator-level inputs of `weight_base` are listed in
+`anaTuple_shift_invariant_columns` (see [Analysis](analysis.md#columns-taken-from-the-central-tree)),
+so the central tree carries them for that event too and the merge computes its `weight_base`. In
+anaTuples produced before that list existed such events had weight 0, so they were missing from the
+shifted templates.
+
 #### Correlating and decorrelating across eras
 
 There is no `correlated:` switch. Combine correlates two entries when they carry the
