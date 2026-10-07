@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <vector>
 
 #include <Math/Vector4D.h>
@@ -48,7 +49,7 @@ namespace hh_bbww {
             delta, ref, fatbjet_p4, fatbjet_isValid, bjet1_p4, bjet1_isValid, bjet2_p4, bjet2_isValid, fallback);
     }
 
-    // Uses the signed DeltaPhi, so the minimum is the most negative value, not the smallest |DeltaPhi|.
+    // Smallest |DeltaPhi| to the b candidates.
     template <typename LVector>
     float MinDeltaPhiToBCands(const LVector& ref,
                               const LorentzVectorM& fatbjet_p4,
@@ -58,7 +59,7 @@ namespace hh_bbww {
                               const LorentzVectorM& bjet2_p4,
                               bool bjet2_isValid,
                               float fallback) {
-        auto delta = [](const auto& a, const auto& b) { return ROOT::Math::VectorUtil::DeltaPhi(a, b); };
+        auto delta = [](const auto& a, const auto& b) { return std::abs(ROOT::Math::VectorUtil::DeltaPhi(a, b)); };
         return MinDeltaToBCands(
             delta, ref, fatbjet_p4, fatbjet_isValid, bjet1_p4, bjet1_isValid, bjet2_p4, bjet2_isValid, fallback);
     }
