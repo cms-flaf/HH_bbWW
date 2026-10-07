@@ -1249,7 +1249,8 @@ def defineLepWCandP4(df):
 
 def AddHHSystemVariables(df):
     """
-    HH production and decay variables, -100 where undefined. H1 is the H->bb candidate (Hbb_p4).
+    HH production and decay variables, -100 where undefined (-9999 for the signed Pzeta pair).
+    H1 is the H->bb candidate (Hbb_p4).
     H2 is H->WW: ll + MET (MET pz = 0) in DL, Hww_p4 in SL; its decay plane is (lep1, lep2) in DL
     and (leptonic W, hadronic W) in SL. Requires categories and defineLepWCandP4.
     """
@@ -1321,8 +1322,11 @@ def AddHHSystemVariables(df):
             "hh_bbww::Calculate_MX_reduced(Hbb_p4, HWWCand_p4)",
         ),
     ]
+    # Pzeta can be any real number, so its sentinel sits far outside the physical range.
+    sentinels = {"Pzeta": "-9999.f", "Pzeta_visible": "-9999.f"}
     for name, valid, expr in hh_variables:
-        df = df.Define(name, f"{valid} ? static_cast<float>({expr}) : -100.f")
+        sentinel = sentinels.get(name, "-100.f")
+        df = df.Define(name, f"{valid} ? static_cast<float>({expr}) : {sentinel}")
     return df
 
 
