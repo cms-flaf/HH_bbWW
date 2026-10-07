@@ -323,6 +323,40 @@ GluGluToBulkGraviton_bbWW_1L:
     channels: [ "e", "mu" ]
   datasets: [ ]
 
+GluGluToRadion_bbTauTau:
+  name: "GluGluToRadion_bbTauTau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoRadiontoHHto2B2Tau_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToRadion_bbTauTau_${MASS}
+    name_pattern: GluGluToRadion bbTauTau mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
+GluGluToBulkGraviton_bbTauTau:
+  name: "GluGluToBulkGraviton_bbTauTau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: GluGlutoBulkGravitontoHHto2B2Tau_M_(\d+)
+    parameters: [ MASS ]
+    process_name: GluGluToBulkGraviton_bbTauTau_${MASS}
+    name_pattern: GluGluToBulkGraviton bbTauTau mass ${MASS} GeV
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
+  datasets: [ ]
+
 GluGlutoHHto2B2V:
   name: "GluGlutoHHto2B2V"
   color: "kBlack"
@@ -456,45 +490,36 @@ VBFHHto2B2WtoLNu2Q:
 Data_Full:
   name: "Data"
   datasets:
+    # No Run2026C: it is the dedicated low-PU run, with no certified luminosity.
     - EGamma0_Run2026A_v1
     - EGamma0_Run2026B_v1
-    - EGamma0_Run2026C_v1
     - EGamma0_Run2026D_v1
     - EGamma1_Run2026A_v1
     - EGamma1_Run2026B_v1
-    - EGamma1_Run2026C_v1
     - EGamma1_Run2026D_v1
     - EGamma2_Run2026A_v1
     - EGamma2_Run2026B_v1
-    - EGamma2_Run2026C_v1
     - EGamma2_Run2026D_v1
     - EGamma3_Run2026A_v1
     - EGamma3_Run2026B_v1
-    - EGamma3_Run2026C_v1
     - EGamma3_Run2026D_v1
     - EGamma4_Run2026A_v1
     - EGamma4_Run2026B_v1
-    - EGamma4_Run2026C_v1
     - EGamma4_Run2026D_v1
     - EGamma5_Run2026A_v1
     - EGamma5_Run2026B_v1
-    - EGamma5_Run2026C_v1
     - EGamma5_Run2026D_v1
     - Muon0_Run2026A_v1
     - Muon0_Run2026B_v1
-    - Muon0_Run2026C_v1
     - Muon0_Run2026D_v1
     - Muon1_Run2026A_v1
     - Muon1_Run2026B_v1
-    - Muon1_Run2026C_v1
     - Muon1_Run2026D_v1
     - Muon2_Run2026A_v1
     - Muon2_Run2026B_v1
-    - Muon2_Run2026C_v1
     - Muon2_Run2026D_v1
     - Muon3_Run2026A_v1
     - Muon3_Run2026B_v1
-    - Muon3_Run2026C_v1
     - Muon3_Run2026D_v1
 
 custom_CI:
@@ -515,6 +540,7 @@ custom_CI_Background_TT:
   genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
+    - TTtoLNu2Q
 
 custom_CI_Background_DY:
   name: "CI -- Background DY"
@@ -535,6 +561,14 @@ custom_CI_Signal:
   color: "kBlack"
   datasets:
     - GluGlutoHHto2B2Vto2L2Nu_kl_1p00_kt_1p00_c2_0p00
+
+# No XtoYH sample exists for 2024 (2025/26 reuse its MC), so the one-lepton HH sample
+# stands in, as the two-lepton one does for custom_CI_Signal.
+custom_CI_Signal_SL:
+  name: "CI -- Signal (1L)"
+  color: "kBlue"
+  datasets:
+    - GluGlutoHHto2B2WtoLNu2Q_kl_1p00_kt_1p00_c2_0p00
 
 custom_CI_Data:
   name: "CI -- Data"

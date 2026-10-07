@@ -583,8 +583,9 @@ def defineGenVariables(dfw, dataset_cfg):
     """Gen-level variables, defined before the event selection.
 
     The MC observables and the information the process declares with `genInfo`.
-    TT: {top, anti-top} vectors of the last-copy top, its b quark and its W's charged lepton
-    (pt/eta/phi/mass, no b mass), plus the lepton's GenLepton::Kind (-1 if hadronic).
+    TT: the scalar TTInfo_nLeptonicW, and a genTop collection ordered {top, anti-top} with the
+    last-copy top, its b quark and its W's charged lepton (pt/eta/phi/mass, no b mass), plus
+    the lepton's GenLepton::Kind (-1 if hadronic).
     """
     for var in MCObservables:
         if isinstance(var, tuple):
@@ -615,32 +616,70 @@ def defineGenVariables(dfw, dataset_cfg):
             " GenPart_genPartIdxMother, GenPart_pt, GenPart_eta, GenPart_phi,"
             " GenPart_mass)",
         )
+        # What the TT stitcher selects on (FLAF/Processors/MCStitchingTT.py). It runs again at
+        # AnaTupleMerge, where GenPart is gone, and reads this count back from the anaTuple; it
+        # has no other way to get it there, so a missing branch fails the merge.
+        dfw.DefineAndAppend("TTInfo_nLeptonicW", "TTInfo.nLeptonicW()")
         for slot in [0, 1]:
             dfw.Define(
-                f"TTInfo_lep{slot}_p4",
+                f"genTop_lep{slot}_p4",
                 "reco_tau::gen_truth::lastCopyP4ByGenPartIndex(genLeptons,"
                 f" TTInfo.lep_index[{slot}])",
             )
+        # The per-top arrays must not share the TTInfo_ prefix with the scalar count:
+        # FuseAnaTuples stores all columns of one prefix as one collection.
         p4s = {
-            "top": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
-            "b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
-            "lep": ("TTInfo_lep0_p4", "TTInfo_lep1_p4"),
+            "genTop": ("TTInfo.top_p4[0]", "TTInfo.top_p4[1]"),
+            "genTop_b": ("TTInfo.b_p4[0]", "TTInfo.b_p4[1]"),
+            "genTop_lep": ("genTop_lep0_p4", "genTop_lep1_p4"),
         }
-        for obj, (from_top, from_antitop) in p4s.items():
+        for prefix, (from_top, from_antitop) in p4s.items():
             for var in PtEtaPhiM:
-                if obj == "b" and var == "mass":
+                if prefix == "genTop_b" and var == "mass":
                     continue  # always zero in NanoAOD
                 dfw.DefineAndAppend(
-                    f"TTInfo_{obj}_{var}",
+                    f"{prefix}_{var}",
                     f"ROOT::VecOps::RVec<float>{{static_cast<float>({from_top}.{var}()),"
                     f" static_cast<float>({from_antitop}.{var}())}}",
                 )
         dfw.DefineAndAppend(
-            "TTInfo_lep_gen_kind",
+            "genTop_lep_gen_kind",
             "ROOT::VecOps::RVec<int>{"
             "reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[0]),"
             " reco_tau::gen_truth::kindByGenPartIndex(genLeptons, TTInfo.lep_index[1])}",
         )
+
+
+# The signal entries of the physics models, by whether their decay has an H->VV, which
+# defineSignalVariables reconstructs at gen level. A signal in neither set is refused.
+signals_with_hvv = {
+    "GluGluToRadion_bbWW_1L",
+    "GluGluToRadion_bbWW_2L",
+    "GluGluToBulkGraviton_bbWW_1L",
+    "GluGluToBulkGraviton_bbWW_2L",
+    "XtoHHto2B2W_SingleLepton_DNN",
+    "custom_CI_Signal",
+    "custom_CI_Signal_SL",
+}
+signals_without_hvv = {
+    "GluGluToRadion_bbTauTau",
+    "GluGluToBulkGraviton_bbTauTau",
+}
+
+has_gen_hvv = None
+
+
+def Initialize(setup, dataset_name):
+    global has_gen_hvv
+    original = setup.original_process(setup.datasets[dataset_name]["process_name"])
+    has_gen_hvv = False
+    if setup.phys_model.listed_process_type(original) == "signals":
+        if original not in signals_with_hvv | signals_without_hvv:
+            raise RuntimeError(
+                f"Signal '{original}' of dataset '{dataset_name}' is in neither"
+                " signals_with_hvv nor signals_without_hvv."
+            )
+        has_gen_hvv = original in signals_with_hvv
 
 
 def addAllVariables(
@@ -699,8 +738,9 @@ def addAllVariables(
         )
         dfw.colToSave.extend(hltBranches)
 
-    if isSignal and not (
-        ("XtoHHto2B2Tau" in dataset_cfg["process_name"])
-        or ("XtoHHto2Tau2B" in dataset_cfg["process_name"])
-    ):
+    if has_gen_hvv is None:
+        raise RuntimeError(
+            "anaTupleDef.Initialize(setup, dataset_name) was not called."
+        )
+    if has_gen_hvv:
         defineSignalVariables(dfw)

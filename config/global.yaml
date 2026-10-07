@@ -81,7 +81,29 @@ anaTupleMerge_drop_columns:
   - "^weight_pdf_"
   - "^weight_qcd_scale_"
 
-corrections:
+# Columns no systematic shift changes. They are stored in the central tree only, and an event
+# selected only by a shift gets them from that shift, so its shifted-tree weight_base is its
+# real weight (FuseAnaTuples checks that every variation selecting an event agrees). Generator-
+# and event-level quantities only: generator information attached to a reconstructed object
+# (lepN_gen_*, centralJet_matchedGenJet_*, *_hadronFlavour) follows the selected object and
+# changes with the shift. HLT_* stays out: Analysis/hh_bbww.py defines every trigger column that
+# GetColumnNames() does not list, and a column taken from the central tree is not listed there.
+anaTuple_shift_invariant_columns:
+  - "^(run|luminosityBlock|event)$"
+  - "^(period|isData|X_mass|X_spin)$"
+  - "^weight_(gen|lumi|xs|xs_ds)$"
+  - "^weight_(pu|ps|pdf|qcd_scale|top_pt)_"
+  - "^Pileup_nTrueInt$"
+  - "^LHE_"
+  - "^LHEPart_"
+  - "^gen(HVV|Hbb|V[12]|V[12]prod[12]|b[12])_"
+  - "^TTInfo_"
+  - "^genTop_"
+
+# Anchored: Run3_2024 and later inherit this block with `<<: *corrections_default` and override
+# only the entries that differ there (btag, dy_hhbbtautau), so a correction added here reaches
+# every era.
+corrections: &corrections_default
   mu:
     stages: [ HistTuple, AnalysisCache ]
     columns:
@@ -111,28 +133,18 @@ corrections:
   gen: { stage: AnaTuple }
   pu:
     stages: [ AnaTuple, AnaTupleMerge ]
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   # Parton-shower ISR/FSR. Stages mirror pu because the mechanism is the same one: the
-  # weights are defined at AnaTuple, where the inclusive sums of
+  # weights are computed at AnaTuple, where the inclusive sums of
   # weight_gen * weight_pu_Central * weight_ps_<var> are accumulated into the anaCache
   # denominators, and AnaTupleMerge reads the persisted branches back to build
   # weight_base_isr{Up,Down}_rel / weight_base_fsr{Up,Down}_rel. Dividing each variation
   # by its own denominator is what makes the nuisance shape-only.
-  #
-  # AnaTupleMerge must stay disabled: the merged tuple holds PS_Weight, not PSWeight, so
-  # an enabled producer there would hit its missing-input path. It raises rather than
-  # shadowing the persisted values, but the config is what should prevent it.
   #
   # No `processes:` -- applied to all MC including signal, which is what makes ps_isr
   # and ps_fsr single correlated nuisances. It is one Pythia shower setting.
   parton_shower:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: PSWeight
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   base: { stage: AnaTupleMerge }
   JEC: { stage: AnaTuple }
   JER:
@@ -162,29 +174,18 @@ corrections:
   # Not used in weights.yaml or the datacards yet.
   top_pt:
     stages: [ AnaTuple, AnaTupleMerge ]
-    processes: [ TT, TT_Inclusive, custom_CI_Background_TT ]
-    branch: TTInfo_top_pt
+    processes: [ TT, custom_CI_Background_TT ]
+    branch: genTop_pt
     parameterization: data_nlo
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
-  # pdf and qcd_scale are staged like pu: the members are built at AnaTuple from the
-  # NanoAOD branches and persisted, and AnaTupleMerge reads them back. The anaTuple no
-  # longer carries LHEPdf_Weight / LHEScale_Weight, so enabling either at AnaTupleMerge
-  # would find no input and silently make every member 1.
+  # pdf and qcd_scale are staged like pu: the members are computed at AnaTuple from the
+  # NanoAOD branches and persisted, and AnaTupleMerge reads them back.
   pdf:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEPdfWeight
     n_members: 103
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
   qcd_scale:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEScaleWeight
-    enabled:
-      AnaTuple: true
-      AnaTupleMerge: false
 extraFormat_for_triggerMatchingAndSF:
   pt: "nano"
 muon_pt_for_presel: "nano"
@@ -1155,6 +1156,31 @@ histTuple_flavors:
         vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
       - name: binary_DNN_m1000_vs_HME
         vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
+
+  # The integration CI's flavor: what its datacards read plus a few observables to plot.
+  # Every variable is booked per variation, channel and category, so `default` does not
+  # fit the CI pod's memory once a process has more than one dataset.
+  CI:
+    # One fullres variable, to keep that path tested.
+    fullResolution_variables:
+      - lep1_pt
+
+    variables:
+      - lep1_pt
+      - lep1_eta
+      - lep2_pt
+      - PuppiMET_pt
+      - bjet1_pt
+      - bjet1_btagPNetB
+      - ll_mass
+      - DeepHME_mass
+
+      # Limit inputs at the CI's MX=300: CI_card_SL.yaml reads the binary score,
+      # CI_card.yaml the DNN-vs-HME plane.
+      - TwoStageDNN_M300_binary
+      - DNN_M300_Signal
+      - name: DNN_m300_vs_HME
+        vars: [ DNN_M300_Signal, DeepHME_mass ]
 
   DL_DNN_Inputs:
     # DL DNN Inputs

@@ -2,11 +2,11 @@
 
 ## How to run anaTuple production
 
-Current version `v2609`
+Current version `v2610`
 
 1. Clone repository
    ```bash
-   git clone -b v2609 --recursive git@github.com:cms-flaf/HH_bbWW.git
+   git clone -b v2610 --recursive git@github.com:cms-flaf/HH_bbWW.git
    cd HH_bbWW
    git lfs pull
    source $PWD/env.sh
@@ -42,5 +42,7 @@ Current version `v2609`
 
 1. Run production
    ```bash
-   law run AnaTupleMergeTask --version v2609 --period ERA --parallel-jobs 2000 --AnaTupleFileTask-tasks-per-job 10 --bundle
+   law run AnaTupleMergeTask --version v2610 --period ERA --parallel-jobs 2000 --bundle
    ```
+   `AnaTupleFileTask` composes its jobs from the estimated cost of each input file; passing
+   `--AnaTupleFileTask-tasks-per-job` turns that off and falls back to fixed-size groups.

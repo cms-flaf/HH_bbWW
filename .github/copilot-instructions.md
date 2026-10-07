@@ -11,6 +11,16 @@ adds only what is specific to this analysis.
 
 ## Analysis-specific invariants
 
+### Shift-invariant columns
+
+- `anaTuple_shift_invariant_columns` in `config/global.yaml` lists only event-level generator and
+  event quantities. Generator information attached to reconstructed objects (`lepN_gen_*`,
+  `centralJet_matchedGenJet_*`, `*_hadronFlavour`) changes under shifts and must not be listed; nor
+  `HLT_*` while `Analysis/hh_bbww.py` checks trigger columns with `GetColumnNames()`.
+- Every input of the merge-stage `weight_base` (generator, luminosity, cross-section and shape
+  weights, the stitching variables) must be listed: shifted trees take `weight_base` from the central
+  tree, and a placeholder row only gets a real weight if all of its inputs are filled.
+
 ### Stitching processors
 
 - The shared anchors in `config/processes.yaml` (`.DY_processors`,
@@ -20,6 +30,17 @@ adds only what is specific to this analysis.
   every process using that anchor dies with
   `combineAnaCaches: processor Stitcher not provided for combining anaCaches`. This shipped
   undetected in the 2024–2026 configs because no CI process ran DY.
+- Every anchor also declares `dependency_level: {AnaTuple: file, AnaTupleMerge: process}`. The
+  merge has to see the whole process: where an inclusive sample sits next to exclusive ones, a
+  per-dataset merge normalises each to the full cross-section and counts the overlap twice.
+- t̄t is not stitched: `TT` takes only the three decay-channel samples (`TTto2L2Nu`, `TTtoLNu2Q`,
+  `TTto4Q`) in every era, which do not overlap. The inclusive `TT`/`TT_ext1` samples of Run3_2022
+  and Run3_2023BPix are not used — they carry no parton-shower weights (`PSWeight` has a single
+  entry), on which the `parton_shower` producer stops. A diff that brings them back needs the t̄t
+  stitcher back as well.
+- Every `TTInfo_*` column must stay a scalar. FuseAnaTuples stores all columns of one prefix as one
+  collection, so an array under `TTInfo_` would turn the scalars into one copy per entry. The
+  per-top arrays therefore live in `genTop`.
 - Which anchor an era's DY process uses is deliberate — `allFlavors` for 2022–2023BPix, the
   single-flavour one for 2024 onwards. Do not propose harmonising them.
 
@@ -39,13 +60,21 @@ adds only what is specific to this analysis.
 
 ### Integration test
 
-`TestModel` runs `custom_CI_Background_TT` and `custom_CI_Background_DY` plus one signal and one
-data process, and each CI background must carry the same `processors:` as the real `TT` / DY
-process **of that era** — that is what exercises the stitching end to end. A diff that changes a
+`TestModel` runs `custom_CI_Background_TT`, `custom_CI_Background_DY` and
+`custom_CI_Background_W` plus one signal and one data process, and each CI background must carry
+the same `processors:` as the real `TT` / DY / W process **of that era** — that is what exercises the stitching end to end. A diff that changes a
 real process's processors and leaves the CI counterpart behind silently removes the coverage.
 
 The process names are also listed in `cms-flaf/FLAF_ci`, a **different repository**; renaming or
 adding one here needs that updated in step.
+
+### Era corrections
+
+- `config/Run3_2024/global.yaml`, 2025 and 2026 inherit `corrections:` with
+  `<<: *corrections_default` and override only `btag` and `dy_hhbbtautau`. Do not turn them back
+  into full copies: a correction added at top level then silently disappears from those eras,
+  which is how the 2024–2026 configs lost `pdf`, `qcd_scale` and `top_pt`. The merge is one
+  level deep, so an overridden entry must be complete.
 
 ### Cost
 
