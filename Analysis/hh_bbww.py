@@ -1247,6 +1247,85 @@ def defineLepWCandP4(df):
     return df
 
 
+def AddHHSystemVariables(df):
+    """
+    HH production and decay variables, -100 where undefined. H1 is the H->bb candidate (Hbb_p4).
+    H2 is H->WW: ll + MET (MET pz = 0) in DL, Hww_p4 in SL; its decay plane is (lep1, lep2) in DL
+    and (leptonic W, hadronic W) in SL. Requires categories and defineLepWCandP4.
+    """
+    df = df.Define("DL_leps_isValid", "DL && lep1_legType > 0 && lep2_legType > 0")
+    df = df.Define(
+        "HWWCand_isValid",
+        "DL_leps_isValid || (SL && lep1_legType > 0 && WhadCand_isValid)",
+    )
+    df = df.Define(
+        "HWWCand_p4",
+        "DL_leps_isValid ? LorentzVectorM(ll_p4 + PuppiMET_p4) : (HWWCand_isValid ? Hww_p4 : LorentzVectorM())",
+    )
+    df = df.Define("HWW_dau1_p4", "DL ? lep1_p4 : lepWfromH_p4")
+    df = df.Define("HWW_dau2_p4", "DL ? lep2_p4 : hadW_p4")
+    df = df.Define("HH_isValid", "HbbCand_isValid && HWWCand_isValid")
+    df = df.Define(
+        "Hbb_isResolved", "bjet1_isValid && bjet2_isValid && !fatbjet_isValid"
+    )
+
+    hh_variables = [
+        (
+            "Pzeta",
+            "DL_leps_isValid",
+            "hh_bbww::Calculate_Pzeta(lep1_p4, lep2_p4, PuppiMET_p4)",
+        ),
+        (
+            "Pzeta_visible",
+            "DL_leps_isValid",
+            "hh_bbww::Calculate_visiblePzeta(lep1_p4, lep2_p4)",
+        ),
+        (
+            "CosThetaStar_HH",
+            "HH_isValid",
+            "hh_bbww::Calculate_cosThetaStar(Hbb_p4, HWWCand_p4)",
+        ),
+        (
+            "HelicityCosTheta_Hbb",
+            "Hbb_isResolved",
+            "hh_bbww::Calculate_cosTheta_2bodies(bjet1_p4, Hbb_p4)",
+        ),
+        (
+            "HelicityCosTheta_HWW",
+            "HWWCand_isValid",
+            "hh_bbww::Calculate_cosTheta_2bodies(lep1_p4, HWWCand_p4)",
+        ),
+        (
+            "Phi_HH",
+            "HH_isValid && Hbb_isResolved",
+            "hh_bbww::Calculate_phi(HWW_dau1_p4, HWW_dau2_p4, bjet1_p4, bjet2_p4, HWWCand_p4, Hbb_p4)",
+        ),
+        (
+            "Phi1_HWW",
+            "HH_isValid",
+            "hh_bbww::Calculate_phi1(HWW_dau1_p4, HWW_dau2_p4, HWWCand_p4, Hbb_p4)",
+        ),
+        (
+            "bb_dR_HbbFrame",
+            "Hbb_isResolved",
+            "hh_bbww::Calculate_dR_boosted(bjet1_p4, bjet2_p4, Hbb_p4)",
+        ),
+        (
+            "ll_dR_HWWFrame",
+            "DL_leps_isValid",
+            "hh_bbww::Calculate_dR_boosted(lep1_p4, lep2_p4, HWWCand_p4)",
+        ),
+        (
+            "MX_reduced",
+            "HH_isValid",
+            "hh_bbww::Calculate_MX_reduced(Hbb_p4, HWWCand_p4)",
+        ),
+    ]
+    for name, valid, expr in hh_variables:
+        df = df.Define(name, f"{valid} ? static_cast<float>({expr}) : -100.f")
+    return df
+
+
 def AddDNNVariablesSL(df, isData=False):
     # single lepton features
     df = df.Define(
@@ -1418,6 +1497,7 @@ def PrepareDfForHistograms(dfForHistograms, isData, stage):
     dfForHistograms.defineCategories()
     dfForHistograms.df = defineTopCandP4(dfForHistograms.df)
     dfForHistograms.df = defineLepWCandP4(dfForHistograms.df)
+    dfForHistograms.df = AddHHSystemVariables(dfForHistograms.df)
     dfForHistograms.df = AddDNNVariablesSL(dfForHistograms.df, isData)
     dfForHistograms.df = defineTopVariables(dfForHistograms.df)
     # I comment this out now to save computation time

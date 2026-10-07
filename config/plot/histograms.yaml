@@ -3478,3 +3478,83 @@ TwoStageDNN_M1000_VV:
   max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
+
+Pzeta:
+  x_bins: "50|-200:300"
+  x_title: "P_{#zeta}"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Pzeta_visible:
+  x_bins: "40|0:400"
+  x_title: "P_{#zeta}^{vis}"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+CosThetaStar_HH:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta^{*} (H#rightarrowbb in HH frame)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HelicityCosTheta_Hbb:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta_{b} (helicity)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HelicityCosTheta_HWW:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta_{l} (helicity)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Phi_HH:
+  x_bins: "20|0:3.1416"
+  x_title: "#Phi (H#rightarrowbb vs H#rightarrowWW decay planes)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Phi1_HWW:
+  x_bins: "20|0:3.1416"
+  x_title: "#Phi_{1} (H#rightarrowWW decay vs production plane)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_dR_HbbFrame:
+  x_bins: "30|3.0:9.0"
+  x_title: "#DeltaR(b, b) in H#rightarrowbb frame"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+ll_dR_HWWFrame:
+  x_bins: "30|0:6.0"
+  x_title: "#DeltaR(l, l) in ll+MET frame"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MX_reduced:
+  x_bins: "50|200:2200"
+  x_title: "Reduced m_{X} [GeV]"
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False

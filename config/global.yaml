@@ -854,6 +854,16 @@ histTuple_flavors:
       - llmet_mass
       - bbllmet_mass
       - ll_bb_pt_ratio
+      - Pzeta
+      - Pzeta_visible
+      - CosThetaStar_HH
+      - HelicityCosTheta_Hbb
+      - HelicityCosTheta_HWW
+      - Phi_HH
+      - Phi1_HWW
+      - bb_dR_HbbFrame
+      - ll_dR_HWWFrame
+      - MX_reduced
 
       - bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino
 
@@ -987,6 +997,16 @@ histTuple_flavors:
       - MT2_blbl2_ptratio
       - ll_mass
       - bb_CosTheta
+      - Pzeta
+      - Pzeta_visible
+      - CosThetaStar_HH
+      - HelicityCosTheta_Hbb
+      - HelicityCosTheta_HWW
+      - Phi_HH
+      - Phi1_HWW
+      - bb_dR_HbbFrame
+      - ll_dR_HWWFrame
+      - MX_reduced
 
       - lep1_Muon_pfRelIso04_all
       - lep2_Muon_pfRelIso04_all
@@ -1174,6 +1194,7 @@ histTuple_flavors:
       - bjet1_btagPNetB
       - ll_mass
       - DeepHME_mass
+      - CosThetaStar_HH
 
       # Limit inputs at the CI's MX=300: CI_card_SL.yaml reads the binary score,
       # CI_card.yaml the DNN-vs-HME plane.
@@ -1223,6 +1244,15 @@ histTuple_flavors:
       - "fatbjet_tau3"
       - "fatbjet_tau4"
       - "fatbjet_msoftdrop"
+      - "Pzeta"
+      - "Pzeta_visible"
+      - "CosThetaStar_HH"
+      - "HelicityCosTheta_Hbb"
+      - "HelicityCosTheta_HWW"
+      - "Phi_HH"
+      - "Phi1_HWW"
+      - "ll_dR_HWWFrame"
+      - "MX_reduced"
 
       - DeepHME_mass
 
