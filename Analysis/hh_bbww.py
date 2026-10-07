@@ -290,7 +290,8 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
         SL_CR_active = False
         for QCDReg in self.config["QCDRegions"]:
-            if QCDReg.startswith("SL_SR") or QCDReg.startswith("SL_CR"):
+            # The regions are named SR_SL_M<mass> and CR_SL_<class>_M<mass> below.
+            if QCDReg.startswith("SR_SL") or QCDReg.startswith("CR_SL"):
                 SL_CR_active = True
 
         if stage == "HistTuple" and SL_CR_active:

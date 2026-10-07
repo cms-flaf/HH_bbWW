@@ -540,6 +540,7 @@ custom_CI_Background_TT:
   genInfo: [ TT ]
   datasets:
     - TTto2L2Nu
+    - TTtoLNu2Q
 
 custom_CI_Background_DY:
   name: "CI -- Background DY"
@@ -560,6 +561,14 @@ custom_CI_Signal:
   color: "kBlack"
   datasets:
     - GluGlutoHHto2B2Vto2L2Nu_kl_1p00_kt_1p00_c2_0p00
+
+# No XtoYH sample exists for 2024 (2025/26 reuse its MC), so the one-lepton HH sample
+# stands in, as the two-lepton one does for custom_CI_Signal.
+custom_CI_Signal_SL:
+  name: "CI -- Signal (1L)"
+  color: "kBlue"
+  datasets:
+    - GluGlutoHHto2B2WtoLNu2Q_kl_1p00_kt_1p00_c2_0p00
 
 custom_CI_Data:
   name: "CI -- Data"
