@@ -15,7 +15,6 @@ analysis = None
 def Initialize():
     global initialized
     if not initialized:
-        headers_dir = os.path.dirname(os.path.abspath(__file__))
         ROOT.gROOT.ProcessLine(f".include {os.environ['ANALYSIS_PATH']}")
         ROOT.gInterpreter.Declare(f'#include "FLAF/include/HistHelper.h"')
         ROOT.gInterpreter.Declare(f'#include "FLAF/include/Utilities.h"')
@@ -23,6 +22,13 @@ def Initialize():
         ROOT.gROOT.ProcessLine(f'#include "FLAF/include/Lester_mt2_bisect.cpp"')
         ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisTools.h"')
         ROOT.gROOT.ProcessLine('#include "FLAF/include/AnalysisMath.h"')
+        for header in [
+            "Helpers.h",
+            "NeutrinoReco.h",
+            "TopCandidates.h",
+            "HHKinematics.h",
+        ]:
+            DeclareHeader(os.path.join(os.environ["ANALYSIS_PATH"], "include", header))
         initialized = True
 
 

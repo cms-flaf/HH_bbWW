@@ -2036,6 +2036,7 @@ DNN_M1500_Other:
   blind: True
 
 DNN_m250_vs_HME:
+  signal_params: { mass: 250 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 200 ], x_bins: "50|-7.5:7.5" }
@@ -2054,6 +2055,7 @@ DNN_m250_vs_HME:
   var_list: [ DNN_M250_Signal, DeepHME_mass ]
 
 DNN_m260_vs_HME:
+  signal_params: { mass: 260 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 210 ], x_bins: "50|-7.5:7.5" }
@@ -2072,6 +2074,7 @@ DNN_m260_vs_HME:
   var_list: [ DNN_M260_Signal, DeepHME_mass ]
 
 DNN_m270_vs_HME:
+  signal_params: { mass: 270 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 220 ], x_bins: "50|-7.5:7.5" }
@@ -2090,6 +2093,7 @@ DNN_m270_vs_HME:
   var_list: [ DNN_M270_Signal, DeepHME_mass ]
 
 DNN_m280_vs_HME:
+  signal_params: { mass: 280 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 230 ], x_bins: "50|-7.5:7.5" }
@@ -2108,6 +2112,7 @@ DNN_m280_vs_HME:
   var_list: [ DNN_M280_Signal, DeepHME_mass ]
 
 DNN_m300_vs_HME:
+  signal_params: { mass: 300 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 250 ], x_bins: "50|-7.5:7.5" }
@@ -2127,6 +2132,7 @@ DNN_m300_vs_HME:
   var_list: [ DNN_M300_Signal, DeepHME_mass ]
 
 DNN_m320_vs_HME:
+  signal_params: { mass: 320 }
   2d:
     combined_bins:
       - { y_bin: [ 0, 270 ], x_bins: "50|-7.5:7.5" }
@@ -2145,6 +2151,7 @@ DNN_m320_vs_HME:
   var_list: [ DNN_M320_Signal, DeepHME_mass ]
 
 DNN_m350_vs_HME:
+  signal_params: { mass: 350 }
   2d:
     combined_bins:
       - { y_bin: [ 250, 300 ], x_bins: "50|-7.5:7.5" }
@@ -2163,6 +2170,7 @@ DNN_m350_vs_HME:
   var_list: [ DNN_M350_Signal, DeepHME_mass ]
 
 DNN_m360_vs_HME:
+  signal_params: { mass: 360 }
   2d:
     combined_bins:
       - { y_bin: [ 260, 310 ], x_bins: "50|-7.5:7.5" }
@@ -2181,6 +2189,7 @@ DNN_m360_vs_HME:
   var_list: [ DNN_M360_Signal, DeepHME_mass ]
 
 DNN_m400_vs_HME:
+  signal_params: { mass: 400 }
   2d:
     combined_bins:
       - { y_bin: [ 300, 350 ], x_bins: "50|-7.5:7.5" }
@@ -2199,6 +2208,7 @@ DNN_m400_vs_HME:
   var_list: [ DNN_M400_Signal, DeepHME_mass ]
 
 DNN_m450_vs_HME:
+  signal_params: { mass: 450 }
   2d:
     combined_bins:
       - { y_bin: [ 350, 400 ], x_bins: "50|-7.5:7.5" }
@@ -2217,6 +2227,7 @@ DNN_m450_vs_HME:
   var_list: [ DNN_M450_Signal, DeepHME_mass ]
 
 DNN_m500_vs_HME:
+  signal_params: { mass: 500 }
   2d:
     combined_bins:
       - { y_bin: [ 400, 450 ], x_bins: "50|-7.5:7.5" }
@@ -2235,6 +2246,7 @@ DNN_m500_vs_HME:
   var_list: [ DNN_M500_Signal, DeepHME_mass ]
 
 DNN_m550_vs_HME:
+  signal_params: { mass: 550 }
   2d:
     combined_bins:
       - { y_bin: [ 450, 500 ], x_bins: "50|-7.5:7.5" }
@@ -2253,6 +2265,7 @@ DNN_m550_vs_HME:
   var_list: [ DNN_M550_Signal, DeepHME_mass ]
 
 DNN_m600_vs_HME:
+  signal_params: { mass: 600 }
   2d:
     combined_bins:
       # - {y_bin: [0,400], x_bins: "5|0.0:1.0"}
@@ -2287,6 +2300,7 @@ DNN_m600_vs_HME:
 
 
 DNN_m650_vs_HME:
+  signal_params: { mass: 650 }
   2d:
     combined_bins:
       - { y_bin: [ 550, 600 ], x_bins: "50|-7.5:7.5" }
@@ -2305,6 +2319,7 @@ DNN_m650_vs_HME:
   var_list: [ DNN_M650_Signal, DeepHME_mass ]
 
 DNN_m700_vs_HME:
+  signal_params: { mass: 700 }
   2d:
     combined_bins:
       - { y_bin: [ 600, 650 ], x_bins: "50|-7.5:7.5" }
@@ -2323,6 +2338,7 @@ DNN_m700_vs_HME:
   var_list: [ DNN_M700_Signal, DeepHME_mass ]
 
 DNN_m750_vs_HME:
+  signal_params: { mass: 750 }
   2d:
     combined_bins:
       - { y_bin: [ 650, 700 ], x_bins: "50|-7.5:7.5" }
@@ -2341,6 +2357,7 @@ DNN_m750_vs_HME:
   var_list: [ DNN_M750_Signal, DeepHME_mass ]
 
 DNN_m800_vs_HME:
+  signal_params: { mass: 800 }
   2d:
     combined_bins:
       - { y_bin: [ 700, 750 ], x_bins: "50|-7.5:7.5" }
@@ -2359,6 +2376,7 @@ DNN_m800_vs_HME:
   var_list: [ DNN_M800_Signal, DeepHME_mass ]
 
 DNN_m850_vs_HME:
+  signal_params: { mass: 850 }
   2d:
     combined_bins:
       - { y_bin: [ 750, 800 ], x_bins: "50|-7.5:7.5" }
@@ -2377,6 +2395,7 @@ DNN_m850_vs_HME:
   var_list: [ DNN_M850_Signal, DeepHME_mass ]
 
 DNN_m900_vs_HME:
+  signal_params: { mass: 900 }
   2d:
     combined_bins:
       - { y_bin: [ 800, 850 ], x_bins: "50|-7.5:7.5" }
@@ -2395,6 +2414,7 @@ DNN_m900_vs_HME:
   var_list: [ DNN_M900_Signal, DeepHME_mass ]
 
 DNN_m1000_vs_HME:
+  signal_params: { mass: 1000 }
   2d:
     combined_bins:
       - { y_bin: [ 900, 950 ], x_bins: "50|-7.5:7.5" }
@@ -2413,6 +2433,7 @@ DNN_m1000_vs_HME:
   var_list: [ DNN_M1000_Signal, DeepHME_mass ]
 
 DNN_m1100_vs_HME:
+  signal_params: { mass: 1100 }
   2d:
     combined_bins:
       - { y_bin: [ 1000, 1050 ], x_bins: "50|-7.5:7.5" }
@@ -2431,6 +2452,7 @@ DNN_m1100_vs_HME:
   var_list: [ DNN_M1100_Signal, DeepHME_mass ]
 
 DNN_m1200_vs_HME:
+  signal_params: { mass: 1200 }
   2d:
     combined_bins:
       - { y_bin: [ 1100, 1150 ], x_bins: "50|-7.5:7.5" }
@@ -2449,6 +2471,7 @@ DNN_m1200_vs_HME:
   var_list: [ DNN_M1200_Signal, DeepHME_mass ]
 
 DNN_m1300_vs_HME:
+  signal_params: { mass: 1300 }
   2d:
     combined_bins:
       - { y_bin: [ 1200, 1250 ], x_bins: "50|-7.5:7.5" }
@@ -2467,6 +2490,7 @@ DNN_m1300_vs_HME:
   var_list: [ DNN_M1300_Signal, DeepHME_mass ]
 
 DNN_m1400_vs_HME:
+  signal_params: { mass: 1400 }
   2d:
     combined_bins:
       - { y_bin: [ 1300, 1350 ], x_bins: "50|-7.5:7.5" }
@@ -2485,6 +2509,7 @@ DNN_m1400_vs_HME:
   var_list: [ DNN_M1400_Signal, DeepHME_mass ]
 
 DNN_m1500_vs_HME:
+  signal_params: { mass: 1500 }
   2d:
     combined_bins:
       - { y_bin: [ 1400, 1450 ], x_bins: "50|-7.5:7.5" }
@@ -3453,3 +3478,83 @@ TwoStageDNN_M1000_VV:
   max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
+
+Pzeta:
+  x_bins: "50|-200:300"
+  x_title: "P_{#zeta}"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Pzeta_visible:
+  x_bins: "40|0:400"
+  x_title: "P_{#zeta}^{vis}"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+CosThetaStar_HH:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta^{*} (H#rightarrowbb in HH frame)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HelicityCosTheta_Hbb:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta_{b} (helicity)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+HelicityCosTheta_HWW:
+  x_bins: "20|-1.0:1.0"
+  x_title: "cos#theta_{l} (helicity)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Phi_HH:
+  x_bins: "20|0:3.1416"
+  x_title: "#Phi (H#rightarrowbb vs H#rightarrowWW decay planes)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+Phi1_HWW:
+  x_bins: "20|0:3.1416"
+  x_title: "#Phi_{1} (H#rightarrowWW decay vs production plane)"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+bb_dR_HbbFrame:
+  x_bins: "30|3.0:9.0"
+  x_title: "#DeltaR(b, b) in H#rightarrowbb frame"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+ll_dR_HWWFrame:
+  x_bins: "30|0:6.0"
+  x_title: "#DeltaR(l, l) in ll+MET frame"
+  y_title: Events
+  use_log_y: False
+  max_y_sf: 1.5
+  divide_by_bin_width: False
+
+MX_reduced:
+  x_bins: "50|200:2200"
+  x_title: "Reduced m_{X} [GeV]"
+  y_title: Events
+  use_log_y: True
+  max_y_sf: 1.5
+  divide_by_bin_width: False
