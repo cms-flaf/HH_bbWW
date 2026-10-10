@@ -13,10 +13,10 @@ points.
 ## Inputs
 
 The training datasets are the `nParity{0..3}_Merged.root` / `nParity{0..3}_Merged_weight.root`
-files written by `Studies/DNN/create_dataset.py`:
+files written by `Studies/DNN_Dataset/create_dataset.py` (see its [README](../DNN_Dataset/README.md)):
 
 ```sh
-cd Studies/DNN
+cd Studies/DNN_Dataset
 python3 create_dataset.py --config config/dataset_setup_doubleLep_merged_nocuts.yaml \
     --output-folder /eos/user/<u>/<you>/HH_bbWW/DNNDatasets/<tag>
 ```
