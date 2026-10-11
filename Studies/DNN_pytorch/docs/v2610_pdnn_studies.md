@@ -142,12 +142,44 @@ Result for v1: `02_limits_v1_combined.png`.
   combined above 450 GeV. Figures: `07_limits_pruned_models_*.png`.
 - **Decision (proposed).** v2b is the optimized input set.
 
-## 10. DeepHME_mass: DNN input vs 2D fit (to do)
+## 10. DeepHME_mass: DNN input vs 2D fit
 
-- Planned comparison, all with the same limit chain:
-  1. 1D fit of the optimized DNN without DeepHME_mass;
-  2. 2D fit of that DNN score × DeepHME_mass;
-  3. 1D fit of the same DNN with DeepHME_mass as an input.
+- **Comparison**, all with the same limit chain and the v2b input set:
+  1. 1D fit of v2b (no DeepHME_mass input), the reference;
+  2. 2D fit of the v2b score × DeepHME_mass (`limit_pdnn.py --observable dnn_hme`: each bin of the
+     1D DNN binning split further in DeepHME_mass at the signal quantiles, merged to ≥ 1
+     background event and ≥ 10 MC events per bin, unrolled);
+  3. 1D fit of v3 = v2b + DeepHME_mass as an input (same training otherwise).
+- **Binning check.** A first 2D binning with coarser DNN slices (to leave room for HME bins) lost
+  the best 1D bins at high score and was 10–20% worse than 1D at 600–1500 GeV. Making the 2D
+  binning a refinement of the 1D binning fixed this; the 2D fit is then never worse than 1D.
+- **Result.** Mean ratio of expected limits to the v2b 1D limit, bands 250–400 | 450–900 |
+  1000–2000 GeV:
+
+  | Category | 2D v2b × HME | 1D v3 (HME input) |
+  |---|---|---|
+  | combined, spin 0 | 0.942 / 0.964 / 0.995 | 0.984 / 1.025 / 0.973 |
+  | combined, spin 2 | 0.935 / 0.965 / 0.999 | 0.981 / 1.022 / 0.987 |
+  | res2b, spin 0 | 0.943 / 0.956 / 0.989 | 0.984 / 1.033 / 0.967 |
+  | boosted, spin 0 | 0.834 / 0.976 / 0.996 | 0.901 / 0.996 / 0.976 |
+
+  Figures: `08_limits_deephme_input_vs_2d_*.png`.
+- **Correlation with DeepHME_mass** (res2b background, weighted Pearson r of the score with
+  DeepHME_mass at 300 / 500 / 800 / 1000 / 1500 GeV): v2b −0.15 / 0.46 / 0.57 / 0.58 / 0.58;
+  v3 −0.15 / 0.47 / 0.58 / 0.60 / 0.60. The DNN without HME already carries most of the
+  HME-like information through the mass-like inputs; adding HME as an input changes little.
+- **Conclusion.** Using DeepHME_mass as a second fit dimension improves the expected limits by
+  ~6% at 250–400 GeV and ~3.5% at 450–900 GeV (beyond the training noise of ~3%); feeding it to
+  the DNN does not reproduce this gain (within ±3% of v2b). Above 1 TeV all three agree within
+  noise, because the best DNN bins are already nearly background-free. Proposed production setup:
+  v2b without HME input, in a 2D DNN × DeepHME fit.
+
+## 11. Run-2-like MEDIUM b-tagging vs LOOSE (planned)
+
+- Run 2 required MEDIUM b-tagged jets; this analysis uses LOOSE, which increases the acceptance.
+  Train the same model with the MEDIUM requirement and compare expected limits.
+- To be resolved: the training dataset has no era column (the MEDIUM PNet working point is era
+  dependent), and `weight_Central` holds the b-tag scale factors of the current selection.
 
 ## Commits
 
