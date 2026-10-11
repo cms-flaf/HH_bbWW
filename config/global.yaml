@@ -232,17 +232,16 @@ payload_producers:
     producers_module_name: Analysis.DNN_Application
     producer_name: DNNProducer
     DL_Resolved:
-      version: "DoubleLepton_Parametric_Resolved_v1"
+      version: "DoubleLepton_Parametric_Resolved_v2"
       parametric: True
     DL_Boosted:
-      version: "DoubleLepton_Parametric_Boosted_v1"
+      version: "DoubleLepton_Parametric_Boosted_v2"
       parametric: True
     SL_Resolved: null
     SL_Boosted: null
-    # The grid below is the produced X->HH points up to 1.5 TeV. 250-280 sit below the lowest
-    # `signal_mass_points` of the models in config/DNN/DoubleLepton_Parametric_*_v1, so until the
-    # network is retrained over this grid those four points are an extrapolation, not an
-    # interpolation, and their scores are provisional.
+    # The grid below is the produced X->HH points up to 1.5 TeV. The v2 models
+    # (config/DNN/DoubleLepton_Parametric_*_v2) are trained on all 30 points 250-2000 GeV, so every
+    # point here is a trained mass hypothesis.
     columns:
       - M250_Signal
       - M260_Signal
@@ -295,6 +294,32 @@ payload_producers:
       - M1300_TT
       - M1400_TT
       - M1500_TT
+
+      - M250_DY
+      - M260_DY
+      - M270_DY
+      - M280_DY
+      - M300_DY
+      - M320_DY
+      - M350_DY
+      - M360_DY
+      - M400_DY
+      - M450_DY
+      - M500_DY
+      - M550_DY
+      - M600_DY
+      - M650_DY
+      - M700_DY
+      - M750_DY
+      - M800_DY
+      - M850_DY
+      - M900_DY
+      - M1000_DY
+      - M1100_DY
+      - M1200_DY
+      - M1300_DY
+      - M1400_DY
+      - M1500_DY
 
       - M250_Other
       - M260_Other
@@ -1314,6 +1339,32 @@ histTuple_flavors:
       - DNN_M1300_TT
       - DNN_M1400_TT
       - DNN_M1500_TT
+
+      - DNN_M250_DY
+      - DNN_M260_DY
+      - DNN_M270_DY
+      - DNN_M280_DY
+      - DNN_M300_DY
+      - DNN_M320_DY
+      - DNN_M350_DY
+      - DNN_M360_DY
+      - DNN_M400_DY
+      - DNN_M450_DY
+      - DNN_M500_DY
+      - DNN_M550_DY
+      - DNN_M600_DY
+      - DNN_M650_DY
+      - DNN_M700_DY
+      - DNN_M750_DY
+      - DNN_M800_DY
+      - DNN_M850_DY
+      - DNN_M900_DY
+      - DNN_M1000_DY
+      - DNN_M1100_DY
+      - DNN_M1200_DY
+      - DNN_M1300_DY
+      - DNN_M1400_DY
+      - DNN_M1500_DY
 
       - DNN_M250_Other
       - DNN_M260_Other
