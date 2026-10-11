@@ -174,12 +174,18 @@ Result for v1: `02_limits_v1_combined.png`.
   noise, because the best DNN bins are already nearly background-free. Proposed production setup:
   v2b without HME input, in a 2D DNN × DeepHME fit.
 
-## 11. Run-2-like MEDIUM b-tagging vs LOOSE (planned)
+## 11. Run-2-like MEDIUM b-tagging vs LOOSE (deferred)
 
-- Run 2 required MEDIUM b-tagged jets; this analysis uses LOOSE, which increases the acceptance.
-  Train the same model with the MEDIUM requirement and compare expected limits.
-- To be resolved: the training dataset has no era column (the MEDIUM PNet working point is era
-  dependent), and `weight_Central` holds the b-tag scale factors of the current selection.
+Run 2 required MEDIUM b-tagged jets; this analysis uses LOOSE (`idbtagPNetB >= 1`), which
+increases the acceptance. Planned study, deferred for now:
+- The Run-2-like categories are a subset of the training dataset: res2b = both b-jet candidates
+  pass the MEDIUM PNet working point, recovery = only the leading one; boosted unchanged.
+- The MEDIUM working point is era dependent (2022 0.245, 2022EE 0.2605, 2023 0.1917,
+  2023BPix 0.1919), and the dataset has no era column: add one in `create_dataset.py`
+  (`DefinePerSample` from the input file path) and re-produce the dataset.
+- Check that `weight_Central` includes the b-tag shape reweighting (`weight_bTagShape_Central`),
+  which stays valid for any cut on the score.
+- Retrain v2b on the MEDIUM selection and compare 1D and 2D expected limits with LOOSE v2b.
 
 ## Commits
 
