@@ -208,6 +208,16 @@ Result for v1: `02_limits_v1_combined.png`.
   are 12–27% below Run 2 DL; with v2b the projection is 19–35% below, with 45% of the luminosity.
   The quick chain reproduces the production limits of the deployed model within ~10% at
   400–1000 GeV. Figures and tables: `09_production_and_run2_comparison_{2D,1D}.{png,csv}`.
+- **All 30 masses.** The production model (trained on 15 Radion masses, 300–2000 GeV) evaluated at
+  all 30 v2b masses, both spins, same quick chain (2D fit). Ratio v2b / production:
+  250 / 260 / 270 / 280 GeV (below the production model's training range): 0.25 / 0.36 / 0.62 / 0.70
+  (spin 0; spin 2 the same); masses between its training points (320–850 GeV) 0.84–0.92, the same
+  gain as at the neighbouring trained masses; above 1 TeV 0.90–1.07 for both. The production model
+  interpolates well between its training masses but extrapolates poorly below 300 GeV (limits up to
+  4× worse, 11× in the 1D fit), which the v2b training range removes. For spin 2 (not in the
+  production model's training) v2b gains a few percent more than for spin 0. Figure and table:
+  `10_production_vs_v2b_all_masses.{png,csv}`.
+
 - **Assumption.** The projection assumes the systematics and control-region constraints of the
   full analysis change the limits of both models by the same factor.
 
