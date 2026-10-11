@@ -174,6 +174,43 @@ Result for v1: `02_limits_v1_combined.png`.
   noise, because the best DNN bins are already nearly background-free. Proposed production setup:
   v2b without HME input, in a 2D DNN × DeepHME fit.
 
+## 12. Comparison with the production model and with Run 2
+
+- **Inputs.** Run 2 DL expected limits (spin 0, 138 fb⁻¹, `run2_spin0_DL_external_limits.json`);
+  the latest production DL expected limits (deployed model
+  `config/DNN/DoubleLepton_Parametric_{Resolved,Boosted}_v1`, full analysis with systematics and
+  TT/DY control regions, 2D DNN × DeepHME fit, 62.3 fb⁻¹, `slides_update_v8/limits_table.csv`).
+  The signal samples are normalised to σ(pp → X → HH) = 1 pb times the branching ratios, so the
+  quick limits of section 4 are on σ(pp → X → HH) in pb as well.
+- **Method.** The quick limits are stat-only and are not compared with the full analysis directly.
+  The deployed model is applied to the v2610 dataset exactly as in the analysis
+  (`score_deployed.py`: the model of fold f scores parity (f + 3) mod 4, never its own training
+  events) and run through the same quick chain as v2b. The production limit is projected with
+  the ratio: projected(m) = production(m) × quick_v2b(m) / quick_production(m)
+  (`production_comparison.py`). Spin 0, combined categories, 2D DNN × DeepHME fit for both models.
+- **Result** (pb):
+
+  | m_X | Run 2 DL | production DL | v2b / production (quick, 2D) | projected with v2b | projected / Run 2 |
+  |---|---|---|---|---|---|
+  | 300 | 6.63 | 5.84 | 0.91 | 5.34 | 0.81 |
+  | 400 | 2.07 | 1.53 | 0.89 | 1.36 | 0.66 |
+  | 500 | 0.397 | 0.308 | 0.84 | 0.259 | 0.65 |
+  | 600 | 0.188 | 0.149 | 0.91 | 0.136 | 0.72 |
+  | 700 | 0.106 | 0.084 | 0.87 | 0.073 | 0.68 |
+  | 800 | 0.078 | 0.060 | 0.92 | 0.055 | 0.71 |
+  | 900 | 0.057 | 0.044 | 0.93 | 0.040 | 0.71 |
+  | 1000 | – | 0.034 | 0.95 | 0.032 | – |
+  | 1200 | – | 0.027 | 0.98 | 0.026 | – |
+  | 1400 | – | 0.029 | 1.01 | 0.029 | – |
+
+  The new model improves the expected limits by 8–16% at 300–900 GeV (1D fit: 8–21%), beyond the
+  ~3% training noise, and matches the production model at 1.2–1.4 TeV. The production DL limits
+  are 12–27% below Run 2 DL; with v2b the projection is 19–35% below, with 45% of the luminosity.
+  The quick chain reproduces the production limits of the deployed model within ~10% at
+  400–1000 GeV. Figures and tables: `09_production_and_run2_comparison_{2D,1D}.{png,csv}`.
+- **Assumption.** The projection assumes the systematics and control-region constraints of the
+  full analysis change the limits of both models by the same factor.
+
 ## 11. Run-2-like MEDIUM b-tagging vs LOOSE (deferred)
 
 Run 2 required MEDIUM b-tagged jets; this analysis uses LOOSE (`idbtagPNetB >= 1`), which
