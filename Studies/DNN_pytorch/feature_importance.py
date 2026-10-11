@@ -24,21 +24,89 @@ import yaml
 import numpy as np
 import pandas as pd
 import onnxruntime as ort
+import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score
 
 from src.model_helper import (
+    ParametricDNN,
     eval_parity_expr,
     get_class_setup,
     load_physical_fold,
 )
 
-# Use the GPU when onnxruntime has CUDA (e.g. the LCG CUDA view on lxplus-gpu)
-PROVIDERS = [
-    p
-    for p in ("CUDAExecutionProvider", "CPUExecutionProvider")
-    if p in ort.get_available_providers()
-]
+
+class OnnxAsTorch:
+    """
+    Runs an exported pDNN on the GPU with torch: rebuilds ParametricDNN from the ONNX
+    initializers (input standardization 'mean' / 'scale' and the 'model.*' weights).
+    onnxruntime's CUDA provider fails on the BatchNormalization nodes
+    (CUDNN_STATUS_NOT_SUPPORTED).
+    """
+
+    def __init__(self, path, device):
+        import onnx
+        from onnx import numpy_helper
+
+        weights = {
+            i.name: torch.tensor(numpy_helper.to_array(i).copy())
+            for i in onnx.load(path).graph.initializer
+        }
+        linear = sorted(
+            (
+                k
+                for k in weights
+                if k.startswith("model.network.") and weights[k].dim() == 2
+            ),
+            key=lambda k: int(k.split(".")[2]),
+        )
+        hidden = [weights[k].shape[0] for k in linear]
+        n_in = weights[linear[0]].shape[1]
+        n_out = weights["model.output_layer.weight"].shape[0]
+        self.model = ParametricDNN(n_in, n_out, hidden_dims=hidden)
+        self.model.load_state_dict(
+            {
+                k[len("model.") :]: v
+                for k, v in weights.items()
+                if k.startswith("model.")
+            },
+            strict=False,
+        )
+        self.model = self.model.to(device).eval()
+        self.mean = weights["mean"].to(device)
+        self.scale = weights["scale"].to(device)
+        self.device = device
+
+    def __call__(self, X):
+        out = []
+        with torch.no_grad():
+            for i in range(0, len(X), 65536):
+                x = torch.tensor(X[i : i + 65536], device=self.device)
+                out.append(
+                    torch.softmax(self.model((x - self.mean) / self.scale), dim=1)
+                )
+        return torch.cat(out).double().cpu().numpy()
+
+
+class OnnxRuntime:
+    def __init__(self, path):
+        self.session = ort.InferenceSession(path, providers=["CPUExecutionProvider"])
+
+    def __call__(self, X):
+        name = self.session.get_inputs()[0].name
+        return np.concatenate(
+            [
+                self.session.run(None, {name: X[i : i + 65536]})[0]
+                for i in range(0, len(X), 65536)
+            ]
+        ).astype(np.float64)
+
+
+def load_model(path):
+    if torch.cuda.is_available():
+        return OnnxAsTorch(path, torch.device("cuda"))
+    return OnnxRuntime(path)
+
 
 MASS_BANDS = {"low": (250, 400), "mid": (450, 900), "high": (1000, 2000)}
 
@@ -78,14 +146,8 @@ def build_matrix(df, features, mass):
     return np.stack(cols, axis=1)
 
 
-def predict(session, X):
-    name = session.get_inputs()[0].name
-    return np.concatenate(
-        [
-            session.run(None, {name: X[i : i + 65536]})[0]
-            for i in range(0, len(X), 65536)
-        ]
-    ).astype(np.float64)
+def predict(model, X):
+    return model(X)
 
 
 def metrics(probs, y, w_phys, w_bal):
@@ -124,11 +186,8 @@ def run_fold(cfg, i_fold, args, rng):
     out = {"cycle": i_fold, "regimes": {}}
     for regime in cfg["regimes"]:
         features = feature_map[regime]
-        session = ort.InferenceSession(
-            os.path.join(
-                fold_dir, model_name_fmt.format(nParity=i_fold, regime=regime)
-            ),
-            providers=PROVIDERS,
+        session = load_model(
+            os.path.join(fold_dir, model_name_fmt.format(nParity=i_fold, regime=regime))
         )
         d = df[(df["boosted"] == 1) if regime == "boosted" else (df["boosted"] == 0)]
         y_all = d["class_targets_multiclass"].values
