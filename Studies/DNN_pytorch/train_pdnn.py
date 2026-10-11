@@ -101,6 +101,12 @@ def main():
         default=4,
         help="CPU threads for torch; on shared nodes (lxplus) more threads run slower",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Random seed for torch and numpy (default: the config's 'seed', if any)",
+    )
     args = parser.parse_args()
     torch.set_num_threads(args.threads)
 
@@ -110,6 +116,14 @@ def main():
     print(f"--> Loading configuration settings from: {args.config}")
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
+
+    seed = args.seed if args.seed is not None else cfg.get("seed")
+    if seed is not None:
+        # Network initialisation, epoch shuffling and background hypotheses; without a seed
+        # every training is a different random draw
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        print(f"--> Random seed {seed}")
 
     # Resolve paths & target evaluation parameters
     input_folder = cfg["input_folder"]
