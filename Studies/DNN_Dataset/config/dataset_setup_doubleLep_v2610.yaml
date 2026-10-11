@@ -11,9 +11,11 @@ nParity: 4
 # Training-file branches: all HistTuple columns, plus add_extra_vars (p4 components etc.) when true
 extra_vars: false
 
-# nParity{k}_Merged_weight.root (all_masses) and/or nParity{k}_Merged_weight_m{mass}.root per mass of per_mass_signal
+# nParity{k}_Merged_weight.root (all_masses) and/or nParity{k}_Merged_weight_m{mass}.root per mass of per_mass_signal.
+# Not needed by the PyTorch training (it weights events from weight_Central itself, see
+# Studies/DNN_pytorch/model_configs/v2610_pDNN_v1.yaml); the first v2610 production wrote all_masses.
 weight_files:
-  all_masses: true
+  all_masses: false
   per_mass_signal: null
 
 # Cuts for RDF in creating the training file

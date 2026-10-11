@@ -8,6 +8,8 @@ import onnxruntime as ort
 
 # Import shared physics utilities and dataset loaders from model_helper
 from src.model_helper import (
+    eval_parity_expr,
+    get_class_setup,
     load_physical_fold,
     update_mass_dependent_features,
 )
@@ -57,9 +59,19 @@ def main():
     extra_vars = cfg["extra_variables"]
     eps = 1e-15
 
-    # Run inference loop across all 4 parity folds
-    for train_parity in range(4):
-        val_parity = (train_parity + 2) % 4
+    class_setup = get_class_setup(cfg)
+    if "output_classes" in cfg:
+        class_names = class_setup["class_names"]
+    else:
+        class_names = cfg.get("class_names", ["Signal", "TT", "Other"])
+    spin_is_input = any("spin" in feats for feats in feature_map.values())
+    eval_spins = class_setup["spin_values"] if spin_is_input else [None]
+    model_name_fmt = cfg.get("model_name", "pdnn_model_{regime}_nparity{nParity}.onnx")
+
+    # Run inference loop across all parity folds
+    for i_fold in range(cfg.get("nParity", 4)):
+        train_parity = eval_parity_expr(cfg["train_parity"]["index"], i_fold)
+        val_parity = eval_parity_expr(cfg["val_parity"]["index"], i_fold)
 
         val_dir = os.path.join(output_folder, f"nParity{train_parity}_validation")
         output_root_filename = os.path.join(val_dir, "validation_applied_onnx.root")
@@ -87,6 +99,7 @@ def main():
             val_weight_path,
             feature_map,
             extra_vars,
+            cfg,
             dedicated_mass=dedicated_mass,
         )
 
@@ -99,11 +112,12 @@ def main():
             "boosted": df_val_raw["boosted"].values.astype(np.int32),
             "channelId": df_val_raw["channelId"].values.astype(np.int32),
             "X_mass": df_val_raw["X_mass"].values.astype(np.float32),
+            "spin": df_val_raw["spin"].values.astype(np.int32),
         }
 
         for regime in cfg["regimes"]:
             onnx_model_path = os.path.join(
-                val_dir, f"pdnn_model_{regime}_nparity{train_parity}.onnx"
+                val_dir, model_name_fmt.format(nParity=i_fold, regime=regime)
             )
 
             if not os.path.exists(onnx_model_path):
@@ -136,17 +150,17 @@ def main():
 
             df_val_temp = df_val_raw[val_mask].copy()
 
-            for mass in eval_mass_points:
+            for mass, spin in [(m, sp) for m in eval_mass_points for sp in eval_spins]:
                 df_val_temp["X_mass"] = mass
+                if spin is not None:
+                    df_val_temp["spin"] = spin
                 df_val_temp = update_mass_dependent_features(
                     df_val_temp, feature_map[regime]
                 )
+                score_name = f"DNN_M{mass}" if spin is None else f"DNN_M{mass}_S{spin}"
 
                 # Unscaled raw features passed directly to ONNX graph (embedded scaler node handles normalization)
                 X_raw_mat = df_val_temp[current_features].values.astype(np.float32)
-                print(f"Using current features {current_features}")
-                print(f"And X_raw_mat is:")
-                print(X_raw_mat)
 
                 batch_size = 32768
                 outputs_list = []
@@ -163,12 +177,12 @@ def main():
                     / np.clip(1.0 - val_prob_sig, eps, 1.0 - eps)
                 )
 
-                for key, source_arr in [
-                    (f"DNN_M{mass}", logit_score),
-                    (f"DNN_M{mass}_prob_sig", val_prob_sig),
-                    (f"DNN_M{mass}_prob_tt", outputs[:, 1]),
-                    (f"DNN_M{mass}_prob_other", outputs[:, 2]),
-                ]:
+                targets_to_save = [(score_name, logit_score)]
+                for c_idx, c_name in enumerate(class_names):
+                    targets_to_save.append(
+                        (f"{score_name}_prob_{c_name.lower()}", outputs[:, c_idx])
+                    )
+                for key, source_arr in targets_to_save:
                     if key not in val_output_data:
                         val_output_data[key] = np.zeros(
                             len(df_val_raw), dtype=np.float32

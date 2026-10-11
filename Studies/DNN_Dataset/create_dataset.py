@@ -709,7 +709,9 @@ if __name__ == "__main__":
 
     # all_masses: nParity{k}_Merged_weight.root (PyTorch pDNN)
     # per_mass_signal: nParity{k}_Merged_weight_m{mass}.root for each mass of that signal (TF)
-    weight_files = config_dict.get("weight_files", {"all_masses": True})
+    # The PyTorch training computes its weights from weight_Central, so no weight file is
+    # written unless the config asks for one (TensorFlow training, legacy PyTorch configs)
+    weight_files = config_dict.get("weight_files") or {}
     if weight_files.get("all_masses", False):
         add_weight_file(output_folder)
     per_mass_signal = weight_files.get("per_mass_signal")
