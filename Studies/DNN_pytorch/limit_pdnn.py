@@ -51,7 +51,7 @@ def validation_paths(cfg):
     return paths
 
 
-def load_validation(cfg, masses, spins):
+def load_validation(cfg, masses, spins, extra=()):
     """
     Reads only the columns the limits need: the bookkeeping branches and one signal logit per
     hypothesis (DNN_M{m}, or DNN_M{m}_S{spin} for spin-parametric models). The validation
@@ -69,6 +69,7 @@ def load_validation(cfg, masses, spins):
         for s in spins
     ]
     base = ["class_value", "weight_Central", "X_mass", "boosted", "res2b", "recovery"]
+    base += list(extra)
     branches = sorted(set(base) | {b for b in scores if b in available})
     arrays = []
     for path in paths:
@@ -126,6 +127,75 @@ def compute_edges(score_sig, w_sig, score_bkg, w_bkg, n_bins, min_bkg, min_bkg_e
         merged.append(edges[j])
         i = j
     return np.array(sorted(set(merged)))
+
+
+def merge_left_to_right(values_bkg, w_bkg, edges, min_bkg, min_bkg_events):
+    """Merges neighbouring bins from low to high until each has the minimum background."""
+    merged = [edges[0]]
+    i = 0
+    while i < len(edges) - 1:
+        j = i + 1
+        while j < len(edges) - 1:
+            in_bin = (values_bkg >= edges[i]) & (values_bkg < edges[j])
+            if w_bkg[in_bin].sum() >= min_bkg and in_bin.sum() >= min_bkg_events:
+                break
+            j += 1
+        merged.append(edges[j])
+        i = j
+    # A last bin short of background is merged into its neighbour
+    if len(merged) > 2:
+        last = (values_bkg >= merged[-2]) & (values_bkg < merged[-1])
+        if w_bkg[last].sum() < min_bkg or last.sum() < min_bkg_events:
+            del merged[-2]
+    return np.array(merged)
+
+
+def binning_2d(score_s, hme_s, w_s, score_b, hme_b, w_b, args):
+    """
+    DNN score x DeepHME_mass binning: the DNN slices are exactly the 1D binning, and each slice is
+    split in HME at the signal quantiles, merging neighbouring HME bins until each has the
+    minimum background. The 2D binning is then a refinement of the 1D one, so the comparison
+    shows what DeepHME_mass adds on top of the same DNN binning.
+    """
+    dnn_edges = compute_edges(
+        score_s, w_s, score_b, w_b, args.n_bins, args.min_bkg, args.min_bkg_events
+    )
+    hme_lo = min(hme_s.min(), hme_b.min()) - 1e-3
+    hme_hi = max(hme_s.max(), hme_b.max()) + 1e-3
+    hme_edges = []
+    for k in range(len(dnn_edges) - 1):
+        in_s = (score_s >= dnn_edges[k]) & (score_s < dnn_edges[k + 1])
+        in_b = (score_b >= dnn_edges[k]) & (score_b < dnn_edges[k + 1])
+        cand = [hme_lo, hme_hi]
+        if w_s[in_s].sum() > 0:
+            order = np.argsort(hme_s[in_s])
+            cum = np.cumsum(w_s[in_s][order]) / w_s[in_s].sum()
+            q = np.arange(1, args.n_hme_bins) / args.n_hme_bins
+            idx = np.clip(np.searchsorted(cum, q), 0, in_s.sum() - 1)
+            cand += list(hme_s[in_s][order][idx])
+        hme_edges.append(
+            merge_left_to_right(
+                hme_b[in_b],
+                w_b[in_b],
+                np.unique(cand),
+                args.min_bkg,
+                args.min_bkg_events,
+            )
+        )
+    return dnn_edges, hme_edges
+
+
+def unroll(score, hme, binning):
+    """Position of each event in the unrolled 2D histogram (bin k at [k, k+1))."""
+    dnn_edges, hme_edges = binning
+    pos = np.full(len(score), -1.0)
+    offset = 0
+    for k, edges in enumerate(hme_edges):
+        in_slice = (score >= dnn_edges[k]) & (score < dnn_edges[k + 1])
+        idx = np.clip(np.digitize(hme[in_slice], edges) - 1, 0, len(edges) - 2)
+        pos[in_slice] = offset + idx + 0.5
+        offset += len(edges) - 1
+    return pos, offset
 
 
 def make_hist(name, values, weights, edges):
@@ -212,7 +282,8 @@ def limits_for_model(cfg, args):
     signal_classes = class_setup["signal_classes"]
     masses = args.masses or cfg["signal_mass_points"]
     spins = args.spins
-    data, spin_is_input = load_validation(cfg, masses, spins)
+    extra = ["DeepHME_mass"] if args.observable == "dnn_hme" else []
+    data, spin_is_input = load_validation(cfg, masses, spins, extra)
     cats = category_masks(data)
     class_value = data["class_value"]
     weight = data["weight_Central"].astype(np.float64)
@@ -226,7 +297,9 @@ def limits_for_model(cfg, args):
     bkg_masks["Other"] = (class_value > 0) & ~np.isin(class_value, listed)
     any_bkg = class_value > 0
 
-    out_dir = args.output_dir or os.path.join(cfg["output_folder"], "limits")
+    out_dir = args.output_dir or os.path.join(
+        cfg["output_folder"], "limits" if args.observable == "dnn" else "limits_dnn_hme"
+    )
     os.makedirs(out_dir, exist_ok=True)
 
     jobs = []
@@ -251,21 +324,36 @@ def limits_for_model(cfg, args):
                 b_mask = any_bkg & cmask
                 if w_sum(weight, s_mask) <= 0 or b_mask.sum() < args.min_bkg_events:
                     continue
-                edges = compute_edges(
-                    score[s_mask],
-                    weight[s_mask],
-                    score[b_mask],
-                    np.clip(weight[b_mask], 0, None),
-                    args.n_bins,
-                    args.min_bkg,
-                    args.min_bkg_events,
-                )
+                if args.observable == "dnn_hme":
+                    hme = data["DeepHME_mass"]
+                    binning = binning_2d(
+                        score[s_mask],
+                        hme[s_mask],
+                        weight[s_mask],
+                        score[b_mask],
+                        hme[b_mask],
+                        np.clip(weight[b_mask], 0, None),
+                        args,
+                    )
+                    x, n_total = unroll(score, hme, binning)
+                    edges = np.arange(n_total + 1, dtype=np.float64)
+                else:
+                    x = score
+                    edges = compute_edges(
+                        score[s_mask],
+                        weight[s_mask],
+                        score[b_mask],
+                        np.clip(weight[b_mask], 0, None),
+                        args.n_bins,
+                        args.min_bkg,
+                        args.min_bkg_events,
+                    )
                 shapes = f"shapes_{cat}.root"
                 f = ROOT.TFile(os.path.join(workdir, shapes), "RECREATE")
-                hists = [make_hist("Signal", score[s_mask], weight[s_mask], edges)]
+                hists = [make_hist("Signal", x[s_mask], weight[s_mask], edges)]
                 for bname, bmask in bkg_masks.items():
                     m = bmask & cmask
-                    hists.append(make_hist(bname, score[m], weight[m], edges))
+                    hists.append(make_hist(bname, x[m], weight[m], edges))
                 # Asimov expected limits ignore data_obs, but combine needs it in the file
                 data_obs = hists[1].Clone("data_obs")
                 for h in hists[2:]:
@@ -354,6 +442,21 @@ def main():
         "--config", help="Model config whose output_folder holds the trained folds"
     )
     parser.add_argument("--masses", type=int, nargs="+", default=None)
+    parser.add_argument(
+        "--observable",
+        choices=["dnn", "dnn_hme"],
+        default="dnn",
+        help="dnn: 1D pDNN log-odds; dnn_hme: the 1D binning split further in DeepHME_mass, unrolled",
+    )
+    parser.add_argument(
+        "--n-dnn-slices", type=int, default=3, help="2D: equal-signal DNN slices"
+    )
+    parser.add_argument(
+        "--n-hme-bins",
+        type=int,
+        default=6,
+        help="2D: HME bins per slice before merging",
+    )
     parser.add_argument("--spins", type=int, nargs="+", default=[0, 2])
     parser.add_argument("--categories", nargs="+", default=CATEGORIES)
     parser.add_argument(
