@@ -68,10 +68,6 @@ training:
     patience: 6
     factor: 0.5
 
-  # Feature Scan Settings
-  perm_scan: true
-  perm_subsample_fraction: 0.20  # Subsample fraction for feature importance scans
-  perm_mass_points: [ 250, 300, 400, 500, 700, 1000, 1500, 2000 ]
 
 # Base Common Kinematic Features
 common_features:

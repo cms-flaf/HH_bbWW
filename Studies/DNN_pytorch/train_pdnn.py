@@ -4,11 +4,8 @@ import argparse
 import json
 import yaml
 import uproot
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-from sklearn.metrics import log_loss
 from sklearn.preprocessing import StandardScaler
 
 import torch
@@ -21,7 +18,6 @@ from src.model_helper import (
     balance_weights,
     load_parametric_fold,
     load_physical_fold,
-    update_mass_dependent_features,
     score_hypotheses,
     DynamicMassManager,
     ParametricDNN,
@@ -172,22 +168,10 @@ def main():
     spin_is_input = any("spin" in feats for feats in feature_map.values())
     eval_spins = class_setup["spin_values"] if spin_is_input else [None]
 
-    # The permutation scan is expensive: run it on a subset of masses (all by default)
-    run_perm_scan = train_cfg.get("perm_scan", True)
-    perm_mass_points = train_cfg.get("perm_mass_points", eval_mass_points)
-
     print(f"Using compute acceleration device: {device}")
     print(f"Configured output classes ({num_classes}): {class_names}")
     regimes = args.regimes if args.regimes is not None else cfg["regimes"]
     folds = args.folds if args.folds is not None else range(n_parity_folds)
-    # Jobs running a subset of the folds (e.g. one fold each) must not overwrite each
-    # other's feature-importance summaries
-    summary_tag = (
-        ""
-        if sorted(folds) == list(range(n_parity_folds))
-        else "_folds" + "".join(str(f) for f in sorted(folds))
-    )
-    feature_importance_records = {regime: [] for regime in regimes}
 
     # Loop over cross-validation parities defined in YAML configuration
     for i_fold in folds:
@@ -300,12 +284,6 @@ def main():
                 df_test_raw[test_mask]
                 .copy()
                 .sample(frac=1, random_state=200)
-                .reset_index(drop=True)
-            )
-            df_val = (
-                df_val_raw[val_mask]
-                .copy()
-                .sample(frac=1, random_state=300)
                 .reset_index(drop=True)
             )
 
@@ -475,7 +453,6 @@ def main():
             model = model.to(device)
             model.eval()
 
-            eps = 1e-15
             val_indices = np.where(val_mask)[0]
             df_val_temp = df_val_raw[val_mask].copy()
 
@@ -499,191 +476,12 @@ def main():
                         )
                     val_output_data[key][val_indices] = source_arr.astype(np.float32)
 
-            # Feature Importance Scanning
-            perm_frac = train_cfg.get("perm_subsample_fraction", 0.20)
-            df_val_scan = df_val[df_val["class_targets_multiclass"] >= 0]
-            if run_perm_scan and len(df_val_scan) > 0:
-                print(
-                    f"--> Initiating feature importance scans for {regime.upper()}..."
-                )
-
-                df_sub_base = (
-                    df_val_scan.sample(frac=perm_frac, random_state=42).copy()
-                    if perm_frac < 1.0
-                    else df_val_scan.copy()
-                )
-                if spin_is_input:
-                    # Backgrounds have no spin: give them random hypotheses, as in training
-                    bkg = df_sub_base["class_targets_multiclass"].values != 0
-                    df_sub_base.loc[bkg, "spin"] = np.random.choice(
-                        class_setup["spin_values"], size=bkg.sum()
-                    ).astype(np.int32)
-                mass_importance_records = {mass: {} for mass in perm_mass_points}
-
-                def compute_batched_loss(X_matrix, y_targets):
-                    tensor_mat = torch.tensor(
-                        X_matrix, dtype=torch.float32, device=device
-                    )
-                    prob_list = []
-                    with torch.no_grad():
-                        for start in range(0, len(tensor_mat), eval_batch_size):
-                            lg = model(tensor_mat[start : start + eval_batch_size])
-                            prob_list.append(torch.softmax(lg, dim=1).cpu().numpy())
-                    return log_loss(
-                        y_targets,
-                        np.concatenate(prob_list, axis=0),
-                        labels=list(range(num_classes)),
-                    )
-
-                for mass in perm_mass_points:
-                    df_mass_eval = df_sub_base.copy()
-                    df_mass_eval["X_mass"] = mass
-                    df_mass_eval = update_mass_dependent_features(
-                        df_mass_eval, current_features
-                    )
-
-                    X_importance_base = scaler.transform(df_mass_eval[current_features])
-                    y_importance_base = df_mass_eval["class_targets_multiclass"].values
-
-                    base_loss_val = compute_batched_loss(
-                        X_importance_base, y_importance_base
-                    )
-
-                    for feat_name in current_features:
-                        if feat_name == "X_mass":
-                            mass_importance_records[mass][feat_name] = 0.0
-                            continue
-
-                        df_permuted = df_mass_eval.copy()
-                        permuted_vals = df_permuted[feat_name].values.copy()
-                        np.random.shuffle(permuted_vals)
-                        df_permuted[feat_name] = permuted_vals
-
-                        df_permuted = update_mass_dependent_features(
-                            df_permuted, current_features
-                        )
-
-                        X_permuted_scaled = scaler.transform(
-                            df_permuted[current_features]
-                        )
-                        perm_loss = compute_batched_loss(
-                            X_permuted_scaled, y_importance_base
-                        )
-
-                        delta_loss = max(0.0, perm_loss - base_loss_val)
-                        mass_importance_records[mass][feat_name] = delta_loss
-
-                feature_importance_records[regime].append(mass_importance_records)
-
         # Output ROOT File Construction
         output_root_filename = os.path.join(out_dir, "validation_applied.root")
         print(f"\n--> Saving applied dataset tree to '{output_root_filename}'...")
         with uproot.recreate(output_root_filename) as f_out:
             f_out.mktree(tree_name, {k: v.dtype for k, v in val_output_data.items()})
             f_out[tree_name].extend(val_output_data)
-
-    # Summary Plotting
-    print("\n" + "=" * 80)
-    print("GENERATING FEATURE IMPORTANCE REPORTS & TREND PLOTS")
-    print("=" * 80)
-
-    for regime in regimes:
-        if not feature_importance_records[regime]:
-            continue
-
-        pdf_path = os.path.join(
-            output_folder, f"per_mass_feature_importance_{regime}{summary_tag}.pdf"
-        )
-        print(f"--> Compiling multi-page report document: '{pdf_path}'")
-
-        folds_list = feature_importance_records[regime]
-        regime_mass_averages = {}
-
-        with PdfPages(pdf_path) as pdf:
-            for mass in perm_mass_points:
-                feat_averages = {}
-                sample_features = list(folds_list[0][mass].keys())
-
-                for feat in sample_features:
-                    feat_vals = [fold[mass][feat] for fold in folds_list]
-                    feat_averages[feat] = np.mean(feat_vals)
-
-                regime_mass_averages[mass] = feat_averages.copy()
-
-                s_importance = pd.Series(feat_averages).sort_values(ascending=True)
-                s_importance = s_importance.drop(labels=["X_mass"], errors="ignore")
-
-                fig, ax = plt.subplots(figsize=(12, 8))
-                ax.barh(
-                    s_importance.index,
-                    s_importance.values,
-                    color="crimson" if regime == "boosted" else "royalblue",
-                    edgecolor="black",
-                    alpha=0.8,
-                )
-                ax.set_xlabel(
-                    "Mean Shift in Cross-Entropy Loss (Permuted - Baseline)",
-                    fontsize=11,
-                    fontweight="bold",
-                )
-                ax.set_ylabel("Kinematic Feature Name", fontsize=11, fontweight="bold")
-                ax.set_title(
-                    f"{regime.upper()} Topology Feature Importance (M_X = {mass} GeV)",
-                    fontsize=13,
-                    fontweight="bold",
-                    pad=15,
-                )
-                ax.grid(True, axis="x", linestyle="--", alpha=0.5)
-                plt.tight_layout()
-
-                pdf.savefig(fig, dpi=150)
-                plt.close(fig)
-
-        if len(perm_mass_points) > 1:
-            df_summary = pd.DataFrame.from_dict(regime_mass_averages, orient="index")
-            if "X_mass" in df_summary.columns:
-                df_summary = df_summary.drop(columns=["X_mass"])
-
-            df_features_vs_mass = df_summary.T
-            top_n = min(15, len(df_features_vs_mass))
-            top_features = df_features_vs_mass.mean(axis=1).nlargest(top_n).index
-            df_top_features = df_features_vs_mass.loc[top_features]
-
-            plt.figure(figsize=(12, 7))
-            for feature in df_top_features.index:
-                plt.plot(
-                    df_top_features.columns,
-                    df_top_features.loc[feature],
-                    marker="o",
-                    markersize=5,
-                    linewidth=2,
-                    label=feature,
-                )
-
-            plt.title(
-                f"{regime.upper()} Topology: Top {top_n} Feature Importances Across Mass Points",
-                fontsize=14,
-                fontweight="bold",
-                pad=15,
-            )
-            plt.xlabel("Mass Point $M_X$ (GeV)", fontsize=12)
-            plt.ylabel("Mean Shift in Cross-Entropy Loss", fontsize=12)
-            plt.grid(True, linestyle="--", alpha=0.5)
-            plt.xticks(perm_mass_points, rotation=45)
-            plt.legend(
-                bbox_to_anchor=(1.05, 1),
-                loc="upper left",
-                title="Kinematic Features",
-                frameon=True,
-            )
-            plt.tight_layout()
-
-            trend_plot_path = os.path.join(
-                output_folder,
-                f"feature_importance_evolution_lines_{regime}{summary_tag}.png",
-            )
-            plt.savefig(trend_plot_path, dpi=300)
-            plt.close()
 
     print("\n--> Training execution complete.")
 

@@ -51,7 +51,7 @@ python3 shape.py
 The torch of the analysis environment is a CPU-only build; `run_lxplus_gpu.sh` sets up the CUDA LCG
 view and runs `train_pdnn.py` with the given arguments. On a T4 an epoch of the resolved network
 takes about 10 s, against about 4 minutes on an lxplus CPU node; one fold of one model takes about
-45 minutes, most of it reading the dataset and the permutation scan.
+30 minutes, most of it reading the dataset.
 
 ```sh
 ssh lxplus-gpu.cern.ch          # note the node, to come back to the tmux session
@@ -65,9 +65,12 @@ need the analysis environment (`source env.sh`), for `combine` and `onnxruntime`
 
 | Script | Does | Writes (under `output_folder`) |
 |---|---|---|
-| `train_pdnn.py` | Trains one model per regime and parity fold, exports ONNX, evaluates on the validation fold | `nParity{f}_validation/pdnn_model_{regime}_nparity{f}.onnx`, `validation_applied.root` (signal log-odds `DNN_M{m}` and class probabilities per hypothesis), `loss_history_{regime}.json` / `loss_curve_{regime}.png`, feature-importance plots |
+| `train_pdnn.py` | Trains one model per regime and parity fold, exports ONNX, evaluates on the validation fold | `nParity{f}_validation/pdnn_model_{regime}_nparity{f}.onnx`, `validation_applied.root` (signal log-odds `DNN_M{m}` and class probabilities per hypothesis), `loss_history_{regime}.json` / `loss_curve_{regime}.png` |
 | `apply_pdnn.py` | Re-evaluates the exported ONNX models on the validation folds | `nParity{f}_validation/validation_applied_onnx.root` |
 | `overtraining_check.py` | Scores each cycle's ONNX models on their training parity and on the validation parity, at a few masses: per-class weighted KS tests and signal-vs-background AUC, train vs validation | `overtraining/overtraining_check.pdf`, `.json` |
+| `feature_importance.py` | Permutation importance of a trained model on each cycle's validation parity: each input, and each group of inputs correlated with \|r\| > 0.8, shuffled at several masses; drop in signal-vs-background AUC (relative to 1 - AUC) and rise in class-balanced loss, averaged over cycles. Runs on the GPU when available (`--folds` to split cycles over jobs, `--summarize` to combine them) | `feature_importance/importance_{regime}.csv`, `.png`, `importance_vs_mass_{regime}.png` |
+| `score_deployed.py` | Scores a training dataset with a deployed model (`config/DNN/<version>`, fold offsets as in `Analysis/DNN_Application.py`) into the `validation_applied.root` layout, so `limit_pdnn.py` can compare it with new models | `nParity{k}_validation/validation_applied.root` under the `--config` output folder |
+| `production_comparison.py` | Projects full-analysis expected limits with the ratio of quick limits of two models, and plots them with the Run 2 expected limits | `production_comparison_{category}.png`, `.csv` |
 | `limit_pdnn.py` | Expected limits per mass and spin from the validation trees of all folds: pDNN-logit templates in res2b / recovery / boosted, stat-only `combine -M AsymptoticLimits -t -1` per category and combined; `--compare` overlays models | `limits/limits.json`, `limits/limits_{cat}.png`, cards and shapes in `limits/spin{s}_M{m}/` |
 | `shape.py` | Combines the folds, bins DeepHME mass in pDNN slices, writes templates and stack plots | `combined_validation/shape_{cat}.root`, `pdnn_mass_stackplots/` |
 
@@ -96,7 +99,6 @@ labelled DY, holds all non-TT background.
 | `output_classes` | Ordered `{output name: signal \| [class_values] \| rest}`; the first must be `signal`, `rest` takes every background not listed. Default: Signal / TT / Other. Events with no output (e.g. 1L signals) are not trained on but are still scored in the validation tree. |
 | `signal_spin`, `spin_values` | Spin of each signal `class_value`, and the spin hypotheses drawn for backgrounds when `spin` is an input. Validation scores are then written per spin, `DNN_M{m}_S{spin}`. |
 | `weighting` | Weights from `weight_Central`: `zero_negative`, `clip_sigma` (clip at mean + N sigma per loaded fold), `flatten_signal_per_mass` (equal total weight per signal mass in each regime) with `flatten_min_events` (masses with fewer signal events, e.g. boosted 250-400 GeV, keep their own weight). After this every output class is scaled to the signal total. |
-| `training.perm_scan`, `training.perm_mass_points` | Turn the permutation-importance scan off, or run it on a subset of masses. |
 
 `DeepHME_mass_error_rel` (`DeepHME_mass_error / DeepHME_mass`) is computed by the loader; the
 deployed `Analysis/DNN_Application.py` does not compute it yet.
