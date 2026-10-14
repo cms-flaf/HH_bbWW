@@ -1,30 +1,36 @@
 #!/usr/bin/env python3
 import os
 import argparse
+import json
 import yaml
 import uproot
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-from sklearn.metrics import log_loss
 from sklearn.preprocessing import StandardScaler
 
 import torch
 import torch.optim as optim
-from torch.utils.data import DataLoader
 
 # Import refactored helper functions, data loaders, and model architectures
 from src.model_helper import (
     eval_parity_expr,
+    get_class_setup,
+    balance_weights,
     load_parametric_fold,
     load_physical_fold,
-    update_mass_dependent_features,
+    score_hypotheses,
     DynamicMassManager,
     ParametricDNN,
     ONNXDeployWrapper,
     WeightedStandardCrossEntropyLoss,
 )
+
+try:
+    import onnxscript  # noqa: F401
+
+    ONNXSCRIPT_AVAILABLE = True
+except ImportError:
+    ONNXSCRIPT_AVAILABLE = False
 
 # Use Apple Silicon MPS if available, otherwise GPU/CPU
 device = torch.device(
@@ -32,6 +38,31 @@ device = torch.device(
     if torch.backends.mps.is_available()
     else ("cuda" if torch.cuda.is_available() else "cpu")
 )
+
+
+def save_loss_history(history, out_dir, regime):
+    """Per-epoch train/test loss and learning rate: loss_history_{regime}.json and a plot."""
+    with open(os.path.join(out_dir, f"loss_history_{regime}.json"), "w") as f:
+        json.dump(history, f, indent=1)
+    best = int(np.argmin(history["test_loss"]))
+    fig, (ax, ax_lr) = plt.subplots(
+        2, 1, figsize=(8, 7), sharex=True, gridspec_kw={"height_ratios": [3, 1]}
+    )
+    ax.plot(history["epoch"], history["train_loss"], label="train")
+    ax.plot(history["epoch"], history["test_loss"], label="test (early stopping)")
+    ax.axvline(history["epoch"][best], color="gray", ls="--", label="saved epoch")
+    ax.set_ylabel("Weighted cross-entropy")
+    ax.set_title(f"{regime.upper()} loss history")
+    ax.legend()
+    ax.grid(alpha=0.3)
+    ax_lr.plot(history["epoch"], history["lr"], color="black")
+    ax_lr.set_yscale("log")
+    ax_lr.set_xlabel("Epoch")
+    ax_lr.set_ylabel("Learning rate")
+    ax_lr.grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"loss_curve_{regime}.png"), dpi=150)
+    plt.close(fig)
 
 
 def main():
@@ -44,7 +75,36 @@ def main():
         default="model_config.yaml",
         help="Path to YAML model configuration file",
     )
+    parser.add_argument(
+        "--folds",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Parity cycles to run (default: all), e.g. one per batch job",
+    )
+    parser.add_argument(
+        "--regimes",
+        nargs="+",
+        default=None,
+        help="Regimes to train (default: the config's regimes)",
+    )
+    parser.add_argument(
+        "--epochs", type=int, default=None, help="Override the number of epochs"
+    )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=4,
+        help="CPU threads for torch; on shared nodes (lxplus) more threads run slower",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Random seed for torch and numpy (default: the config's 'seed', if any)",
+    )
     args = parser.parse_args()
+    torch.set_num_threads(args.threads)
 
     if not os.path.exists(args.config):
         raise FileNotFoundError(f"Configuration file not found: {args.config}")
@@ -53,6 +113,14 @@ def main():
     with open(args.config, "r") as f:
         cfg = yaml.safe_load(f)
 
+    seed = args.seed if args.seed is not None else cfg.get("seed")
+    if seed is not None:
+        # Network initialisation, epoch shuffling and background hypotheses; without a seed
+        # every training is a different random draw
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        print(f"--> Random seed {seed}")
+
     # Resolve paths & target evaluation parameters
     input_folder = cfg["input_folder"]
     output_folder = cfg["output_folder"]
@@ -60,8 +128,15 @@ def main():
     dedicated_mass = cfg.get("dedicated_mass", None)
 
     # Class mapping & configuration
-    class_names = cfg.get("class_names", ["Signal", "TT", "Other"])
+    class_setup = get_class_setup(cfg)
+    if "output_classes" in cfg:
+        class_names = class_setup["class_names"]
+    else:
+        class_names = cfg.get("class_names", ["Signal", "TT", "Other"])
     num_classes = len(class_names)
+    weighting_cfg = cfg.get("weighting", {})
+    flatten_signal_per_mass = weighting_cfg.get("flatten_signal_per_mass", False)
+    flatten_min_events = weighting_cfg.get("flatten_min_events", 0)
 
     # ONNX Model Naming Pattern
     model_name_fmt = cfg.get("model_name", "pdnn_model_{regime}_nparity{nParity}.onnx")
@@ -89,12 +164,17 @@ def main():
     extra_vars = cfg["extra_variables"]
     train_cfg = cfg["training"]
 
+    # With 'spin' as an input, validation events are scored once per spin hypothesis
+    spin_is_input = any("spin" in feats for feats in feature_map.values())
+    eval_spins = class_setup["spin_values"] if spin_is_input else [None]
+
     print(f"Using compute acceleration device: {device}")
     print(f"Configured output classes ({num_classes}): {class_names}")
-    feature_importance_records = {regime: [] for regime in cfg["regimes"]}
+    regimes = args.regimes if args.regimes is not None else cfg["regimes"]
+    folds = args.folds if args.folds is not None else range(n_parity_folds)
 
     # Loop over cross-validation parities defined in YAML configuration
-    for i_fold in range(n_parity_folds):
+    for i_fold in folds:
         # Dynamically evaluate target parity indices using string expressions from config
         train_parity = eval_parity_expr(train_parity_expr, i_fold)
         test_parity = eval_parity_expr(test_parity_expr, i_fold)
@@ -139,6 +219,7 @@ def main():
             feature_map,
             extra_vars,
             cfg["signal_mass_points"],
+            cfg,
             seed=100,
             dedicated_mass=dedicated_mass,
         )
@@ -148,6 +229,7 @@ def main():
             feature_map,
             extra_vars,
             cfg["signal_mass_points"],
+            cfg,
             seed=200,
             dedicated_mass=dedicated_mass,
         )
@@ -156,6 +238,7 @@ def main():
             files["val"]["weight"],
             feature_map,
             extra_vars,
+            cfg,
             dedicated_mass=dedicated_mass,
         )
 
@@ -168,9 +251,10 @@ def main():
             "boosted": df_val_raw["boosted"].values.astype(np.int32),
             "channelId": df_val_raw["channelId"].values.astype(np.int32),
             "X_mass": df_val_raw["X_mass"].values.astype(np.float32),
+            "spin": df_val_raw["spin"].values.astype(np.int32),
         }
 
-        for regime in cfg["regimes"]:
+        for regime in regimes:
             print(f"\n--- Initiating Network Training for Regime: {regime.upper()} ---")
             current_features = feature_map[regime]
 
@@ -202,12 +286,6 @@ def main():
                 .sample(frac=1, random_state=200)
                 .reset_index(drop=True)
             )
-            df_val = (
-                df_val_raw[val_mask]
-                .copy()
-                .sample(frac=1, random_state=300)
-                .reset_index(drop=True)
-            )
 
             if len(df_train) == 0 or len(df_test) == 0:
                 print(
@@ -215,19 +293,11 @@ def main():
                 )
                 continue
 
-            # Class rebalancing dynamically across num_classes
+            # Equal total weight per signal mass point (optional) and per output class
             for df_split in [df_train, df_test]:
-                y_arr = df_split["class_targets_multiclass"]
-                w_arr = df_split["class_weight"]
-                sums = {c: w_arr[y_arr == c].sum() for c in range(num_classes)}
-                target_sum = sums.get(0, 1.0)  # Signal class index 0 as target baseline
-                if target_sum <= 0:
-                    target_sum = 1.0
-
-                for c in range(num_classes):
-                    mask = y_arr == c
-                    if sums[c] > 0:
-                        df_split.loc[mask, "class_weight"] *= target_sum / sums[c]
+                balance_weights(
+                    df_split, num_classes, flatten_signal_per_mass, flatten_min_events
+                )
 
             scaler = StandardScaler()
             scaler.fit(df_train[current_features])
@@ -237,6 +307,7 @@ def main():
                 current_features,
                 scaler,
                 cfg["signal_mass_points"],
+                spin_values=class_setup["spin_values"],
                 is_training=True,
             )
             test_manager = DynamicMassManager(
@@ -244,33 +315,17 @@ def main():
                 current_features,
                 scaler,
                 cfg["signal_mass_points"],
+                spin_values=class_setup["spin_values"],
                 is_training=False,
             )
 
-            X_test_tensor, y_test_tensor, w_test_tensor = (
-                test_manager.get_scaled_tensors()
+            # Whole splits live on the device and batches are sliced there: a DataLoader
+            # builds every batch on the CPU, which dominates the epoch time on a GPU
+            X_test_dev, y_test_dev, w_test_dev = (
+                t.to(device) for t in test_manager.get_scaled_tensors()
             )
-            test_dataset = torch.utils.data.TensorDataset(
-                X_test_tensor, y_test_tensor, w_test_tensor
-            )
-            test_loader = DataLoader(
-                test_dataset,
-                batch_size=train_cfg["eval_batch_size"],
-                shuffle=False,
-                num_workers=0,
-            )
-
-            X_tr_init, y_tr_init, w_tr_init = train_manager.get_scaled_tensors()
-            epoch_dataset = torch.utils.data.TensorDataset(
-                X_tr_init, y_tr_init, w_tr_init
-            )
-            train_loader = DataLoader(
-                epoch_dataset,
-                batch_size=train_cfg["batch_size"],
-                shuffle=True,
-                drop_last=True,
-                num_workers=0,
-            )
+            batch_size = train_cfg["batch_size"]
+            eval_batch_size = train_cfg["eval_batch_size"]
 
             model = ParametricDNN(
                 input_dim=len(current_features),
@@ -295,54 +350,49 @@ def main():
             )
 
             best_loss = float("inf")
-            epochs = train_cfg["epochs"]
+            epochs = args.epochs if args.epochs is not None else train_cfg["epochs"]
             early_stopping_patience = train_cfg.get("early_stopping_patience", 10)
             epochs_no_improve = 0
+            history = {"epoch": [], "train_loss": [], "test_loss": [], "lr": []}
 
             for epoch in range(1, epochs + 1):
                 train_manager.randomize_background_masses()
                 X_train_epoch, y_train_epoch, w_train_epoch = (
-                    train_manager.get_scaled_tensors()
-                )
-                train_loader.dataset.tensors = (
-                    X_train_epoch,
-                    y_train_epoch,
-                    w_train_epoch,
+                    t.to(device) for t in train_manager.get_scaled_tensors()
                 )
 
                 model.train()
-                train_loss = 0.0
-                for batch_x, batch_y, batch_w in train_loader:
-                    batch_x, batch_y, batch_w = (
-                        batch_x.to(device),
-                        batch_y.to(device),
-                        batch_w.to(device),
-                    )
+                train_loss = torch.zeros((), device=device)
+                n_train = (len(X_train_epoch) // batch_size) * batch_size  # drop_last
+                perm = torch.randperm(len(X_train_epoch), device=device)
+                for start in range(0, n_train, batch_size):
+                    idx = perm[start : start + batch_size]
+                    batch_y = y_train_epoch[idx]
                     optimizer.zero_grad()
 
-                    outputs = model(batch_x)
-                    loss = criterion(outputs, batch_y, batch_w)
+                    outputs = model(X_train_epoch[idx])
+                    loss = criterion(outputs, batch_y, w_train_epoch[idx])
                     loss.backward()
                     optimizer.step()
 
-                    train_loss += loss.item() * len(batch_y)
+                    train_loss += loss.detach() * len(batch_y)
 
-                train_loss /= len(X_train_epoch)
+                train_loss = train_loss.item() / n_train
 
                 model.eval()
-                val_loss = 0.0
+                val_loss = torch.zeros((), device=device)
                 with torch.no_grad():
-                    for batch_x, batch_y, batch_w in test_loader:
-                        batch_x, batch_y, batch_w = (
-                            batch_x.to(device),
-                            batch_y.to(device),
-                            batch_w.to(device),
-                        )
-                        outputs = model(batch_x)
-                        loss = criterion(outputs, batch_y, batch_w)
-                        val_loss += loss.item() * len(batch_y)
-                val_loss /= len(test_dataset)
+                    for start in range(0, len(X_test_dev), eval_batch_size):
+                        sl = slice(start, start + eval_batch_size)
+                        outputs = model(X_test_dev[sl])
+                        loss = criterion(outputs, y_test_dev[sl], w_test_dev[sl])
+                        val_loss += loss * len(y_test_dev[sl])
+                val_loss = val_loss.item() / len(X_test_dev)
 
+                history["epoch"].append(epoch)
+                history["train_loss"].append(train_loss)
+                history["test_loss"].append(val_loss)
+                history["lr"].append(optimizer.param_groups[0]["lr"])
                 scheduler.step(val_loss)
 
                 if val_loss < best_loss:
@@ -366,6 +416,7 @@ def main():
                     )
                     break
 
+            save_loss_history(history, out_dir, regime)
             model.load_state_dict(
                 torch.load(os.path.join(out_dir, f"best_pdnn_model_{regime}.pth"))
             )
@@ -392,6 +443,8 @@ def main():
                     "raw_inputs": {0: "batch_size"},
                     "probabilities": {0: "batch_size"},
                 },
+                # The dynamo exporter needs onnxscript; fall back to the TorchScript one without it
+                dynamo=ONNXSCRIPT_AVAILABLE,
             )
             print(
                 f"    [{regime.upper()}] Successfully exported ONNX model to: {onnx_path}"
@@ -400,49 +453,20 @@ def main():
             model = model.to(device)
             model.eval()
 
-            eps = 1e-15
             val_indices = np.where(val_mask)[0]
             df_val_temp = df_val_raw[val_mask].copy()
 
-            val_scaled_mat_placeholder = torch.zeros(
-                (1, len(current_features)), dtype=torch.float32
-            )
-            v_dataset = torch.utils.data.TensorDataset(val_scaled_mat_placeholder)
-            v_loader = DataLoader(
-                v_dataset, batch_size=32768, shuffle=False, num_workers=0
-            )
-
-            for mass in eval_mass_points:
-                df_val_temp["X_mass"] = mass
-                df_val_temp = update_mass_dependent_features(
-                    df_val_temp, current_features
-                )
-
-                val_scaled_mat = torch.tensor(
-                    scaler.transform(df_val_temp[current_features]), dtype=torch.float32
-                )
-                v_loader.dataset.tensors = (val_scaled_mat,)
-
-                outputs_list = []
-                with torch.no_grad():
-                    for (batch_x,) in v_loader:
-                        batch_x = batch_x.to(device)
-                        logits = model(batch_x)
-                        probs = torch.softmax(logits, dim=1).cpu().numpy()
-                        outputs_list.append(probs)
-
-                outputs = np.concatenate(outputs_list, axis=0)
-                val_prob_sig = outputs[:, 0]
-                logit_score = np.log(
-                    np.clip(val_prob_sig, eps, 1.0 - eps)
-                    / np.clip(1.0 - val_prob_sig, eps, 1.0 - eps)
-                )
+            hypotheses = [(m, sp) for m in eval_mass_points for sp in eval_spins]
+            for mass, spin, outputs, logit_score in score_hypotheses(
+                model, scaler, df_val_temp, current_features, hypotheses, device
+            ):
+                score_name = f"DNN_M{mass}" if spin is None else f"DNN_M{mass}_S{spin}"
 
                 # Dynamic branch generation based on class_names
-                targets_to_save = [(f"DNN_M{mass}", logit_score)]
+                targets_to_save = [(score_name, logit_score)]
                 for c_idx, c_name in enumerate(class_names):
                     targets_to_save.append(
-                        (f"DNN_M{mass}_prob_{c_name.lower()}", outputs[:, c_idx])
+                        (f"{score_name}_prob_{c_name.lower()}", outputs[:, c_idx])
                     )
 
                 for key, source_arr in targets_to_save:
@@ -452,191 +476,12 @@ def main():
                         )
                     val_output_data[key][val_indices] = source_arr.astype(np.float32)
 
-            # Feature Importance Scanning
-            perm_frac = train_cfg.get("perm_subsample_fraction", 0.20)
-            if len(df_val) > 0:
-                print(
-                    f"--> Initiating feature importance scans for {regime.upper()}..."
-                )
-
-                df_sub_base = (
-                    df_val.sample(frac=perm_frac, random_state=42).copy()
-                    if perm_frac < 1.0
-                    else df_val.copy()
-                )
-                mass_importance_records = {mass: {} for mass in eval_mass_points}
-
-                tensor_mat_placeholder = torch.zeros(
-                    (1, len(current_features)), dtype=torch.float32
-                )
-                perm_dataset = torch.utils.data.TensorDataset(tensor_mat_placeholder)
-                perm_loader = DataLoader(
-                    perm_dataset, batch_size=32768, shuffle=False, num_workers=0
-                )
-
-                def compute_batched_loss(X_matrix, y_targets):
-                    tensor_mat = torch.tensor(X_matrix, dtype=torch.float32)
-                    perm_loader.dataset.tensors = (tensor_mat,)
-                    prob_list = []
-                    with torch.no_grad():
-                        for (bx,) in perm_loader:
-                            bx = bx.to(device)
-                            lg = model(bx)
-                            prob_list.append(torch.softmax(lg, dim=1).cpu().numpy())
-                    return log_loss(
-                        y_targets,
-                        np.concatenate(prob_list, axis=0),
-                        labels=list(range(num_classes)),
-                    )
-
-                for mass in eval_mass_points:
-                    df_mass_eval = df_sub_base.copy()
-                    df_mass_eval["X_mass"] = mass
-                    df_mass_eval = update_mass_dependent_features(
-                        df_mass_eval, current_features
-                    )
-
-                    X_importance_base = scaler.transform(df_mass_eval[current_features])
-                    y_importance_base = df_mass_eval["class_targets_multiclass"].values
-
-                    base_loss_val = compute_batched_loss(
-                        X_importance_base, y_importance_base
-                    )
-
-                    for feat_name in current_features:
-                        if feat_name == "X_mass":
-                            mass_importance_records[mass][feat_name] = 0.0
-                            continue
-
-                        df_permuted = df_mass_eval.copy()
-                        permuted_vals = df_permuted[feat_name].values.copy()
-                        np.random.shuffle(permuted_vals)
-                        df_permuted[feat_name] = permuted_vals
-
-                        df_permuted = update_mass_dependent_features(
-                            df_permuted, current_features
-                        )
-
-                        X_permuted_scaled = scaler.transform(
-                            df_permuted[current_features]
-                        )
-                        perm_loss = compute_batched_loss(
-                            X_permuted_scaled, y_importance_base
-                        )
-
-                        delta_loss = max(0.0, perm_loss - base_loss_val)
-                        mass_importance_records[mass][feat_name] = delta_loss
-
-                feature_importance_records[regime].append(mass_importance_records)
-
         # Output ROOT File Construction
         output_root_filename = os.path.join(out_dir, "validation_applied.root")
         print(f"\n--> Saving applied dataset tree to '{output_root_filename}'...")
         with uproot.recreate(output_root_filename) as f_out:
             f_out.mktree(tree_name, {k: v.dtype for k, v in val_output_data.items()})
             f_out[tree_name].extend(val_output_data)
-
-    # Summary Plotting
-    print("\n" + "=" * 80)
-    print("GENERATING FEATURE IMPORTANCE REPORTS & TREND PLOTS")
-    print("=" * 80)
-
-    for regime in cfg["regimes"]:
-        if not feature_importance_records[regime]:
-            continue
-
-        pdf_path = os.path.join(
-            output_folder, f"per_mass_feature_importance_{regime}.pdf"
-        )
-        print(f"--> Compiling multi-page report document: '{pdf_path}'")
-
-        folds_list = feature_importance_records[regime]
-        regime_mass_averages = {}
-
-        with PdfPages(pdf_path) as pdf:
-            for mass in eval_mass_points:
-                feat_averages = {}
-                sample_features = list(folds_list[0][mass].keys())
-
-                for feat in sample_features:
-                    feat_vals = [fold[mass][feat] for fold in folds_list]
-                    feat_averages[feat] = np.mean(feat_vals)
-
-                regime_mass_averages[mass] = feat_averages.copy()
-
-                s_importance = pd.Series(feat_averages).sort_values(ascending=True)
-                s_importance = s_importance.drop(labels=["X_mass"], errors="ignore")
-
-                fig, ax = plt.subplots(figsize=(12, 8))
-                ax.barh(
-                    s_importance.index,
-                    s_importance.values,
-                    color="crimson" if regime == "boosted" else "royalblue",
-                    edgecolor="black",
-                    alpha=0.8,
-                )
-                ax.set_xlabel(
-                    "Mean Shift in Cross-Entropy Loss (Permuted - Baseline)",
-                    fontsize=11,
-                    fontweight="bold",
-                )
-                ax.set_ylabel("Kinematic Feature Name", fontsize=11, fontweight="bold")
-                ax.set_title(
-                    f"{regime.upper()} Topology Feature Importance (M_X = {mass} GeV)",
-                    fontsize=13,
-                    fontweight="bold",
-                    pad=15,
-                )
-                ax.grid(True, axis="x", linestyle="--", alpha=0.5)
-                plt.tight_layout()
-
-                pdf.savefig(fig, dpi=150)
-                plt.close(fig)
-
-        if len(eval_mass_points) > 1:
-            df_summary = pd.DataFrame.from_dict(regime_mass_averages, orient="index")
-            if "X_mass" in df_summary.columns:
-                df_summary = df_summary.drop(columns=["X_mass"])
-
-            df_features_vs_mass = df_summary.T
-            top_n = min(15, len(df_features_vs_mass))
-            top_features = df_features_vs_mass.mean(axis=1).nlargest(top_n).index
-            df_top_features = df_features_vs_mass.loc[top_features]
-
-            plt.figure(figsize=(12, 7))
-            for feature in df_top_features.index:
-                plt.plot(
-                    df_top_features.columns,
-                    df_top_features.loc[feature],
-                    marker="o",
-                    markersize=5,
-                    linewidth=2,
-                    label=feature,
-                )
-
-            plt.title(
-                f"{regime.upper()} Topology: Top {top_n} Feature Importances Across Mass Points",
-                fontsize=14,
-                fontweight="bold",
-                pad=15,
-            )
-            plt.xlabel("Mass Point $M_X$ (GeV)", fontsize=12)
-            plt.ylabel("Mean Shift in Cross-Entropy Loss", fontsize=12)
-            plt.grid(True, linestyle="--", alpha=0.5)
-            plt.xticks(eval_mass_points, rotation=45)
-            plt.legend(
-                bbox_to_anchor=(1.05, 1),
-                loc="upper left",
-                title="Kinematic Features",
-                frameon=True,
-            )
-            plt.tight_layout()
-
-            trend_plot_path = os.path.join(
-                output_folder, f"feature_importance_evolution_lines_{regime}.png"
-            )
-            plt.savefig(trend_plot_path, dpi=300)
-            plt.close()
 
     print("\n--> Training execution complete.")
 

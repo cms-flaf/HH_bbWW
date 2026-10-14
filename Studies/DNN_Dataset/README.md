@@ -23,7 +23,7 @@ Inputs on another site are read over xrootd, so a valid grid proxy is needed
 | `nParity`, `parity_cut` | Events with `event % nParity == k` go to fold `k`. |
 | `iterate_cut` | RDF filter applied before the split. |
 | `extra_vars` | `false` (default): save all HistTuple columns plus `class_value` and `X_mass`. `true`: also run `add_extra_vars` (p4 components, etc.). |
-| `weight_files.all_masses` | Write `nParity{k}_Merged_weight.root` (PyTorch). |
+| `weight_files.all_masses` | Write `nParity{k}_Merged_weight.root` (legacy PyTorch configs without a `weighting` block). No weight file is written when `weight_files` is absent. |
 | `weight_files.per_mass_signal` | Signal key; writes `nParity{k}_Merged_weight_m{mass}.root` for each of its `mass_points`, where other masses get weight 0 (TensorFlow). `null` to skip. |
 | `signal`, `background` | Datasets per process, and their `class_value`. Signals use `class_value <= 0`. |
 
@@ -31,7 +31,7 @@ Inputs on another site are read over xrootd, so a valid grid proxy is needed
 
 - `nParity{k}_Merged.root`: `Events` tree with the selected columns plus `class_value` and `X_mass`
   (0 for backgrounds).
-- `nParity{k}_Merged_weight[_m{mass}].root`, event-aligned with the file above:
+- `nParity{k}_Merged_weight[_m{mass}].root`, only when `weight_files` asks for it, event-aligned with the file above:
   - `weight_tree` (TTree) with branches:
     - `class_target`: all signals set to 0;
     - `class_targets_binary`: 0 for signal, 1 for background;
