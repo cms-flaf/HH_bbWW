@@ -6,6 +6,14 @@ storage_folder: /eos/user/d/daebi/HH_bbWW/v2605a_DNNTraining_Jul24/HistTuples/*/
 
 nParity: 4
 
+# Training-file branches: all HistTuple columns, plus add_extra_vars (p4 components etc.) when true
+extra_vars: false
+
+# nParity{k}_Merged_weight.root (all_masses) and/or nParity{k}_Merged_weight_m{mass}.root per mass of per_mass_signal
+weight_files:
+  all_masses: true
+  per_mass_signal: null
+
 # Cuts for RDF in creating the training file
 iterate_cut: (
   (SR == 1) &&
