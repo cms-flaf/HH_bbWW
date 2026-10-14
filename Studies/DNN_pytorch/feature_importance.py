@@ -369,9 +369,10 @@ def summarize(cfg, out_dir, top_n=12):
         .groupby(["regime", "cycle", "mass"])["pos"]
         .sum()
     )
-    df["share"] = df["d_auc"].clip(lower=0) / df.set_index(
-        ["regime", "cycle", "mass"]
-    ).index.map(total).values
+    df["share"] = (
+        df["d_auc"].clip(lower=0)
+        / df.set_index(["regime", "cycle", "mass"]).index.map(total).values
+    )
     for regime in df["regime"].unique():
         d = df[df["regime"] == regime]
         # mean over masses within each cycle, then mean and spread over cycles
@@ -408,9 +409,7 @@ def summarize(cfg, out_dir, top_n=12):
         colors = [
             "darkorange" if f.startswith("group:") else "royalblue" for f in s.index
         ]
-        ax.barh(
-            range(len(s)), s["share_mean"], xerr=s["share_std"], color=colors
-        )
+        ax.barh(range(len(s)), s["share_mean"], xerr=s["share_std"], color=colors)
         ax.set_yticks(range(len(s)))
         ax.set_yticklabels(
             [f if len(f) < 60 else f[:57] + "..." for f in s.index], fontsize=7
@@ -426,12 +425,7 @@ def summarize(cfg, out_dir, top_n=12):
         plt.close(fig)
 
         # Heat map: feature x mass
-        hm = (
-            d.groupby(["feature", "mass"])["share"]
-            .mean()
-            .unstack()
-            .loc[summary.index]
-        )
+        hm = d.groupby(["feature", "mass"])["share"].mean().unstack().loc[summary.index]
         fig, ax = plt.subplots(figsize=(1 + 0.6 * hm.shape[1], 0.3 * hm.shape[0] + 1.5))
         # Log colour scale (groups can exceed the single inputs); below 0.001 at the floor
         im = ax.imshow(
