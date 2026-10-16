@@ -21,6 +21,16 @@ adds only what is specific to this analysis.
   weights, the stitching variables) must be listed: shifted trees take `weight_base` from the central
   tree, and a placeholder row only gets a real weight if all of its inputs are filled.
 
+### Corrections reach the hooks as an argument
+
+FLAF builds one `Corrections` object per dataset, era and stage and passes it to the hooks as the
+required keyword `corrections`: `addAllVariables(..., *, corrections)`, `GetDfw(df, setup,
+dataset_name, *, corrections, ...)` and `DefineWeightForHistograms(..., corrections)`. There is no
+global instance: code that keeps one in a module-level variable, or builds its own, mixes eras
+when a process handles several. The object owns C++ providers that the dataframe refers to by
+address, so it must stay reachable while the dataframe is used (FLAF keeps it on the wrapper as
+`dfw.corrections`). The era is called `era` (`--era`); `period` is only the AnaTuple column.
+
 ### Stitching processors
 
 - The shared anchors in `config/processes.yaml` (`.DY_processors`,
