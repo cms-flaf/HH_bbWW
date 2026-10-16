@@ -23,7 +23,7 @@ WorkingPointsUParTAK4 = {
 }
 
 
-def createKeyFilterDict(global_params, period):
+def createKeyFilterDict(global_params, era):
     filter_dict = {}
     filter_str = ""
     channels_to_consider = global_params["channels_to_consider"]
@@ -380,13 +380,13 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.df = self.df.Define(varToDefine, var_expression)
         self.colToSave.append(varToDefine)
 
-    def __init__(self, df, config, period, colToSave=[], **kwargs):
+    def __init__(self, df, config, era, colToSave=[], **kwargs):
         super(DataFrameBuilderForHistograms, self).__init__(df, **kwargs)
         self.config = config
-        self.period = period
+        self.era = era
         self.colToSave = colToSave + ["channelId"]
-        self.bTagWP = WorkingPointsParticleNet[period]["Medium"]
-        self.bTagWP_Loose = WorkingPointsParticleNet[period][
+        self.bTagWP = WorkingPointsParticleNet[era]["Medium"]
+        self.bTagWP_Loose = WorkingPointsParticleNet[era][
             "Loose"
         ]  # wp should go to global config.
 
@@ -610,7 +610,7 @@ def AddDNNVariablesDL(df, isData=False):
     return df
 
 
-def defineJetSelections(df, isData, period="Run3_2023BPix"):
+def defineJetSelections(df, isData, era="Run3_2023BPix"):
     # Define vars to save
     jet_vars = [
         "p4",
@@ -736,13 +736,13 @@ def defineJetSelections(df, isData, period="Run3_2023BPix"):
     elif use_upart:
         id_branch = None
         score_branch = "btagUParTAK4B"
-        bTagWP = WorkingPointsUParTAK4.get(period, WorkingPointsParticleNet[period])[
+        bTagWP = WorkingPointsUParTAK4.get(era, WorkingPointsParticleNet[era])[
             "Medium"
         ]
     else:
         id_branch = None
         score_branch = "btagPNetB"
-        bTagWP = WorkingPointsParticleNet[period]["Medium"]
+        bTagWP = WorkingPointsParticleNet[era]["Medium"]
     if id_branch is not None:
         df = df.Define(
             "bjet1_isBTagged", f"bjet1_isValid ? BJet_{id_branch}[0] >= 1 : 0"
@@ -1490,7 +1490,7 @@ def PrepareDfForHistograms(dfForHistograms, isData, stage):
     dfForHistograms.df = defineJetSelections(
         dfForHistograms.df,
         isData,
-        getattr(dfForHistograms, "period", "Run3_2023BPix"),
+        dfForHistograms.era,
     )
     dfForHistograms.df = AddDNNVariablesCommon(dfForHistograms.df, isData)
     dfForHistograms.df = AddDNNVariablesDL(dfForHistograms.df, isData)

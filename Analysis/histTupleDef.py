@@ -40,8 +40,8 @@ def analysis_setup(setup):
 def GetDfw(df, setup, dataset_name, *, corrections, stage=None):
     global_params = setup.global_params
     isData = dataset_name == "data"
-    period = global_params["era"]
-    dfw = analysis.DataFrameBuilderForHistograms(df, global_params, period)
+    era = global_params["era"]
+    dfw = analysis.DataFrameBuilderForHistograms(df, global_params, era)
     new_dfw = analysis.PrepareDfForHistograms(dfw, isData, stage)
     return new_dfw
 

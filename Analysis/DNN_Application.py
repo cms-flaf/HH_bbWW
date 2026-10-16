@@ -17,7 +17,7 @@ from contextlib import contextmanager
 
 
 class DNNProducer:
-    def __init__(self, cfg: dict, payload_name: str, period: str):
+    def __init__(self, cfg: dict, payload_name: str, era: str):
         """
         Inference producer for Parametric DNN models with NaN/Inf diagnostics.
 
@@ -27,12 +27,12 @@ class DNNProducer:
             Master payload configuration dictionary containing channel definitions and columns.
         payload_name : str
             Prefix used for output branches in the snapshot array.
-        period : str
-            Data-taking period string (e.g. "e2018").
+        era : str
+            FLAF era (e.g. "Run3_2022").
         """
         self.cfg = cfg
         self.payload_name = payload_name
-        self.period = period
+        self.era = era
 
         # Ensure analysis module path is loaded
         analysis_path = os.environ.get("ANALYSIS_PATH", ".")
@@ -528,10 +528,10 @@ def onnx_session(path):
 
 
 class TwoStageDNNProducer:
-    def __init__(self, cfg, payload_name, period):
+    def __init__(self, cfg, payload_name, era):
         self.cfg = cfg
         self.payload_name = payload_name
-        self.period = period
+        self.era = era
         self.masses = self.cfg.get("masses")
 
         sys.path.append(os.environ["ANALYSIS_PATH"])
