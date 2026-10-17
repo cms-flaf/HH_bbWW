@@ -736,9 +736,7 @@ def defineJetSelections(df, isData, era="Run3_2023BPix"):
     elif use_upart:
         id_branch = None
         score_branch = "btagUParTAK4B"
-        bTagWP = WorkingPointsUParTAK4.get(era, WorkingPointsParticleNet[era])[
-            "Medium"
-        ]
+        bTagWP = WorkingPointsUParTAK4.get(era, WorkingPointsParticleNet[era])["Medium"]
     else:
         id_branch = None
         score_branch = "btagPNetB"
