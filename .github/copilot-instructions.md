@@ -139,6 +139,6 @@ Verified 2026-08-27; re-check before relying on any of it.
 | Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/CI_card.yaml` |
 | Large files | DNN `.onnx` payloads are tracked with Git LFS; never commit a binary directly |
 | Tests | No unit tests in this repo; validation is the integration test and physics checks. The framework's suites live in `FLAF/test/` |
-| Workflows | `formatting-check`, `repo-sanity-checks`, `test-setup-loading`, `deploy-docs`, `trigger-flaf-integration`. Formatting and era loading are checked automatically — do not comment on them |
+| Workflows | `formatting-check`, `repo-sanity-checks` (FLAF's sanity checks and FLAF's `run_tools/check_era_rename.py` for leftovers of the `period` → `era` rename), `test-setup-loading`, `deploy-docs`, `trigger-flaf-integration`. Formatting and era loading are checked automatically — do not comment on them |
 | Integration test | Triggered by `@cms-flaf-bot please test`; its configuration lives in `cms-flaf/FLAF_ci`, **not** in this repo. There is no `.github/integration_cfg.yaml` here |
 | Docs | `docs/`, plus the shared framework docs in `FLAF/docs/` |
