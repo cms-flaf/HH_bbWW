@@ -1,6 +1,5 @@
 import AnaProd.baseline as AnaBaseline
 import FLAF.Common.BaselineSelection as CommonBaseline
-from Corrections.Corrections import Corrections
 
 loadTF = False
 loadHHBtag = False
@@ -693,10 +692,12 @@ def addAllVariables(
     global_params,
     channels,
     dataset_cfg,
+    *,
+    corrections,
 ):
     print(f"Adding variables for {syst_name}")
     dfw.Apply(
-        Corrections.getGlobal().JetVetoMap.GetJetVetoMap
+        corrections.JetVetoMap.GetJetVetoMap
     )  # Must init JetVetoMap before applying
     dfw.Apply(
         CommonBaseline.ApplyJetVetoMap,
@@ -704,8 +705,8 @@ def addAllVariables(
         defineElectronCleaning=True,
         isV12=global_params["nano_version"] == "v12",
     )
-    dfw.Apply(Corrections.getGlobal().jet.getEnergyResolution)
-    dfw.Apply(Corrections.getGlobal().btag.getWPid, "Jet")
+    dfw.Apply(corrections.jet.getEnergyResolution)
+    dfw.Apply(corrections.btag.getWPid, "Jet")
 
     dfw.Apply(AnaBaseline.selectHWW, selected_channels=channels)
 

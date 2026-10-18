@@ -8,7 +8,7 @@ the commands. This page collects what is **specific to HH→bb̄WW**.
 ERA=Run3_2022
 VER=dev
 
-law run FLAF.Analysis.tasks.HistPlotTask --period $ERA --version $VER --workflow local --test 1000
+law run FLAF.Analysis.tasks.HistPlotTask --era $ERA --version $VER --workflow local --test 1000
 ```
 
 ## The b-tag-shape cache runs first

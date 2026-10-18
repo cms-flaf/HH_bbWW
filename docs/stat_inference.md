@@ -23,7 +23,7 @@ step the chain runs first — see [Where the binning is decided](#where-the-binn
 law run PlotResonantLimitsTask \
   --version dev \
   --hists-version VERSION_OF_THE_MERGED_HISTS \
-  --period Run3_2022 \
+  --era Run3_2022 \
   --workflow local
 ```
 
@@ -51,12 +51,12 @@ selected by `StatInference.config` in `config/global.yaml`. It declares the eras
 channels, categories, mass points, processes and uncertainties — the chain reads them
 from there, not from `global.yaml`'s own variable lists.
 
-!!! warning "`--period` does not choose the era"
+!!! warning "`--era` does not choose the eras of the datacards"
     Which eras get datacards and limits comes from the configuration's `eras:` and
     `era_groups:` blocks. A real era listed inside an `era_groups:` entry is covered by
     that meta-era and is not built standalone, so with the Run 3 configuration the chain
-    always builds the `Run3_Early` combination of all four eras regardless of `--period`.
-    `--period` is only used to construct a valid FLAF `Setup`.
+    always builds the `Run3_Early` combination of all four eras regardless of `--era`.
+    `--era` takes one real era here and is only used to construct a valid FLAF `Setup`.
 
 ### Where the shape uncertainties come from
 
@@ -303,7 +303,7 @@ beside the limit plots:
 law run PlotPullsAndImpactsTask \
   --version dev \
   --hists-version VERSION_OF_THE_MERGED_HISTS \
-  --period Run3_2022
+  --era Run3_2022
 ```
 
 ```yaml
