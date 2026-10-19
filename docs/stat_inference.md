@@ -23,7 +23,7 @@ step the chain runs first — see [Where the binning is decided](#where-the-binn
 law run PlotResonantLimitsTask \
   --version dev \
   --hists-version VERSION_OF_THE_MERGED_HISTS \
-  --era Run3_2022 \
+  --era Run3_2022,Run3_2022EE,Run3_2023,Run3_2023BPix \
   --workflow local
 ```
 
@@ -51,12 +51,17 @@ selected by `StatInference.config` in `config/global.yaml`. It declares the eras
 channels, categories, mass points, processes and uncertainties — the chain reads them
 from there, not from `global.yaml`'s own variable lists.
 
-!!! warning "`--era` does not choose the eras of the datacards"
+!!! warning "`--era` must hold every era behind the datacards"
     Which eras get datacards and limits comes from the configuration's `eras:` and
-    `era_groups:` blocks. A real era listed inside an `era_groups:` entry is covered by
-    that meta-era and is not built standalone, so with the Run 3 configuration the chain
-    always builds the `Run3_Early` combination of all four eras regardless of `--era`.
-    `--era` takes one real era here and is only used to construct a valid FLAF `Setup`.
+    `era_groups:` blocks, not from `--era`. A real era listed inside an `era_groups:` entry
+    is covered by that meta-era and is not built standalone, so with the Run 3
+    configuration the chain builds the `Run3_Early` combination of all four eras. `--era`
+    must name every real era those cards read — here the four of `Run3_Early` — or the
+    run stops with `the cards of … need Run3_Early: …, which --era does not include`.
+    Further eras are allowed and are not carded. `CreateDatacardsTask` and
+    `PreprocessShapesTask` are one workflow each, with one branch per card, and their
+    outputs (`Datacards/<card>`, `Hists_preprocessed/<card>`) do not depend on `--era`
+    ([FLAF → Eras](https://cms-flaf.github.io/FLAF/concepts/eras/#which-tasks-take-several-eras)).
 
 ### Where the shape uncertainties come from
 
@@ -303,7 +308,7 @@ beside the limit plots:
 law run PlotPullsAndImpactsTask \
   --version dev \
   --hists-version VERSION_OF_THE_MERGED_HISTS \
-  --era Run3_2022
+  --era Run3_2022,Run3_2022EE,Run3_2023,Run3_2023BPix
 ```
 
 ```yaml

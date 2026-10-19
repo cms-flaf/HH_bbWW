@@ -56,10 +56,14 @@ address, so it must stay reachable while the dataframe is used (FLAF keeps it on
 
 ### The CI datacard
 
-`config/Datacards/CI_card.yaml` drives the `test_multi_era` job. Two things about it:
+`config/ci_custom.yaml` selects the datacard configuration of the `test_multi_era` job:
+`config/Datacards/CI_card_SL.yaml` (single lepton) today, `config/Datacards/CI_card.yaml` (double
+lepton, with the preprocess step) before. Two things about them:
 
-- It declares `eras: Run3_2022 … Run3_2023BPix` only. A datacard task run for a later era fails on
-  a missing signal histogram; that is the card's scope, not a bug.
+- They declare `eras: Run3_2022 … Run3_2023BPix` only. The job passes every CI era in `--era`
+  (StatInference takes several): the four behind the cards are carded, the later ones are only
+  plotted. A card naming a later era would fail on a missing signal histogram; that is the
+  card's scope, not a bug.
 - **The DY background is deliberately not in it.** The bbWW DY samples are amc@NLO, so they carry
   negative event weights, and under `--test 1000` too few events remain for those to cancel: the
   histogram comes out negative but statistically compatible with zero. `resolveNegativeBins`
@@ -136,7 +140,7 @@ Verified 2026-08-27; re-check before relying on any of it.
 | Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`), `Analysis/` (`hh_bbww.py`, `histTupleDef.py`, `hh_bbWW_AnaCacheProducer.py`, DeepHME/DNN producers), `Studies/`, `config/`, `include/`, `docs/` |
 | Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `DeepHME`, `SyncTool` |
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026 |
-| Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/CI_card.yaml` |
+| Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/` (`x_hh_bbww_{DL,SL}_run3.yaml`, CI: `CI_card.yaml`, `CI_card_SL.yaml`) |
 | Large files | DNN `.onnx` payloads are tracked with Git LFS; never commit a binary directly |
 | Tests | No unit tests in this repo; validation is the integration test and physics checks. The framework's suites live in `FLAF/test/` |
 | Workflows | `formatting-check`, `repo-sanity-checks` (FLAF's sanity checks and FLAF's `run_tools/check_era_rename.py` for leftovers of the `period` → `era` rename), `test-setup-loading`, `test-era-dimension` (FLAF's `test/test_era_dimension.py` over the seven Run 3 eras: every stage built over all eras at once and taken through what the scheduler does before anything runs, and the settings that must agree between eras), `deploy-docs`, `trigger-flaf-integration`. Formatting, era loading and the multi-era construction are checked automatically — do not comment on them |
