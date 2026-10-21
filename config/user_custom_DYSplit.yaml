@@ -1,4 +1,0 @@
-# DY split by mass (studies): layered on top of user_custom.yaml with
-# --user-custom config/user_custom_DYSplit.yaml. Use its own --version: the merged histograms
-# and plots of this model are not those of Run3_Model.
-phys_model: Run3_Model_DYSplit
