@@ -145,7 +145,7 @@ sgn_hist:
   # true adds each signal's yield to its legend entry (internal studies)
   show_yield: false
   # with signal_plot_scale: bkg, said once in the legend instead of on every signal
-  norm_legend_note: "Signals normalised to the total background"
+  norm_legend_note: "Signals norm. to total bkg."
 
 data_hist:
   fill_style: 0

@@ -154,7 +154,7 @@ class PlotConfig(unittest.TestCase):
                 masses = radion_masses(setup, channel)
                 self.assertEqual(len(signals), len(masses), [k for k, _ in signals])
                 for mass, (key, entry) in zip(masses, signals):
-                    self.assertIn(f"= {mass} GeV", entry[1])
+                    self.assertRegex(entry[1], rf"=\s*{mass} GeV")
                     self.assertEqual(
                         sorted(key.split("+")),
                         sorted(

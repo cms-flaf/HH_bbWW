@@ -239,7 +239,7 @@ GluGluToRadion_bbWW_2L:
     dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
     parameters: [ MASS ]
     process_name: GluGluToRadion_bbWW_2L_${MASS}
-    name_pattern: "gg#rightarrowX#rightarrowbbWW 2 Leptons m_{X} = ${MASS} GeV"
+    name_pattern: "gg#rightarrowX#rightarrowbbWW 2 Leptons M_{X}=${MASS} GeV"
     to_plot:
       - [ '400' ]
       - [ '700' ]
@@ -296,7 +296,7 @@ GluGluToRadion_bbWW_1L:
     dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
     parameters: [ MASS ]
     process_name: GluGluToRadion_bbWW_1L_${MASS}
-    name_pattern: "gg#rightarrowX#rightarrowbbWW 1 Lepton m_{X} = ${MASS} GeV"
+    name_pattern: "gg#rightarrowX#rightarrowbbWW 1 Lepton M_{X}=${MASS} GeV"
     to_plot:
       - [ '400' ]
       - [ '700' ]

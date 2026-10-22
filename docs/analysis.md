@@ -115,6 +115,27 @@ variables:
   - ggF_DNN_HH
 ```
 
+## Control plots
+
+`HistPlotTask` draws the stacked control plots with the HH→bb̄WW settings below; the keys are
+FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLAF/reference/tasks/#histplottask).
+
+- **Backgrounds** are grouped into one stack entry each (`plot_process_groups` in
+  `config/global.yaml`), from the bottom: Diboson + Triboson, Single Higgs, W→ℓν + Jets, DY (or,
+  with `Run3_Model_DYSplit`, DY m_ℓℓ ∈ [10, 50] GeV and DY m_ℓℓ > 50 GeV), Single top,
+  t̄t + t̄tV.
+- **Signal:** only the spin-0 (Radion) bb̄WW signal is drawn, at M_X = 400, 700 and 1000 GeV,
+  its dilepton and single-lepton samples summed per mass into one curve, in every channel. The
+  merged histograms keep the samples apart (see [Production model](setup.md#production-model)).
+  Signals are normalised to the total background (`signal_plot_scale: bkg`), as the legend says.
+- **Control regions** (`plot_control_regions: [ TT_CR, DY_CR ]`): no signal is drawn, and the
+  data is shown even for variables blinded in the signal regions (`blind: true` in
+  `config/plot/histograms.yaml`).
+- **Labels:** "CMS Preliminary"; the luminosity of each era is the one the simulation is
+  normalised to; axis titles carry their units.
+- **Tests:** `test/test_plot_config.py` (CI: Test Plot Config) checks these settings in every era
+  and both DY models with FLAF's own plot rules.
+
 ## Statistical interpretation
 
 Continue to [Statistical inference](stat_inference.md) for datacards, limits and diagnostics.

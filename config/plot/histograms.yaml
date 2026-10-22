@@ -71,28 +71,28 @@ lep2_mass:
 
 lep1_Muon_pfRelIso04_all:
   x_bins: "50|0:0.5"
-  x_title: "Muon1_Iso"
+  x_title: "Muon 1 rel. isolation"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
 
 lep2_Muon_pfRelIso04_all:
   x_bins: "50|0:0.5"
-  x_title: "Muon2_Iso"
+  x_title: "Muon 2 rel. isolation"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
 
 lep1_Electron_pfRelIso03_all:
   x_bins: "50|0:0.5"
-  x_title: "Ele1_Iso"
+  x_title: "Electron 1 rel. isolation"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
 
 lep2_Electron_pfRelIso03_all:
   x_bins: "50|0:0.5"
-  x_title: "Ele2_Iso"
+  x_title: "Electron 2 rel. isolation"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
@@ -455,7 +455,7 @@ ll_pt:
 
 ll_pt_gen:
   x_bins: "50|20:500"
-  x_title: "VHE Vpt [GeV]"
+  x_title: "LHE V p_{T} [GeV]"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
@@ -486,14 +486,14 @@ bb_mass:
 
 bb_mass_PNetRegPtRawCorr:
   x_bins: "100|0:300"
-  x_title: m(bb)_PNetRegPtRawCorr
+  x_title: "m(bb), PNet reg. [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
 
 bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
   x_bins: "100|0:300"
-  x_title: "m(bb)_RawCorr_RawCorrNeutrino [GeV]"
+  x_title: "m(bb), PNet reg. + #nu [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
@@ -636,7 +636,7 @@ total_MT:
 
 ll_met_MT_WithMass:
   x_bins: "25|0:200"
-  x_title: ll met MT with mass
+  x_title: "ll met MT with mass [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
@@ -657,7 +657,7 @@ lep2_MT:
 
 MT2:
   x_bins: "100|0:500"
-  x_title: MT2
+  x_title: "MT2 [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
@@ -783,7 +783,7 @@ MT2_blbl2_balanced:
 
 m_bbllmet:
   x_bins: "1000|0:2500"
-  x_title: m(bbllmet)
+  x_title: "m(bbllmet) [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
@@ -896,21 +896,21 @@ min_lmet_dphi:
 
 Lep1Jet1Jet2_mass:
   x_bins: "100|0:1000"
-  x_title: Lep1Jet1Jet2 mass
+  x_title: "Lep1Jet1Jet2 mass [GeV]"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
 
 Lep1Lep2Jet1Jet2_mass:
   x_bins: "100|0:1000"
-  x_title: Lep1Lep2Jet1Jet2 mass
+  x_title: "Lep1Lep2Jet1Jet2 mass [GeV]"
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
 
 bbllmet_mass:
   x_bins: "50|0:1000"
-  x_title: m(bbllmet)
+  x_title: "m(bbllmet) [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False
@@ -975,7 +975,7 @@ DeepHME_mass:
   # 78 bins: 10 GeV to 700, 25 to 1000, 50 to 1500, 100 to 2000 (bin width <= ~1/3 of the HME resolution)
   x_bins: [ 0, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 640, 650, 660, 670, 680, 690, 700, 725, 750, 775, 800, 825, 850, 875, 900, 925, 950, 975, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1600, 1700, 1800, 1900, 2000 ]
   x_title: "Deep HME Mass [GeV]"
-  y_title: "Events"
+  y_title: "Events / GeV"
   use_log_y: False
   divide_by_bin_width: True
   blind: True
@@ -1010,7 +1010,7 @@ DeepHME_Hbb_pz:
 
 DeepHME_Hbb_E:
   x_bins: "100|0:1000"
-  x_title: "Single Lepton Deep HME Hbb E"
+  x_title: "Single Lepton Deep HME Hbb E [GeV]"
   y_title: "Events"
   use_log_y: False
   divide_by_bin_width: False
