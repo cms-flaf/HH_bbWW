@@ -4,7 +4,6 @@ lep1_type:
   x_title: lep1_type
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_type:
@@ -12,7 +11,6 @@ lep2_type:
   x_title: lep2_type
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_phi:
@@ -20,7 +18,6 @@ lep1_phi:
   x_title: lep1_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_phi:
@@ -28,7 +25,6 @@ lep2_phi:
   x_title: lep2_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_eta:
@@ -36,7 +32,6 @@ lep1_eta:
   x_title: lep1_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_eta:
@@ -44,7 +39,6 @@ lep2_eta:
   x_title: lep2_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_pt:
@@ -52,7 +46,6 @@ lep1_pt:
   x_title: lep1_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_pt:
@@ -60,7 +53,6 @@ lep2_pt:
   x_title: lep2_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_mass:
@@ -68,7 +60,6 @@ lep1_mass:
   x_title: lep1_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_mass:
@@ -76,7 +67,6 @@ lep2_mass:
   x_title: lep2_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_Muon_pfRelIso04_all:
@@ -84,7 +74,6 @@ lep1_Muon_pfRelIso04_all:
   x_title: "Muon1_Iso"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_Muon_pfRelIso04_all:
@@ -92,7 +81,6 @@ lep2_Muon_pfRelIso04_all:
   x_title: "Muon2_Iso"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_Electron_pfRelIso03_all:
@@ -100,7 +88,6 @@ lep1_Electron_pfRelIso03_all:
   x_title: "Ele1_Iso"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_Electron_pfRelIso03_all:
@@ -108,7 +95,6 @@ lep2_Electron_pfRelIso03_all:
   x_title: "Ele2_Iso"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_charge:
@@ -116,7 +102,6 @@ lep1_charge:
   x_title: lep1_charge
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_charge:
@@ -124,7 +109,6 @@ lep2_charge:
   x_title: lep2_charge
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_pt_vs_eta:
@@ -148,7 +132,6 @@ bjet1_phi:
   x_title: bjet1_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet2_phi:
@@ -156,7 +139,6 @@ bjet2_phi:
   x_title: bjet2_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet1_eta:
@@ -164,7 +146,6 @@ bjet1_eta:
   x_title: bjet1_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet2_eta:
@@ -172,7 +153,6 @@ bjet2_eta:
   x_title: bjet2_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet1_pt:
@@ -180,7 +160,6 @@ bjet1_pt:
   x_title: bjet1_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet2_pt:
@@ -188,7 +167,6 @@ bjet2_pt:
   x_title: bjet2_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet1_mass:
@@ -196,7 +174,6 @@ bjet1_mass:
   x_title: bjet1_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet2_mass:
@@ -204,7 +181,6 @@ bjet2_mass:
   x_title: bjet2_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet1_btagPNetB:
@@ -212,7 +188,6 @@ bjet1_btagPNetB:
   x_title: bjet1 btagPNetB
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bjet2_btagPNetB:
@@ -220,7 +195,6 @@ bjet2_btagPNetB:
   x_title: bjet2 btagPNetB
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## wjet BEGIN ##########
@@ -230,7 +204,6 @@ wjet1_phi:
   x_title: wjet1_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet2_phi:
@@ -238,7 +211,6 @@ wjet2_phi:
   x_title: wjet2_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet1_eta:
@@ -246,7 +218,6 @@ wjet1_eta:
   x_title: wjet1_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet2_eta:
@@ -254,7 +225,6 @@ wjet2_eta:
   x_title: wjet2_eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet1_pt:
@@ -262,7 +232,6 @@ wjet1_pt:
   x_title: wjet1_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet2_pt:
@@ -270,7 +239,6 @@ wjet2_pt:
   x_title: wjet2_pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet1_mass:
@@ -278,7 +246,6 @@ wjet1_mass:
   x_title: wjet1_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet2_mass:
@@ -286,7 +253,6 @@ wjet2_mass:
   x_title: wjet2_mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet1_btagPNetB:
@@ -294,7 +260,6 @@ wjet1_btagPNetB:
   x_title: wjet1 btagPNetB
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 wjet2_btagPNetB:
@@ -302,7 +267,6 @@ wjet2_btagPNetB:
   x_title: wjet2 btagPNetB
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## fatbjet BEGIN ##########
@@ -312,7 +276,6 @@ fatbjet_phi:
   x_title: fatbjet_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_eta:
@@ -320,7 +283,6 @@ fatbjet_eta:
   x_title: fatbjet eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_pt:
@@ -328,7 +290,6 @@ fatbjet_pt:
   x_title: fatbjet pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_mass:
@@ -336,7 +297,6 @@ fatbjet_mass:
   x_title: fatbjet mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_mass_PNetCorr:
@@ -344,7 +304,6 @@ fatbjet_mass_PNetCorr:
   x_title: fatbjet mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_XbbVsQCD:
@@ -352,7 +311,6 @@ fatbjet_XbbVsQCD:
   x_title: fatbjet XbbVsQCD
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_particleNetWithMass_HbbvsQCD:
@@ -360,7 +318,6 @@ fatbjet_particleNetWithMass_HbbvsQCD:
   x_title: fatbjet HbbVsQCD
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_tau1:
@@ -368,7 +325,6 @@ fatbjet_tau1:
   x_title: fatbjet tau1
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_tau2:
@@ -376,7 +332,6 @@ fatbjet_tau2:
   x_title: fatbjet tau2
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_tau3:
@@ -384,7 +339,6 @@ fatbjet_tau3:
   x_title: fatbjet tau3
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_tau4:
@@ -392,7 +346,6 @@ fatbjet_tau4:
   x_title: fatbjet tau4
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatbjet_msoftdrop:
@@ -400,7 +353,6 @@ fatbjet_msoftdrop:
   x_title: fatbjet msoftdrop [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 
@@ -411,7 +363,6 @@ fatwjet_phi:
   x_title: fatwjet_phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_eta:
@@ -419,7 +370,6 @@ fatwjet_eta:
   x_title: fatwjet eta
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_pt:
@@ -427,7 +377,6 @@ fatwjet_pt:
   x_title: fatwjet pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_mass:
@@ -435,7 +384,6 @@ fatwjet_mass:
   x_title: fatwjet mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_XbbVsQCD:
@@ -443,7 +391,6 @@ fatwjet_XbbVsQCD:
   x_title: fatwjet XbbVsQCD
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_particleNetWithMass_HbbvsQCD:
@@ -451,7 +398,6 @@ fatwjet_particleNetWithMass_HbbvsQCD:
   x_title: fatwjet HbbVsQCD
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 fatwjet_particleNetWithMass_WvsQCD:
@@ -459,7 +405,6 @@ fatwjet_particleNetWithMass_WvsQCD:
   x_title: fatwjet WvsQCD
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## MET BEGIN ##########
@@ -469,7 +414,6 @@ PuppiMET_pt:
   x_title: "Puppi MET Transverse Momentum [GeV]"
   y_title: "Events"
   use_log_y: True  # MET often spans several orders of magnitude, so a log scale might be useful
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 PuppiMET_phi:
@@ -477,7 +421,6 @@ PuppiMET_phi:
   x_title: "Puppi MET Phi"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 met_pt:
@@ -485,7 +428,6 @@ met_pt:
   x_title: "MET Transverse Momentum [GeV]"
   y_title: "Events"
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 met_phi:
@@ -493,7 +435,6 @@ met_phi:
   x_title: "MET Phi"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## ll BEGIN ##########
@@ -503,7 +444,6 @@ ll_mass:
   x_title: "diLep mass [GeV]"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_pt:
@@ -511,7 +451,6 @@ ll_pt:
   x_title: "diLep pt [GeV]"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_pt_gen:
@@ -519,7 +458,6 @@ ll_pt_gen:
   x_title: "VHE Vpt [GeV]"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_dphi:
@@ -528,7 +466,6 @@ ll_dphi:
   x_title: "dPhi between lepton 1 and lepton 2"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## bb BEGIN ##########
@@ -538,7 +475,6 @@ bb_pt:
   x_title: bb pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_mass:
@@ -546,7 +482,6 @@ bb_mass:
   x_title: "m(bb) [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_mass_PNetRegPtRawCorr:
@@ -554,7 +489,6 @@ bb_mass_PNetRegPtRawCorr:
   x_title: m(bb)_PNetRegPtRawCorr
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
@@ -562,7 +496,6 @@ bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
   x_title: "m(bb)_RawCorr_RawCorrNeutrino [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_CosTheta:
@@ -570,7 +503,6 @@ bb_CosTheta:
   x_title: CosTheta (bb)
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_dphi:
@@ -578,7 +510,6 @@ bb_dphi:
   x_title: "dPhi between bjet 1 and bjet 2"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_deta:
@@ -586,7 +517,6 @@ bb_deta:
   x_title: "dEta between bjet 1 and bjet 2"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_ptToE:
@@ -594,7 +524,6 @@ bb_ptToE:
   x_title: bb pt / E
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_btag_product:
@@ -602,7 +531,6 @@ bb_btag_product:
   x_title: bjet1 btag * bjet2 btag
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## WW BEGIN ##########
@@ -612,7 +540,6 @@ WW_pt:
   x_title: WW pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 WW_ptToE:
@@ -620,7 +547,6 @@ WW_ptToE:
   x_title: WW pt / E
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## hadT BEGIN ##########
@@ -630,7 +556,6 @@ hadT_constituentPtFrac:
   x_title: had top pT / sum(had top q constituents pT)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 hadT_mass:
@@ -638,7 +563,6 @@ hadT_mass:
   x_title: hadronic top mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 hadT_pt:
@@ -646,7 +570,6 @@ hadT_pt:
   x_title: hadronic top pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## hadW BEGIN ##########
@@ -656,7 +579,6 @@ hadW_mass:
   x_title: hadronic W mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## lepT BEGIN ##########
@@ -666,7 +588,6 @@ lepT_constituentPtFrac:
   x_title: leptonic top pT / sum(leptonic top q constituents pT)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lepT_mass:
@@ -674,7 +595,6 @@ lepT_mass:
   x_title: leptonic top mass [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lepT_mT:
@@ -682,7 +602,6 @@ lepT_mT:
   x_title: leptonic top MT [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lepT_pt:
@@ -690,7 +609,6 @@ lepT_pt:
   x_title: leptonic top pt [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## MT BEGIN ##########
@@ -700,7 +618,6 @@ mT_fix:
   x_title: m_T (fix) [GeV]
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT:
@@ -708,7 +625,6 @@ MT:
   x_title: "MT [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 total_MT:
@@ -716,7 +632,6 @@ total_MT:
   x_title: "MT total [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_met_MT_WithMass:
@@ -724,7 +639,6 @@ ll_met_MT_WithMass:
   x_title: ll met MT with mass
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_MT:
@@ -732,7 +646,6 @@ lep1_MT:
   x_title: "MT lep1 [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep2_MT:
@@ -740,7 +653,6 @@ lep2_MT:
   x_title: "MT lep2 [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2:
@@ -748,7 +660,6 @@ MT2:
   x_title: MT2
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_ll:
@@ -756,7 +667,6 @@ MT2_ll:
   x_title: "MT2 ll [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_bb:
@@ -764,7 +674,6 @@ MT2_bb:
   x_title: "MT2 bb [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1:
@@ -772,7 +681,6 @@ MT2_blbl1:
   x_title: "MT2 blbl1 [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2:
@@ -780,7 +688,6 @@ MT2_blbl2:
   x_title: "MT2 blbl2 [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl_min:
@@ -788,7 +695,6 @@ MT2_blbl_min:
   x_title: "MT2 blbl minimum [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl_max:
@@ -796,7 +702,6 @@ MT2_blbl_max:
   x_title: "MT2 blbl maximum [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl_dR:
@@ -804,7 +709,6 @@ MT2_blbl_dR:
   x_title: "MT2 blbl (min dR pairing) [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1_delta_phi:
@@ -812,7 +716,6 @@ MT2_blbl1_delta_phi:
   x_title: MT2 blbl1 delta phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2_delta_phi:
@@ -820,7 +723,6 @@ MT2_blbl2_delta_phi:
   x_title: MT2 blbl2 delta phi
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1_ptratio:
@@ -828,7 +730,6 @@ MT2_blbl1_ptratio:
   x_title: MT2 blbl1 pt ratio
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2_ptratio:
@@ -836,7 +737,6 @@ MT2_blbl2_ptratio:
   x_title: MT2 blbl2 pt ratio
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1_nu1_ptfrac:
@@ -844,7 +744,6 @@ MT2_blbl1_nu1_ptfrac:
   x_title: MT2 blbl1 nu1 pt fraction
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1_nu2_ptfrac:
@@ -852,7 +751,6 @@ MT2_blbl1_nu2_ptfrac:
   x_title: MT2 blbl1 nu2 pt fraction
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2_nu1_ptfrac:
@@ -860,7 +758,6 @@ MT2_blbl2_nu1_ptfrac:
   x_title: MT2 blbl2 nu1 pt fraction
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2_nu2_ptfrac:
@@ -868,7 +765,6 @@ MT2_blbl2_nu2_ptfrac:
   x_title: MT2 blbl2 nu2 pt fraction
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl1_balanced:
@@ -876,7 +772,6 @@ MT2_blbl1_balanced:
   x_title: MT2 blbl1 (balanced)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MT2_blbl2_balanced:
@@ -884,7 +779,6 @@ MT2_blbl2_balanced:
   x_title: MT2 blbl2 (balanced)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 m_bbllmet:
@@ -892,7 +786,6 @@ m_bbllmet:
   x_title: m(bbllmet)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 min_lmet_mt:
@@ -900,7 +793,6 @@ min_lmet_mt:
   x_title: min(lmet) mT
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## dR BEGIN ##########
@@ -910,7 +802,6 @@ ll_dR:
   x_title: "dR between leptons"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_dR:
@@ -918,7 +809,6 @@ bb_dR:
   x_title: "dR between two b-jets"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_bb_dR:
@@ -926,7 +816,6 @@ ll_bb_dR:
   x_title: "dR between dilepton and dibjet system"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_jj_dR:
@@ -934,7 +823,6 @@ ll_jj_dR:
   x_title: "dR between dilepton and dijet system"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Hbb_lepWfromH_dR:
@@ -942,7 +830,6 @@ Hbb_lepWfromH_dR:
   x_title: "dR between W and Hbb system"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lep1_bjets_minDr:
@@ -950,7 +837,6 @@ lep1_bjets_minDr:
   x_title: "min(dR) between lep1 and bjets"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 hadT_hadW_dR:
@@ -958,7 +844,6 @@ hadT_hadW_dR:
   x_title: "dR hadronic T and hadronic W"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 min_lb_dR:
@@ -966,7 +851,6 @@ min_lb_dR:
   x_title: "min dR (l1b1, l1b2, l2b1, l2b2)"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 lb_centrality:
@@ -974,7 +858,6 @@ lb_centrality:
   x_title: "pT centrality (l1+l2)/(b1+b2+met)"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MET_over_sqrt_HT:
@@ -982,7 +865,6 @@ MET_over_sqrt_HT:
   x_title: "PuppiMET pT / sqrt(HT)"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## dPhi BEGIN ##########
@@ -993,7 +875,6 @@ met_ll_dphi:
   x_title: "dPhi between MET and dilepton system"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 met_bb_dphi:
@@ -1002,7 +883,6 @@ met_bb_dphi:
   x_title: "dPhi between MET and dibjet system"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 min_lmet_dphi:
@@ -1010,7 +890,6 @@ min_lmet_dphi:
   x_title: "min(dPhi) between leptons and MET"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## Extra BEGIN ##########
@@ -1020,7 +899,6 @@ Lep1Jet1Jet2_mass:
   x_title: Lep1Jet1Jet2 mass
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Lep1Lep2Jet1Jet2_mass:
@@ -1028,7 +906,6 @@ Lep1Lep2Jet1Jet2_mass:
   x_title: Lep1Lep2Jet1Jet2 mass
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bbllmet_mass:
@@ -1036,7 +913,6 @@ bbllmet_mass:
   x_title: m(bbllmet)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Njets:
@@ -1044,7 +920,6 @@ Njets:
   x_title: Njets
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 nJet:
@@ -1052,7 +927,6 @@ nJet:
   x_title: nJet (raw?)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 nBTaggedJets:
@@ -1060,7 +934,6 @@ nBTaggedJets:
   x_title: nBjets (loose)
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 HT:
@@ -1068,7 +941,6 @@ HT:
   x_title: HT [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 HT_total:
@@ -1076,7 +948,6 @@ HT_total:
   x_title: HT Total [GeV]
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_bb_pt_ratio:
@@ -1084,7 +955,6 @@ ll_bb_pt_ratio:
   x_title: "ll_pT / bb_pT"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ########## DNN and HME BEGIN ##########
@@ -1093,14 +963,12 @@ SingleLepHME_mass:
   x_bins: "100|-10:2500"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DoubleLepHME_mass:
   x_bins: "100|-10:2500"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_mass:
@@ -1109,7 +977,6 @@ DeepHME_mass:
   x_title: "Deep HME Mass [GeV]"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: True
   blind: True
 
@@ -1118,7 +985,6 @@ DeepHME_mass_error:
   x_title: "Single Lepton Deep HME Mass Error [GeV]"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_Hbb_px:
@@ -1126,7 +992,6 @@ DeepHME_Hbb_px:
   x_title: "Single Lepton Deep HME Hbb px"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_Hbb_py:
@@ -1134,7 +999,6 @@ DeepHME_Hbb_py:
   x_title: "Single Lepton Deep HME Hbb py"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_Hbb_pz:
@@ -1142,7 +1006,6 @@ DeepHME_Hbb_pz:
   x_title: "Single Lepton Deep HME Hbb pz"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_Hbb_E:
@@ -1150,35 +1013,30 @@ DeepHME_Hbb_E:
   x_title: "Single Lepton Deep HME Hbb E"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_HVV_px:
   x_bins: "100|-1000:1000"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_HVV_py:
   x_bins: "100|-1000:1000"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_HVV_pz:
   x_bins: "100|-1000:1000"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DeepHME_HVV_E:
   x_bins: "100|0:1000"
   y_title: "Events"
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 DNN_M250_Signal:
@@ -1186,7 +1044,6 @@ DNN_M250_Signal:
   x_title: DNN M250 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1195,7 +1052,6 @@ DNN_M260_Signal:
   x_title: DNN M260 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1204,7 +1060,6 @@ DNN_M270_Signal:
   x_title: DNN M270 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1213,7 +1068,6 @@ DNN_M280_Signal:
   x_title: DNN M280 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1222,7 +1076,6 @@ DNN_M300_Signal:
   x_title: DNN M300 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1231,7 +1084,6 @@ DNN_M320_Signal:
   x_title: DNN M320 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1240,7 +1092,6 @@ DNN_M350_Signal:
   x_title: DNN M350 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1249,7 +1100,6 @@ DNN_M360_Signal:
   x_title: DNN M360 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1258,7 +1108,6 @@ DNN_M400_Signal:
   x_title: DNN M400 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1267,7 +1116,6 @@ DNN_M450_Signal:
   x_title: DNN M450 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1276,7 +1124,6 @@ DNN_M500_Signal:
   x_title: DNN M500 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1285,7 +1132,6 @@ DNN_M550_Signal:
   x_title: DNN M550 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1294,7 +1140,6 @@ DNN_M600_Signal:
   x_title: DNN M600 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1303,7 +1148,6 @@ DNN_M650_Signal:
   x_title: DNN M650 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1312,7 +1156,6 @@ DNN_M700_Signal:
   x_title: DNN M700 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1321,7 +1164,6 @@ DNN_M750_Signal:
   x_title: DNN M750 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1330,7 +1172,6 @@ DNN_M800_Signal:
   x_title: DNN M800 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1339,7 +1180,6 @@ DNN_M850_Signal:
   x_title: DNN M850 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1348,7 +1188,6 @@ DNN_M900_Signal:
   x_title: DNN M900 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1357,7 +1196,6 @@ DNN_M1000_Signal:
   x_title: DNN M1000 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1366,7 +1204,6 @@ DNN_M1100_Signal:
   x_title: DNN M1100 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1375,7 +1212,6 @@ DNN_M1200_Signal:
   x_title: DNN M1200 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1384,7 +1220,6 @@ DNN_M1300_Signal:
   x_title: DNN M1300 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1393,7 +1228,6 @@ DNN_M1400_Signal:
   x_title: DNN M1400 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1402,7 +1236,6 @@ DNN_M1500_Signal:
   x_title: DNN M1500 Signal Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1411,7 +1244,6 @@ DNN_M250_TT:
   x_title: DNN M250 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1420,7 +1252,6 @@ DNN_M260_TT:
   x_title: DNN M260 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1429,7 +1260,6 @@ DNN_M270_TT:
   x_title: DNN M270 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1438,7 +1268,6 @@ DNN_M280_TT:
   x_title: DNN M280 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1447,7 +1276,6 @@ DNN_M300_TT:
   x_title: DNN M300 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1456,7 +1284,6 @@ DNN_M320_TT:
   x_title: DNN M320 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1465,7 +1292,6 @@ DNN_M350_TT:
   x_title: DNN M350 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1474,7 +1300,6 @@ DNN_M360_TT:
   x_title: DNN M360 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1483,7 +1308,6 @@ DNN_M400_TT:
   x_title: DNN M400 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1492,7 +1316,6 @@ DNN_M450_TT:
   x_title: DNN M450 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1501,7 +1324,6 @@ DNN_M500_TT:
   x_title: DNN M500 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1510,7 +1332,6 @@ DNN_M550_TT:
   x_title: DNN M550 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1519,7 +1340,6 @@ DNN_M600_TT:
   x_title: DNN M600 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1528,7 +1348,6 @@ DNN_M650_TT:
   x_title: DNN M650 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1537,7 +1356,6 @@ DNN_M700_TT:
   x_title: DNN M700 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1546,7 +1364,6 @@ DNN_M750_TT:
   x_title: DNN M750 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1555,7 +1372,6 @@ DNN_M800_TT:
   x_title: DNN M800 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1564,7 +1380,6 @@ DNN_M850_TT:
   x_title: DNN M850 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1573,7 +1388,6 @@ DNN_M900_TT:
   x_title: DNN M900 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1582,7 +1396,6 @@ DNN_M1000_TT:
   x_title: DNN M1000 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1591,7 +1404,6 @@ DNN_M1100_TT:
   x_title: DNN M1100 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1600,7 +1412,6 @@ DNN_M1200_TT:
   x_title: DNN M1200 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1609,7 +1420,6 @@ DNN_M1300_TT:
   x_title: DNN M1300 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1618,7 +1428,6 @@ DNN_M1400_TT:
   x_title: DNN M1400 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1627,7 +1436,6 @@ DNN_M1500_TT:
   x_title: DNN M1500 TT Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1636,7 +1444,6 @@ DNN_M250_DY:
   x_title: DNN M250 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1645,7 +1452,6 @@ DNN_M260_DY:
   x_title: DNN M260 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1654,7 +1460,6 @@ DNN_M270_DY:
   x_title: DNN M270 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1663,7 +1468,6 @@ DNN_M280_DY:
   x_title: DNN M280 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1672,7 +1476,6 @@ DNN_M300_DY:
   x_title: DNN M300 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1681,7 +1484,6 @@ DNN_M320_DY:
   x_title: DNN M320 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1690,7 +1492,6 @@ DNN_M350_DY:
   x_title: DNN M350 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1699,7 +1500,6 @@ DNN_M360_DY:
   x_title: DNN M360 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1708,7 +1508,6 @@ DNN_M400_DY:
   x_title: DNN M400 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1717,7 +1516,6 @@ DNN_M450_DY:
   x_title: DNN M450 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1726,7 +1524,6 @@ DNN_M500_DY:
   x_title: DNN M500 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1735,7 +1532,6 @@ DNN_M550_DY:
   x_title: DNN M550 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1744,7 +1540,6 @@ DNN_M600_DY:
   x_title: DNN M600 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1753,7 +1548,6 @@ DNN_M650_DY:
   x_title: DNN M650 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1762,7 +1556,6 @@ DNN_M700_DY:
   x_title: DNN M700 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1771,7 +1564,6 @@ DNN_M750_DY:
   x_title: DNN M750 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1780,7 +1572,6 @@ DNN_M800_DY:
   x_title: DNN M800 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1789,7 +1580,6 @@ DNN_M850_DY:
   x_title: DNN M850 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1798,7 +1588,6 @@ DNN_M900_DY:
   x_title: DNN M900 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1807,7 +1596,6 @@ DNN_M1000_DY:
   x_title: DNN M1000 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1816,7 +1604,6 @@ DNN_M1100_DY:
   x_title: DNN M1100 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1825,7 +1612,6 @@ DNN_M1200_DY:
   x_title: DNN M1200 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1834,7 +1620,6 @@ DNN_M1300_DY:
   x_title: DNN M1300 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1843,7 +1628,6 @@ DNN_M1400_DY:
   x_title: DNN M1400 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1852,7 +1636,6 @@ DNN_M1500_DY:
   x_title: DNN M1500 DY Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1861,7 +1644,6 @@ DNN_M300_ST:
   x_title: DNN M300 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1870,7 +1652,6 @@ DNN_M400_ST:
   x_title: DNN M400 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1879,7 +1660,6 @@ DNN_M500_ST:
   x_title: DNN M500 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1888,7 +1668,6 @@ DNN_M550_ST:
   x_title: DNN M550 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1897,7 +1676,6 @@ DNN_M600_ST:
   x_title: DNN M600 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1906,7 +1684,6 @@ DNN_M650_ST:
   x_title: DNN M650 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1915,7 +1692,6 @@ DNN_M700_ST:
   x_title: DNN M700 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1924,7 +1700,6 @@ DNN_M800_ST:
   x_title: DNN M800 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1933,7 +1708,6 @@ DNN_M900_ST:
   x_title: DNN M900 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1942,7 +1716,6 @@ DNN_M1000_ST:
   x_title: DNN M1000 ST Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1951,7 +1724,6 @@ DNN_M250_Other:
   x_title: DNN M250 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1960,7 +1732,6 @@ DNN_M260_Other:
   x_title: DNN M260 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1969,7 +1740,6 @@ DNN_M270_Other:
   x_title: DNN M270 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1978,7 +1748,6 @@ DNN_M280_Other:
   x_title: DNN M280 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1987,7 +1756,6 @@ DNN_M300_Other:
   x_title: DNN M300 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -1996,7 +1764,6 @@ DNN_M320_Other:
   x_title: DNN M320 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2005,7 +1772,6 @@ DNN_M350_Other:
   x_title: DNN M350 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2014,7 +1780,6 @@ DNN_M360_Other:
   x_title: DNN M360 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2023,7 +1788,6 @@ DNN_M400_Other:
   x_title: DNN M400 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2032,7 +1796,6 @@ DNN_M450_Other:
   x_title: DNN M450 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2041,7 +1804,6 @@ DNN_M500_Other:
   x_title: DNN M500 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2050,7 +1812,6 @@ DNN_M550_Other:
   x_title: DNN M550 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2059,7 +1820,6 @@ DNN_M600_Other:
   x_title: DNN M600 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2068,7 +1828,6 @@ DNN_M650_Other:
   x_title: DNN M650 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2077,7 +1836,6 @@ DNN_M700_Other:
   x_title: DNN M700 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2086,7 +1844,6 @@ DNN_M750_Other:
   x_title: DNN M750 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2095,7 +1852,6 @@ DNN_M800_Other:
   x_title: DNN M800 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2104,7 +1860,6 @@ DNN_M850_Other:
   x_title: DNN M850 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2113,7 +1868,6 @@ DNN_M900_Other:
   x_title: DNN M900 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2122,7 +1876,6 @@ DNN_M1000_Other:
   x_title: DNN M1000 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2131,7 +1884,6 @@ DNN_M1100_Other:
   x_title: DNN M1100 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2140,7 +1892,6 @@ DNN_M1200_Other:
   x_title: DNN M1200 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2149,7 +1900,6 @@ DNN_M1300_Other:
   x_title: DNN M1300 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2158,7 +1908,6 @@ DNN_M1400_Other:
   x_title: DNN M1400 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2167,7 +1916,6 @@ DNN_M1500_Other:
   x_title: DNN M1500 Other Logits
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2669,7 +2417,6 @@ TwoStageDNN_M300_binary:
   x_title: Binary DNN M300 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2678,7 +2425,6 @@ TwoStageDNN_M400_binary:
   x_title: Binary DNN M400 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2687,7 +2433,6 @@ TwoStageDNN_M500_binary:
   x_title: Binary DNN M500 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2696,7 +2441,6 @@ TwoStageDNN_M550_binary:
   x_title: Binary DNN M550 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2705,7 +2449,6 @@ TwoStageDNN_M600_binary:
   x_title: Binary DNN M600 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2714,7 +2457,6 @@ TwoStageDNN_M650_binary:
   x_title: Binary DNN M650 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2723,7 +2465,6 @@ TwoStageDNN_M700_binary:
   x_title: Binary DNN M700 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2732,7 +2473,6 @@ TwoStageDNN_M800_binary:
   x_title: Binary DNN M800 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2741,7 +2481,6 @@ TwoStageDNN_M900_binary:
   x_title: Binary DNN M900 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2750,7 +2489,6 @@ TwoStageDNN_M1000_binary:
   x_title: Binary DNN M1000 score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2963,7 +2701,6 @@ TwoStageDNN_M300_Signal:
   x_title: Multiclass DNN M300 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2972,7 +2709,6 @@ TwoStageDNN_M300_TT:
   x_title: Multiclass DNN M300 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2981,7 +2717,6 @@ TwoStageDNN_M300_ST:
   x_title: Multiclass DNN M300 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2990,7 +2725,6 @@ TwoStageDNN_M300_WJets:
   x_title: Multiclass DNN M300 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -2999,7 +2733,6 @@ TwoStageDNN_M300_DY:
   x_title: Multiclass DNN M300 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3008,7 +2741,6 @@ TwoStageDNN_M300_H:
   x_title: Multiclass DNN M300 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3017,7 +2749,6 @@ TwoStageDNN_M300_VV:
   x_title: Multiclass DNN M300 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3029,7 +2760,6 @@ TwoStageDNN_M400_Signal:
   x_title: Multiclass DNN M400 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3038,7 +2768,6 @@ TwoStageDNN_M400_TT:
   x_title: Multiclass DNN M400 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3047,7 +2776,6 @@ TwoStageDNN_M400_ST:
   x_title: Multiclass DNN M400 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3056,7 +2784,6 @@ TwoStageDNN_M400_WJets:
   x_title: Multiclass DNN M400 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3065,7 +2792,6 @@ TwoStageDNN_M400_DY:
   x_title: Multiclass DNN M400 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3074,7 +2800,6 @@ TwoStageDNN_M400_H:
   x_title: Multiclass DNN M400 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3083,7 +2808,6 @@ TwoStageDNN_M400_VV:
   x_title: Multiclass DNN M400 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3095,7 +2819,6 @@ TwoStageDNN_M500_Signal:
   x_title: Multiclass DNN M500 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3104,7 +2827,6 @@ TwoStageDNN_M500_TT:
   x_title: Multiclass DNN M500 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3113,7 +2835,6 @@ TwoStageDNN_M500_ST:
   x_title: Multiclass DNN M500 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3122,7 +2843,6 @@ TwoStageDNN_M500_WJets:
   x_title: Multiclass DNN M500 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3131,7 +2851,6 @@ TwoStageDNN_M500_DY:
   x_title: Multiclass DNN M500 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3140,7 +2859,6 @@ TwoStageDNN_M500_H:
   x_title: Multiclass DNN M500 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3149,7 +2867,6 @@ TwoStageDNN_M500_VV:
   x_title: Multiclass DNN M500 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3161,7 +2878,6 @@ TwoStageDNN_M550_Signal:
   x_title: Multiclass DNN M550 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3170,7 +2886,6 @@ TwoStageDNN_M550_TT:
   x_title: Multiclass DNN M550 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3179,7 +2894,6 @@ TwoStageDNN_M550_ST:
   x_title: Multiclass DNN M550 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3188,7 +2902,6 @@ TwoStageDNN_M550_WJets:
   x_title: Multiclass DNN M550 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3197,7 +2910,6 @@ TwoStageDNN_M550_DY:
   x_title: Multiclass DNN M550 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3206,7 +2918,6 @@ TwoStageDNN_M550_H:
   x_title: Multiclass DNN M550 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3215,7 +2926,6 @@ TwoStageDNN_M550_VV:
   x_title: Multiclass DNN M550 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3227,7 +2937,6 @@ TwoStageDNN_M600_Signal:
   x_title: Multiclass DNN M600 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3236,7 +2945,6 @@ TwoStageDNN_M600_TT:
   x_title: Multiclass DNN M600 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3245,7 +2953,6 @@ TwoStageDNN_M600_ST:
   x_title: Multiclass DNN M600 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3254,7 +2961,6 @@ TwoStageDNN_M600_WJets:
   x_title: Multiclass DNN M600 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3263,7 +2969,6 @@ TwoStageDNN_M600_DY:
   x_title: Multiclass DNN M600 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3272,7 +2977,6 @@ TwoStageDNN_M600_H:
   x_title: Multiclass DNN M600 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3281,7 +2985,6 @@ TwoStageDNN_M600_VV:
   x_title: Multiclass DNN M600 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3293,7 +2996,6 @@ TwoStageDNN_M650_Signal:
   x_title: Multiclass DNN M650 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3302,7 +3004,6 @@ TwoStageDNN_M650_TT:
   x_title: Multiclass DNN M650 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3311,7 +3012,6 @@ TwoStageDNN_M650_ST:
   x_title: Multiclass DNN M650 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3320,7 +3020,6 @@ TwoStageDNN_M650_WJets:
   x_title: Multiclass DNN M650 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3329,7 +3028,6 @@ TwoStageDNN_M650_DY:
   x_title: Multiclass DNN M650 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3338,7 +3036,6 @@ TwoStageDNN_M650_H:
   x_title: Multiclass DNN M650 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3347,7 +3044,6 @@ TwoStageDNN_M650_VV:
   x_title: Multiclass DNN M650 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3359,7 +3055,6 @@ TwoStageDNN_M700_Signal:
   x_title: Multiclass DNN M700 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3368,7 +3063,6 @@ TwoStageDNN_M700_TT:
   x_title: Multiclass DNN M700 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3377,7 +3071,6 @@ TwoStageDNN_M700_ST:
   x_title: Multiclass DNN M700 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3386,7 +3079,6 @@ TwoStageDNN_M700_WJets:
   x_title: Multiclass DNN M700 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3395,7 +3087,6 @@ TwoStageDNN_M700_DY:
   x_title: Multiclass DNN M700 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3404,7 +3095,6 @@ TwoStageDNN_M700_H:
   x_title: Multiclass DNN M700 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3413,7 +3103,6 @@ TwoStageDNN_M700_VV:
   x_title: Multiclass DNN M700 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3425,7 +3114,6 @@ TwoStageDNN_M800_Signal:
   x_title: Multiclass DNN M800 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3434,7 +3122,6 @@ TwoStageDNN_M800_TT:
   x_title: Multiclass DNN M800 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3443,7 +3130,6 @@ TwoStageDNN_M800_ST:
   x_title: Multiclass DNN M800 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3452,7 +3138,6 @@ TwoStageDNN_M800_WJets:
   x_title: Multiclass DNN M800 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3461,7 +3146,6 @@ TwoStageDNN_M800_DY:
   x_title: Multiclass DNN M800 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3470,7 +3154,6 @@ TwoStageDNN_M800_H:
   x_title: Multiclass DNN M800 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3479,7 +3162,6 @@ TwoStageDNN_M800_VV:
   x_title: Multiclass DNN M800 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3491,7 +3173,6 @@ TwoStageDNN_M900_Signal:
   x_title: Multiclass DNN M900 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3500,7 +3181,6 @@ TwoStageDNN_M900_TT:
   x_title: Multiclass DNN M900 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3509,7 +3189,6 @@ TwoStageDNN_M900_ST:
   x_title: Multiclass DNN M900 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3518,7 +3197,6 @@ TwoStageDNN_M900_WJets:
   x_title: Multiclass DNN M900 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3527,7 +3205,6 @@ TwoStageDNN_M900_DY:
   x_title: Multiclass DNN M900 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3536,7 +3213,6 @@ TwoStageDNN_M900_H:
   x_title: Multiclass DNN M900 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3545,7 +3221,6 @@ TwoStageDNN_M900_VV:
   x_title: Multiclass DNN M900 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3557,7 +3232,6 @@ TwoStageDNN_M1000_Signal:
   x_title: Multiclass DNN M1000 Signal score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3566,7 +3240,6 @@ TwoStageDNN_M1000_TT:
   x_title: Multiclass DNN M1000 TT score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3575,7 +3248,6 @@ TwoStageDNN_M1000_ST:
   x_title: Multiclass DNN M1000 ST score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3584,7 +3256,6 @@ TwoStageDNN_M1000_WJets:
   x_title: Multiclass DNN M1000 WJets score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3593,7 +3264,6 @@ TwoStageDNN_M1000_DY:
   x_title: Multiclass DNN M1000 DY score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3602,7 +3272,6 @@ TwoStageDNN_M1000_H:
   x_title: Multiclass DNN M1000 H score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3611,7 +3280,6 @@ TwoStageDNN_M1000_VV:
   x_title: Multiclass DNN M1000 VV score
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
   blind: True
 
@@ -3620,7 +3288,6 @@ Pzeta:
   x_title: "P_{#zeta} [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Pzeta_visible:
@@ -3628,7 +3295,6 @@ Pzeta_visible:
   x_title: "P_{#zeta}^{vis} [GeV]"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 CosThetaStar_HH:
@@ -3636,7 +3302,6 @@ CosThetaStar_HH:
   x_title: "cos#theta^{*} (H#rightarrowbb in HH frame)"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 HelicityCosTheta_Hbb:
@@ -3644,7 +3309,6 @@ HelicityCosTheta_Hbb:
   x_title: "cos#theta_{b} (helicity)"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 HelicityCosTheta_HWW:
@@ -3652,7 +3316,6 @@ HelicityCosTheta_HWW:
   x_title: "cos#theta_{l} (helicity)"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Phi_HH:
@@ -3660,7 +3323,6 @@ Phi_HH:
   x_title: "#Phi (H#rightarrowbb vs H#rightarrowWW decay planes)"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 Phi1_HWW:
@@ -3668,7 +3330,6 @@ Phi1_HWW:
   x_title: "#Phi_{1} (H#rightarrowWW decay vs production plane)"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 bb_dR_HbbFrame:
@@ -3676,7 +3337,6 @@ bb_dR_HbbFrame:
   x_title: "#DeltaR(b, b) in H#rightarrowbb frame"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 ll_dR_HWWFrame:
@@ -3684,7 +3344,6 @@ ll_dR_HWWFrame:
   x_title: "#DeltaR(l, l) in ll+MET frame"
   y_title: Events
   use_log_y: False
-  max_y_sf: 1.5
   divide_by_bin_width: False
 
 MX_reduced:
@@ -3692,5 +3351,4 @@ MX_reduced:
   x_title: "Reduced m_{X} [GeV]"
   y_title: Events
   use_log_y: True
-  max_y_sf: 1.5
   divide_by_bin_width: False
