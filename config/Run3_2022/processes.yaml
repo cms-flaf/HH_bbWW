@@ -244,7 +244,7 @@ GluGluToRadion_bbWW_2L:
       - [ '400' ]
       - [ '700' ]
       - [ '1000' ]
-    plot_color: [ "kBlack", "kBlue", "kRed" ]
+    plot_color: [ "kOrange+7", "kBlue", "kMagenta+2" ]
     channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_250
@@ -462,7 +462,10 @@ GluGluToRadion_bbTauTau:
     parameters: [ MASS ]
     process_name: GluGluToRadion_bbTauTau_${MASS}
     name_pattern: GluGluToRadion bbTauTau mass ${MASS} GeV
-    to_plot: [ ]  # not drawn on the control plots
+    to_plot:
+      - [ '400' ]
+      - [ '700' ]
+      - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:

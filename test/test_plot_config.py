@@ -8,9 +8,9 @@ and checked against what the plots must show:
 
 - no plot group raises (malformed group, background mixed with signal, ...);
 - every background lands in a plot group, and the stack sums its inputs;
-- in a signal region: one Radion entry per plotted mass (400, 700, 1000 GeV) in increasing
-  order, each the sum of the 2L and 1L samples of that mass -- a typo in a group's process
-  names would instead give the six single samples;
+- in a signal region: one X->HH (Radion) entry per plotted mass (400, 700, 1000 GeV) in
+  increasing order, each the sum of the bbWW 2L, bbWW 1L and bbtautau samples of that mass -- a
+  typo in a group's process names would instead give the single samples;
 - in the control regions (plot_control_regions): no signal.
 
 ROOT is not needed. Run: python3 test/test_plot_config.py
@@ -46,6 +46,8 @@ ERAS = [
 ]
 MODELS = ["Run3_Model", "Run3_Model_DYSplit"]
 SIGNAL_REGION = "SR"
+# the spin-0 samples summed into one X->HH entry per mass
+RADION = ("GluGluToRadion_bbWW_2L", "GluGluToRadion_bbWW_1L", "GluGluToRadion_bbTauTau")
 
 
 class Hist:
@@ -92,13 +94,14 @@ def plotted_processes(setup, channel, region, plot_control_regions):
     return hists
 
 
-def radion_masses(setup, channel):
-    """The masses of the Radion bbWW samples the configuration plots in `channel`."""
+def radion_masses(setup, channel, samples=RADION):
+    """The masses of the Radion `samples` the configuration plots in `channel`."""
     masses = set()
     for name, process in setup.parent_processes.items():
-        if name.startswith("GluGluToRadion_bbWW_") and process.get("to_plot"):
+        sample, _, mass = name.rpartition("_")
+        if sample in samples and process.get("to_plot"):
             if channel in process.get("channels", [channel]):
-                masses.add(int(name.rsplit("_", 1)[1]))
+                masses.add(int(mass))
     return sorted(masses)
 
 
@@ -158,21 +161,25 @@ class PlotConfig(unittest.TestCase):
                     self.assertEqual(
                         sorted(key.split("+")),
                         sorted(
-                            f"GluGluToRadion_bbWW_{ch}_{mass}"
-                            for ch in ("2L", "1L")
-                            if f"GluGluToRadion_bbWW_{ch}_{mass}" in hists
+                            f"{sample}_{mass}"
+                            for sample in RADION
+                            if f"{sample}_{mass}" in hists
                         ),
                     )
 
-    def test_the_early_eras_plot_the_three_radion_masses(self):
+    def test_the_early_eras_plot_the_three_masses_of_each_radion_sample(self):
         for era in ERAS[:4]:
             for model in MODELS:
                 setup = self.setups[(era, model)]
                 for channel in ("e", "mu", "eE", "eMu", "muMu"):
-                    with self.subTest(era=era, model=model, channel=channel):
-                        self.assertEqual(
-                            radion_masses(setup, channel), [400, 700, 1000]
-                        )
+                    for sample in RADION:
+                        with self.subTest(
+                            era=era, model=model, channel=channel, sample=sample
+                        ):
+                            self.assertEqual(
+                                radion_masses(setup, channel, (sample,)),
+                                [400, 700, 1000],
+                            )
 
 
 if __name__ == "__main__":

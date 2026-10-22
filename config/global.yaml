@@ -567,9 +567,12 @@ plot_process_groups:
     processes: [ ST ]
   - name: "t#bar{t} + t#bar{t}V"
     processes: [ TT, ttV ]
-  # the spin-0 (Radion) bbWW signal, its 2-lepton and 1-lepton samples together, per mass
-  - name: "gg#rightarrowX#rightarrowbbWW spin‐0 M_{X}=${MASS} GeV"  # U+2010 hyphen: mathtext draws - as a spaced minus
-    processes: [ "GluGluToRadion_bbWW_2L_${MASS}", "GluGluToRadion_bbWW_1L_${MASS}" ]
+  # the spin-0 (Radion) X->HH signal per mass: its bbWW 2-lepton (which includes HH->bbZZ->2l2nu)
+  # and 1-lepton and its bbtautau samples, each normalised to sigma(X->HH) = 1 pb times the BR of
+  # its own final state, which do not overlap
+  - name: "X#rightarrowHH spin‐0 M_{X}=${MASS} GeV"  # U+2010 hyphen: mathtext draws - as a spaced minus
+    processes: [ "GluGluToRadion_bbWW_2L_${MASS}", "GluGluToRadion_bbWW_1L_${MASS}",
+                 "GluGluToRadion_bbTauTau_${MASS}" ]
 
 # This is for Analysis Selection
 channelSelection:
