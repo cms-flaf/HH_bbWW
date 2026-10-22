@@ -1,0 +1,129 @@
+# Equal-signal binning of the DL fit inputs, v2610: read by Analysis/EqualSignalBinning.py, the
+# `preprocess:` step of x_hh_bbww_DL_run3.yaml.
+#
+# Each datacard category is one frozen HME window (hme_windows_DL_v2610.yaml) of the 2D
+# DNN_m<MX>_vs_HME shapes, binned in the DNN score into bins of equal signal, from the top of the
+# score down. A bin is only closed once the backgrounds in it pass the gates below, so a window can
+# end with fewer bins than its target; nothing is ever left negative or carried by one large-weight
+# event.
+
+# [low, high] HME window per mass and category, in GeV.
+windows: config/Datacards/hme_windows_DL_v2610.yaml
+
+# Target number of bins per window, the n <= 20 that maximises the expected sensitivity of a
+# TT-only fit (v2610 study). The gates may merge the lowest bins into fewer.
+n_bins:
+  250: { res2b: 16, recovery: 20, boosted: 1 }
+  260: { res2b: 20, recovery: 20, boosted: 12 }
+  270: { res2b: 20, recovery: 20, boosted: 17 }
+  280: { res2b: 20, recovery: 20, boosted: 19 }
+  300: { res2b: 20, recovery: 19, boosted: 14 }
+  320: { res2b: 20, recovery: 20, boosted: 19 }
+  350: { res2b: 20, recovery: 20, boosted: 18 }
+  360: { res2b: 20, recovery: 20, boosted: 20 }
+  400: { res2b: 20, recovery: 18, boosted: 20 }
+  450: { res2b: 14, recovery: 20, boosted: 17 }
+  500: { res2b: 19, recovery: 18, boosted: 19 }
+  550: { res2b: 17, recovery: 20, boosted: 17 }
+  600: { res2b: 15, recovery: 18, boosted: 14 }
+  650: { res2b: 14, recovery: 19, boosted: 14 }
+  700: { res2b: 20, recovery: 15, boosted: 16 }
+  750: { res2b: 16, recovery: 19, boosted: 8 }
+  800: { res2b: 16, recovery: 18, boosted: 12 }
+  850: { res2b: 16, recovery: 20, boosted: 6 }
+  900: { res2b: 16, recovery: 20, boosted: 7 }
+  1000: { res2b: 15, recovery: 15, boosted: 7 }
+  1100: { res2b: 13, recovery: 16, boosted: 3 }
+  1200: { res2b: 16, recovery: 18, boosted: 5 }
+  1300: { res2b: 17, recovery: 13, boosted: 6 }
+  1400: { res2b: 8, recovery: 13, boosted: 3 }
+  1500: { res2b: 10, recovery: 13, boosted: 3 }
+
+# What every bin has to satisfy, summed over the eras of the card, for the nominal and for every
+# up/down variation:
+#   - total background >= min_bkg, with an effective MC count (sum w)^2 / sum w^2 >= min_bkg_neff;
+#   - every background >= 0;
+#   - every background that is at least exempt_fraction of its window's total: > min_each, with
+#     N_eff >= min_each_neff, and each of its variations with N_eff >= min_variation_neff.
+gates:
+  min_bkg: 0.2
+  min_bkg_neff: 4
+  min_each: 0.01
+  min_each_neff: 2
+  min_variation_neff: 2
+  exempt_fraction: 0.05
+
+# The datacard backgrounds, each the sum of the merged-histogram processes listed (a variation
+# a member lacks enters with that member's nominal).
+#   TT    = TT + ttV: ttV alone (a few % of the background) has too few, too heavily weighted
+#           events to pass the gates; TT absorbs it, and its uncertainties stay its own below.
+#   DY    = low-mass + M>50 DY (Run3_Model_DYSplit); low-mass DY in boosted: see lowmass_dy.
+#   Minor = VV + VVV + H + W, each <= ~10% of the background where the signal is.
+backgrounds:
+  TT: [ TT, ttV ]
+  DY: [ DY_M_10to50, DY_M_50 ]
+  ST: [ ST ]
+  Minor: [ VV, VVV, H, W ]
+
+# Inputs left out of a category. W (non-prompt leptons, from MC) is 0.3-1% of the background in
+# res2b and boosted and ~0 where the signal is, and its few large-weight events break the gates
+# there; it is kept in recovery (3% of the eMu background).
+drop:
+  W: [ res2b, boosted ]
+
+# Low-mass DY in boosted: its MC there is a few large-weight events, so it is estimated per bin from
+# recovery, where it has statistics, transferred with the much better populated M>50 sample:
+#   L = lowmass(reference) x M50(category) / M50(reference),
+# all three in the category's HME window, summed over the eras and shared out to them by their M>50
+# yield. The variations of DY take L at its nominal value; `nuisance` is a +-100% shape on it.
+lowmass_dy:
+  process: DY_M_10to50
+  transfer: DY_M_50
+  categories: [ boosted ]
+  reference: recovery
+  nuisance: CMS_bbww_dy_lowmass
+
+# Uncertainties on a member of a merged background, written as shape variations of that background
+# so each member keeps its own size on its own part: variation = nominal + value x member nominal,
+# value = [ down, up ] (a single number v means [ -v, v ]). They replace the per-process lnN of a
+# card with separate processes; the datacard configuration declares them as shapes.
+member_uncertainties:
+  # TT: crossSec 923.6 pb,
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO#Updated_reference_cross_sections
+  # unc: +22.6 -33.4 (scale) +/- 22.8 (PDF alphas) -24.6 +25.4 (mass)
+  QCD_scale_TT:
+    - { member: TT, value: [ -0.036, 0.025 ] }
+  # ttV (ttZ + ttW): there is no LHC Top WG 13.6 TeV recommendation yet. +-12 % covers the NLO QCD
+  # scale uncertainty of both ttZ and ttW; replace with the official numbers once they exist.
+  QCD_scale_ttV:
+    - { member: ttV, value: 0.12 }
+  top_mass:
+    - { member: TT, value: [ -0.027, 0.028 ] }
+    - { member: ST, value: [ -0.015, 0.015 ] }   # taken from tW for now (largest)
+  PDF_alphas:
+    - { member: TT, value: 0.025 }
+    - { member: ttV, value: 0.03 }
+    - { member: ST, value: 0.027 }
+    - { member: DY_M_10to50, value: 0.01 }
+    - { member: DY_M_50, value: 0.01 }
+    - { member: H, value: 0.035 }
+  # WARNING: this is not a QCD scale uncertainty. XSDB's `unc` field is an absolute uncertainty in
+  # pb on its own Monte-Carlo integration, and 0.005 is just that number divided by the cross section
+  # (WW 0.3733/80.23 = 0.47%, WZ 0.1318/29.1 = 0.45%, ZZ 0.0649/12.75 = 0.51%;
+  # FLAF/config/crossSections13p6TeV.yaml:1051-1209). The real NNLO diboson scale uncertainty is
+  # several percent. Needs replacing with a number from the diboson theory reference.
+  CMS_bbww_minor_norm_VV:
+    - { member: VV, value: 0.005 }
+  # VVV: no theory reference collected. PROPOSAL, to be confirmed.
+  CMS_bbww_minor_norm_VVV:
+    - { member: VVV, value: 0.15 }
+  # Single Higgs is one process (ggH + VBFH + VH + ttH), so it gets one normalisation, ttH's QCD
+  # scale (largest of the production modes, expected to dominate a two-b-jet dilepton selection):
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap (13.6 TeV, mH = 125),
+  # ttH +6.0 -9.3 % (QCD scale), +-3.5 % (PDF+alpha_s, in PDF_alphas above).
+  CMS_bbww_minor_norm_H:
+    - { member: H, value: [ -0.093, 0.06 ] }
+  # W+jets enters a dilepton selection through a nonprompt lepton, which MC models poorly; this is
+  # a normalisation uncertainty on that, not a cross-section one. PROPOSAL, to be confirmed.
+  CMS_bbww_minor_norm_W:
+    - { member: W, value: 0.3 }
