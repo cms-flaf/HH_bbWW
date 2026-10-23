@@ -11,21 +11,23 @@ signalFractionForRelevantBins: 0.2
 # statistics a handful of DY shapes go negative beyond tolerance in the sparsest DNN
 # slices, and resolveNegativeBins rejects them. Measured over 4 mass points, of ~500
 # background shapes each -- 2022: 5 rejected, 2022EE: 5, 2023: 2, 2023BPix: 6, and
-# Run3_Early: 0. It does not track luminosity; it tracks where DY's negative-weight
+# their combination: 0. It does not track luminosity; it tracks where DY's negative-weight
 # events land. Turning them back on wants either min_slice_bkg_each_neff on in
 # config/Datacards/binning_2d.yaml, so those slices are never cut, or a looser
 # max_n_sigma_for_negative_bins for DY. (Measured with binning_2d.yaml.)
 #
-# They stay in era_groups below regardless: Run3_Early is the combination of all four
-# datasets, which is a statement about the data, not about which limits we set.
+# They stay in era_groups below regardless: Run3_22_23 is the combination of all four
+# datasets, which is a statement about the data, not about which limits we set. The name
+# is the meta-era's of global.yaml's era_groups, whose plot style (config/plot/Run3_22_23.yaml)
+# the shape plots of the datacard step use.
 eras:
   # - Run3_2022
   # - Run3_2022EE
   # - Run3_2023
   # - Run3_2023BPix
-  - Run3_Early
+  - Run3_22_23
 era_groups:
-  Run3_Early:
+  Run3_22_23:
     - Run3_2022
     - Run3_2022EE
     - Run3_2023
@@ -653,7 +655,8 @@ autoMCStats:
   mode: 1
 
 campaigns:
-  Run3_Early: run3_early
+  # dhi's key for the four eras combined (its luminosity label)
+  Run3_22_23: run3_early
   Run3_2022: "2022preEE"
   Run3_2022EE: "2022postEE"
   Run3_2023: "2023preBPix"
