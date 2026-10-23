@@ -493,7 +493,7 @@ bb_mass_PNetRegPtRawCorr:
 
 bb_mass_PNetRegPtRawCorr_PNetRegPtRawCorrNeutrino:
   x_bins: "100|0:300"
-  x_title: "m(bb), PNet reg. + #nu [GeV]"
+  x_title: "m(bb), PNet reg.+#nu [GeV]"
   y_title: Events
   use_log_y: False
   divide_by_bin_width: False

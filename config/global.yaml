@@ -553,7 +553,7 @@ plot_process_groups:
     processes: [ VV, VVV ]
   - name: "Single Higgs"
     processes: [ H ]
-  - name: "W #rightarrow #ell#nu + Jets"
+  - name: "W#rightarrow#ell#nu + Jets"
     processes: [ W ]
   - name: "DY m_{#ell#ell}#in[10,50] GeV"
     processes: [ DY_M_10to50 ]
