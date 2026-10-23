@@ -244,14 +244,16 @@ GluGluToRadion_bbWW_2L:
   meta_setup:
     dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
     parameters: [ MASS ]
+    # Plotted in the X->HH group of plot_process_groups (config/global.yaml), under the group's name;
+    # this plot_color, of the group's first member, is the colour of its curves.
     process_name: GluGluToRadion_bbWW_2L_${MASS}
-    name_pattern: GluGluToRadion bbWW 2L mass ${MASS} GeV
+    name_pattern: "gg#rightarrowX#rightarrowbbWW 2 Leptons M_{X}=${MASS} GeV"
     to_plot:
-      - [ '300' ]
-      - [ '600' ]
+      - [ '400' ]
+      - [ '700' ]
       - [ '1000' ]
-    plot_color: [ "kBlack", "kBlue", "kRed" ]
-    channels: [ "eE", "eMu", "muMu" ]
+    plot_color: [ "kOrange+7", "kBlue", "kMagenta+2" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_250
     - GluGlutoRadiontoHHto2B2Vto2B2L2Nu_M_260
@@ -301,14 +303,16 @@ GluGluToRadion_bbWW_1L:
   meta_setup:
     dataset_name_pattern: GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_(\d+)  # GluGlutoRadiontoHHto2B2Vto2B([^_]+)_M_(\d+)
     parameters: [ MASS ]
+    # Plotted in the X->HH group of plot_process_groups (config/global.yaml), under the group's name
+    # and the 2L sample's colour: name_pattern and plot_color do not reach the plots.
     process_name: GluGluToRadion_bbWW_1L_${MASS}
-    name_pattern: GluGluToRadion bbWW 1L mass ${MASS} GeV
+    name_pattern: "gg#rightarrowX#rightarrowbbWW 1 Lepton M_{X}=${MASS} GeV"
     to_plot:
-      - [ '300' ]
-      - [ '600' ]
+      - [ '400' ]
+      - [ '700' ]
       - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
-    channels: [ "e", "mu" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:
     - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_250
     - GluGlutoRadiontoHHto2B2Vto2B2JLNu_M_260
@@ -360,10 +364,7 @@ GluGluToBulkGraviton_bbWW_2L:
     parameters: [ MASS ]
     process_name: GluGluToBulkGraviton_bbWW_2L_${MASS}
     name_pattern: GluGluToBulkGraviton bbWW 2L mass ${MASS} GeV
-    to_plot:
-      - [ '300' ]
-      - [ '600' ]
-      - [ '1000' ]
+    to_plot: [ ]  # not drawn on the control plots
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "eE", "eMu", "muMu" ]
   datasets:
@@ -417,10 +418,7 @@ GluGluToBulkGraviton_bbWW_1L:
     parameters: [ MASS ]
     process_name: GluGluToBulkGraviton_bbWW_1L_${MASS}
     name_pattern: GluGluToBulkGraviton bbWW 1L mass ${MASS} GeV
-    to_plot:
-      - [ '300' ]
-      - [ '600' ]
-      - [ '1000' ]
+    to_plot: [ ]  # not drawn on the control plots
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu" ]
   datasets:
@@ -472,11 +470,13 @@ GluGluToRadion_bbTauTau:
   meta_setup:
     dataset_name_pattern: GluGlutoRadiontoHHto2B2Tau_M_(\d+)
     parameters: [ MASS ]
+    # Plotted in the X->HH group of plot_process_groups (config/global.yaml), under the group's name
+    # and the 2L sample's colour: name_pattern and plot_color do not reach the plots.
     process_name: GluGluToRadion_bbTauTau_${MASS}
     name_pattern: GluGluToRadion bbTauTau mass ${MASS} GeV
     to_plot:
-      - [ '300' ]
-      - [ '600' ]
+      - [ '400' ]
+      - [ '700' ]
       - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu", "eE", "eMu", "muMu" ]
@@ -531,10 +531,7 @@ GluGluToBulkGraviton_bbTauTau:
     parameters: [ MASS ]
     process_name: GluGluToBulkGraviton_bbTauTau_${MASS}
     name_pattern: GluGluToBulkGraviton bbTauTau mass ${MASS} GeV
-    to_plot:
-      - [ '300' ]
-      - [ '600' ]
-      - [ '1000' ]
+    to_plot: [ ]  # not drawn on the control plots
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets:
