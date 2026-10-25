@@ -137,7 +137,7 @@ Verified 2026-08-27; re-check before relying on any of it.
 
 | | |
 |---|---|
-| Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`), `Analysis/` (`hh_bbww.py`, `histTupleDef.py`, `hh_bbWW_AnaCacheProducer.py`, DeepHME/DNN producers), `Studies/`, `config/`, `include/`, `docs/` |
+| Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`), `Analysis/` (`hh_bbww.py`, `histTupleDef.py`, DeepHME/DNN producers), `Studies/`, `config/`, `include/`, `docs/` |
 | Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `DeepHME`, `SyncTool` |
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026 |
 | Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/` (`x_hh_bbww_{DL,SL}_run3.yaml`, CI: `CI_card.yaml`, `CI_card_SL.yaml`) |
