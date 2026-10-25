@@ -90,6 +90,13 @@ adding one here needs that updated in step.
   which is how the 2024–2026 configs lost `pdf`, `qcd_scale` and `top_pt`. The merge is one
   level deep, so an overridden entry must be complete.
 
+### ONNX sessions
+
+- DeepHME and the DNN producers get their ONNX Runtime sessions, or their session options, from
+  `FLAF.Common.OnnxSession` (one thread; DeepHME through its `session_options` argument). A bare
+  `ort.InferenceSession` with the default options makes the outputs depend on the core count of
+  the batch node (cms-flaf/FLAF#357).
+
 ### Cost
 
 `AnalysisCacheTask` (BtagShape) runs before `HistTupleProducerTask` even for simple variables and
