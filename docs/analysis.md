@@ -115,6 +115,33 @@ variables:
   - ggF_DNN_HH
 ```
 
+## Control plots
+
+`HistPlotTask` draws the stacked control plots with the HH→bb̄WW settings below; the keys are
+FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLAF/reference/tasks/#histplottask).
+
+- **Backgrounds** are grouped into one stack entry each (`plot_process_groups` in
+  `config/global.yaml`), from the bottom: Diboson + Triboson, Single Higgs, W→ℓν + Jets, DY (or,
+  with `Run3_Model_DYSplit`, DY m_ℓℓ ∈ [10, 50] GeV and DY m_ℓℓ > 50 GeV), Single top,
+  t̄t + t̄tV.
+- **Signal:** only the spin-0 (Radion) X→HH signal is drawn, at M_X = 400, 700 and 1000 GeV, in
+  every channel of the eras with these samples (Run3_2022 to Run3_2023BPix, and Run3_22_23): per
+  mass, one curve summing its bb̄WW dilepton (which includes HH→bb̄ZZ→2ℓ2ν),
+  bb̄WW single-lepton and bb̄ττ samples. Each sample is normalised to σ(X→HH) = 1 pb times the
+  branching fraction of its own final state, and the final states do not overlap. The merged
+  histograms keep the samples apart (see [Production model](setup.md#production-model)).
+  Signals are normalised to the total background (`signal_plot_scale: bkg`), as the legend says.
+- **Control regions** (`plot_control_regions: [ TT_CR, DY_CR ]`): no signal is drawn, and the
+  data is shown even for variables blinded in the signal regions (`blind: true` in
+  `config/plot/histograms.yaml`).
+- **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
+  luminosity of each era is the one the simulation is normalised to; axis titles carry their
+  units.
+- **Tests:** `test/test_plot_config.py` (CI: Test Plot Config) checks, with FLAF's own plot rules,
+  in every era, the Run3_22_23 meta-era and both DY models: the control regions (exactly TT_CR
+  and DY_CR) with the data they show, the signal normalisation, the grouping and stack order of
+  the backgrounds, and the X→HH entries. It does not render the plots.
+
 ## Statistical interpretation
 
 Continue to [Statistical inference](stat_inference.md) for datacards, limits and diagnostics.
