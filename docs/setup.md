@@ -38,7 +38,10 @@ for HH→bb̄WW is `Run3_Model` (set in `config/global.yaml`). It carries every 
 together — Radion and BulkGraviton, bb̄WW single lepton and dilepton, and bb̄ττ — and does not
 select the central X→YH samples. AnaTuple and histogram production branch per dataset, and each merged histogram is
 named by its expanded process (`GluGluToRadion_bbWW_2L_300`,
-`GluGluToBulkGraviton_bbWW_1L_1000`, …), so the hypotheses are not added into one histogram. Which hypothesis a fit uses is chosen later, by the
+`GluGluToBulkGraviton_bbWW_1L_1000`, …), so the hypotheses are not added into one histogram (the
+control plots sum the Radion bb̄WW dilepton, single-lepton and bb̄ττ samples per mass, for display
+only; see
+[Control plots](analysis.md#control-plots)). Which hypothesis a fit uses is chosen later, by the
 datacard's process list; the dilepton card fits `GluGluToRadion_bbTauTau` together with
 `GluGluToRadion_bbWW_2L`. A signal added to a physics model must also be registered in
 `AnaProd/anaTupleDef.py`: in `signals_with_hvv` when its decay has an H→VV, whose gen-level
