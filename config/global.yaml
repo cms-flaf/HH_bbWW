@@ -1048,6 +1048,20 @@ histTuple_flavors:
       - ll_dR_HWWFrame
       - MX_reduced
 
+      # Inputs of the deployed DL DNN (DoubleLepton_Parametric_*_v2) not covered above
+      - MET_over_sqrt_HT
+      - ll_met_MT_WithMass
+      - bbllmet_mass
+      - HT_total
+      - lb_centrality
+      - bb_btag_product
+      - min_lb_dR
+      - min_lmet_dphi
+      - fatbjet_mass_PNetCorr
+      - fatbjet_msoftdrop
+      - fatbjet_tau1
+      - fatbjet_tau2
+
       - lep1_Muon_pfRelIso04_all
       - lep2_Muon_pfRelIso04_all
       - lep1_Electron_pfRelIso03_all
