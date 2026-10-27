@@ -36,19 +36,35 @@ channels:
   - muMu
   - eMu
   - eE
-# One datacard category per signal-region jet category: the frozen HME window of
-# hme_windows_DL_v2610.yaml, binned in the DNN score. The names carry no "/" (they become the
-# datacard bin names, and with them the names of the per-bin MC-stat nuisances, which dhi's
-# impact merging cannot handle with a "/"); input_categories maps each to its directory in the
-# histogram files. Control regions will follow the same pattern (TT_res2b: TT/res2b, ...).
+# One datacard category per region and jet category, all in the frozen HME window of the jet
+# category (hme_windows_DL_v2610.yaml):
+#   SR_* : m_ll < 70 GeV, the DNN score in equal-signal bins;
+#   TT_* : TT_CR, m_ll > 110 GeV, one bin;
+#   DY_* : DY_CR, |m_ll - mZ| < 10 GeV, one bin.
+# The control regions fix the TT and DY normalisations (the rateParams below). The names carry no
+# "/" (they become the datacard bin names, and with them the names of the per-bin MC-stat
+# nuisances, which dhi's impact merging cannot handle with a "/"); input_categories maps each to
+# its directory in the histogram files.
 categories:
   - SR_res2b
   - SR_boosted
   - SR_recovery
+  - TT_res2b
+  - TT_boosted
+  - TT_recovery
+  - DY_res2b
+  - DY_boosted
+  - DY_recovery
 input_categories:
   SR_res2b: SR/res2b
   SR_boosted: SR/boosted
   SR_recovery: SR/recovery
+  TT_res2b: TT_CR/res2b
+  TT_boosted: TT_CR/boosted
+  TT_recovery: TT_CR/recovery
+  DY_res2b: DY_CR/res2b
+  DY_boosted: DY_CR/boosted
+  DY_recovery: DY_CR/recovery
 
 # Applied to the merged histograms before the datacards are built, by
 # PreprocessShapesTask. The chain knows nothing about what this does -- it supplies
@@ -89,10 +105,12 @@ processes:
 
   # The backgrounds are made by the preprocess step from the merged-histogram processes
   # (binning_eqsig_DL_v2610.yaml: backgrounds):
-  #   TT    = TT + ttV
-  #   DY    = DY_M_10to50 + DY_M_50, low-mass DY in boosted estimated from recovery
+  #   TT         = TT + ttV
+  #   DY         = DY_M_10to50 + DY_M_50, normalised in DY_CR; low-mass DY in SR boosted
+  #                estimated from SR recovery, none in the control regions; in SR eE/muMu
+  #                resolved and SR boosted a smooth template replaces the DY MC (dy_template)
   #   ST
-  #   Minor = VV + VVV + H + W (W in recovery only)
+  #   Minor      = VV + VVV + H + W (W in recovery only)
   # The binning only closes a bin once each of them passes its gates, for the nominal and every
   # variation, so none of them has negative or single-event bins; the tolerances below are
   # kept as a safety net.
@@ -597,18 +615,90 @@ uncertainties:
   - name: CMS_bbww_minor_norm_H
     type: shape
     processes: [ Minor ]
-  # W is only in recovery (binning_eqsig_DL_v2610.yaml: drop)
+  # W is only in recovery (binning_eqsig_DL_v2610.yaml: drop), in every region
   - name: CMS_bbww_minor_norm_W
     type: shape
     processes: [ Minor ]
-    categories: [ SR_recovery ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
 
-  # Low-mass DY in boosted is estimated from recovery (binning_eqsig_DL_v2610.yaml:
-  # lowmass_dy); +-100 % on that estimate.
+  # The DY templates (binning_eqsig_DL_v2610.yaml: dy_template) replace the DY MC statistics in
+  # the same-flavour resolved categories and in boosted; each window's fit uncertainty is its own
+  # nuisance. Boosted eE and muMu share one fit, and so one nuisance.
+  - name: CMS_bbww_dy_fit_eE_res2b
+    type: shape
+    processes: [ DY ]
+    channels: [ eE ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_dy_fit_muMu_res2b
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_dy_fit_eE_recovery
+    type: shape
+    processes: [ DY ]
+    channels: [ eE ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_dy_fit_muMu_recovery
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_dy_fit_eE_muMu_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ eE, muMu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_dy_fit_eMu_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ eMu ]
+    categories: [ SR_boosted ]
+
+  # Low-mass DY in SR boosted is estimated from SR recovery into DY (binning_eqsig_DL_v2610.yaml:
+  # lowmass_dy); +-100% on that estimate.
   - name: CMS_bbww_dy_lowmass
     type: shape
     processes: [ DY ]
     categories: [ SR_boosted ]
+
+  # Low-mass DY (10 < m_ll < 50 GeV) is in no control region: both lie above 70 GeV. It is part of
+  # DY, so it shares the normalisation DY_CR fixes, and has a prior of its own on top, a shape of DY
+  # that moves only its low-mass part (binning_eqsig_DL_v2610.yaml: member_uncertainties). In SR
+  # boosted it is the estimate instead (CMS_bbww_dy_lowmass); there is none in the control regions.
+  - name: CMS_bbww_norm_DY_lowmass
+    type: shape
+    processes: [ DY ]
+    categories: [ SR_res2b, SR_recovery ]
+
+  # Free normalisations of TT (incl. ttV) and DY (m_ll > 50 GeV), each fixed by its control
+  # region (TT_CR / DY_CR) and shared with the signal region of the same jet category, every
+  # channel and every era. Boosted has ~100 events per era in either control region, so it
+  # shares the res2b parameter.
+  - name: CMS_bbww_rate_TT_res2b
+    type: rateParam
+    processes: [ TT ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    value: 1.0
+    range: [ 0.0, 5.0 ]
+  - name: CMS_bbww_rate_TT_recovery
+    type: rateParam
+    processes: [ TT ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
+    value: 1.0
+    range: [ 0.0, 5.0 ]
+  - name: CMS_bbww_rate_DY_res2b
+    type: rateParam
+    processes: [ DY ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    value: 1.0
+    range: [ 0.0, 5.0 ]
+  - name: CMS_bbww_rate_DY_recovery
+    type: rateParam
+    processes: [ DY ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
+    value: 1.0
+    range: [ 0.0, 5.0 ]
 
   # Higgs branching ratios: theory, so correlated across every era -- no `eras:` field,
   # which is what makes them apply everywhere. Values from
