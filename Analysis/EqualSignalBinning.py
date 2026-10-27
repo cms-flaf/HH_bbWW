@@ -28,6 +28,8 @@ import uproot
 import yaml
 import ROOT
 
+from DYTemplate import fit_template, lowmass_boost_shape, tail_template
+
 ROOT.gROOT.SetBatch(True)
 # config/... paths are relative to the analysis area this script belongs to
 ANALYSIS_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,6 +76,12 @@ def project(hist, mask):
         q[-1] += p[-1]
         out.append(q)
     return tuple(out)
+
+
+def negligible(y):
+    """Variance of a templated bin: a relative MC-stat. error of 1e-3, since the template's own
+    uncertainty (a shape nuisance) replaces the MC statistics."""
+    return (1e-3 * np.asarray(y)) ** 2
 
 
 def variation_suffixes(names, process):
@@ -136,7 +144,16 @@ class Binning:
             b: cfg.get("backgrounds", {}).get(b, [b]) for b in card.backgrounds
         }
         self.drop = cfg.get("drop") or {}
+        self.single_bin_regions = set(cfg.get("single_bin_regions") or [])
         self.lowmass = cfg.get("lowmass_dy")
+        if self.lowmass is not None:
+            # the process that carries the estimate (DY when the low-mass sample is a member of it)
+            self.lowmass.setdefault("output", "DY")
+            self.lowmass.setdefault("nuisance_factors", [0.0, 2.0])
+        self.dy_template = cfg.get("dy_template")
+        self.pooled = (
+            {}
+        )  # (mass, directory, channels) -> fitted DY shape of fit-only windows
         self.member_uncs = {
             name: [(t["member"], signed(t["value"])) for t in terms]
             for name, terms in (cfg.get("member_uncertainties") or {}).items()
@@ -145,14 +162,151 @@ class Binning:
 
     @staticmethod
     def window_key(directory):
-        """The windows file keys a category by its base name: SR/res2b -> res2b."""
+        """The windows file keys a category by its base name: SR/res2b -> res2b, and so
+        does every region of that category (TT_CR/res2b -> res2b)."""
         return directory.rsplit("/", 1)[-1]
 
+    @staticmethod
+    def region(directory):
+        """SR/res2b -> SR, TT_CR/res2b -> TT_CR."""
+        return directory.rsplit("/", 1)[0] if "/" in directory else ""
+
     def lowmass_applies(self, directory):
+        lm = self.lowmass
         return (
-            self.lowmass is not None
-            and self.window_key(directory) in self.lowmass["categories"]
+            lm is not None
+            and self.window_key(directory) in lm["categories"]
+            and ("regions" not in lm or self.region(directory) in lm["regions"])
         )
+
+    def template_mode(self, channel, directory):
+        """'tail', 'fit_only' or None: how dy_template replaces the DY MC of a category."""
+        t = self.dy_template
+        if t is None:
+            return None
+        key, region = self.window_key(directory), self.region(directory)
+        for mode in ("tail", "fit_only"):
+            m = t.get(mode)
+            if (
+                m
+                and key in m["categories"]
+                and region in m.get("regions", [region])
+                and channel in m.get("channels", self.card.channels)
+            ):
+                return mode
+        return None
+
+    def pooled_shape(self, mass, channel, directory, files, window, x):
+        """(channels fitted, (shape, up, down)) of the fit-only DY template, each normalised to
+        the nominal's sum: one fit to the DY MC summed over the eras and over the channels pooled
+        with `channel`."""
+        t = self.dy_template
+        group = next(
+            (tuple(g) for g in t["fit_only"].get("pool", []) if channel in g),
+            (channel,),
+        )
+        key = (mass, directory, group)
+        if key not in self.pooled:
+            proc, lowmass = t["process"], self.lowmass_applies(directory)
+            y, w = np.zeros(len(x)), np.zeros(len(x))
+            for ch in group:
+                raw, _ = self.read(files, ch, directory, window)
+                for r in raw.values():
+                    p = self.build_processes(r, directory, lowmass, mass).get(proc)
+                    if p:
+                        y, w = y + p[""][0], w + p[""][1]
+            tmpl, (up, down), ok = fit_template(
+                x, y, np.maximum(w, 0.0), **t.get("fit", {})
+            )
+            if not ok:
+                raise RuntimeError(
+                    f"dy_template: the {proc} fit of {'+'.join(group)} {directory} "
+                    f"MX={mass} failed"
+                )
+            norm = tmpl.sum()
+            self.pooled[key] = (tmpl / norm, up / norm, down / norm)
+        return group, self.pooled[key]
+
+    def apply_template(
+        self, mode, per_era, raw, mass, channel, directory, files, window, x
+    ):
+        """Replace the DY MC of every era by its smooth template (in place); returns the
+        fit-only shape (None for 'tail').
+
+        tail: each MC member summed over the eras, raw below its fitted peak and fitted above
+          (DYTemplate.tail_template); the members' templates add up to DY.
+        fit_only: one pooled fit (pooled_shape) times the window's DY MC.
+        The total is shared out to the eras by their share_by window yield. Each DY variation of
+        an era is the template times that era's (varied / nominal) window yield, except a member
+        uncertainty, which moves its own member's template (tail). The template's band is the
+        shape nuisance <nuisance>_<channels fitted>_<category>."""
+        t = self.dy_template
+        proc = t["process"]
+        eras = [e for e, p in per_era.items() if proc in p]
+        if not eras:
+            return None
+        zero = np.zeros(len(x))
+        fit = t.get("fit", {})
+        member_tmpl, shape, fitted = {}, None, (channel,)
+        if mode == "tail":
+            members = [
+                m
+                for m in self.members[proc]
+                if m not in self.dropped_in(directory)
+                and any(m in raw[e] for e in eras)
+                and not (
+                    self.lowmass_applies(directory) and m == self.lowmass["process"]
+                )
+            ]
+            total, up, down = zero, zero, zero
+            for m in members:
+                y = sum((raw[e][m][0] for e in eras if m in raw[e]), zero)
+                w = sum((raw[e][m][1] for e in eras if m in raw[e]), zero)
+                tmpl, (u, d), ok = tail_template(x, y, np.maximum(w, 0.0), **fit)
+                if not ok:
+                    raise RuntimeError(
+                        f"dy_template: the {m} fit of {channel}/{directory} MX={mass} "
+                        "failed"
+                    )
+                member_tmpl[m] = tmpl
+                total, up, down = total + tmpl, up + u, down + d
+        else:
+            fitted, (shape, s_up, s_down) = self.pooled_shape(
+                mass, channel, directory, files, window, x
+            )
+            n = sum(float(per_era[e][proc][""][0].sum()) for e in eras)
+            total, up, down = shape * n, s_up * n, s_down * n
+
+        by = {
+            e: max(float(raw[e].get(t["share_by"], (zero,))[0].sum()), 0.0)
+            for e in eras
+        }
+        by_total = sum(by.values())
+        member_shift = {}  # suffix -> template change of a member uncertainty
+        for unc, terms in self.member_uncs.items():
+            if any(m in member_tmpl for m, _ in terms):
+                for k, direction in ((0, "Down"), (1, "Up")):
+                    member_shift[f"_{unc}_{direction}"] = sum(
+                        (v[k] * member_tmpl[m] for m, v in terms if m in member_tmpl),
+                        zero,
+                    )
+        nuisance = f"_{t['nuisance']}_{'_'.join(fitted)}_{self.window_key(directory)}"
+        for e in eras:
+            share = by[e] / by_total if by_total > 0 else 1.0 / len(eras)
+            shapes = per_era[e][proc]
+            nominal = float(shapes[""][0].sum())
+            new = {}
+            for s, (y, _) in shapes.items():
+                if s in member_shift:
+                    v = share * (total + member_shift[s])
+                else:
+                    r = float(y.sum()) / nominal if (s and nominal > 0) else 1.0
+                    v = share * total * max(r, 0.0)
+                new[s] = (v, negligible(v))
+            for direction, v in (("Up", up), ("Down", down)):
+                new[f"{nuisance}_{direction}"] = (share * v, negligible(share * v))
+            per_era[e][proc] = new
+        return shape
 
     def read(self, files, channel, directory, window):
         """{era: {merged-histogram name: (values, variances)}} of one category, projected on
@@ -167,26 +321,45 @@ class Binning:
             out[era] = {n: project(d[n], mask) for n in names}
         return out, x_edges
 
-    def build_processes(self, raw, category_key, lowmass, mass):
+    def dropped_in(self, directory):
+        """Inputs left out of a category: `drop` lists, per input, jet categories (res2b), regions
+        (TT_CR) or region/category directories (TT_CR/res2b)."""
+        keys = {self.window_key(directory), self.region(directory), directory}
+        return {m for m, cats in self.drop.items() if keys & set(cats)}
+
+    def build_processes(self, raw, directory, lowmass, mass):
         """{output process: {suffix: (values, variances)}} of one era, suffix '' = nominal.
 
-        With `lowmass` the low-mass member is left out of DY here; it is added per bin
-        range from the transfer estimate (see bin_window)."""
-        dropped = {m for m, cats in self.drop.items() if category_key in cats}
+        With `lowmass` the low-mass member's MC is left out of its output process here (which
+        keeps that member's variations, so it exists even if the member was its only one); the
+        estimate is added per bin range from the transfer (see bin_window)."""
+        dropped = self.dropped_in(directory)
         out = {}
         for proc, members in self.members.items():
             members = [m for m in members if m in raw and m not in dropped]
-            if lowmass and proc == "DY":
-                members = [m for m in members if m != self.lowmass["process"]]
             if not members:
                 continue
+            mc_members = members
+            if lowmass and proc == self.lowmass["output"]:
+                mc_members = [m for m in members if m != self.lowmass["process"]]
             suffixes = set().union(*(variation_suffixes(raw, m) for m in members))
+            zero = np.zeros_like(raw[members[0]][0])
             shapes = {}
             for s in [""] + sorted(suffixes):
-                parts = [raw.get(m + s, raw[m]) for m in members]
-                shapes[s] = (sum(p[0] for p in parts), sum(p[1] for p in parts))
+                parts = [raw.get(m + s, raw[m]) for m in mc_members]
+                shapes[s] = (
+                    sum((p[0] for p in parts), zero),
+                    sum((p[1] for p in parts), zero),
+                )
             for unc, terms in self.member_uncs.items():
-                terms = [(m, v) for m, v in terms if m in members]
+                if any(m in members for m, _ in terms) and not any(
+                    m in mc_members for m, _ in terms
+                ):
+                    # a member uncertainty on the estimate alone: it enters through its factor
+                    for direction in ("Down", "Up"):
+                        shapes[f"_{unc}_{direction}"] = shapes[""]
+                    continue
+                terms = [(m, v) for m, v in terms if m in mc_members]
                 if not terms:
                     continue
                 for k, direction in ((0, "Down"), (1, "Up")):
@@ -213,8 +386,9 @@ class Binning:
                     if s == f"_{unc}_{direction}":
                         f += sum(v[k] for m, v in terms if m == lm["process"])
             factors[s] = f
-        factors[f"_{lm['nuisance']}_Up"] = 2.0
-        factors[f"_{lm['nuisance']}_Down"] = 0.0
+        down, up = lm["nuisance_factors"]
+        factors[f"_{lm['nuisance']}_Up"] = float(up)
+        factors[f"_{lm['nuisance']}_Down"] = float(down)
         return factors
 
     def bin_window(self, mass, channel, category, directory, files):
@@ -224,8 +398,15 @@ class Binning:
         nb = len(x_edges) - 1
         lowmass = self.lowmass_applies(directory)
         per_era = {
-            e: self.build_processes(r, key, lowmass, mass) for e, r in raw.items()
+            e: self.build_processes(r, directory, lowmass, mass) for e, r in raw.items()
         }
+        x = 0.5 * (x_edges[1:] + x_edges[:-1])
+        mode = self.template_mode(channel, directory)
+        template_shape = None
+        if mode:
+            template_shape = self.apply_template(
+                mode, per_era, raw, mass, channel, directory, files, window, x
+            )
         bkgs = [b for b in self.members if any(b in p for p in per_era.values())]
         signals = self.card.resolved(self.card.signals, mass)
 
@@ -240,14 +421,16 @@ class Binning:
             for b in bkgs
         }
         L, factors = None, {}
-        if lowmass and "DY" in bkgs:
+        lm_out = self.lowmass["output"] if self.lowmass else None
+        if lowmass and lm_out in bkgs:
             lm = self.lowmass
-            ref_dir = next(
-                d
-                for d in self.card.categories.values()
-                if self.window_key(d) == lm["reference"]
-            )
-            # the reference category projected on THIS category's window
+            # the reference category of the same region, projected on THIS category's window
+            ref_dir = f"{self.region(directory)}/{lm['reference']}"
+            if ref_dir not in self.card.categories.values():
+                raise RuntimeError(
+                    f"lowmass_dy: reference {ref_dir} of {directory} is not a datacard "
+                    "category input"
+                )
             ref, _ = self.read(files, channel, ref_dir, window)
             zero = np.zeros(nb)
             low = [
@@ -260,7 +443,17 @@ class Binning:
             ]
             c_low, c_low_w = cumulative(low[0]), cumulative(np.maximum(low[1], 0.0))
             c_tr = cumulative(transfer[0])
-            c_m50 = cumulative(summed("DY", "")[0])
+            # the transfer sample in this category itself
+            m50_here = {
+                e: r.get(lm["transfer"], (zero, zero))[0] for e, r in raw.items()
+            }
+            if mode == "fit_only":
+                # its template: the output process's MC here is the transfer sample
+                m50_here = {
+                    e: p[lm_out][""][0] if lm_out in p else zero
+                    for e, p in per_era.items()
+                }
+            c_m50 = cumulative(sum(m50_here.values()))
 
             def estimate(i, j):
                 """(low-mass DY, its variance) over fine bins i..j"""
@@ -271,8 +464,25 @@ class Binning:
                 return in_range(c_low, i, j) * r, in_range(c_low_w, i, j) * r * r
 
             L = estimate
-            factors = self.lowmass_factors(suffixes["DY"])
-            suffixes["DY"] = sorted(set(suffixes["DY"]) | set(factors))
+            if template_shape is not None:
+                # the window's double ratio with a smooth DNN shape: fit(low-mass, reference) x
+                # the template here / fit(transfer, reference)
+                shape = lowmass_boost_shape(
+                    x,
+                    (low[0], np.maximum(low[1], 0.0)),
+                    (transfer[0], np.maximum(transfer[1], 0.0)),
+                    template_shape,
+                    **self.dy_template.get("fit", {}),
+                )
+                c_fine = cumulative(shape * estimate(0, nb - 1)[0])
+
+                def smooth(i, j):
+                    v = in_range(c_fine, i, j) if j >= i else 0.0
+                    return v, float(negligible(v))
+
+                L = smooth
+            factors = self.lowmass_factors(suffixes[lm_out])
+            suffixes[lm_out] = sorted(set(suffixes[lm_out]) | set(factors))
 
         series = {
             b: {
@@ -290,10 +500,10 @@ class Binning:
         def get(b, s, i, j):
             c = series[b][s if s in series[b] else ""]
             y, w = in_range(c[0], i, j), in_range(c[1], i, j)
-            if L is not None and b == "DY":
+            if L is not None and b == lm_out:
                 lv, lw = L(i, j)
                 f = factors.get(s, 1.0)
-                # a variation without the estimate (dy_lowmass Down) has M>50's MC stat alone
+                # a variation without the estimate (factor 0) has the other members' MC stat alone
                 y, w = y + f * lv, w + (lw if f > 0 else 0.0)
             return y, w
 
@@ -303,30 +513,39 @@ class Binning:
             b for b in bkgs if totals[b] < g["exempt_fraction"] * sum(totals.values())
         }
 
-        def passes(i, j):
+        def failure(i, j):
+            """Why fine bins i..j fail the gates, or None if they pass."""
             nominal = {b: get(b, "", i, j) for b in bkgs}
             bt = sum(v[0] for v in nominal.values())
             bw = sum(v[1] for v in nominal.values())
             if bt < g["min_bkg"] or bw <= 0 or bt * bt / bw < g["min_bkg_neff"]:
-                return False
+                return f"total background {bt:.3g}, N_eff {bt * bt / bw if bw > 0 else 0:.2f}"
             for b in bkgs:
                 y, w = nominal[b]
                 if y < -1e-12:
-                    return False
+                    return f"{b} {y:.3g} < 0"
                 strict = b not in exempt
                 if strict and (
                     y <= g["min_each"] or w <= 0 or y * y / w < g["min_each_neff"]
                 ):
-                    return False
+                    return f"{b} {y:.3g}, N_eff {y * y / w if w > 0 else 0:.2f}"
                 for s in suffixes[b]:
                     yv, wv = get(b, s, i, j)
                     if yv < -1e-12:
-                        return False
+                        return f"{b}{s} {yv:.3g} < 0"
                     if strict and (wv <= 0 or yv * yv / wv < g["min_variation_neff"]):
-                        return False
-            return True
+                        return f"{b}{s} N_eff {yv * yv / wv if wv > 0 else 0:.2f}"
+            return None
 
-        n = self.n_bins[mass][key]
+        def passes(i, j):
+            return failure(i, j) is None
+
+        # control regions: one bin over the window (they constrain normalisations, not shapes)
+        n = (
+            1
+            if self.region(directory) in self.single_bin_regions
+            else self.n_bins[mass][key]
+        )
         bins, hi = [], nb - 1
         # equal signal from the top of the score down, each bin as narrow as the gates allow
         while hi >= 0 and len(bins) < n - 1:
@@ -349,7 +568,8 @@ class Binning:
             while not passes(*last):
                 if not bins:
                     raise RuntimeError(
-                        f"{channel}/{directory} MX={mass}: the whole window fails the gates"
+                        f"{channel}/{directory} MX={mass}: the whole window fails the "
+                        f"gates: {failure(0, nb - 1)}"
                     )
                 last = (0, bins.pop()[1])
             bins.append(last)
@@ -371,7 +591,7 @@ class Binning:
         # the low-mass estimate is shared out to the eras by their M>50 yield in each bin
         lowmass_by_era = {}
         if L is not None:
-            m50 = {e: p["DY"][""][0] for e, p in per_era.items() if "DY" in p}
+            m50 = m50_here
             for e in m50:
                 vals = []
                 for i, j in bins:
@@ -409,6 +629,7 @@ class Binning:
                             edges,
                             factors,
                             lowmass_by_era.get(e),
+                            self.lowmass["output"] if self.lowmass else None,
                         )
             for f in out.values():
                 f.Close()
@@ -417,9 +638,10 @@ class Binning:
             json.dump({"binning": {self.era: self.record}}, f, indent=1)
 
     @staticmethod
-    def write(directory, procs, bins, edges, factors, lowmass):
+    def write(directory, procs, bins, edges, factors, lowmass, lowmass_process):
         """One era's histograms of a category: the variations that era's input has, and
-        for DY with the low-mass estimate also its own variations (every era)."""
+        for the process carrying the low-mass estimate also its own variations (every era).
+        """
         directory.cd()
         edges = np.array(edges, dtype=float)
 
@@ -433,13 +655,14 @@ class Binning:
 
         for proc, shapes in procs.items():
             names = set(shapes) - {""}
-            if proc == "DY" and lowmass is not None:
+            carries_estimate = proc == lowmass_process and lowmass is not None
+            if carries_estimate:
                 # the variations that move the estimate exist in every era
                 names |= {s for s, f in factors.items() if f != 1.0}
             for s in [""] + sorted(names):
                 y, w = shapes.get(s, shapes[""])
                 h = hist(proc + s, y, w)
-                if proc == "DY" and lowmass is not None:
+                if carries_estimate:
                     f = factors.get(s, 1.0)
                     for k, (lv, lw) in enumerate(lowmass, start=1):
                         h.SetBinContent(k, h.GetBinContent(k) + f * lv)
