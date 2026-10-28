@@ -137,10 +137,11 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their
   units.
-- **Tests:** `test/test_plot_config.py` (CI: Test Plot Config) checks, with FLAF's own plot rules,
-  in every era, the Run3_22_23 meta-era and both DY models: the control regions (exactly TT_CR
-  and DY_CR) with the data they show, the signal normalisation, the grouping and stack order of
-  the backgrounds, and the X→HH entries. It does not render the plots.
+- **Tests:** `test/test_plot_config.py` (CI: Unit Tests, through FLAF's reusable workflow) checks,
+  with FLAF's own plot rules, in every era, the Run3_22_23 meta-era and both DY models: the
+  control regions (exactly TT_CR and DY_CR) with the data they show, the signal normalisation,
+  the grouping and stack order of the backgrounds, and the X→HH entries. It does not render the
+  plots.
 
 ## Statistical interpretation
 
