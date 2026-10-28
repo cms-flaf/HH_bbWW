@@ -113,14 +113,16 @@ lowmass_dy:
 #         enough, and the MC is kept.
 #   fit_only: SR boosted, too few events for a raw core: an exp(poly2) fit below that point and
 #         the tail fit above, eE and muMu fitted together (pool), eMu alone, times each channel's
-#         DY MC yield in the window. The low-mass estimate there (lowmass_dy) keeps its window
-#         total, with the DNN shape fit(low-mass) x template / fit(DY_M_50) of the reference.
+#         DY MC yield in the window, whose own statistical error (1 / sqrt(N_eff)) is added to
+#         the band. The low-mass estimate there (lowmass_dy) keeps its window total, with the DNN
+#         shape fit(low-mass) x template / fit(DY_M_50) of the reference.
 # The template is shared out to the eras by their share_by yield in the window; a DY variation
 # of an era is the template times that era's varied / nominal window yield, and a member
-# uncertainty moves its own member's template. Its MC statistical error is negligible: the
-# template's band, the larger difference to two alternative fits (exp(poly2) from the peak,
-# whole-window exp(poly4)) with the tail's 1 / sqrt(N_eff), is the shape nuisance
-# <nuisance>_<channel>_<category> instead. The t3s settings below closed best on the v2610 MC.
+# uncertainty moves its own member's template. The bins kept raw (tail, below its start) keep
+# their MC statistical error; in the fitted bins it is negligible: the template's band, the
+# larger difference to two alternative fits (exp(poly2) from the peak, whole-window exp(poly4))
+# with the tail's 1 / sqrt(N_eff), is the shape nuisance <nuisance>_<channel>_<category>
+# instead. The t3s settings below closed best on the v2610 MC.
 dy_template:
   process: DY
   share_by: DY_M_50
@@ -149,6 +151,11 @@ member_uncertainties:
   # scale uncertainty of both ttZ and ttW; replace with the official numbers once they exist.
   QCD_scale_ttV:
     - { member: ttV, value: 0.12 }
+  # DY NNLO QCD + NLO EW, 2094.2 x 3 pb, +0.7 -1.1 %:
+  # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
+  # On DY_M_50 only: low-mass DY has its own prior (CMS_bbww_norm_DY_lowmass below).
+  QCD_scale_DY:
+    - { member: DY_M_50, value: [ -0.011, 0.007 ] }
   top_mass:
     - { member: TT, value: [ -0.027, 0.028 ] }
     - { member: ST, value: [ -0.015, 0.015 ] }   # taken from tW for now (largest)

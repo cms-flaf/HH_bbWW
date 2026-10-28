@@ -139,34 +139,38 @@ def _start(x, f2, shift):
     return kp, min(int(np.searchsorted(x, x[kp] + shift * s)), len(x) - 3)
 
 
-def tail_template(x, y, w2, deg=3, shift=1.0, merge=True):
-    """-> template, (up, down), ok. Raw MC below the tail start, the tail fit above it."""
+def _fits(x, y, w2, deg, shift, merge):
+    """(whole-window exp(poly2) fit, tail fit, tail mask, peak index), or None if the poly2 fit
+    fails; the tail fit falls back to the poly2 fit."""
     g2 = LogPolyFit(x, y, w2, 2, merge=merge)
     if not g2.ok:
-        return y.copy(), (y.copy(), y.copy()), False
-    kp, k = _start(x, g2.predict(), shift)
-    mask = np.arange(len(x)) >= k
-    ft = LogPolyFit(x, y, w2, deg, mask=mask, merge=merge)
-    if not ft.ok:
-        ft = g2
-    f = ft.predict()
-    tmpl = np.where(mask, f, y)
-    err = _band(x, y, w2, f, mask, kp, merge)
-    return tmpl, (tmpl + err, np.clip(tmpl - err, 0, None)), True
-
-
-def fit_template(x, y, w2, deg=3, shift=1.0, merge=True):
-    """-> template, (up, down), ok. Fit-only: exp(poly2) below the tail start, the tail fit above."""
-    g2 = LogPolyFit(x, y, w2, 2, merge=merge)
-    if not g2.ok:
-        return None, (None, None), False
+        return None
     f2 = g2.predict()
     kp, k = _start(x, f2, shift)
     mask = np.arange(len(x)) >= k
     ft = LogPolyFit(x, y, w2, deg, mask=mask, merge=merge)
-    if not ft.ok:
-        ft = g2
-    tmpl = np.where(mask, ft.predict(), f2)
+    return f2, (ft if ft.ok else g2).predict(), mask, kp
+
+
+def tail_template(x, y, w2, deg=3, shift=1.0, merge=True):
+    """-> template, (up, down), tail mask, ok. Raw MC below the tail start (mask False), the tail
+    fit above it."""
+    fits = _fits(x, y, w2, deg, shift, merge)
+    if fits is None:
+        return y.copy(), (y.copy(), y.copy()), np.zeros(len(x), bool), False
+    _, f, mask, kp = fits
+    tmpl = np.where(mask, f, y)
+    err = _band(x, y, w2, f, mask, kp, merge)
+    return tmpl, (tmpl + err, np.clip(tmpl - err, 0, None)), mask, True
+
+
+def fit_template(x, y, w2, deg=3, shift=1.0, merge=True):
+    """-> template, (up, down), ok. Fit-only: exp(poly2) below the tail start, the tail fit above."""
+    fits = _fits(x, y, w2, deg, shift, merge)
+    if fits is None:
+        return None, (None, None), False
+    f2, f, mask, kp = fits
+    tmpl = np.where(mask, f, f2)
     err = _band(
         x, y, w2, tmpl, mask, kp, merge, core_rel=1.0 / np.sqrt(max(_neff(y, w2), 1.0))
     )

@@ -72,13 +72,18 @@ input_categories:
 # "<era>/<variable>/<variable>.root". Here it cuts each category's HME window out of the 2D
 # shapes, merges the merged-histogram processes into the backgrounds below and bins the DNN
 # inside the window into bins of equal signal (binning_eqsig_DL_v2610.yaml). Its input is the
-# Run3_Model_DYSplit merged histograms (DY as DY_M_10to50 + DY_M_50), e.g. --hists-version
-# v2610_output_DYSplit. Remove this block and the chain reads the merged histograms unchanged.
+# Run3_Model_DYSplit merged histograms with the control regions (DY as DY_M_10to50 + DY_M_50;
+# TT_CR and DY_CR), e.g. --hists-version v2610_output_CR. Remove this block and the chain reads
+# the merged histograms unchanged.
+# --jobs: masses binned in parallel, one process each (< 1 GB). On condor give the task as many
+# CPUs: --PreprocessShapesTask-n-cpus 8.
 preprocess:
   script: Analysis/EqualSignalBinning.py
   args:
     - --binning-config
     - config/Datacards/binning_eqsig_DL_v2610.yaml
+    - --jobs
+    - "8"
 
 processes:
   - process: data_obs
@@ -571,17 +576,6 @@ uncertainties:
     type: shape
 
 
-  # For multiple values, Konstantin says do [ down, up ]
-  - name: QCD_scale_DY
-    type: lnN
-    processes:
-      - DY
-    value: [ -0.011, 0.007 ] # DY XS uncertainty in percentage from xsec yaml
-    # DY_NNLO_QCD+NLO_EW:
-    # crossSec: 2094.2 * 3
-    # reference: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
-    # unc: +0.7% - 1.1%, +- 1.0% PDF alphas
-
   - name: QCD_scale_ST
     type: lnN
     processes:
@@ -590,13 +584,17 @@ uncertainties:
     # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
 
   # Theory and normalisation uncertainties of the members of merged backgrounds (TT = TT + ttV,
-  # Minor = VV + VVV + H + W, and PDF_alphas across TT, ST, DY and Minor). The preprocess step
-  # writes each as a shape of the merged background that moves only that member's own part, by
-  # the member's own amount; the values and their sources are in binning_eqsig_DL_v2610.yaml
-  # (member_uncertainties).
+  # DY = DY_M_10to50 + DY_M_50, Minor = VV + VVV + H + W, and PDF_alphas across TT, ST, DY and
+  # Minor). The preprocess step writes each as a shape of the merged background that moves only
+  # that member's own part, by the member's own amount; the values and their sources are in
+  # binning_eqsig_DL_v2610.yaml (member_uncertainties).
   - name: QCD_scale_TT
     type: shape
     processes: [ TT ]
+  # DY_M_50 only: low-mass DY has its own prior (CMS_bbww_norm_DY_lowmass)
+  - name: QCD_scale_DY
+    type: shape
+    processes: [ DY ]
   - name: QCD_scale_ttV
     type: shape
     processes: [ TT ]
@@ -623,7 +621,8 @@ uncertainties:
 
   # The DY templates (binning_eqsig_DL_v2610.yaml: dy_template) replace the DY MC statistics in
   # the same-flavour resolved categories and in boosted; each window's fit uncertainty is its own
-  # nuisance. Boosted eE and muMu share one fit, and so one nuisance.
+  # nuisance. Boosted eE and muMu share one fitted shape, but each channel's normalisation is its
+  # own DY MC yield, with its own statistical error: one nuisance per channel.
   - name: CMS_bbww_dy_fit_eE_res2b
     type: shape
     processes: [ DY ]
@@ -644,10 +643,15 @@ uncertainties:
     processes: [ DY ]
     channels: [ muMu ]
     categories: [ SR_recovery ]
-  - name: CMS_bbww_dy_fit_eE_muMu_boosted
+  - name: CMS_bbww_dy_fit_eE_boosted
     type: shape
     processes: [ DY ]
-    channels: [ eE, muMu ]
+    channels: [ eE ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_dy_fit_muMu_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
     categories: [ SR_boosted ]
   - name: CMS_bbww_dy_fit_eMu_boosted
     type: shape
@@ -767,7 +771,7 @@ limit_plots:
       xsec: pb
       y_log: true
       x_min: 200
-      x_max: 1000
+      x_max: 1500
       y_min: 0.001
       y_max: 100
 
@@ -784,9 +788,11 @@ limit_plots:
   - name: categories
     datacards:
       - { name: "Combined", glob: "*.txt" }
-      - { name: "res 2b", glob: "${ERA}/categories/SR_res2b/*.txt" }
-      - { name: "recovery", glob: "${ERA}/categories/SR_recovery/*.txt" }
-      - { name: "boosted", glob: "${ERA}/categories/SR_boosted/*.txt" }
+      # each jet category with its own control regions (SR_res2b + TT_res2b + DY_res2b: dhi
+      # combines the cards of one mass), which fix the rateParams the SR shares
+      - { name: "res 2b", glob: "${ERA}/categories/*_res2b/*.txt" }
+      - { name: "recovery", glob: "${ERA}/categories/*_recovery/*.txt" }
+      - { name: "boosted", glob: "${ERA}/categories/*_boosted/*.txt" }
     external_limits:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style

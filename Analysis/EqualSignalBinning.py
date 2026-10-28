@@ -20,7 +20,9 @@ config/Datacards/binning_eqsig_DL_v2610.yaml for what each entry means.
 
 import argparse
 import json
+import multiprocessing
 import os
+from concurrent.futures import ProcessPoolExecutor
 from string import Template
 
 import numpy as np
@@ -137,6 +139,7 @@ class Binning:
             input_dir,
             output_dir,
         )
+        self.cfg = cfg
         self.windows = yaml.safe_load(open(analysis_file(cfg["windows"])))["windows"]
         self.n_bins = cfg["n_bins"]
         self.gates = cfg["gates"]
@@ -210,7 +213,9 @@ class Binning:
             proc, lowmass = t["process"], self.lowmass_applies(directory)
             y, w = np.zeros(len(x)), np.zeros(len(x))
             for ch in group:
-                raw, _ = self.read(files, ch, directory, window)
+                raw, _ = self.read(
+                    files, ch, directory, window, only=set(self.members[proc])
+                )
                 for r in raw.values():
                     p = self.build_processes(r, directory, lowmass, mass).get(proc)
                     if p:
@@ -234,12 +239,15 @@ class Binning:
         fit-only shape (None for 'tail').
 
         tail: each MC member summed over the eras, raw below its fitted peak and fitted above
-          (DYTemplate.tail_template); the members' templates add up to DY.
-        fit_only: one pooled fit (pooled_shape) times the window's DY MC.
+          (DYTemplate.tail_template); the members' templates add up to DY. The raw part keeps
+          its MC statistical error.
+        fit_only: one pooled fit (pooled_shape) times the window's DY MC; the band adds that
+          yield's own MC statistical error (1 / sqrt(N_eff) of this channel's DY).
         The total is shared out to the eras by their share_by window yield. Each DY variation of
         an era is the template times that era's (varied / nominal) window yield, except a member
         uncertainty, which moves its own member's template (tail). The template's band is the
-        shape nuisance <nuisance>_<channels fitted>_<category>."""
+        shape nuisance <nuisance>_<channel>_<category>; the fitted part's MC statistical error
+        is negligible (the band replaces it)."""
         t = self.dy_template
         proc = t["process"]
         eras = [e for e, p in per_era.items() if proc in p]
@@ -247,7 +255,10 @@ class Binning:
             return None
         zero = np.zeros(len(x))
         fit = t.get("fit", {})
-        member_tmpl, shape, fitted = {}, None, (channel,)
+        member_tmpl, shape = {}, None
+        raw_var = (
+            zero  # MC variance of the bins kept raw (tail mode, below the tail start)
+        )
         if mode == "tail":
             members = [
                 m
@@ -262,7 +273,8 @@ class Binning:
             for m in members:
                 y = sum((raw[e][m][0] for e in eras if m in raw[e]), zero)
                 w = sum((raw[e][m][1] for e in eras if m in raw[e]), zero)
-                tmpl, (u, d), ok = tail_template(x, y, np.maximum(w, 0.0), **fit)
+                w = np.maximum(w, 0.0)
+                tmpl, (u, d), tail, ok = tail_template(x, y, w, **fit)
                 if not ok:
                     raise RuntimeError(
                         f"dy_template: the {m} fit of {channel}/{directory} MX={mass} "
@@ -270,12 +282,20 @@ class Binning:
                     )
                 member_tmpl[m] = tmpl
                 total, up, down = total + tmpl, up + u, down + d
+                raw_var = raw_var + np.where(tail, 0.0, w)
         else:
-            fitted, (shape, s_up, s_down) = self.pooled_shape(
+            _, (shape, s_up, s_down) = self.pooled_shape(
                 mass, channel, directory, files, window, x
             )
             n = sum(float(per_era[e][proc][""][0].sum()) for e in eras)
-            total, up, down = shape * n, s_up * n, s_down * n
+            w_n = sum(float(per_era[e][proc][""][1].sum()) for e in eras)
+            # this channel's yield: its own MC statistical error, on top of the pooled band
+            norm = 1.0 / np.sqrt(max(n * n / w_n, 1.0)) if n > 0 and w_n > 0 else 0.0
+            total = shape * n
+            rel_up = np.where(shape > 0, s_up / np.maximum(shape, 1e-300) - 1.0, 0.0)
+            rel_dn = np.where(shape > 0, 1.0 - s_down / np.maximum(shape, 1e-300), 0.0)
+            up = total * (1.0 + np.minimum(np.hypot(rel_up, norm), 1.0))
+            down = total * (1.0 - np.minimum(np.hypot(rel_dn, norm), 1.0))
 
         by = {
             e: max(float(raw[e].get(t["share_by"], (zero,))[0].sum()), 0.0)
@@ -290,31 +310,44 @@ class Binning:
                         (v[k] * member_tmpl[m] for m, v in terms if m in member_tmpl),
                         zero,
                     )
-        nuisance = f"_{t['nuisance']}_{'_'.join(fitted)}_{self.window_key(directory)}"
+        nuisance = f"_{t['nuisance']}_{channel}_{self.window_key(directory)}"
         for e in eras:
             share = by[e] / by_total if by_total > 0 else 1.0 / len(eras)
             shapes = per_era[e][proc]
             nominal = float(shapes[""][0].sum())
             new = {}
             for s, (y, _) in shapes.items():
+                r = 1.0
                 if s in member_shift:
                     v = share * (total + member_shift[s])
                 else:
-                    r = float(y.sum()) / nominal if (s and nominal > 0) else 1.0
-                    v = share * total * max(r, 0.0)
-                new[s] = (v, negligible(v))
+                    r = (
+                        max(float(y.sum()) / nominal, 0.0)
+                        if (s and nominal > 0)
+                        else 1.0
+                    )
+                    v = share * total * r
+                new[s] = (v, negligible(v) + share * raw_var * r * r)
             for direction, v in (("Up", up), ("Down", down)):
-                new[f"{nuisance}_{direction}"] = (share * v, negligible(share * v))
+                new[f"{nuisance}_{direction}"] = (
+                    share * v,
+                    negligible(share * v) + share * raw_var,
+                )
             per_era[e][proc] = new
         return shape
 
-    def read(self, files, channel, directory, window):
+    def read(self, files, channel, directory, window, only=None):
         """{era: {merged-histogram name: (values, variances)}} of one category, projected on
-        `window`, plus the DNN-score bin edges."""
+        `window`, plus the DNN-score bin edges; `only`: just these names (nominals)."""
         out, x_edges = {}, None
         for era, f in files.items():
             d = f[f"{channel}/{directory}"]
             names = d.keys(recursive=False, cycle=False)
+            if only is not None:
+                names = [n for n in names if n in only]
+            if not names:
+                out[era] = {}
+                continue
             first = d[names[0]]
             x_edges = first.axes[0].edges()
             mask = window_mask(first.axes[1].edges(), *window)
@@ -431,7 +464,9 @@ class Binning:
                     f"lowmass_dy: reference {ref_dir} of {directory} is not a datacard "
                     "category input"
                 )
-            ref, _ = self.read(files, channel, ref_dir, window)
+            ref, _ = self.read(
+                files, channel, ref_dir, window, only={lm["process"], lm["transfer"]}
+            )
             zero = np.zeros(nb)
             low = [
                 sum(r.get(lm["process"], (zero, zero))[k] for r in ref.values())
@@ -503,8 +538,8 @@ class Binning:
             if L is not None and b == lm_out:
                 lv, lw = L(i, j)
                 f = factors.get(s, 1.0)
-                # a variation without the estimate (factor 0) has the other members' MC stat alone
-                y, w = y + f * lv, w + (lw if f > 0 else 0.0)
+                # the estimate scaled by f: its variance by f^2 (none for f = 0)
+                y, w = y + f * lv, w + f * f * lw
             return y, w
 
         g = self.gates
@@ -589,51 +624,72 @@ class Binning:
         }
 
         # the low-mass estimate is shared out to the eras by their M>50 yield in each bin
+        # (a negative era sum counts as none, so every share is in [0, 1])
         lowmass_by_era = {}
         if L is not None:
             m50 = m50_here
             for e in m50:
                 vals = []
                 for i, j in bins:
-                    tot = sum(m50[x][i : j + 1].sum() for x in m50)
-                    share = m50[e][i : j + 1].sum() / tot if tot > 0 else 1.0 / len(m50)
+                    part = {x_: max(float(m50[x_][i : j + 1].sum()), 0.0) for x_ in m50}
+                    tot = sum(part.values())
+                    share = part[e] / tot if tot > 0 else 1.0 / len(m50)
                     lv, lw = L(i, j)
                     vals.append((lv * share, lw * share))
                 lowmass_by_era[e] = vals
         return per_era, bins, edges, factors, lowmass_by_era
 
-    def run(self):
+    def run_mass(self, mass):
+        """Bin and write every window of one mass; returns its binning.json record."""
         card = self.card
-        for mass in card.masses:
-            files = {
-                e: uproot.open(os.path.join(self.input_dir, card.input_file(e, mass)))
-                for e in card.eras
-            }
-            out = {}
-            for e in card.eras:
-                path = os.path.join(self.output_dir, card.input_file(e, mass))
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                out[e] = ROOT.TFile(path, "RECREATE")
-            reached = {}
-            for channel in card.channels:
-                for category, directory in card.categories.items():
-                    per_era, bins, edges, factors, lowmass_by_era = self.bin_window(
-                        mass, channel, category, directory, files
+        files = {
+            e: uproot.open(os.path.join(self.input_dir, card.input_file(e, mass)))
+            for e in card.eras
+        }
+        out = {}
+        for e in card.eras:
+            path = os.path.join(self.output_dir, card.input_file(e, mass))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            out[e] = ROOT.TFile(path, "RECREATE")
+        reached = {}
+        for channel in card.channels:
+            for category, directory in card.categories.items():
+                per_era, bins, edges, factors, lowmass_by_era = self.bin_window(
+                    mass, channel, category, directory, files
+                )
+                reached[f"{channel}/{category}"] = len(bins)
+                for e, procs in per_era.items():
+                    self.write(
+                        out[e].mkdir(f"{channel}/{directory}", "", True),
+                        procs,
+                        bins,
+                        edges,
+                        factors,
+                        lowmass_by_era.get(e),
+                        self.lowmass["output"] if self.lowmass else None,
                     )
-                    reached[f"{channel}/{category}"] = len(bins)
-                    for e, procs in per_era.items():
-                        self.write(
-                            out[e].mkdir(f"{channel}/{directory}", "", True),
-                            procs,
-                            bins,
-                            edges,
-                            factors,
-                            lowmass_by_era.get(e),
-                            self.lowmass["output"] if self.lowmass else None,
-                        )
-            for f in out.values():
-                f.Close()
-            print(f"MX={mass}: bins per window {json.dumps(reached)}", flush=True)
+        for f in out.values():
+            f.Close()
+        self.pooled.clear()
+        print(f"MX={mass}: bins per window {json.dumps(reached)}", flush=True)
+        return self.record.get(str(mass), {})
+
+    def run(self, jobs=1):
+        """Every mass of the card, `jobs` at a time (each mass in its own process)."""
+        masses = self.card.masses
+        if jobs > 1 and len(masses) > 1:
+            args = [
+                (self.card, self.era, self.cfg, self.input_dir, self.output_dir, m)
+                for m in masses
+            ]
+            # spawned, not forked: ROOT's state does not survive a fork
+            ctx = multiprocessing.get_context("spawn")
+            with ProcessPoolExecutor(min(jobs, len(masses)), mp_context=ctx) as pool:
+                for mass, record in zip(masses, pool.map(_run_mass, args)):
+                    self.record[str(mass)] = record
+        else:
+            for mass in masses:
+                self.run_mass(mass)
         with open(os.path.join(self.output_dir, "binning.json"), "w") as f:
             json.dump({"binning": {self.era: self.record}}, f, indent=1)
 
@@ -666,10 +722,16 @@ class Binning:
                     f = factors.get(s, 1.0)
                     for k, (lv, lw) in enumerate(lowmass, start=1):
                         h.SetBinContent(k, h.GetBinContent(k) + f * lv)
-                        if f > 0:
-                            h.SetBinError(k, float(np.sqrt(h.GetBinError(k) ** 2 + lw)))
+                        h.SetBinError(
+                            k, float(np.sqrt(h.GetBinError(k) ** 2 + f * f * lw))
+                        )
                 h.Write()
                 h.Delete()
+
+
+def _run_mass(args):
+    card, era, cfg, input_dir, output_dir, mass = args
+    return Binning(card, era, cfg, input_dir, output_dir).run_mass(mass)
 
 
 def main():
@@ -688,6 +750,12 @@ def main():
         default="",
         help="comma-separated subset of the card's masses (tests)",
     )
+    ap.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="masses processed in parallel, one process each (match the job's CPUs)",
+    )
     args = ap.parse_args()
 
     card = Card(args.config, args.era)
@@ -701,7 +769,7 @@ def main():
         args.output,
     )
     os.makedirs(args.output, exist_ok=True)
-    binning.run()
+    binning.run(args.jobs)
 
 
 if __name__ == "__main__":
