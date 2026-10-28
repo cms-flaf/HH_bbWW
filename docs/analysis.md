@@ -30,6 +30,11 @@ The HH mass is reconstructed with **DeepHME** (the bb̄WW counterpart to SVfit i
 of the observable computation and requires no special command — it runs as part of the standard
 producer chain.
 
+DeepHME and the DNN producers run their ONNX models with one thread per session
+(`FLAF.Common.OnnxSession`), so their outputs do not depend on the core count of the batch node.
+They still differ in the last digits between `x86_64-v3` and `x86_64-v4` nodes: compare them with a
+tolerance ([NN outputs and the CPU of the node](https://cms-flaf.github.io/FLAF/concepts/environment/#nn-outputs-and-the-cpu-of-the-node)).
+
 ## Stored gen-level t̄t information
 
 Processes with `genInfo: [ TT ]` store, next to the usual observables:
