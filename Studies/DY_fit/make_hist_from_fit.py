@@ -172,8 +172,8 @@ def fill_th2(name, title, x_edges, y_edges, Z, Zerr=None):
     ny = len(y_edges) - 1
     h = ROOT.TH2D(name, title, nx, x_edges.astype(float), ny, y_edges.astype(float))
     h.SetDirectory(0)
-    # main() runs this with the output file current, which then owns the new histogram,
-    # not PyROOT; detached, it would be owned by nobody, never freed
+    # main() runs this with a directory of the output file current, which then owns the
+    # new histogram, not PyROOT; detached, it would be owned by nobody, never freed
     ROOT.SetOwnership(h, True)
     for ix in range(nx):
         for iy in range(ny):

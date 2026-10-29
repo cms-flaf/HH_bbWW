@@ -2,13 +2,13 @@
 """The histograms that the Studies scripts read, clone, rebin or project must be freed.
 
 PyROOT does not own what TDirectory::Get, TH1::Clone, TH1::Rebin(n, newname, ...) and
-TH2::ProjectionY return, nor a histogram constructed while a file is the current directory,
-and SetDirectory(0) does not give it back: detached, such a histogram was owned by nobody and
-stayed allocated until the job ended. The functions are called as the scripts call them: the
-DY_fit loaders and projections with gROOT current, make_hist_from_fit.fill_th2 with the output
-file current, DNN_Limit_Condor.RebinShape under its TH1.AddDirectory(False). The live
-histograms are counted with ROOT's object table, which counts only the objects made after it is
-switched on, so the calls run in a child process that switches it on first.
+TH2::ProjectionY return, nor a histogram constructed while a file directory is current, and
+SetDirectory(0) does not give it back: detached, such a histogram would be owned by nobody and
+stay allocated until the job ends. The functions are called as the scripts call them: the
+DY_fit loaders and projections with gROOT current, make_hist_from_fit.fill_th2 with a directory
+of the output file current, DNN_Limit_Condor.RebinShape under its TH1.AddDirectory(False). The
+live histograms are counted with ROOT's object table, which counts only the objects made after
+it is switched on, so the calls run in a child process that switches it on first.
 
 Studies/DY_fit is published from HH_bbWW_dev (hh_bbww/share), where a change to it is made.
 Needs ROOT: run inside the analysis environment (source env.sh).

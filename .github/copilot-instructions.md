@@ -140,7 +140,7 @@ Where it goes:
 
 ## Repository facts
 
-Verified 2026-10-23; re-check before relying on any of it.
+Verified 2026-10-23 (Tests row 2026-10-29); re-check before relying on any of it.
 
 | | |
 |---|---|
