@@ -161,10 +161,13 @@ def GetMuWeight(lep_index):
 
 
 def GetTriggerWeight():
-    weight_MuTrg = f"(lep1_legType == static_cast<int>(Leg::mu) ? weight_lep1_TrgSF_singleIsoMu_Central : 1.0)"
-    weight_EleTrg = f"(lep1_legType == static_cast<int>(Leg::e) ? weight_lep1_TrgSF_singleEleWpTight_Central : 1.0)"
-
-    return f"{weight_MuTrg} * {weight_EleTrg}"
+    # The SF of the one lepton chosen by trgSF_lep (defineLeptonPreselection). A lepton's
+    # branch of the other flavour's path is 1, so the product is its own SF.
+    sf = {
+        lep: f"weight_{lep}_TrgSF_singleIsoMu_Central * weight_{lep}_TrgSF_singleEleWpTight_Central"
+        for lep in ["lep1", "lep2"]
+    }
+    return f"(trgSF_lep == 1 ? ({sf['lep1']}) : trgSF_lep == 2 ? ({sf['lep2']}) : 1.0)"
 
 
 class DataFrameBuilderForHistograms(DataFrameBuilderBase):
@@ -219,17 +222,22 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("recovery", "resolved && !res2b && bjet1_isBTagged")
 
     def defineLeptonPreselection(self):
+        # The offline thresholds of the single-lepton trigger match (offline_obj of
+        # singleEleWpTight and singleIsoMu in config/<era>/triggers.yaml): 32 GeV for an
+        # electron, 26 GeV for a muon. Single_lep_trg already requires a matched lepton above
+        # them, so this is not an extra cut; it is kept explicit for when dilepton triggers,
+        # with lower thresholds, are added.
         self.df = self.df.Define(
             "leadingleppT_ele",
             "((lep1_legType == 1 && lep1_pt  > 32 ) || (lep2_legType == 1 && lep2_pt  > 32))",
         )
         self.df = self.df.Define(
             "leadingleppT_Mu",
-            "((lep1_legType == 2 && lep1_pt  > 25 ) || (lep2_legType == 2 && lep2_pt  > 25))",
+            "((lep1_legType == 2 && lep1_pt  > 26 ) || (lep2_legType == 2 && lep2_pt  > 26))",
         )
         self.df = self.df.Define(
             "leadingleppT", "(leadingleppT_ele || leadingleppT_Mu)"
-        )  # 32 need to be changed to 25 for DL channel once Double lepton trigger SF are integrated
+        )
         self.df = self.df.Define(
             "subleadleppT", "(lep2_legType < 1 || (lep1_pt > 10 && lep2_pt > 10))"
         )
@@ -244,11 +252,28 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             ((lep2_legType != 2) || (lep2_Muon_pfRelIso04_all < 0.15))
             """,
         )
+        # A lepton is trigger-matched when it fired the single-lepton path of its flavour and is
+        # matched to that path's HLT object (which also requires the offline threshold).
+        for lep in ["lep1", "lep2"]:
+            self.df = self.df.Define(
+                f"{lep}_isTrgMatched",
+                f"(HLT_singleIsoMu && {lep}_legType == 2 && {lep}_HasMatching_singleIsoMu) || "
+                f"(HLT_singleEleWpTight && {lep}_legType == 1 && {lep}_HasMatching_singleEleWpTight)",
+            )
         self.df = self.df.Define(
-            "Single_lep_trg",
+            "Single_lep_trg", "lep1_isTrgMatched || lep2_isTrgMatched"
+        )
+        # The lepton whose trigger SF the event carries (GetTriggerWeight and the trigger
+        # variations of config/<era>/weights.yaml): the matched one; if both are matched, the
+        # muon in eMu and the higher-pT lepton in ee and mumu (lep1 on a tie). 0 if neither.
+        self.df = self.df.Define(
+            "trgSF_lep",
             """
-            (HLT_singleIsoMu && lep1_legType == 2 && lep1_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep1_legType == 1 && lep1_HasMatching_singleEleWpTight) ||
-            (HLT_singleIsoMu && lep2_legType == 2 && lep2_HasMatching_singleIsoMu) || (HLT_singleEleWpTight && lep2_legType == 1 && lep2_HasMatching_singleEleWpTight)
+            !lep1_isTrgMatched && !lep2_isTrgMatched ? 0 :
+            !lep2_isTrgMatched ? 1 :
+            !lep1_isTrgMatched ? 2 :
+            lep1_legType != lep2_legType ? (lep1_legType == 2 ? 1 : 2) :
+            (lep1_pt >= lep2_pt ? 1 : 2)
             """,
         )
         self.df = self.df.Define(
