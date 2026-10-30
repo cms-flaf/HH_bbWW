@@ -602,10 +602,20 @@ class Binning:
             last = (0, hi)
             while not passes(*last):
                 if not bins:
-                    raise RuntimeError(
-                        f"{channel}/{directory} MX={mass}: the whole window fails the "
-                        f"gates: {failure(0, nb - 1)}"
+                    why = failure(0, nb - 1)
+                    if "< 0" in why:
+                        # a negative background cannot be written, at any binning
+                        raise RuntimeError(
+                            f"{channel}/{directory} MX={mass}: the whole window fails "
+                            f"the gates: {why}"
+                        )
+                    # too few events for any finer binning: the window is one bin
+                    print(
+                        f"WARNING: {channel}/{directory} MX={mass}: the whole window "
+                        f"fails the gates ({why}); it is one bin",
+                        flush=True,
                     )
+                    break
                 last = (0, bins.pop()[1])
             bins.append(last)
         bins.sort()
