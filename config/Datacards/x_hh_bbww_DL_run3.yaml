@@ -756,14 +756,17 @@ campaigns:
   Run3_2023: "2023preBPix"
   Run3_2023BPix: "2023postBPix"
 
+# One set per spin hypothesis, named and labelled with it: this card is spin-0 (radion), its
+# twin x_hh_bbww_DL_run3_spin2.yaml spin-2 (bulk graviton); each compares with the Run 2 DL
+# expected limit of its own spin (HIG-21-005 cards, recomputed: run2_spin*_DL_external_limits.json).
 limit_plots:
-  - name: run3_vs_run2
+  - name: spin0_run3_vs_run2
     # Draw 1/2 sigma bands
     bands: true
     datacards:
-      - { name: "Early Run 3", glob: "*.txt" }
+      - { name: "Early Run 3 spin-0 (radion)", glob: "*.txt" }
     lumi_projections:
-      - name: "Early Run 3 scaled to 138 fb^{-1}"
+      - name: "Early Run 3 spin-0 scaled to 138 fb^{-1}"
         lumi_target: 138
     external_limits:
       - config/Datacards/run2_spin0_DL_external_limits.json
@@ -775,9 +778,9 @@ limit_plots:
       y_min: 0.001
       y_max: 100
 
-  - name: channels
+  - name: spin0_channels
     datacards:
-      - { name: "Combined", glob: "*.txt" }
+      - { name: "Combined spin-0 (radion)", glob: "*.txt" }
       - { name: "ee", glob: "${ERA}/eE/*.txt" }
       - { name: "e#mu", glob: "${ERA}/eMu/*.txt" }
       - { name: "#mu#mu", glob: "${ERA}/muMu/*.txt" }
@@ -785,9 +788,9 @@ limit_plots:
       - config/Datacards/run2_spin0_DL_external_limits.json
     plot_params: *limit_plot_style
 
-  - name: categories
+  - name: spin0_categories
     datacards:
-      - { name: "Combined", glob: "*.txt" }
+      - { name: "Combined spin-0 (radion)", glob: "*.txt" }
       # each jet category with its own control regions (SR_res2b + TT_res2b + DY_res2b: dhi
       # combines the cards of one mass), which fix the rateParams the SR shares
       - { name: "res 2b", glob: "${ERA}/categories/*_res2b/*.txt" }
