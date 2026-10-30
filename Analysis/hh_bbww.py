@@ -742,11 +742,12 @@ def defineJetSelections(df, isData, era="Run3_2023BPix"):
         score_branch = "btagPNetB"
         bTagWP = WorkingPointsParticleNet[era]["Medium"]
     if id_branch is not None:
+        # Medium WP, as the score path below: idbtag = (> Loose) + (> Medium) + (> Tight)
         df = df.Define(
-            "bjet1_isBTagged", f"bjet1_isValid ? BJet_{id_branch}[0] >= 1 : 0"
+            "bjet1_isBTagged", f"bjet1_isValid ? BJet_{id_branch}[0] >= 2 : 0"
         )
         df = df.Define(
-            "bjet2_isBTagged", f"bjet2_isValid ? BJet_{id_branch}[1] >= 1 : 0"
+            "bjet2_isBTagged", f"bjet2_isValid ? BJet_{id_branch}[1] >= 2 : 0"
         )
     else:
         df = df.Define(
