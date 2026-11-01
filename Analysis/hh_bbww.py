@@ -311,7 +311,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("SR_mbb", f"ll_mass < 70 && OS_Iso && mbb_SR")
         self.DefineAndAppend("TT_CR", f"ll_mass > 110 && OS_Iso")
         self.DefineAndAppend("DY_CR", f"(abs(ll_mass - 91.1876) < 10) && OS_Iso")
-        self.DefineAndAppend("W_CR", f"lep1_MT > 50 && Iso")
+        self.DefineAndAppend("W_CR", f"lep1_MT > 50 && OS_Iso")
 
         SL_CR_active = False
         for QCDReg in self.config["QCDRegions"]:
