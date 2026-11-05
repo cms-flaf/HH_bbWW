@@ -159,9 +159,10 @@ corrections: &corrections_default
     branch: genTop_pt
     parameterization: data_nlo
   # PDF (103 members) and QCD scale (8 muR/muF points): their weights.yaml norm entries have one
-  # weight per member, reduced per bin and per physics-model process in HistMerger (Hessian with
-  # alpha_s; 7-point envelope). The members are self-normalised, so the *_shape_* nuisances are
-  # shape + acceptance only; the rates stay in the datacard lnN terms.
+  # weight per member, and HistMerger writes every member histogram per physics-model process.
+  # The datacard step reduces them to Up/Down (Hessian with alpha_s; 7-point envelope). The
+  # members are self-normalised, so the *_shape_* nuisances are shape + acceptance only; the
+  # rates stay in the datacard lnN terms.
   pdf:
     stages: [ AnaTuple, AnaTupleMerge ]
     branch: LHEPdfWeight

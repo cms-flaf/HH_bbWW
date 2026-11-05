@@ -40,11 +40,9 @@ norm:
   qcd_scale:
     expression: weight_base_qcd_scale{scale}_rel * final_weight
     name: QCDscale_shape_{process}_{}
-    reduction: envelope
   pdf:
     expression: weight_base_pdf{scale}_rel * final_weight
     name: pdf_shape_{process}_{}
-    reduction: hessian
 
 shape:
   JER:
