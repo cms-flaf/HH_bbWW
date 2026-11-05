@@ -84,13 +84,6 @@ norm:
     expression: weight_base_fsr{scale}_rel * final_weight
     name: ps_fsr_{}
 
-  # Theory uncertainties on the shapes: one weight per member (8 QCD-scale points, 103 PDF
-  # members), reduced to Up/Down per bin by HistMergerFromHists once the datasets of a process
-  # are summed (FLAF Common/TheoryUncertainties.py): the 7-point envelope, and the Hessian sum
-  # with alpha_s. The members are normalised to their own total, so these are shape and
-  # acceptance only; the rates stay with the inclusive QCD_scale_* / PDF_alphas lnN of the
-  # datacards, so these are named *_shape_*. Filled for every variable, with one nuisance per
-  # process of the physics model (each DY mass range, each signal mass point).
   qcd_scale:
     expression: weight_base_qcd_scale{scale}_rel * final_weight
     name: QCDscale_shape_{process}_{}
