@@ -1115,8 +1115,8 @@ histTuple_flavors:
       - DeepHME_mass
       - CosThetaStar_HH
 
-      # Limit inputs at the CI's MX=300: CI_card_SL.yaml reads the binary score,
-      # CI_card.yaml the DNN-vs-HME plane.
+      # Limit inputs at the CI's MX=300: the CI_SL card (CI/CI_card_SL.yaml) reads the
+      # binary score, the CI_DL card (CI/CI_card_DL.yaml) the DNN-vs-HME plane.
       - TwoStageDNN_M300_binary
       - DNN_M300_Signal
       - name: DNN_m300_vs_HME
@@ -1445,7 +1445,12 @@ histTuple_flavors:
       #   vars: [ TwoStageDNN_M2000_binary, DeepHME_mass ]
 
 StatInference:
-  config: config/Datacards/x_hh_bbww_DL_run3.yaml
+  # The cards to build, by name: each gets its own datacards, limits and plots, under
+  # Datacards/<card>/<era>/, ResonantLimitsTask/<card>/, ... The limit and plot tasks take
+  # --card <name>, or run every card. `config:` instead of `cards:` builds a single card file.
+  cards:
+    DL_spin0: config/Datacards/DL/dl_spin0.yaml
+    DL_spin2: config/Datacards/DL/dl_spin2.yaml
   # hist_bins is unset: the shapes reaching the datacard step are already at their final
-  # binning, cut by the `preprocess:` step the datacard configuration declares.
+  # binning, cut by the `preprocess:` step the cards declare.
   # param_values: [ 300 ]

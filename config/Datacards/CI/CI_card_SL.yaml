@@ -1,0 +1,49 @@
+# The CI single-lepton card. What it shares with the other CI card is in CI_common.yaml.
+include:
+  - CI_common.yaml
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  # The binary score of the two-stage single-lepton DNN, 1D.
+  input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
+channels:
+  - e
+  - mu
+# The single-lepton CI card. The datacard categories keep their own names and are read
+# through input_categories from OS_Iso -- for one lepton "isolated + event selection", i.e.
+# the analysis's SR_SL without its DNN signal-class requirement and tau veto -- for the reason
+# the DL card reads OS_Iso: at --test 1000 statistics SR_SL itself leaves channel x category
+# bins with no background at all (the first integration run of this card failed on an empty
+# asimov data_obs in e/SR/recovery). SR_SL is still produced (ci_custom.yaml QCDRegions), so
+# the two-stage DNN's regions stay exercised. (Before #191 each mass had its own
+# SR_SL_M${MX} and this mapping was per mass, StatInference#24.)
+categories:
+  - SR/res2b
+  - SR/recovery
+input_categories:
+  SR/res2b: OS_Iso/res2b
+  SR/recovery: OS_Iso/recovery
+
+# One bin per channel and category, for the reason CI_card_DL.yaml gives: at --test
+# statistics a per-bin distribution is mostly empty or negative. No preprocess step --
+# the maker rebins, which leaves the rebinning out of what this card tests. The binary
+# score is saved as a logit (TwoStageDNN binary_output save_as: logit, histogrammed over
+# -23.5:23.5 in config/plot/histograms.yaml), so the one bin spans that whole range: the
+# old [ 0, 1 ] of the probability score kept only logits 0-1 and dropped the rest.
+hist_bins: [ -23.5, 23.5 ]
+processes:
+  # The one-lepton CI signal (custom_CI_Signal_SL); the two-lepton one is DL-only.
+  - process: XtoHHto2B2W_1L_${MX}
+    hist_name: XtoHHto2B2W_1L_${MX}
+    param_values: [ 300 ]
+    is_signal: true
+    # at --test statistics a channel x category can hold no 1L signal event
+    allow_zero_integral: true
+  # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
+  # and plotted by the integration test, but it is not valid input for a limit here: it is an
+  # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
+  # events for them to cancel — the single-bin histogram came out -1669 +/- 2817, compatible
+  # with zero at 0.6 sigma but negative, which makes the datacard job flaky by construction.
+  # The CI t#bar{t} is TTto2L2Nu + TTtoLNu2Q; at --test statistics a category can still be empty.
+  - process: custom_CI_Background_TT
+    allow_zero_integral: true
