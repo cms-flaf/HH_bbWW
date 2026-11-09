@@ -32,13 +32,22 @@ input_categories:
 # old [ 0, 1 ] of the probability score kept only logits 0-1 and dropped the rest.
 hist_bins: [ -23.5, 23.5 ]
 processes:
-  # The one-lepton CI signal (custom_CI_Signal_SL); the two-lepton one is DL-only.
+  # The one-lepton CI signal (custom_CI_Signal_SL), and the two-lepton one (custom_CI_Signal),
+  # as the SL cards hold the 2L bbWW signal and the DL cards the 1L one.
   - process: XtoHHto2B2W_1L_${MX}
     hist_name: XtoHHto2B2W_1L_${MX}
     param_values: [ 300 ]
     is_signal: true
     # at --test statistics a channel x category can hold no 1L signal event
     allow_zero_integral: true
+  - process: XtoHHto2B2W_2L_${MX}
+    hist_name: XtoHHto2B2W_2L_${MX}
+    param_values: [ 300 ]
+    is_signal: true
+    # a dilepton event selected with one lepton: few at --test statistics
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
   # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
   # and plotted by the integration test, but it is not valid input for a limit here: it is an
   # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few

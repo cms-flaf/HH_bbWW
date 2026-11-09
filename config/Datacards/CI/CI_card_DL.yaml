@@ -36,6 +36,16 @@ processes:
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
     param_values: [ 300 ]
     is_signal: true
+  # The one-lepton CI signal too, as the DL cards hold the 1L bbWW signal; it reaches the
+  # dilepton channels only through a non-prompt or misidentified lepton, so at --test
+  # statistics most channel x category bins hold none of it.
+  - process: XtoHHto2B2W_1L_${MX}
+    hist_name: XtoHHto2B2W_1L_${MX}
+    param_values: [ 300 ]
+    is_signal: true
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
   # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
   # and plotted by the integration test, but it is not valid input for a limit here: it is an
   # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
