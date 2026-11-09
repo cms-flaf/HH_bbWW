@@ -533,12 +533,13 @@ region_default: SR
 custom_regions: QCDRegions
 
 # Window sets for window regions (FLAF Common/WindowRegions.py): a histTuple flavour's
-# `window_regions` makes regions <region>_<set>Win_m<MX>, the base region with the window of
-# mass MX on `variable`, per category as the definitions give it. The edges must be bin edges of
-# the variable's binning (histograms.yaml); the cut is made on its stored bin index.
+# `window_regions` makes regions <region>_<set>Win_m<MX>, the base region within the window of
+# mass MX, per category as the definitions give it: a box {<variable>: [low, high], ...} over the
+# set's `variables`. The edges must be bin edges of each variable's binning (histograms.yaml); the
+# cut is made on the stored bin indices.
 windows:
   HME:
-    variable: DeepHME_mass
+    variables: [ DeepHME_mass ]
     definitions: config/windows/hme_DL_v2610.yaml
 
 custom_categories: ""
