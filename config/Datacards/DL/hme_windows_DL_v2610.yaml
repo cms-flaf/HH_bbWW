@@ -1,7 +1,8 @@
-# Frozen HME windows for the DL channel, v2610 (decided 2026-10-16).
+# Frozen HME windows for the DL channel, v2610 (decided 2026-10-16, on the four eras of Run3_22_23, then still
+# named Run3_Early).
 #
 # Definition: straight-line fits HME_cut = a + b * MX to the HME windows that maximise S/sqrt(B_TT) with >= 95% of
-# the category's signal (Run3_Early, spin 0 bbWW 2l + bbtautau, eE+muMu+eMu, signal and TT summed over the DNN):
+# the category's signal (Run3_22_23, spin 0 bbWW 2l + bbtautau, eE+muMu+eMu, signal and TT summed over the DNN):
 #   res2b    low  = 98.1200 + 0.538263 * MX   (fit to MX 250-1500)
 #            high = -18.9189 + 1.378378 * MX   (fit to MX 250, 260, 270, 280, 300, where the high cut is
 #                   constrained; extrapolated above)
@@ -18,7 +19,7 @@ fits:
   recovery: { low: [ 98.1200, 0.538263 ], high: [ -18.9189, 1.378378 ] }  # = res2b
   boosted: { low: [ 64.2077, 0.685021 ], high: [ 135.9084, 1.109257 ] }
 # windows[MX][category] = [low, high] in GeV, on the stored grid; signal_fraction = share of that category's
-# signal inside the window (Run3_Early, spin 0).
+# signal inside the window (Run3_22_23, spin 0).
 windows:
   250: { res2b: [ 230, 330 ], recovery: [ 230, 330 ], boosted: [ 230, 420 ] }
   260: { res2b: [ 230, 340 ], recovery: [ 230, 340 ], boosted: [ 240, 430 ] }

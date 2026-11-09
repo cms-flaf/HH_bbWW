@@ -75,7 +75,7 @@ Two networks consume that grid, and they do not cover the same part of it:
 
 - the **dilepton DNN** is parametric — one model per fold, evaluated at whatever masses
   `DNN.columns` in `config/global.yaml` asks for. It is configured over the produced points up to
-  1.5 TeV, and the datacard `param_values` in `config/Datacards/x_hh_bbww_DL_run3.yaml` follow
+  1.5 TeV, and the datacard `param_values` in `config/Datacards/DL/dl_spin{0,2}.yaml` follow
   the same 25 points. The four lowest of them, 250 to 280 GeV, are below the lowest
   `signal_mass_points` of the models currently in `config/DNN/DoubleLepton_Parametric_*_v1`, so
   those scores extrapolate and stay provisional until the network is retrained over this grid.

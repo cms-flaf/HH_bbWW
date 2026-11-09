@@ -23,6 +23,7 @@ import argparse
 import json
 import multiprocessing
 import os
+import sys
 from concurrent.futures import ProcessPoolExecutor
 from string import Template
 
@@ -36,6 +37,11 @@ from DYTemplate import fit_template, lowmass_boost_shape, tail_template
 ROOT.gROOT.SetBatch(True)
 # config/... paths are relative to the analysis area this script belongs to
 ANALYSIS_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The datacard configuration is read through StatInference's loader, so a card that
+# includes shared files (config/Datacards/DL/dl_spin0.yaml) also reads merged when this
+# script is run by hand; PreprocessShapesTask already hands it the merged card.
+sys.path.insert(0, ANALYSIS_PATH)
+from StatInference.common.card_config import load_card_config  # noqa: E402
 
 
 def analysis_file(path):
@@ -100,8 +106,7 @@ class Card:
     """What the binning needs from the datacard configuration."""
 
     def __init__(self, path, era):
-        with open(path) as f:
-            cfg = yaml.safe_load(f)
+        cfg = load_card_config(path)
         self.eras = cfg.get("era_groups", {}).get(era, [era])
         self.channels = cfg["channels"]
         mapping = cfg.get("input_categories") or {}
@@ -780,30 +785,35 @@ class Binning:
             for e in card.eras
         }
         out = {}
-        for e in card.eras:
-            path = os.path.join(self.output_dir, card.input_file(e, mass))
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            out[e] = ROOT.TFile(path, "RECREATE")
         reached = {}
-        for channel in card.channels:
-            for category, directory in card.categories.items():
-                per_era, bins, edges, factors, lowmass_by_era = self.bin_window(
-                    mass, channel, category, directory, files
-                )
-                reached[f"{channel}/{category}"] = len(bins)
-                for e, procs in per_era.items():
-                    self.write(
-                        out[e].mkdir(f"{channel}/{directory}", "", True),
-                        procs,
-                        bins,
-                        edges,
-                        factors,
-                        lowmass_by_era.get(e),
-                        self.lowmass["output"] if self.lowmass else None,
+        try:
+            for e in card.eras:
+                path = os.path.join(self.output_dir, card.input_file(e, mass))
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                out[e] = ROOT.TFile(path, "RECREATE")
+            for channel in card.channels:
+                for category, directory in card.categories.items():
+                    per_era, bins, edges, factors, lowmass_by_era = self.bin_window(
+                        mass, channel, category, directory, files
                     )
-        for f in out.values():
-            f.Close()
-        self.pooled.clear()
+                    reached[f"{channel}/{category}"] = len(bins)
+                    for e, procs in per_era.items():
+                        self.write(
+                            out[e].mkdir(f"{channel}/{directory}", "", True),
+                            procs,
+                            bins,
+                            edges,
+                            factors,
+                            lowmass_by_era.get(e),
+                            self.lowmass["output"] if self.lowmass else None,
+                        )
+        finally:
+            # outputs and inputs alike: with --jobs 1 every mass runs in this one process
+            for f in out.values():
+                f.Close()
+            for f in files.values():
+                f.close()
+            self.pooled.clear()
         print(f"MX={mass}: bins per window {json.dumps(reached)}", flush=True)
         return self.record.get(str(mass), {})
 
