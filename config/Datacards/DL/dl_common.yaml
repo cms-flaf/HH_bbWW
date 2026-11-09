@@ -1,8 +1,9 @@
 # HH->bbWW DL resonant datacards: everything the spin-0 and spin-2 cards share.
 #
-# Not a card on its own. The cards dl_spin0.yaml and dl_spin2.yaml include it and add
-# what differs between the spins: the signal processes, their branching-ratio
-# uncertainties and the limit plots. Merging is strict (StatInference/common/card_config.py):
+# Not a card on its own. The cards dl_spin0.yaml and dl_spin2.yaml include it, together with
+# the uncertainties shared with the SL cards (../systematics.yaml), and add what differs
+# between the spins: the signal processes, their branching-ratio uncertainties and the limit
+# plots. Merging is strict (StatInference/common/card_config.py):
 # a top-level key is set in one file only, and an entry of `processes`, `uncertainties`,
 # `limit_plots` or `impact_plots` is defined once -- anything set twice is an error, never
 # an override. So a setting that differs between the spins goes in both spin cards and
