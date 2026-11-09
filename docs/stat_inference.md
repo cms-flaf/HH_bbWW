@@ -63,11 +63,24 @@ processes and uncertainties; the chain reads them from there, not from `global.y
 own variable lists. Each card gets its own datacards, limits and plots, under
 `Datacards/<card>/<era>/`, `ResonantLimitsTask/<card>/` and so on.
 
-What the spins share is in `DL/dl_common.yaml`, which both cards `include:`. The merge is
+The cards are built from shared files, each card listing the ones it uses under `include:`:
+
+```
+config/Datacards/
+  systematics.yaml          object-level experimental uncertainties, shared by DL and SL
+  DL/dl_common.yaml         everything else the DL spin cards share
+  DL/dl_spin{0,2}.yaml      include ../systematics.yaml and dl_common.yaml; add the signals,
+                            their BR uncertainties and the limit plots
+  SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
+  SL/sl_spin{0,2}.yaml
+```
+
+Includes do not nest, which is why each card lists both shared files. The merge is
 strict: a top-level setting is made in one file only, and an entry of `processes`,
 `uncertainties`, `limit_plots` or `impact_plots` is defined once — anything set twice
 stops the chain with an error naming both files, never an override. A setting that
-differs between the spins therefore lives in each spin card, not in the shared file.
+differs between the spins therefore lives in each spin card, and one that differs between DL
+and SL in that channel's common file, not in `systematics.yaml`.
 Include paths are relative to the including file. To see a card as the chain reads it:
 
 ```bash

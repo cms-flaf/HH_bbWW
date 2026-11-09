@@ -1,0 +1,108 @@
+# HH->bbWW SL resonant datacards: everything the spin-0 and spin-2 SL cards share.
+#
+# SKELETON: the structure of the SL cards, laid out as the DL ones (DL/dl_common.yaml). It is
+# not in global.yaml's StatInference `cards:` and has not been built or validated; binning,
+# backgrounds and SL-specific uncertainties are placeholders to be replaced when the SL inputs
+# are final. The previous single-file SL card, x_hh_bbww_SL_run3.yaml, is kept for reference.
+#
+# Not a card on its own. The cards sl_spin0.yaml and sl_spin2.yaml include it, together with the
+# uncertainties shared with DL (../systematics.yaml), and add what differs between the spins:
+# the signal processes, their branching-ratio uncertainties and the limit plots. Merging is strict
+# (StatInference/common/card_config.py): a top-level key is set in one file only, and an entry of
+# `processes`, `uncertainties`, `limit_plots` or `impact_plots` is defined once -- anything set
+# twice is an error, never an override.
+# ${MX} and ${ERA} are filled by StatInference.
+analysis: hh_bbww
+type: resonant
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  # The binary score of the two-stage SL DNN (a logit, -23.5:23.5), parametrised in the mass. 1D.
+  input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
+signalFractionForRelevantBins: 0.2
+# As for DL: one card on the four datasets combined.
+eras:
+  - Run3_22_23
+era_groups:
+  Run3_22_23:
+    - Run3_2022
+    - Run3_2022EE
+    - Run3_2023
+    - Run3_2023BPix
+channels:
+  - e
+  - mu
+# One datacard category per jet category of the SL signal region, named without "/" as DL's are;
+# input_categories maps each to its directory in the histogram files: the mass-independent SR_SL
+# of the two-stage DNN's multiclass (cms-flaf/HH_bbWW#191). Control regions (CR_SL_<class>)
+# would follow the same pattern.
+categories:
+  - SR_res2b
+  - SR_recovery
+  - SR_boosted
+input_categories:
+  SR_res2b: SR_SL/res2b
+  SR_recovery: SR_SL/recovery
+  SR_boosted: SR_SL/boosted
+
+# No `preprocess:` step yet: the shapes are read as produced. A binning step for the binary
+# score goes here, as DL's EqualSignalBinning.py does for DL.
+
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+
+  # Placeholder backgrounds (those of the previous SL card); to be fixed with the SL merging.
+  - process: TT
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: W
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: ST
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: DY
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+  - process: VV
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+  - process: H
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+
+# SL-specific uncertainties (process theory and normalisations of the SL backgrounds, SL control
+# regions, ...). The object-level experimental ones shared with DL are in ../systematics.yaml.
+uncertainties: [ ]
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+
+campaigns:
+  Run3_22_23: run3_early
+  Run3_2022: "2022preEE"
+  Run3_2022EE: "2022postEE"
+  Run3_2023: "2023preBPix"
+  Run3_2023BPix: "2023postBPix"
+
+impact_plots:
+  - name: combined
+    masses: [ 300, 600, 800 ]
+    poi_value: limit
+    fit_args:
+      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+    plot_params:
+      method: default
+      order_by_impact: true
+      mc_stats: false

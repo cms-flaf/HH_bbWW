@@ -1,0 +1,72 @@
+# HH->bbWW SL resonant datacards, spin-0 (radion) signal hypothesis. SKELETON, see sl_common.yaml.
+# Everything but the signal processes, their branching-ratio uncertainties and the limit
+# plots is in sl_common.yaml (SL) and ../systematics.yaml (DL and SL), shared with the
+# spin-2 card sl_spin2.yaml.
+# ${MX} and ${ERA} are filled by StatInference.
+include:
+  - ../systematics.yaml
+  - sl_common.yaml
+
+processes:
+  # The spin-0 (radion) X->HH signal: the samples are split by the generated decay, not by
+  # channel, so the two-lepton sample contributes events that lose a lepton.
+  - process: GluGluToRadion_bbWW_1L_${MX}
+    hist_name: GluGluToRadion_bbWW_1L_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+  - process: GluGluToRadion_bbWW_2L_${MX}
+    hist_name: GluGluToRadion_bbWW_2L_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+  - process: GluGluToRadion_bbTauTau_${MX}
+    hist_name: GluGluToRadion_bbTauTau_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+
+uncertainties:
+  # Higgs branching ratios, as in the DL cards (values from
+  # https://gitlab.cern.ch/hh/naming-conventions#experimental-uncertainties). The process
+  # patterns are regexes matched against the mass-resolved signal names.
+  - name: BR_hbb
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbWW_1L_
+      - ^GluGluToRadion_bbWW_2L_
+      - ^GluGluToRadion_bbTauTau_
+    value: [ -0.0126, 0.0124 ]
+  - name: BR_hww
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbWW_1L_
+      - ^GluGluToRadion_bbWW_2L_
+    value: [ -0.0152, 0.0153 ]
+  - name: BR_htt
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbTauTau_
+    value: [ -0.0163, 0.0165 ]
+
+# No Run 2 SL reference in run2_external_limits.json yet (its SL entry is empty).
+limit_plots:
+  - name: spin0_channels
+    datacards:
+      - { name: "Combined spin-0 (radion)", glob: "*.txt" }
+      - { name: "e", glob: "${ERA}/e/*.txt" }
+      - { name: "#mu", glob: "${ERA}/mu/*.txt" }
+    plot_params: &limit_plot_style
+      xsec: pb
+      y_log: true
+      x_min: 200
+      x_max: 1500
+      y_min: 0.001
+      y_max: 100
+  - name: spin0_categories
+    datacards:
+      - { name: "Combined spin-0 (radion)", glob: "*.txt" }
+      - { name: "res 2b", glob: "${ERA}/categories/SR_res2b/*.txt" }
+      - { name: "recovery", glob: "${ERA}/categories/SR_recovery/*.txt" }
+      - { name: "boosted", glob: "${ERA}/categories/SR_boosted/*.txt" }
+    plot_params: *limit_plot_style
