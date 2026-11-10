@@ -1,14 +1,17 @@
 # Equal-signal binning of the DL fit inputs, v2610: read by Analysis/EqualSignalBinning.py, the
 # `preprocess:` step of the DL cards (DL/dl_common.yaml).
 #
-# Each datacard category is one frozen HME window (hme_windows_DL_v2610.yaml) of the 2D
-# DNN_m<MX>_vs_HME shapes, binned in the DNN score into bins of equal signal, from the top of the
-# score down. A bin is only closed once the backgrounds in it pass the gates below, so a window can
+# Each datacard category is one frozen HME window: FLAF's window region <region>_HMEWin_m<MX> of
+# the flavour Signal_Extraction_DL_window (windows in config/windows/hme_DL_v2610.yaml), where
+# DNN_M<MX>_Signal holds the events inside the window of MX. Its DNN score is binned into bins of
+# equal signal, from the top of the score down. A bin is only closed once the backgrounds in it pass the gates below, so a window can
 # end with fewer bins than its target; nothing is ever left negative or carried by one large-weight
 # event.
 
-# [low, high] HME window per mass and category, in GeV.
-windows: config/Datacards/DL/hme_windows_DL_v2610.yaml
+# The inputs are 1D, already inside the window. For the 2D DNN_m<MX>_vs_HME inputs instead
+# (flavour Signal_Extraction_DL, input_file_pattern ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+# and input_categories without the window regions), name the windows to cut out of them:
+# windows: config/windows/hme_DL_v2610.yaml
 
 # Target number of bins per window, the n <= 20 that maximises the expected sensitivity of a
 # TT-only fit (v2610 study). The gates may merge the lowest bins into fewer.

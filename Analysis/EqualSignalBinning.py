@@ -1,18 +1,26 @@
-"""Equal-signal binning of the 2D DNN x HME fit inputs inside fixed HME windows.
+"""Equal-signal binning of the DL fit inputs: the DNN score inside fixed HME windows.
 
 The `preprocess:` step of a datacard configuration (StatInference's PreprocessShapesTask calls
 it with --input, --output, --era and --config; the bins follow the card's signal). For every
-mass point and datacard category it
-cuts the category's HME window out of the 2D merged histograms, merges the merged-histogram
-processes into the card's backgrounds, and bins the DNN score inside the window into bins of
-equal signal, from the top of the score down. A bin is only closed once every background in it
-passes the gates of the binning configuration, for the nominal and for every variation.
+mass point and datacard category it takes the DNN score inside the category's HME window,
+merges the merged-histogram processes into the card's backgrounds, and bins the score into bins
+of equal signal, from the top of the score down. A bin is only closed once every background in
+it passes the gates of the binning configuration, for the nominal and for every Up/Down
+variation.
 
 Input:  <input>/<era>/<variable>/<variable>.root for every era of the card (the merged
-        histograms), with <channel>/<input category>/<process>[_<uncertainty>_Up|Down] 2D
-        histograms, DNN score on x and HME mass on y.
+        histograms), with <channel>/<input category>/<process>[_<variation>] histograms, either
+        - 1D in the DNN score, already inside the window: FLAF's window regions
+          (<region>_HMEWin_m<MX>/<category>, `input_categories` with ${MX}); or
+        - 2D, DNN score on x and HME mass on y, when the binning configuration names the
+          `windows` to cut out of them.
 Output: the same layout under <output>, 1D in the DNN score, one file per era of the card, and
         <output>/binning.json with the bins of every window.
+
+Member uncertainties of the card (StatInference/dc_make/member_reduction.py: QCD-scale points,
+PDF members) are carried to the output in the final bins, per member, for the datacard maker to
+reduce; they do not take part in the gates, which hold for the nominal and the Up/Down
+variations.
 
 What is merged, dropped and estimated, the windows, the gates and the target number of bins per
 window are all in the binning configuration (--binning-config); see
@@ -23,6 +31,7 @@ import argparse
 import json
 import multiprocessing
 import os
+import re
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from string import Template
@@ -42,6 +51,10 @@ ANALYSIS_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # script is run by hand; PreprocessShapesTask already hands it the merged card.
 sys.path.insert(0, ANALYSIS_PATH)
 from StatInference.common.card_config import load_card_config  # noqa: E402
+from StatInference.dc_make.member_reduction import MemberReduction  # noqa: E402
+
+# FLAF window regions are named <region>_<window set>Win_m<MX>
+WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+Win_m[0-9]+$")
 
 
 def analysis_file(path):
@@ -75,11 +88,12 @@ def window_mask(y_edges, low, high):
 
 
 def project(hist, mask):
-    """(values, variances) of a flow-inclusive 2D histogram summed over the masked y bins, the
-    x flows folded into the first and last bin."""
+    """(values, variances) of a flow-inclusive 2D histogram summed over the masked y bins (of a
+    1D histogram, with mask None, its own), the x flows folded into the first and last bin.
+    """
     out = []
     for arr in (hist.values(flow=True), hist.variances(flow=True)):
-        p = arr[:, mask].sum(axis=1)
+        p = arr if mask is None else arr[:, mask].sum(axis=1)
         q = p[1:-1].copy()
         q[0] += p[0]
         q[-1] += p[-1]
@@ -114,6 +128,19 @@ class Card:
         self.categories = {c: mapping.get(c, c) for c in cfg["categories"]}
         model = cfg["model"]
         self.param = model["parameters"][0]
+        # (name, MemberReduction, card processes it applies to) of every member uncertainty
+        self.member_uncs = []
+        for u in cfg.get("uncertainties") or []:
+            if isinstance(u, dict) and "members" in u:
+                procs = u.get("processes") or []
+                procs = [procs] if isinstance(procs, str) else list(procs)
+                self.member_uncs.append(
+                    (
+                        u["name"],
+                        MemberReduction.fromConfig(u["members"], u["name"]),
+                        procs,
+                    )
+                )
         self.pattern = model["input_file_pattern"]
         self.signals, self.backgrounds, self.data, masses = [], [], [], set()
         for p in cfg["processes"]:
@@ -134,6 +161,46 @@ class Card:
     def input_file(self, era, mass):
         return Template(self.pattern).substitute(ERA=era, **{self.param: mass})
 
+    def directories(self, mass):
+        """{card category: its directory in the input and output files} for one mass."""
+        return {
+            c: Template(d).substitute(**{self.param: mass})
+            for c, d in self.categories.items()
+        }
+
+    def member_suffixes(self, names, process):
+        """'_<variation>' of every member histogram of `process` among `names`; a member
+        histogram with {process} takes the merged-histogram process name (the signals').
+        """
+        out = set()
+        for unc_name, members, _ in self.member_uncs:
+            for m in members.all_members():
+                s = "_" + members.histogram_name(unc_name, process, m)
+                if process + s in names:
+                    out.add(s)
+        return out
+
+    def declared_member_suffixes(self, card_process):
+        """'_<variation>' of every member of the member uncertainties the card applies to
+        `card_process` (exact name or ^regex, as StatInference matches them), for those
+        named without {process}: the datacard maker reads them for that process in every
+        category, so they have to exist even where their own merged-histogram process
+        has no MC (dropped, or no events)."""
+        out = set()
+        for unc_name, members, procs in self.member_uncs:
+            if "{process}" in members.histogram:
+                continue
+            if procs and not any(
+                re.match(p, card_process) if p.startswith("^") else p == card_process
+                for p in procs
+            ):
+                continue
+            out |= {
+                "_" + members.histogram_name(unc_name, card_process, m)
+                for m in members.all_members()
+            }
+        return out
+
     def resolved(self, names, mass):
         return [Template(n).safe_substitute(**{self.param: mass}) for n in names]
 
@@ -147,7 +214,13 @@ class Binning:
             output_dir,
         )
         self.cfg = cfg
-        self.windows = yaml.safe_load(open(analysis_file(cfg["windows"])))["windows"]
+        # 2D inputs: the HME windows to cut out of them; 1D inputs are already windowed
+        self.windows = (
+            yaml.safe_load(open(analysis_file(cfg["windows"])))["windows"]
+            if cfg.get("windows")
+            else None
+        )
+        self.member_suffix_seen = set()  # member variations met, kept out of the gates
         self.n_bins = cfg["n_bins"]
         self.gates = dict(cfg["gates"])
         # A background holding at least exempt_fraction of its window's background has to hold at
@@ -193,8 +266,25 @@ class Binning:
 
     @staticmethod
     def region(directory):
-        """SR/res2b -> SR, TT_CR/res2b -> TT_CR."""
-        return directory.rsplit("/", 1)[0] if "/" in directory else ""
+        """SR/res2b -> SR, TT_CR/res2b -> TT_CR; a window region is its base region
+        (SR_HMEWin_m500/res2b -> SR)."""
+        region = directory.rsplit("/", 1)[0] if "/" in directory else ""
+        return WINDOW_REGION.sub("", region)
+
+    def window(self, mass, directory):
+        """The HME (low, high) window of a category for 2D inputs, None for 1D. A window
+        file in FLAF's box form ({DeepHME_mass: [low, high]}) gives its one variable's.
+        """
+        if self.windows is None:
+            return None
+        w = self.windows[mass][self.window_key(directory)]
+        if isinstance(w, dict):
+            if len(w) != 1:
+                raise ValueError(
+                    f"windows: a box over {sorted(w)} cannot cut a 2D histogram's y axis"
+                )
+            w = next(iter(w.values()))
+        return tuple(w)
 
     def lowmass_applies(self, directory):
         lm = self.lowmass
@@ -378,7 +468,17 @@ class Binning:
                 continue
             first = d[names[0]]
             x_edges = first.axes[0].edges()
-            mask = window_mask(first.axes[1].edges(), *window)
+            dims = len(first.axes)
+            if (window is None) != (dims == 1):
+                raise RuntimeError(
+                    f"{channel}/{directory}: {dims}D input histograms, but the binning "
+                    "configuration "
+                    + ("has no `windows`" if window is None else "has `windows`")
+                    + " (windows are for 2D inputs only)"
+                )
+            mask = (
+                None if window is None else window_mask(first.axes[1].edges(), *window)
+            )
             out[era] = {n: project(d[n], mask) for n in names}
         return out, x_edges
 
@@ -404,6 +504,10 @@ class Binning:
             if lowmass and proc == self.lowmass["output"]:
                 mc_members = [m for m in members if m != self.lowmass["process"]]
             suffixes = set().union(*(variation_suffixes(raw, m) for m in members))
+            for m in members:
+                found = self.card.member_suffixes(raw, m)
+                self.member_suffix_seen |= found
+                suffixes |= found
             zero = np.zeros_like(raw[members[0]][0])
             shapes = {}
             for s in [""] + sorted(suffixes):
@@ -412,6 +516,11 @@ class Binning:
                     sum((p[0] for p in parts), zero),
                     sum((p[1] for p in parts), zero),
                 )
+            # a member uncertainty declared for this process, whose own process has no
+            # MC here: the nominal, as for member_uncertainties below
+            for s in self.card.declared_member_suffixes(proc) - set(shapes):
+                shapes[s] = shapes[""]
+                self.member_suffix_seen.add(s)
             for unc, terms in self.member_uncs.items():
                 if not any(m in self.members[proc] for m, _ in terms):
                     continue  # not this process's uncertainty
@@ -427,7 +536,15 @@ class Binning:
                     y = shapes[""][0] + sum(v[k] * raw[m][0] for m, v in terms)
                     shapes[f"_{unc}_{direction}"] = (y, shapes[""][1])
             out[proc] = shapes
-        for name in self.card.resolved(self.card.signals, mass) + self.card.data:
+        for name in self.card.resolved(self.card.signals, mass):
+            if name in raw:
+                found = self.card.member_suffixes(raw, name)
+                self.member_suffix_seen |= found
+                out[name] = {
+                    s: raw[name + s]
+                    for s in [""] + sorted(variation_suffixes(raw, name) | found)
+                }
+        for name in self.card.data:
             if name in raw:
                 out[name] = {
                     s: raw[name + s]
@@ -494,7 +611,7 @@ class Binning:
 
     def bin_window(self, mass, channel, category, directory, files):
         key = self.window_key(directory)
-        window = self.windows[mass][key]
+        window = self.window(mass, directory)
         raw, x_edges = self.read(files, channel, directory, window)
         nb = len(x_edges) - 1
         lowmass = self.lowmass_applies(directory)
@@ -533,8 +650,8 @@ class Binning:
         if lowmass and lm_out in bkgs:
             lm = self.lowmass
             # the reference category of the same region, projected on THIS category's window
-            ref_dir = f"{self.region(directory)}/{lm['reference']}"
-            if ref_dir not in self.card.categories.values():
+            ref_dir = f"{directory.rsplit('/', 1)[0]}/{lm['reference']}"
+            if ref_dir not in self.card.directories(mass).values():
                 raise RuntimeError(
                     f"lowmass_dy: reference {ref_dir} of {directory} is not a datacard "
                     "category input"
@@ -617,6 +734,12 @@ class Binning:
                 y, w = y + f * lv, w + f * f * lw
             return y, w
 
+        # the gates hold for the nominal and the Up/Down variations; a member of a member
+        # uncertainty is not a variation on its own (the datacard maker reduces them)
+        gated = {
+            b: [s for s in suffixes[b] if s not in self.member_suffix_seen]
+            for b in bkgs
+        }
         g = self.gates
         totals = {b: get(b, "", 0, nb - 1)[0] for b in bkgs}
         exempt = {
@@ -639,7 +762,7 @@ class Binning:
                     y <= g["min_each"] or w <= 0 or y * y / w < g["min_each_neff"]
                 ):
                     return f"{b} {y:.3g}, N_eff {y * y / w if w > 0 else 0:.2f}"
-                for s in suffixes[b]:
+                for s in gated[b]:
                     yv, wv = get(b, s, i, j)
                     if yv < -1e-12:
                         return f"{b}{s} {yv:.3g} < 0"
@@ -652,7 +775,7 @@ class Binning:
             failure() can stop at an earlier gate, so its message does not say whether one is.
             """
             for b in bkgs:
-                for s in [""] + list(suffixes[b]):
+                for s in [""] + gated[b]:
                     y = get(b, s, i, j)[0]
                     if y < -1e-12:
                         return f"{b}{s} {y:.3g} < 0"
@@ -718,7 +841,14 @@ class Binning:
 
         self.record.setdefault(str(mass), {}).setdefault(channel, {})[category] = {
             "slices": [
-                {"y_range": [float(window[0]), float(window[1])], "edges": edges}
+                (
+                    {"edges": edges}
+                    if window is None
+                    else {
+                        "y_range": [float(window[0]), float(window[1])],
+                        "edges": edges,
+                    }
+                )
             ],
             "n_bins_target": n,
             "n_bins": len(bins),
@@ -792,7 +922,7 @@ class Binning:
                 os.makedirs(os.path.dirname(path), exist_ok=True)
                 out[e] = ROOT.TFile(path, "RECREATE")
             for channel in card.channels:
-                for category, directory in card.categories.items():
+                for category, directory in card.directories(mass).items():
                     per_era, bins, edges, factors, lowmass_by_era = self.bin_window(
                         mass, channel, category, directory, files
                     )

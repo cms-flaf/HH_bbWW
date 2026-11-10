@@ -266,10 +266,14 @@ unaffected.
 The DL cards (`DL/dl_spin0.yaml` and `DL/dl_spin2.yaml`, through their shared
 `DL/dl_common.yaml`) plug in `Analysis/EqualSignalBinning.py`. For every mass, channel and category it:
 
-- cuts the category's frozen HME window
-  ([`config/Datacards/DL/hme_windows_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/hme_windows_DL_v2610.yaml))
-  out of the 2D `DNN_m<MX>_vs_HME` histograms. The control regions use their jet category's
-  window, and events outside the window are dropped;
+- reads the DNN score `DNN_M<MX>_Signal` in the category's frozen HME window: FLAF's window
+  regions `<region>_HMEWin_m<MX>` of the flavour `Signal_Extraction_DL_window`
+  ([`config/windows/hme_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/windows/hme_DL_v2610.yaml)).
+  The control regions use their jet category's window, and events outside the window are not
+  in it. With `windows:` in the binning configuration it instead cuts the windows out of the 2D
+  `DNN_m<MX>_vs_HME` histograms;
+- carries the members of the QCD-scale and PDF uncertainties (`members:` in the cards) to the
+  final bins; the datacard maker reduces them (7-point envelope, Hessian) on the summed eras;
 - merges the processes into the card's backgrounds (TT, DY, ST, Minor) and writes the
   members' theory and normalisation uncertainties as shapes;
 - replaces the sparse, partly negative-weight DY MC with a smooth fit template

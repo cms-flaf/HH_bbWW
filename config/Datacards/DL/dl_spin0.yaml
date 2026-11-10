@@ -74,6 +74,42 @@ uncertainties:
     processes:
       - ^GluGluToRadion_bbTauTau_
     value: [ -0.0163, 0.0165 ]
+  # QCD scale and PDF shapes of the signals (see dl_common.yaml for the backgrounds'): one
+  # nuisance per signal sample, the same name at every mass; the member histograms carry the
+  # mass (<signal>_QCDscale_shape_<signal>_<point>). The weights are normalised to each sample's
+  # nominal sum of weights, so these are acceptance and shape effects only. No alpha_s: the
+  # signal samples have no alpha_s weights (members 101/102 are NaN).
+  - name: QCDscale_shape_GluGluToRadion_bbWW_2L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_2L_ ]
+    members: &sig_qcd_scale
+      reduction: envelope
+      names: [ muR0p5_muF0p5, muR0p5_muF1, muR1_muF0p5, muR1_muF2, muR2_muF1, muR2_muF2 ]
+      histogram: QCDscale_shape_{process}_{member}
+  - name: pdf_shape_GluGluToRadion_bbWW_2L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_2L_ ]
+    members: &sig_pdf_hessian
+      reduction: hessian
+      names: { first: 1, last: 100 }
+      histogram: pdf_shape_{process}_{member}
+  - name: QCDscale_shape_GluGluToRadion_bbWW_1L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_1L_ ]
+    members: *sig_qcd_scale
+  - name: pdf_shape_GluGluToRadion_bbWW_1L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_1L_ ]
+    members: *sig_pdf_hessian
+  - name: QCDscale_shape_GluGluToRadion_bbTauTau
+    type: shape
+    processes: [ ^GluGluToRadion_bbTauTau_ ]
+    members: *sig_qcd_scale
+  - name: pdf_shape_GluGluToRadion_bbTauTau
+    type: shape
+    processes: [ ^GluGluToRadion_bbTauTau_ ]
+    members: *sig_pdf_hessian
+
 
 # Named and labelled with the spin, as in the spin-2 card; compared with the Run 2 DL
 # expected limit of the same spin (HIG-21-005 cards, recomputed). run2_external_limits.json holds every Run 2 reference, by channel and spin

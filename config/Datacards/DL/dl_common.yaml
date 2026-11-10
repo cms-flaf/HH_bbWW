@@ -14,7 +14,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
 signalFractionForRelevantBins: 0.2
 # Every era listed here gets its own binning, its own datacards and its own limit.
 #
@@ -48,7 +48,9 @@ channels:
   - eMu
   - eE
 # One datacard category per region and jet category, all in the frozen HME window of the jet
-# category (hme_windows_DL_v2610.yaml):
+# category: FLAF's window regions <region>_HMEWin_m<MX> (config/windows/hme_DL_v2610.yaml,
+# flavour Signal_Extraction_DL_window), where the DNN score DNN_M<MX>_Signal is filled only for
+# events inside the window of MX:
 #   SR_* : m_ll < 70 GeV, the DNN score in equal-signal bins;
 #   TT_* : TT_CR, m_ll > 110 GeV, the DNN score in 5 bins of equal background;
 #   DY_* : DY_CR, |m_ll - mZ| < 10 GeV, the same (binning_eqsig_DL_v2610.yaml: control_region_bins).
@@ -69,25 +71,27 @@ categories:
   - DY_boosted
   - DY_recovery
 input_categories:
-  SR_res2b: SR/res2b
-  SR_boosted: SR/boosted
-  SR_recovery: SR/recovery
-  TT_res2b: TT_CR/res2b
-  TT_boosted: TT_CR/boosted
-  TT_recovery: TT_CR/recovery
-  DY_res2b: DY_CR/res2b
-  DY_boosted: DY_CR/boosted
-  DY_recovery: DY_CR/recovery
+  SR_res2b: SR_HMEWin_m${MX}/res2b
+  SR_boosted: SR_HMEWin_m${MX}/boosted
+  SR_recovery: SR_HMEWin_m${MX}/recovery
+  TT_res2b: TT_CR_HMEWin_m${MX}/res2b
+  TT_boosted: TT_CR_HMEWin_m${MX}/boosted
+  TT_recovery: TT_CR_HMEWin_m${MX}/recovery
+  DY_res2b: DY_CR_HMEWin_m${MX}/res2b
+  DY_boosted: DY_CR_HMEWin_m${MX}/boosted
+  DY_recovery: DY_CR_HMEWin_m${MX}/recovery
 
 # Applied to the merged histograms before the datacards are built, by
 # PreprocessShapesTask. The chain knows nothing about what this does -- it supplies
 # --input, --output, --era and --config, and the script writes
-# "<era>/<variable>/<variable>.root". Here it cuts each category's HME window out of the 2D
-# shapes, merges the merged-histogram processes into the backgrounds below and bins the DNN
-# inside the window into bins of equal signal (binning_eqsig_DL_v2610.yaml). Its input is the
-# Run3_Model_DYSplit merged histograms with the control regions (DY as DY_M_10to50 + DY_M_50;
-# TT_CR and DY_CR), e.g. --hists-version v2610_output_CR. Remove this block and the chain reads
-# the merged histograms unchanged.
+# "<era>/<variable>/<variable>.root". Here it merges the merged-histogram processes into the
+# backgrounds below and bins the DNN score of each window region into bins of equal signal
+# (binning_eqsig_DL_v2610.yaml); it also carries the members of the member uncertainties
+# (QCD-scale points, PDF members) to the final bins, which the datacard maker reduces. Its input
+# is the Run3_Model_DYSplit merged histograms of the flavour Signal_Extraction_DL_window, with
+# the control regions (DY as DY_M_10to50 + DY_M_50; TT_CR and DY_CR) and the theory members,
+# e.g. --hists-version v2610_theory_window_test. Remove this block and the chain reads the
+# merged histograms unchanged.
 # --jobs: masses binned in parallel, one process each (< 1 GB). On condor give the task as many
 # CPUs: --PreprocessShapesTask-n-cpus 8.
 preprocess:
@@ -382,6 +386,97 @@ uncertainties:
     type: shape
     processes: [ TT ]
     categories: [ TT_boosted ]
+
+  # QCD scale and PDF shapes, one nuisance each per merged-histogram process (the physics
+  # model's processes, not the card's backgrounds): the merged histograms keep every member
+  # (<process>_QCDscale_shape_<process>_<muR..._muF...>, <process>_pdf_shape_<process>_<k>),
+  # the preprocess step carries them to the final bins inside the card background holding that
+  # process, and the datacard maker reduces them on the summed eras (StatInference
+  # dc_make/member_reduction.py). The weights are normalised to the nominal sum of weights of
+  # each sample, so these are shape and acceptance effects; the cross-section uncertainties are
+  # the lnN / member terms above. QCD scale: 7-point envelope (the 6 points without the
+  # opposite muR, muF variations). PDF: the Hessian sum of members 1-100 around the nominal
+  # (member 0 equals it), plus alpha_s from 101/102 where the sample has them -- ST and VVV do
+  # not (4-flavour t-channel / no alpha_s weights; theirs are NaN).
+  - name: QCDscale_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &qcd_scale_7point
+      reduction: envelope
+      names: [ muR0p5_muF0p5, muR0p5_muF1, muR1_muF0p5, muR1_muF2, muR2_muF1, muR2_muF2 ]
+  - name: pdf_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &pdf_hessian_alphas
+      reduction: hessian
+      names: { first: 1, last: 100 }
+      alpha_s: [ 101, 102 ]
+  - name: QCDscale_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: &pdf_hessian
+      reduction: hessian
+      names: { first: 1, last: 100 }
+  - name: QCDscale_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian
+  - name: QCDscale_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_W
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_W
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
 
 autolnNThr: 0.1
 asymlnNThr: 0.001
