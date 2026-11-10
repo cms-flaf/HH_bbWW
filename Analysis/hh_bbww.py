@@ -276,10 +276,12 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             (lep1_pt >= lep2_pt ? 1 : 2)
             """,
         )
+        # needed to invert isolation req for electrons or tight ID reqs for muons 
         self.df = self.df.Define(
-            "event_selection",
-            "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
+            "base_event_selection",
+            "leadingleppT &&  subleadleppT && Single_lep_trg && ( lep2_legType < 1 ||  ll_mass > 12 )",
         )
+        self.df = self.df.Define("event_selection", "base_event_selection && tightlep")
 
     def defineQCDRegions(self):
         self.DefineAndAppend(
@@ -343,8 +345,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 )
 
             self.DefineAndAppend(
-                "OS_AntiIso_SR",
-                "return predicted_class == 0 && OS_AntiIso && tau_veto;",
+                "SR_SL_Fakeable",
+                """
+                    if (!(SL && predicted_class == 0 && base_event_selection && tau_veto))
+                        return false;
+                    if (lep1_legType == 1)
+                        return lep1_Electron_mvaIso > -0.9 && lep1_Electron_mvaIso_WP80 != 1;
+                    if (lep1_legType == 2)
+                        return lep1_Muon_tightId == 1 && lep1_Muon_pfRelIso04_all > 0.15 && lep1_Muon_pfRelIso04_all < 0.4;
+                    return false;
+                """,
             )
 
     def calculateMT(self):
