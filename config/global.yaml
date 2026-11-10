@@ -530,8 +530,10 @@ payload_producers:
 
 region: All
 region_default: SR
-# The regions histogrammed are each histTuple flavour's `regions` (histTuple_flavors below);
-# FLAF publishes the active flavour's as histTuple_regions.
+# What is histogrammed where (FLAF booking plugin, Analysis/hist_booking.py): each histTuple
+# flavour's `regions` (histTuple_flavors below) and `sub_regions`; FLAF publishes the regions as
+# histTuple_regions.
+hist_booking_module: Analysis.hist_booking
 
 custom_categories: ""
 custom_subcategories: [ ]
@@ -1351,9 +1353,10 @@ histTuple_flavors:
         vars: [ DNN_M1500_Signal, DeepHME_mass ]
 
   Signal_Extraction_DL_window:
-    # Signal_Extraction_DL with the 2D DNN_m<MX>_vs_HME replaced by sub-regions: each
-    # DNN_M<MX>_Signal is also filled in SR/TT_CR/DY_CR_HMESub_m<MX>, the base region within the
-    # frozen HME range of MX (config/sub_regions/hme_DL_v2610.yaml), the slice of the 2D.
+    # Signal_Extraction_DL with the 2D DNN_m<MX>_vs_HME replaced by sub-regions: the variables of
+    # mass MX (signal_params in histograms.yaml) and DeepHME_mass are also filled in
+    # SR/TT_CR/DY_CR_HMESub_m<MX>, the base region within the frozen HME range of MX
+    # (config/sub_regions/hme_DL_v2610.yaml); DNN_M<MX>_Signal there is the slice of the 2D.
     fullResolution_variables: [ ]
 
     regions: [ SR, TT_CR, DY_CR ]
@@ -1362,7 +1365,6 @@ histTuple_flavors:
         cuts: config/sub_regions/hme_DL_v2610.yaml
         regions: [ SR, TT_CR, DY_CR ]
         masses: all
-        vars: [ "DNN_M{MX}_Signal" ]
 
     variables:
       - DeepHME_mass
