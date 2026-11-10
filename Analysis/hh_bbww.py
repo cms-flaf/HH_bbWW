@@ -37,15 +37,10 @@ def createKeyFilterDict(global_params, era):
         custom_categories = list(global_params.get(custom_categories_name, []))
         if not custom_categories:
             print("No custom categories found")
-    ### regions
-    custom_regions = []
-    custom_regions_name = global_params.get(
-        "custom_regions", None
-    )  # can be extended to list of names, if for example adding QCD regions + other control regions
-    if custom_regions_name:
-        custom_regions = list(global_params.get(custom_regions_name, []))
-        if not custom_regions:
-            print("No custom regions found")
+    ### regions: the histTuple flavour's, as FLAF's Setup resolves them
+    custom_regions = list(global_params.get("histTuple_regions") or [])
+    if not custom_regions:
+        print("No regions found")
     all_categories = categories + custom_categories
     custom_subcategories = list(global_params.get("custom_subcategories", []))
     triggers_dict = global_params["triggers"]
@@ -314,7 +309,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && OS_Iso")
 
         SL_CR_active = False
-        for QCDReg in self.config["QCDRegions"]:
+        for QCDReg in self.config.get("histTuple_regions") or []:
             # The regions are named SR_SL and CR_SL_<class> below.
             if QCDReg.startswith("SR_SL") or QCDReg.startswith("CR_SL"):
                 SL_CR_active = True

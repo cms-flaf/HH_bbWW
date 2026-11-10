@@ -17,9 +17,9 @@ fits:
   res2b: { low: [ 98.1200, 0.538263 ], high: [ -18.9189, 1.378378 ] }
   recovery: { low: [ 98.1200, 0.538263 ], high: [ -18.9189, 1.378378 ] }  # = res2b
   boosted: { low: [ 64.2077, 0.685021 ], high: [ 135.9084, 1.109257 ] }
-# windows[MX][category] = { DeepHME_mass: [low, high] } in GeV (a one-variable box, FLAF window regions), on the stored grid; signal_fraction = share of that category's
+# cuts[MX][category] = { DeepHME_mass: [low, high] } in GeV (bin-form cuts of FLAF sub-regions), on the stored grid; signal_fraction = share of that category's
 # signal inside the window (Run3_Early, spin 0).
-windows:
+cuts:
   250: { res2b: { DeepHME_mass: [ 230, 330 ] }, recovery: { DeepHME_mass: [ 230, 330 ] }, boosted: { DeepHME_mass: [ 230, 420 ] } }
   260: { res2b: { DeepHME_mass: [ 230, 340 ] }, recovery: { DeepHME_mass: [ 230, 340 ] }, boosted: { DeepHME_mass: [ 240, 430 ] } }
   270: { res2b: { DeepHME_mass: [ 240, 360 ] }, recovery: { DeepHME_mass: [ 240, 360 ] }, boosted: { DeepHME_mass: [ 240, 440 ] } }
