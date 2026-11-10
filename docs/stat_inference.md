@@ -67,7 +67,8 @@ The cards are built from shared files, each card listing the ones it uses under 
 
 ```
 config/Datacards/
-  systematics.yaml          object-level experimental uncertainties, shared by DL and SL
+  systematics.yaml          the uncertainties shared by DL and SL: luminosity, pileup, lepton,
+                            b-tagging, AK8, jet and electron, parton shower
   DL/dl_common.yaml         everything else the DL spin cards share
   DL/dl_spin{0,2}.yaml      include ../systematics.yaml and dl_common.yaml; add the signals,
                             their BR uncertainties and the limit plots
@@ -91,7 +92,18 @@ prints each setting and entry with the file it comes from; every datacard and pr
 output also keeps the merged card it was built from, as `card_config.yaml`.
 
 `ResonantLimitsTask`, `PlotResonantLimitsTask` and `PlotPullsAndImpactsTask` run for every
-card, or for one with `--card DL_spin0`.
+card, or with `--card DL_spin0` for that card only: they then build, preprocess and fit just
+its datacards, so another card neither has to run nor can block it. Without `--card`, the plot
+tasks leave out (and name) a card that declares no plots. The `StatInference` block's
+`param_values` and `hist_bins` apply to every card; `param_values` builds each card for the
+requested masses it declares.
+
+!!! warning "Outputs from before the cards need a new `--version`"
+    Every output path now has a `<card>` level (`Datacards/<card>/<era>/…`,
+    `ResonantLimitsTask/<card>/…`, `LimitPlots/<card>`, `ImpactPlots/<card>`). Run under a new
+    `--version`: in one produced before, `ResonantLimitsAndHistPlotTask`'s marker is already
+    complete (it does not look at cards or eras), and old plot directories or HTCondor job
+    files can be taken for the new ones.
 
 !!! warning "`--era` must hold every era behind the datacards"
     Which eras get datacards and limits comes from the configuration's `eras:` and
@@ -99,7 +111,8 @@ card, or for one with `--card DL_spin0`.
     is covered by that meta-era and is not built standalone, so with the Run 3
     configuration the chain builds the `Run3_22_23` combination of all four eras. `--era`
     must name every real era those cards read — here the four of `Run3_22_23` — or the
-    run stops with `the cards of … need Run3_22_23: …, which --era does not include`.
+    run stops with `the cards need DL_spin0 Run3_22_23: …, which --era does not include`.
+    This holds with `--card` too: the datacard workflows' branch maps cover every card.
     Further eras are allowed and are not carded. `CreateDatacardsTask` and
     `PreprocessShapesTask` are one workflow each, with one branch per card and era (and mass), and their
     outputs (`Datacards/<card>/<era>`, `Hists_preprocessed/<card>/<era>`) do not depend on `--era`
@@ -363,7 +376,8 @@ Hints:
 ## 3. Pulls & impacts
 
 Declared in the datacard configuration's `impact_plots` block and drawn by
-`PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<mass>/` on `fs_default`
+`PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`
+on `fs_default`
 beside the limit plots:
 
 ```sh
@@ -401,10 +415,11 @@ limits already merged for those cards; a number sets it directly.
     `POITask` hard-codes both the joined values and the postfix, dropping it silently.
 
 Each entry becomes one dhi `PlotPullsAndImpacts` per era and mass, and the plots land in
-`<version>/ImpactPlots/<name>/<era>/<mass>/`.
+`<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`, with the card in the file name too (the
+default `plot_postfix`).
 
 With no `glob:`, an entry uses the combined card `ResonantLimitsTask` writes at
-`data/<version>/Datacards/combined/combined_<mass>.txt` — every era and category in one
+`data/<version>/Datacards/<card>/combined/combined_<mass>.txt` — every era and category in one
 fit, which is the ranking that describes the result. It is drawn once and labelled
 `combined`.
 
@@ -434,7 +449,8 @@ and `C2V`, against a workspace other than the one the chain built.
     `method: default` instead fits each nuisance separately, roughly two combine jobs per
     nuisance per mass (~160 here), and only that case is worth sending to a batch system.
     `create_branch_map` in `dhi/tasks/pulls_impacts.py` is where the difference lives.
-    Pass `--redraw` to redraw without refitting.
+    To redraw without refitting, pass `--redraw` together with `--remove-output 0,a,y` (and
+    `--card`): once a card's plots exist the task is complete, and `--redraw` alone does nothing.
 
 !!! danger "`method: robust` can silently drop a nuisance"
     robustHesse removes parameters it cannot invert, logging `Dropping <name> from the

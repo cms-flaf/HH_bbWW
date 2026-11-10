@@ -135,9 +135,9 @@ processes:
     allow_zero_integral: true
 
 uncertainties:
-  # The object-level experimental uncertainties shared with the SL cards are in
-  # ../systematics.yaml, which the DL cards include next to this file; the ones below
-  # are DL-specific.
+  # The uncertainties shared with the SL cards (luminosity, pileup, lepton, b-tagging, AK8,
+  # jet and electron, parton shower) are in ../systematics.yaml, which the DL cards include
+  # next to this file; the ones below are DL-specific.
 
   # DY reweighting (hh2bbtautau derivation). Scoped to DY: the correction is
   # configured with a processes: list, so it is a no-op everywhere else.
@@ -401,7 +401,7 @@ campaigns:
   Run3_2023BPix: "2023postBPix"
 
 # Nuisance pulls and impacts, drawn by PlotPullsAndImpactsTask into
-# <version>/ImpactPlots/<name>/<era>/<mass>/.
+# <version>/ImpactPlots/<card>/<name>/<era>/<mass>/.
 #
 # This entry has no `glob:`, so it uses the combined card ResonantLimitsTask writes --
 # every era and every category in one fit. To rank one category instead, give an entry a

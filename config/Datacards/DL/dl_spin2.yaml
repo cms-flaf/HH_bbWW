@@ -9,9 +9,9 @@ include:
 
 processes:
   # The spin-2 (graviton) X->HH signal. Run3_Model histograms both hypotheses; the spin-0
-  # card is dl_spin0.yaml. The equal-signal binning follows this signal; the HME windows and the
-  # target numbers of bins are shared by both spins (the pDNN is spin-inclusive, and spin hardly
-  # changes the HH mass).
+  # card is dl_spin0.yaml. The equal-signal binning follows the sum of this card's
+  # signals (2L, 1L and bbTauTau); the HME windows and the target numbers of bins are shared
+  # by both spins (the pDNN is spin-inclusive, and spin hardly changes the HH mass).
   - process: GluGluToBulkGraviton_bbWW_2L_${MX}
     hist_name: GluGluToBulkGraviton_bbWW_2L_${MX}
     # the produced X->HH points up to 1.5 TeV; the DNN has to be retrained over this
