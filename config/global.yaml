@@ -606,9 +606,9 @@ categories:
 
 QCDRegions:
   - OS_Iso
-  # - SR
-  # - TT_CR
-  # - DY_CR
+  - SR
+  - TT_CR
+  - DY_CR
   # - W_CR
   # - SR_mbb
 

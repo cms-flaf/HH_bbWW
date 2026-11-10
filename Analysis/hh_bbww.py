@@ -276,7 +276,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             (lep1_pt >= lep2_pt ? 1 : 2)
             """,
         )
-        # needed to invert isolation req for electrons or tight ID reqs for muons 
+        # needed to invert isolation req for electrons or tight ID reqs for muons
         self.df = self.df.Define(
             "base_event_selection",
             "leadingleppT &&  subleadleppT && Single_lep_trg && ( lep2_legType < 1 ||  ll_mass > 12 )",
