@@ -1,7 +1,19 @@
-# Frozen HME windows of the DL categories (v2610, Run3_22_23): straight-line fits HME_cut = a + b * MX
-# to the windows maximising S/sqrt(B_TT) with >= 95 % of the category's signal (spin 0); recovery
-# uses res2b's. Cuts are rounded outward to the stored DeepHME_mass grid (78 bins, 0-2000 GeV); a cut
-# at the first (last) edge includes the underflow (overflow).
+# Frozen HME windows for the DL channel, v2610 (decided 2026-10-16, on the four eras of Run3_22_23, then still
+# named Run3_Early).
+#
+# Definition: straight-line fits HME_cut = a + b * MX to the HME windows that maximise S/sqrt(B_TT) with >= 95% of
+# the category's signal (Run3_22_23, spin 0 bbWW 2l + bbtautau, eE+muMu+eMu, signal and TT summed over the DNN):
+#   res2b    low  = 98.1200 + 0.538263 * MX   (fit to MX 250-1500)
+#            high = -18.9189 + 1.378378 * MX   (fit to MX 250, 260, 270, 280, 300, where the high cut is
+#                   constrained; extrapolated above)
+#   boosted  low  = 64.2077 + 0.685021 * MX   (fit to MX 300-1500)
+#            high = 135.9084 + 1.109257 * MX   (fit to MX 300-1500)
+#   recovery uses the res2b window (no fit of its own; it keeps ~80-92% of the recovery signal).
+# Each cut is rounded OUTWARD to the stored DeepHME_mass grid (low cut down, high cut up), so the window is never
+# smaller than the fit. A cut at the first (last) grid edge includes the underflow (overflow).
+# Stored grid: 78 bins, 0-2000 GeV (10 GeV to 700, 25 to 1000, 50 to 1500, 100 to 2000).
+# Study and plots: /eos/user/d/daebi/HH_bbWW/binning_studies/v2610_hme_window_scan/ (window_versions.png,
+# tt_window_limits_v2.png, stack_plots/stack_lin.pdf).
 fits:
   res2b: { low: [ 98.1200, 0.538263 ], high: [ -18.9189, 1.378378 ] }
   recovery: { low: [ 98.1200, 0.538263 ], high: [ -18.9189, 1.378378 ] }  # = res2b
