@@ -10,8 +10,8 @@ variation.
 
 Input:  <input>/<era>/<variable>/<variable>.root for every era of the card (the merged
         histograms), with <channel>/<input category>/<process>[_<variation>] histograms, either
-        - 1D in the DNN score, already inside the window: FLAF's window regions
-          (<region>_HMEWin_m<MX>/<category>, `input_categories` with ${MX}); or
+        - 1D in the DNN score, already inside the window: the sub-regions of the booking plugin
+          (<region>_HMESub_m<MX>/<category>, `input_categories` with ${MX}); or
         - 2D, DNN score on x and HME mass on y, when the binning configuration names the
           `windows` to cut out of them.
 Output: the same layout under <output>, 1D in the DNN score, one file per era of the card, and
@@ -53,8 +53,8 @@ sys.path.insert(0, ANALYSIS_PATH)
 from StatInference.common.card_config import load_card_config  # noqa: E402
 from StatInference.dc_make.member_reduction import MemberReduction  # noqa: E402
 
-# FLAF window regions are named <region>_<window set>Win_m<MX>
-WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+Win_m[0-9]+$")
+# sub-regions (Analysis/hist_booking.py) are named <region>_<sub-region>_m<MX>
+WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+_m[0-9]+$")
 
 
 def analysis_file(path):
@@ -216,7 +216,7 @@ class Binning:
         self.cfg = cfg
         # 2D inputs: the HME windows to cut out of them; 1D inputs are already windowed
         self.windows = (
-            yaml.safe_load(open(analysis_file(cfg["windows"])))["windows"]
+            self.load_windows(analysis_file(cfg["windows"]))
             if cfg.get("windows")
             else None
         )
@@ -266,14 +266,24 @@ class Binning:
 
     @staticmethod
     def region(directory):
-        """SR/res2b -> SR, TT_CR/res2b -> TT_CR; a window region is its base region
-        (SR_HMEWin_m500/res2b -> SR)."""
+        """SR/res2b -> SR, TT_CR/res2b -> TT_CR; a sub-region is its base region
+        (SR_HMESub_m500/res2b -> SR)."""
         region = directory.rsplit("/", 1)[0] if "/" in directory else ""
         return WINDOW_REGION.sub("", region)
 
+    @staticmethod
+    def load_windows(path):
+        """{mass: {category: window}} of a windows file: `windows:` ([low, high] or a box), or
+        a sub-region cuts file's `cuts:` (config/sub_regions/hme_DL_v2610.yaml)."""
+        data = yaml.safe_load(open(path))
+        for key in ("windows", "cuts"):
+            if key in data:
+                return data[key]
+        raise ValueError(f"{path}: no `windows:` or `cuts:`")
+
     def window(self, mass, directory):
         """The HME (low, high) window of a category for 2D inputs, None for 1D. A window
-        file in FLAF's box form ({DeepHME_mass: [low, high]}) gives its one variable's.
+        file in box form ({DeepHME_mass: [low, high]}) gives its one variable's.
         """
         if self.windows is None:
             return None

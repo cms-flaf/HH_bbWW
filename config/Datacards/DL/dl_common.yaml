@@ -48,7 +48,7 @@ channels:
   - eMu
   - eE
 # One datacard category per region and jet category, all in the frozen HME window of the jet
-# category: FLAF's window regions <region>_HMEWin_m<MX> (config/windows/hme_DL_v2610.yaml,
+# category: the sub-regions <region>_HMESub_m<MX> (config/sub_regions/hme_DL_v2610.yaml,
 # flavour Signal_Extraction_DL_window), where the DNN score DNN_M<MX>_Signal is filled only for
 # events inside the window of MX:
 #   SR_* : m_ll < 70 GeV, the DNN score in equal-signal bins;
@@ -71,21 +71,21 @@ categories:
   - DY_boosted
   - DY_recovery
 input_categories:
-  SR_res2b: SR_HMEWin_m${MX}/res2b
-  SR_boosted: SR_HMEWin_m${MX}/boosted
-  SR_recovery: SR_HMEWin_m${MX}/recovery
-  TT_res2b: TT_CR_HMEWin_m${MX}/res2b
-  TT_boosted: TT_CR_HMEWin_m${MX}/boosted
-  TT_recovery: TT_CR_HMEWin_m${MX}/recovery
-  DY_res2b: DY_CR_HMEWin_m${MX}/res2b
-  DY_boosted: DY_CR_HMEWin_m${MX}/boosted
-  DY_recovery: DY_CR_HMEWin_m${MX}/recovery
+  SR_res2b: SR_HMESub_m${MX}/res2b
+  SR_boosted: SR_HMESub_m${MX}/boosted
+  SR_recovery: SR_HMESub_m${MX}/recovery
+  TT_res2b: TT_CR_HMESub_m${MX}/res2b
+  TT_boosted: TT_CR_HMESub_m${MX}/boosted
+  TT_recovery: TT_CR_HMESub_m${MX}/recovery
+  DY_res2b: DY_CR_HMESub_m${MX}/res2b
+  DY_boosted: DY_CR_HMESub_m${MX}/boosted
+  DY_recovery: DY_CR_HMESub_m${MX}/recovery
 
 # Applied to the merged histograms before the datacards are built, by
 # PreprocessShapesTask. The chain knows nothing about what this does -- it supplies
 # --input, --output, --era and --config, and the script writes
 # "<era>/<variable>/<variable>.root". Here it merges the merged-histogram processes into the
-# backgrounds below and bins the DNN score of each window region into bins of equal signal
+# backgrounds below and bins the DNN score of each sub-region into bins of equal signal
 # (binning_eqsig_DL_v2610.yaml); it also carries the members of the member uncertainties
 # (QCD-scale points, PDF members) to the final bins, which the datacard maker reduces. Its input
 # is the Run3_Model_DYSplit merged histograms of the flavour Signal_Extraction_DL_window, with
