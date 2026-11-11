@@ -456,10 +456,10 @@ resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt
 and `C2V`, against a workspace other than the one the chain built.
 
 !!! warning "What a mass costs depends on `method`"
-    With `method: robust` — what this analysis uses — dhi runs **one** fit per mass and
-    reads every impact off the inverted Hessian, so all three masses take minutes.
-    `method: default` instead fits each nuisance separately, roughly two combine jobs per
-    nuisance per mass (~160 here), and only that case is worth sending to a batch system.
+    With `method: default` — what this analysis uses — dhi fits each nuisance separately,
+    roughly two combine jobs per nuisance per mass (~160 here), so it is worth sending to a
+    batch system. `method: robust` instead runs **one** fit per mass and reads every impact
+    off the inverted Hessian (minutes for all three masses), but can drop parameters (below).
     `create_branch_map` in `dhi/tasks/pulls_impacts.py` is where the difference lives.
     To redraw without refitting, pass `--redraw` together with `--remove-output 0,a,y` (and
     `--card`): once a card's plots exist the task is complete, and `--redraw` alone does nothing.
