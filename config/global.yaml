@@ -531,9 +531,10 @@ payload_producers:
 region: All
 region_default: SR
 # What is histogrammed where (FLAF booking plugin, Analysis/hist_booking.py): each histTuple
-# flavour's `regions` (histTuple_flavors below) and `sub_regions`; FLAF publishes the regions as
-# histTuple_regions.
+# flavour's `regions` (histTuple_flavors below) and `sub_regions`. The plugin fills the list
+# custom_regions names (QCDRegions) with the active flavour's regions.
 hist_booking_module: Analysis.hist_booking
+custom_regions: QCDRegions
 
 custom_categories: ""
 custom_subcategories: [ ]
@@ -608,9 +609,8 @@ categories:
   # - baseline_boosted
   # - baseline_resolved
 
-# A histTuple keeps the events in one of the flavour's regions and one of the categories.
 histTuple_selectors:
-  - histTuple_regions
+  - QCDRegions
   - categories
 
 boosted_categories: [ ]
@@ -1364,7 +1364,7 @@ histTuple_flavors:
       - name: HMESub
         cuts: config/sub_regions/hme_DL_v2610.yaml
         regions: [ SR, TT_CR, DY_CR ]
-        masses: all
+        points: all
 
     variables:
       - DeepHME_mass
