@@ -1,10 +1,5 @@
-# Leptons: muon ID, ID+isolation and single-muon trigger scale factors; electron ID+isolation
-# and single-electron trigger scale factors, electron energy scale and resolution.
-#
-# Included by every card that shares it -- DL/dl_spin{0,2}.yaml, SL/sl_spin{0,2}.yaml and the CI
-# cards -- each listing every file of config/Datacards/systematics/ explicitly. The merge is strict
-# (StatInference/common/card_config.py): an uncertainty is defined in one file only, and defining
-# it again anywhere a card includes is an error, never an override.
+# Muon and electron ID, isolation and trigger; electron scale and resolution (shared by all
+# cards).
 uncertainties:
   # Muon ID
   - name: CMS_eff_m_id_2022

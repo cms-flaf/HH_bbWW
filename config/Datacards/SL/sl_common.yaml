@@ -1,17 +1,6 @@
-# HH->bbWW SL resonant datacards: everything the spin-0 and spin-2 SL cards share.
-#
-# SKELETON: the structure of the SL cards, laid out as the DL ones (DL/dl_common.yaml). It is
-# not in global.yaml's StatInference `cards:` and has not been built or validated; binning,
-# backgrounds and SL-specific uncertainties are placeholders to be replaced when the SL inputs
-# are final. The previous single-file SL card, x_hh_bbww_SL_run3.yaml, is kept for reference.
-#
-# Not a card on its own. The cards sl_spin0.yaml and sl_spin2.yaml include it, together with the
-# uncertainties shared with DL (../systematics/), and add what differs between the spins:
-# the signal processes, their branching-ratio uncertainties and the limit plots. Merging is strict
-# (StatInference/common/card_config.py): a top-level key is set in one file only, and an entry of
-# `processes`, `uncertainties`, `limit_plots` or `impact_plots` is defined once -- anything set
-# twice is an error, never an override.
-# ${MX} and ${ERA} are filled by StatInference.
+# HH->bbWW SL datacards: the settings shared by sl_spin0.yaml and sl_spin2.yaml (as DL/dl_common.yaml).
+# SKELETON: not in `cards:`, not built or validated; binning, backgrounds and SL uncertainties are
+# placeholders. x_hh_bbww_SL_run3.yaml (the earlier single-file SL card) is kept for reference.
 analysis: hh_bbww
 type: resonant
 model:
@@ -20,7 +9,6 @@ model:
   # The binary score of the two-stage SL DNN (a logit, -23.5:23.5), parametrised in the mass. 1D.
   input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
 signalFractionForRelevantBins: 0.2
-# As for DL: one card on the four datasets combined.
 eras:
   - Run3_22_23
 era_groups:
@@ -32,10 +20,7 @@ era_groups:
 channels:
   - e
   - mu
-# One datacard category per jet category of the SL signal region, named without "/" as DL's are;
-# input_categories maps each to its directory in the histogram files: the mass-independent SR_SL
-# of the two-stage DNN's multiclass (cms-flaf/HH_bbWW#191). Control regions (CR_SL_<class>)
-# would follow the same pattern.
+# The jet categories of the mass-independent SR_SL (#191); CR_SL_<class> would follow the same way.
 categories:
   - SR_res2b
   - SR_recovery
@@ -45,8 +30,7 @@ input_categories:
   SR_recovery: SR_SL/recovery
   SR_boosted: SR_SL/boosted
 
-# No `preprocess:` step yet: the shapes are read as produced. A binning step for the binary
-# score goes here, as DL's EqualSignalBinning.py does for DL.
+# No `preprocess:` (binning) step yet: the shapes are read as produced.
 
 processes:
   - process: data_obs
@@ -76,9 +60,7 @@ processes:
     max_n_sigma_for_negative_bins: 2
     allow_zero_integral: true
 
-# SL-specific uncertainties (process theory and normalisations of the SL backgrounds, SL control
-# regions, ...). The ones shared with DL (luminosity, pileup, lepton, b-tagging, AK8, jet and
-# electron, parton shower) are in ../systematics/, one file per topic.
+# SL-specific uncertainties go here; the shared ones are in ../systematics/.
 uncertainties: [ ]
 
 autolnNThr: 0.1

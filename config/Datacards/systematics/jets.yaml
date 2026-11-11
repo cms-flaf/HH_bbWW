@@ -1,10 +1,4 @@
-# Jets: energy scale (JES) and resolution (JER), AK4 b-tagging, and the AK8 (boosted) Hbb, Hcc
-# and tau21 scale factors.
-#
-# Included by every card that shares it -- DL/dl_spin{0,2}.yaml, SL/sl_spin{0,2}.yaml and the CI
-# cards -- each listing every file of config/Datacards/systematics/ explicitly. The merge is strict
-# (StatInference/common/card_config.py): an uncertainty is defined in one file only, and defining
-# it again anywhere a card includes is an error, never an override.
+# JES, JER, AK4 b-tagging and AK8 tagging (shared by all cards).
 uncertainties:
   # AK4 BTagging
   - name: CMS_btag_LF

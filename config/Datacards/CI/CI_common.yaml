@@ -1,8 +1,4 @@
-# The CI datacard cards' shared part: included by CI_card_DL.yaml and CI_card_SL.yaml, which
-# config/ci_custom.yaml lists as the cards CI_DL and CI_SL (StatInference `cards:`), next to the
-# analysis's own ../systematics/ files -- so the CI fits every uncertainty the analysis cards share
-# and exercises the include merge they use (StatInference/common/card_config.py): a setting or a
-# named entry is defined in one file only, anything set twice is an error.
+# What the two CI cards share besides ../systematics/ (which they include too).
 analysis: hh_bbww
 type: resonant
 signalFractionForRelevantBins: 0.2

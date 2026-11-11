@@ -1,5 +1,4 @@
-# The CI double-lepton card (with the preprocess step). What it shares with the
-# single-lepton CI card is in CI_common.yaml.
+# The CI double-lepton card (CI_DL in ci_custom.yaml), with the preprocess step.
 include:
   # uncertainties shared by all cards (every file of ../systematics/)
   - ../systematics/luminosity.yaml
@@ -15,22 +14,16 @@ channels:
   - muMu
   - eMu
   - eE
-# The datacard bins, which are what CI_binning_2d.yaml's single window produces: one
-# bin per channel and base category, named by the pattern below.
+# One bin per channel and base category (CI_binning_2d.yaml's single window).
 categories:
   - OS_Iso/res2b_hmebox0
   - OS_Iso/recovery_hmebox0
 
-# How to take those names apart again. Must match CI_binning_2d.yaml's category_pattern.
+# must match CI_binning_2d.yaml's category_pattern
 category_pattern: "{base_category}_hmebox{slice_idx}"
 
-# The CI reads the 2D DNN-vs-HME plane, as the production configuration does, and cuts
-# it with the same script -- so the chain the CI exercises is the chain that runs for
-# real, PreprocessShapesTask included. What differs is only the binning it is given:
-# CI_binning_2d.yaml keeps one window and one bin with every gate off, because at
-# --test statistics (--nEvents 1000, so every yield is ~1e-3 of nominal) the production
-# floors would reject every category, and a per-bin distribution that is mostly empty or
-# negative is not something combine will fit.
+# The production chain (rebin_2d.py on the 2D plane), with a one-bin binning: at --test
+# statistics anything finer is empty or negative.
 preprocess:
   script: StatInference/bin_opt_2d/rebin_2d.py
   args:
@@ -41,9 +34,7 @@ processes:
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
     param_values: [ 300 ]
     is_signal: true
-  # The one-lepton CI signal too, as the DL cards hold the 1L bbWW signal; it reaches the
-  # dilepton channels only through a non-prompt or misidentified lepton, so at --test
-  # statistics most channel x category bins hold none of it.
+  # the 1L CI signal, as the DL cards hold the 1L signal; mostly empty at --test statistics
   - process: XtoHHto2B2W_1L_${MX}
     hist_name: XtoHHto2B2W_1L_${MX}
     param_values: [ 300 ]
@@ -51,9 +42,6 @@ processes:
     allow_zero_integral: true
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
-  # Only the t#bar{t} background. custom_CI_Background_DY is produced, merged, histogrammed
-  # and plotted by the integration test, but it is not valid input for a limit here: it is an
-  # amc@NLO sample, so it carries negative event weights, and `--test 1000` leaves too few
-  # events for them to cancel — the single-bin histogram came out -1669 +/- 2817, compatible
-  # with zero at 0.6 sigma but negative, which makes the datacard job flaky by construction.
+  # TT only: the amc@NLO DY sample's negative weights do not cancel at --test 1000, so its
+  # histogram can come out negative.
   - custom_CI_Background_TT
