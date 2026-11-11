@@ -1,7 +1,14 @@
 # The CI double-lepton card (with the preprocess step). What it shares with the
 # single-lepton CI card is in CI_common.yaml.
 include:
-  - ../systematics.yaml
+  # uncertainties shared by all cards (every file of ../systematics/)
+  - ../systematics/luminosity.yaml
+  - ../systematics/muons.yaml
+  - ../systematics/electrons.yaml
+  - ../systematics/jets.yaml
+  - ../systematics/btag.yaml
+  - ../systematics/ak8.yaml
+  - ../systematics/parton_shower.yaml
   - CI_common.yaml
 model:
   parameters: [ MX ]

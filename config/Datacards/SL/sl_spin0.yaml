@@ -1,10 +1,17 @@
 # HH->bbWW SL resonant datacards, spin-0 (radion) signal hypothesis. SKELETON, see sl_common.yaml.
 # Everything but the signal processes, their branching-ratio uncertainties and the limit
-# plots is in sl_common.yaml (SL) and ../systematics.yaml (DL and SL), shared with the
+# plots is in sl_common.yaml (SL) and ../systematics/ (DL and SL), shared with the
 # spin-2 card sl_spin2.yaml.
 # ${MX} and ${ERA} are filled by StatInference.
 include:
-  - ../systematics.yaml
+  # uncertainties shared by all cards (every file of ../systematics/)
+  - ../systematics/luminosity.yaml
+  - ../systematics/muons.yaml
+  - ../systematics/electrons.yaml
+  - ../systematics/jets.yaml
+  - ../systematics/btag.yaml
+  - ../systematics/ak8.yaml
+  - ../systematics/parton_shower.yaml
   - sl_common.yaml
 
 processes:

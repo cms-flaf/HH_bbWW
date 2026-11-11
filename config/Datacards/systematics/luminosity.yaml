@@ -1,0 +1,56 @@
+# Luminosity and pileup.
+#
+# Included by every card that shares it -- DL/dl_spin{0,2}.yaml, SL/sl_spin{0,2}.yaml and the CI
+# cards -- each listing every file of config/Datacards/systematics/ explicitly. The merge is strict
+# (StatInference/common/card_config.py): an uncertainty is defined in one file only, and defining
+# it again anywhere a card includes is an error, never an override.
+uncertainties:
+  # Luminosity, as the Run 3 recommendation splits it: one component correlated across
+  # all four eras but with a different size in each year group, and a second carried by
+  # 2023 alone. Not a per-year uncorrelated pair -- that would treat the two year groups
+  # as independent, which they are not.
+  #
+  # lumi_1 is one nuisance whose value depends on the era. Under a meta-era the datacard
+  # maker cannot express that as a single lnN on the summed yield, so it builds the
+  # variation sub-era by sub-era and writes it as a shape; each sub-era contributes its
+  # own factor, and the ratio to nominal comes out as the yield-weighted blend.
+  #
+  # Reference: https://twiki.cern.ch/twiki/bin/viewauth/CMS/LumiRecommendationsRun3?extralog=-%20caching%20topic#Correlations_between_years_and_c
+  - name: lumi_1_13p6TeV
+    hasMultipleValues: True
+    type: lnN
+    value:
+      - value: 0.0138
+        type: lnN
+        eras:
+          - Run3_2022
+          - Run3_2022EE
+      - value: 0.0017
+        type: lnN
+        eras:
+          - Run3_2023
+          - Run3_2023BPix
+  - name: lumi_2_13p6TeV
+    type: lnN
+    eras:
+      - Run3_2023
+      - Run3_2023BPix
+    value: 0.0127
+
+  # Pileup
+  - name: CMS_pileup_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_pileup_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_pileup_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_pileup_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix

@@ -67,21 +67,36 @@ The cards are built from shared files, each card listing the ones it uses under 
 
 ```
 config/Datacards/
-  systematics.yaml          the uncertainties shared by DL and SL: luminosity, pileup, lepton,
-                            b-tagging, AK8, jet and electron, parton shower
-  DL/dl_common.yaml         everything else the DL spin cards share
-  DL/dl_spin{0,2}.yaml      include ../systematics.yaml and dl_common.yaml; add the signals,
+  systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
+    luminosity.yaml           luminosity and pileup
+    muons.yaml                muon ID, ID+isolation, trigger
+    electrons.yaml            electron ID+isolation, trigger, energy scale and resolution
+    jets.yaml                 JES, JER
+    btag.yaml                 AK4 b-tagging
+    ak8.yaml                  AK8 Hbb, Hcc, tau21
+    parton_shower.yaml        ISR, FSR
+  DL/systematics/           the DL-only uncertainties:
+    theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)
+    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
+    dy_template.yaml          the DY templates and the low-mass DY estimate
+    normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
+    cr_shapes.yaml            the control regions' DNN-shape nuisances
+  DL/dl_common.yaml         the other settings the DL spin cards share
+  DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
                             their BR uncertainties and the limit plots
   SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
   SL/sl_spin{0,2}.yaml
 ```
 
-Includes do not nest, which is why each card lists both shared files. The merge is
+Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
+another version of one of them). `test/test_datacard_includes.py` checks that the cards of one
+kind include the same topics, and every card every topic of `systematics/`, so a file forgotten
+in one card does not go unnoticed. The merge is
 strict: a top-level setting is made in one file only, and an entry of `processes`,
 `uncertainties`, `limit_plots` or `impact_plots` is defined once — anything set twice
 stops the chain with an error naming both files, never an override. A setting that
 differs between the spins therefore lives in each spin card, and one that differs between DL
-and SL in that channel's common file, not in `systematics.yaml`.
+and SL in that channel's own files, not in `systematics/`.
 Include paths are relative to the including file. To see a card as the chain reads it:
 
 ```bash

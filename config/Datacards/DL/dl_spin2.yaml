@@ -1,10 +1,23 @@
 # HH->bbWW DL resonant datacards, spin-2 (graviton) signal hypothesis.
 # Everything but the signal processes, their branching-ratio uncertainties and the limit
-# plots is in dl_common.yaml (DL) and ../systematics.yaml (DL and SL), shared with the
-# spin-0 card dl_spin0.yaml.
+# plots is shared with the spin-0 card dl_spin0.yaml: the settings in dl_common.yaml, the
+# DL-only uncertainties in systematics/ and those shared with SL in ../systematics/.
 # ${MX} and ${ERA} are filled by StatInference.
 include:
-  - ../systematics.yaml
+  # uncertainties shared by all cards (every file of ../systematics/)
+  - ../systematics/luminosity.yaml
+  - ../systematics/muons.yaml
+  - ../systematics/electrons.yaml
+  - ../systematics/jets.yaml
+  - ../systematics/btag.yaml
+  - ../systematics/ak8.yaml
+  - ../systematics/parton_shower.yaml
+  # DL-only uncertainties (every file of systematics/)
+  - systematics/theory.yaml
+  - systematics/dy_reweighting.yaml
+  - systematics/dy_template.yaml
+  - systematics/normalisations.yaml
+  - systematics/cr_shapes.yaml
   - dl_common.yaml
 
 processes:

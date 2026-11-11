@@ -1,0 +1,35 @@
+# Process theory: QCD scale, PDF+alpha_s, top mass of the DL backgrounds.
+#
+# DL only: included by DL/dl_spin0.yaml and DL/dl_spin2.yaml, next to ../systematics/ (shared with
+# SL) and dl_common.yaml. The merge is strict (StatInference/common/card_config.py): an uncertainty
+# is defined in one file only.
+uncertainties:
+  - name: QCD_scale_ST
+    type: lnN
+    processes:
+      - ST
+    value: [ -0.022, +0.022 ]
+    # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
+
+  # Theory and normalisation uncertainties of the members of merged backgrounds (TT = TT + ttV,
+  # DY = DY_M_10to50 + DY_M_50, Minor = VV + VVV + H + W, and PDF_alphas across TT, ST, DY and
+  # Minor). The preprocess step writes each as a shape of the merged background that moves only
+  # that member's own part, by the member's own amount; the values and their sources are in
+  # binning_eqsig_DL_v2610.yaml (member_uncertainties).
+  - name: QCD_scale_TT
+    type: shape
+    processes: [ TT ]
+
+  # DY_M_50 only: low-mass DY has its own prior (CMS_bbww_norm_DY_lowmass)
+  - name: QCD_scale_DY
+    type: shape
+    processes: [ DY ]
+  - name: QCD_scale_ttV
+    type: shape
+    processes: [ TT ]
+  - name: top_mass
+    type: shape
+    processes: [ TT, ST ]
+  - name: PDF_alphas
+    type: shape
+    processes: [ TT, ST, DY, Minor ]

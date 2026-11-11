@@ -6,7 +6,7 @@
 # are final. The previous single-file SL card, x_hh_bbww_SL_run3.yaml, is kept for reference.
 #
 # Not a card on its own. The cards sl_spin0.yaml and sl_spin2.yaml include it, together with the
-# uncertainties shared with DL (../systematics.yaml), and add what differs between the spins:
+# uncertainties shared with DL (../systematics/), and add what differs between the spins:
 # the signal processes, their branching-ratio uncertainties and the limit plots. Merging is strict
 # (StatInference/common/card_config.py): a top-level key is set in one file only, and an entry of
 # `processes`, `uncertainties`, `limit_plots` or `impact_plots` is defined once -- anything set
@@ -78,7 +78,7 @@ processes:
 
 # SL-specific uncertainties (process theory and normalisations of the SL backgrounds, SL control
 # regions, ...). The ones shared with DL (luminosity, pileup, lepton, b-tagging, AK8, jet and
-# electron, parton shower) are in ../systematics.yaml.
+# electron, parton shower) are in ../systematics/, one file per topic.
 uncertainties: [ ]
 
 autolnNThr: 0.1

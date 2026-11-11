@@ -1,0 +1,56 @@
+# AK8 (boosted) tagging: Hbb, Hcc and tau21 scale factors.
+#
+# Included by every card that shares it -- DL/dl_spin{0,2}.yaml, SL/sl_spin{0,2}.yaml and the CI
+# cards -- each listing every file of config/Datacards/systematics/ explicitly. The merge is strict
+# (StatInference/common/card_config.py): an uncertainty is defined in one file only, and defining
+# it again anywhere a card includes is an error, never an override.
+uncertainties:
+  # AK8 BTagging
+  - name: CMS_bbww_ak8_Hbb_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_bbww_ak8_Hbb_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_bbww_ak8_Hbb_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_bbww_ak8_Hbb_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_bbww_ak8_Hcc_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_bbww_ak8_Hcc_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_bbww_ak8_Hcc_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_bbww_ak8_Hcc_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_bbww_ak8_tau21_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_bbww_ak8_tau21_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_bbww_ak8_tau21_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_bbww_ak8_tau21_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
