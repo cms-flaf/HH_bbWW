@@ -530,17 +530,10 @@ payload_producers:
 
 region: All
 region_default: SR
-custom_regions: QCDRegions
-
-# Window sets for window regions (FLAF Common/WindowRegions.py): a histTuple flavour's
-# `window_regions` makes regions <region>_<set>Win_m<MX>, the base region within the window of
-# mass MX, per category as the definitions give it: a box {<variable>: [low, high], ...} over the
-# set's `variables`. The edges must be bin edges of each variable's binning (histograms.yaml); the
-# cut is made on the stored bin indices.
-windows:
-  HME:
-    variables: [ DeepHME_mass ]
-    definitions: config/windows/hme_DL_v2610.yaml
+# What is histogrammed where (FLAF booking plugin, Analysis/hist_booking.py): each histTuple
+# flavour's `regions` (histTuple_flavors below) and `sub_regions`; FLAF publishes the regions as
+# histTuple_regions.
+hist_booking_module: Analysis.hist_booking
 
 custom_categories: ""
 custom_subcategories: [ ]
@@ -615,28 +608,9 @@ categories:
   # - baseline_boosted
   # - baseline_resolved
 
-QCDRegions:
-  - OS_Iso
-  - SR
-  - TT_CR
-  - DY_CR
-  # - W_CR
-  # - SR_mbb
-
-  # SL signal and control regions
-  # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
-  - SR_SL
-  # - CR_SL_TT
-  # - CR_SL_ST
-  # - CR_SL_WJets
-  # - CR_SL_DY
-  # - CR_SL_H
-  # - CR_SL_VV
-
-  - OS_AntiIso_SR
-
+# A histTuple keeps the events in one of the flavour's regions and one of the categories.
 histTuple_selectors:
-  - QCDRegions
+  - histTuple_regions
   - categories
 
 boosted_categories: [ ]
@@ -692,6 +666,29 @@ histTuple_flavor: binary_DNN_outputs
 histTuple_flavors:
   binary_DNN_outputs:
     fullResolution_variables: [ ]
+
+    # The regions histogrammed (and kept in the histTuples, histTuple_selectors), each a boolean
+    # column (Analysis/hh_bbww.py). The other flavours reuse this list (*all_regions) unless they
+    # need their own.
+    regions: &all_regions
+      - OS_Iso
+      - SR
+      - TT_CR
+      - DY_CR
+      # - W_CR
+      # - SR_mbb
+
+      # SL signal and control regions
+      # if you are running SL Hist*Task, you might want to uncomment these so that signal regions and SRs are created for the SL channel
+      - SR_SL
+      # - CR_SL_TT
+      # - CR_SL_ST
+      # - CR_SL_WJets
+      # - CR_SL_DY
+      # - CR_SL_H
+      # - CR_SL_VV
+
+      - OS_AntiIso_SR
 
     variables:
       - TwoStageDNN_M250_binary
@@ -787,6 +784,7 @@ histTuple_flavors:
         vars: [ TwoStageDNN_M2000_binary, DeepHME_mass ]
 
   DNN_Training:
+    regions: *all_regions
     fullResolution_variables:
       - lep1_pt
       - lep1_eta
@@ -948,6 +946,7 @@ histTuple_flavors:
       - lep1_pt
 
   Control_Plots:
+    regions: *all_regions
     fullResolution_variables:
       # Add one default fullres for CI to validate it works
       - lep1_pt
@@ -1111,6 +1110,9 @@ histTuple_flavors:
   # Every variable is booked per variation, channel and category, so `default` does not
   # fit the CI pod's memory once a process has more than one dataset.
   CI:
+    # The CI chain: the inclusive OS_Iso and the mass-independent single-lepton signal region
+    # (CI_card_SL.yaml still reads the per-mass SR_SL_M${MX} until the datacard configs follow).
+    regions: [ OS_Iso, SR_SL ]
     # One fullres variable, to keep that path tested.
     fullResolution_variables:
       - lep1_pt
@@ -1134,6 +1136,7 @@ histTuple_flavors:
         vars: [ DNN_M300_Signal, DeepHME_mass ]
 
   DL_DNN_Inputs:
+    regions: *all_regions
     # DL DNN Inputs
     fullResolution_variables: [ ]
 
@@ -1187,6 +1190,7 @@ histTuple_flavors:
       - DeepHME_mass
 
   Signal_Extraction_DL:
+    regions: *all_regions
     # DNN Outputs (Shapes)
     fullResolution_variables: [ ]
 
@@ -1349,16 +1353,18 @@ histTuple_flavors:
         vars: [ DNN_M1500_Signal, DeepHME_mass ]
 
   Signal_Extraction_DL_window:
-    # Signal_Extraction_DL with the 2D DNN_m<MX>_vs_HME replaced by window regions: each
-    # DNN_M<MX>_Signal is also filled in SR/TT_CR/DY_CR_HMEWin_m<MX> (the base region within the
-    # frozen HME window of MX, config/windows/hme_DL_v2610.yaml), the window slice of the 2D.
+    # Signal_Extraction_DL with the 2D DNN_m<MX>_vs_HME replaced by sub-regions: the variables of
+    # mass MX (signal_params in histograms.yaml) and DeepHME_mass are also filled in
+    # SR/TT_CR/DY_CR_HMESub_m<MX>, the base region within the frozen HME range of MX
+    # (config/sub_regions/hme_DL_v2610.yaml); DNN_M<MX>_Signal there is the slice of the 2D.
     fullResolution_variables: [ ]
 
-    window_regions:
-      - window: HME
+    regions: [ SR, TT_CR, DY_CR ]
+    sub_regions:
+      - name: HMESub
+        cuts: config/sub_regions/hme_DL_v2610.yaml
         regions: [ SR, TT_CR, DY_CR ]
         masses: all
-        vars: [ "DNN_M{MX}_Signal" ]
 
     variables:
       - DeepHME_mass
@@ -1468,6 +1474,7 @@ histTuple_flavors:
       - DNN_M1500_Other
 
   TwoStageDNN_Outputs:
+    regions: *all_regions
     # DNN Outputs (Shapes)
     fullResolution_variables: [ ]
 

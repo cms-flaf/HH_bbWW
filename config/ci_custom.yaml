@@ -6,14 +6,9 @@ compute_unc_variations: true
 compute_unc_histograms: true
 store_noncentral: true
 phys_model: TestModel
-# The trimmed variable set in global.yaml; `default` runs the CI pod out of memory.
+# The trimmed variable set in global.yaml; `default` runs the CI pod out of memory. Its regions
+# (OS_Iso and SR_SL) are the flavour's.
 histTuple_flavor: CI
-
-QCDRegions:
-  - OS_Iso
-  # The mass-independent single-lepton signal region of the two-stage DNN. Produced and
-  # plotted; the CI_SL card reads the looser OS_Iso (see CI/CI_card_SL.yaml).
-  - SR_SL
 
 StatInference:
   # Both CI cards, each with its own datacards and limit, as the analysis lists its cards.
