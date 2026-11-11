@@ -69,11 +69,8 @@ The cards are built from shared files, each card listing the ones it uses under 
 config/Datacards/
   systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
     luminosity.yaml           luminosity and pileup
-    muons.yaml                muon ID, ID+isolation, trigger
-    electrons.yaml            electron ID+isolation, trigger, energy scale and resolution
-    jets.yaml                 JES, JER
-    btag.yaml                 AK4 b-tagging
-    ak8.yaml                  AK8 Hbb, Hcc, tau21
+    leptons.yaml              muon and electron ID, isolation and trigger; electron scale and resolution
+    jets.yaml                 JES, JER, AK4 b-tagging, AK8 Hbb, Hcc, tau21
     parton_shower.yaml        ISR, FSR
   DL/systematics/           the DL-only uncertainties:
     theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)

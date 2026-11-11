@@ -6,11 +6,8 @@
 include:
   # uncertainties shared by all cards (every file of ../systematics/)
   - ../systematics/luminosity.yaml
-  - ../systematics/muons.yaml
-  - ../systematics/electrons.yaml
+  - ../systematics/leptons.yaml
   - ../systematics/jets.yaml
-  - ../systematics/btag.yaml
-  - ../systematics/ak8.yaml
   - ../systematics/parton_shower.yaml
   - sl_common.yaml
 
