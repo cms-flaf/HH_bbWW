@@ -1,7 +1,8 @@
-# Systematic uncertainties shared by the HH->bbWW datacard cards: the object-level experimental
-# ones (luminosity, lepton ID/isolation/trigger, pileup, b-tagging, AK8 tagging, jet and electron
-# scale and resolution, parton shower), which apply to every process in every channel and
-# category. Every card includes this file next to its channel's common file:
+# Systematic uncertainties shared by the HH->bbWW datacard cards: those not tied to a channel's
+# processes or categories -- luminosity, lepton ID/isolation/trigger, pileup, b-tagging, AK8
+# tagging, jet and electron scale and resolution, parton shower -- which apply to every process
+# in every channel and category. Every card includes this file next to its channel's common file
+# (the CI cards too, next to CI/CI_common.yaml):
 #
 #   include:
 #     - ../systematics.yaml

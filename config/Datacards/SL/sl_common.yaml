@@ -77,7 +77,8 @@ processes:
     allow_zero_integral: true
 
 # SL-specific uncertainties (process theory and normalisations of the SL backgrounds, SL control
-# regions, ...). The object-level experimental ones shared with DL are in ../systematics.yaml.
+# regions, ...). The ones shared with DL (luminosity, pileup, lepton, b-tagging, AK8, jet and
+# electron, parton shower) are in ../systematics.yaml.
 uncertainties: [ ]
 
 autolnNThr: 0.1

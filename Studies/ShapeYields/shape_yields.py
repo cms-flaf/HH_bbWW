@@ -35,6 +35,7 @@ import sys
 
 import numpy as np
 import uproot
+import yaml
 
 import matplotlib
 
@@ -72,7 +73,14 @@ DERIVED_FILL = "#f0efec"
 
 
 def load_config(path):
+    """The datacard card, merged with its includes."""
     return load_card_config(path)
+
+
+def load_yaml(path):
+    """Any other YAML file (the binning configuration is not a card)."""
+    with open(path) as f:
+        return yaml.safe_load(f)
 
 
 class CategoryNaming:
@@ -774,7 +782,7 @@ def main():
         "era_group": group,
     }
     if args.binning_config:
-        b = load_config(args.binning_config)
+        b = load_yaml(args.binning_config)
         knobs["category_pattern"] = b.get("category_pattern", knobs["category_pattern"])
         knobs["slice_var"] = b.get("slice_var", knobs["slice_var"])
 

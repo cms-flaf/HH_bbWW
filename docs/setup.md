@@ -42,8 +42,9 @@ named by its expanded process (`GluGluToRadion_bbWW_2L_300`,
 control plots sum the Radion bb̄WW dilepton, single-lepton and bb̄ττ samples per mass, for display
 only; see
 [Control plots](analysis.md#control-plots)). Which hypothesis a fit uses is chosen later, by the
-datacard's process list; the dilepton card fits `GluGluToRadion_bbTauTau` together with
-`GluGluToRadion_bbWW_2L`. A signal added to a physics model must also be registered in
+datacard's process list; the dilepton spin-0 card fits `GluGluToRadion_bbWW_2L`,
+`GluGluToRadion_bbWW_1L` and `GluGluToRadion_bbTauTau` together, as one signal under one signal
+strength r (the spin-2 card the three `GluGluToBulkGraviton` ones). A signal added to a physics model must also be registered in
 `AnaProd/anaTupleDef.py`: in `signals_with_hvv` when its decay has an H→VV, whose gen-level
 candidate the anaTuple then stores, or in `signals_without_hvv` otherwise. The AnaTuple job of
 an unregistered signal stops at start-up. The samples cover Run3_2022 through Run3_2023BPix; later eras have no
