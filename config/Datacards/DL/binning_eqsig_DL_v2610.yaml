@@ -59,7 +59,9 @@ control_region_bins:
 
 # A tilt of each CR's main process along the DNN, nominal x (1 +- size x (2t - 1)), one nuisance per
 # jet category; size = the observed data/MC end-to-end slope. Keeps the CR slope from pulling the
-# shared shape nuisances.
+# shared shape nuisances. Measured (v2610 loose, MX 300, 5 equal-MC bins), data/MC first -> last bin:
+#   TT_CR res2b 1.005 -> 0.980, recovery 1.008 -> 0.970   (size 0.02)
+#   DY_CR res2b 1.025 -> 0.955, recovery 1.027 -> 0.958   (size 0.04)
 control_region_shapes:
   DY_CR: { process: DY, nuisance: CMS_bbww_dycr_shape, size: 0.04 }
   TT_CR: { process: TT, nuisance: CMS_bbww_ttcr_shape, size: 0.02 }
