@@ -102,7 +102,8 @@ Model `p` is applied to the events with `event % 4 == (p + 3) % 4`.
 1. **Multiclass**, one model for all masses. Its 7 outputs, in the order of `class_names` (Signal,
    TT, ST, WJets, DY, H, VV), are stored as `TwoStageDNN_<class>`. In `Analysis/hh_bbww.py` the
    class with the highest score selects the SL region: `SR_SL` for Signal, `CR_SL_<class>` for the
-   others. The regions are built only when one of them is in `QCDRegions`.
+   others. The regions are built only when one of them is in the active flavour's regions (see
+   [Regions and sub-regions](#regions-and-sub-regions)).
 2. **Binary**, parametrized by the resonance mass, which is the **last** input column. The producer
    evaluates it at each of `TwoStageDNN.masses`, filling that column with the hypothesis mass in
    GeV (the input normalization is part of the ONNX graph), and stores `TwoStageDNN_M<mass>_binary`.
@@ -154,6 +155,26 @@ and fills them in for events that only a shift selected, after checking that eve
 HH→bb̄WW is analysed in **resolved** and **boosted** categories (low- and high-p_T HH topologies).
 Category and channel selection is driven by `config/global.yaml`; narrow or extend it there or via
 your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/).
+
+## Regions and sub-regions
+
+The regions come from the **active histTuple flavour** (`histTuple_flavor`), not from a list you
+set. The analysis' booking plugin (`Analysis/hist_booking.py`, named by `hist_booking_module` in
+`config/global.yaml`; FLAF's hook is described in its
+[Booking plugin reference](https://cms-flaf.github.io/FLAF/reference/tasks/#booking-plugin)) fills
+`QCDRegions`, the list `custom_regions` names, from the flavour's `regions:` and the base regions of
+its `sub_regions:`. Everything that reads `QCDRegions` (`createKeyFilterDict`, `histTuple_selectors`,
+the plots) gets them from there.
+
+- **To change the regions,** select another flavour or edit the flavour's `regions:` in
+  `config/global.yaml`. Setting `QCDRegions` in a `user_custom.yaml` has no effect: the plugin
+  overwrites it.
+- **Sub-regions** (e.g. `HMESub` of `Signal_Extraction_DL_window`): a base region restricted by a
+  cut per model point, read from a cuts file (`config/sub_regions/hme_DL_v2610.yaml`). They are
+  filled in HistFromNtupleProducer, as keys of their own (`<channel>/SR_HMESub_m<MX>/<category>`),
+  with the variables of their model point (`signal_params` in `config/plot/histograms.yaml`;
+  variables without `signal_params` go in every point). The plugin's docstring describes the cut
+  forms.
 
 ## Choosing which variables to histogram
 
