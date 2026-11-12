@@ -511,7 +511,7 @@ class Binning:
                     sum((p[1] for p in parts), zero),
                 )
             # a member uncertainty declared for this process, whose own process has no
-            # MC here: the nominal, as for member_uncertainties below
+            # MC here: the nominal, as for the member values below
             for s in self.card.declared_member_suffixes(proc) - set(shapes):
                 shapes[s] = shapes[""]
                 self.member_suffix_seen.add(s)
