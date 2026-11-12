@@ -294,9 +294,9 @@ The DL cards (`DL/dl_spin0.yaml` and `DL/dl_spin2.yaml`, through their shared
 - reads the DNN score `DNN_M<MX>_Signal` in the category's frozen HME window: the
   sub-regions `<region>_HMESub_m<MX>` (Analysis/hist_booking.py) of the flavour `Signal_Extraction_DL_window`
   ([`config/sub_regions/hme_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/sub_regions/hme_DL_v2610.yaml)).
-  The control regions use their jet category's window, and events outside the window are not
-  in it. With `windows:` in the binning configuration it instead cuts the windows out of the 2D
-  `DNN_m<MX>_vs_HME` histograms;
+  The control regions use their jet category's window. The sub-region histograms are filled only
+  with events inside the window, so there is nothing to cut here. With `windows:` in the binning
+  configuration it instead cuts the windows out of the 2D `DNN_m<MX>_vs_HME` histograms;
 - carries the members of the QCD-scale and PDF uncertainties (`members:` in the cards) to the
   final bins; the datacard maker reduces them (7-point envelope, Hessian) on the summed eras;
 - merges the processes into the card's backgrounds (TT, DY, ST, Minor) and writes the
@@ -352,7 +352,8 @@ cmsEnv python3 Analysis/EqualSignalBinning.py \
 
 The datacard bins are named without a `/` (`SR_res2b`, `TT_res2b`, `DY_res2b`, …), because
 dhi's impact merging cannot handle one. `input_categories` maps each name to its directory in
-the histogram files (`SR_res2b: SR/res2b`, `TT_res2b: TT_CR/res2b`, …).
+the histogram files, the sub-region of the mass being built (`SR_res2b: SR_HMESub_m${MX}/res2b`,
+`TT_res2b: TT_CR_HMESub_m${MX}/res2b`, …); StatInference substitutes `${MX}`.
 
 The generic `StatInference/bin_opt_2d/rebin_2d.py` (with `config/Datacards/DL/binning_hmebox.yaml`
 or `DL/binning_2d.yaml`) was the DL card's earlier preprocessing step. It is still available
