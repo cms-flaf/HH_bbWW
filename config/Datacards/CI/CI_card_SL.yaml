@@ -1,0 +1,48 @@
+# The CI single-lepton card (CI_SL in ci_custom.yaml).
+include:
+  # uncertainties shared by all cards (every file of ../systematics/)
+  - ../systematics/luminosity.yaml
+  - ../systematics/leptons.yaml
+  - ../systematics/jets.yaml
+  - ../systematics/parton_shower.yaml
+  - CI_common.yaml
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  # The binary score of the two-stage single-lepton DNN, 1D.
+  input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
+channels:
+  - e
+  - mu
+# Read from OS_Iso (one lepton: isolated + event selection, i.e. SR_SL without the DNN class and
+# tau veto): SR_SL alone leaves bins with no background at --test statistics.
+categories:
+  - SR/res2b
+  - SR/recovery
+input_categories:
+  SR/res2b: OS_Iso/res2b
+  SR/recovery: OS_Iso/recovery
+
+# One bin over the binary score's histogram range (it is an unbounded logit; anything outside
+# is in the flow bins, empty at MX 300).
+hist_bins: [ -23.5, 23.5 ]
+processes:
+  # both CI signals, as the analysis cards hold both
+  - process: XtoHHto2B2W_1L_${MX}
+    hist_name: XtoHHto2B2W_1L_${MX}
+    param_values: [ 300 ]
+    is_signal: true
+    # at --test statistics a channel x category can hold no 1L signal event
+    allow_zero_integral: true
+  - process: XtoHHto2B2W_2L_${MX}
+    hist_name: XtoHHto2B2W_2L_${MX}
+    param_values: [ 300 ]
+    is_signal: true
+    # a dilepton event selected with one lepton: few at --test statistics
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  # TT only: the amc@NLO DY sample's negative weights do not cancel at --test 1000, so its
+  # histogram can come out negative.
+  - process: custom_CI_Background_TT
+    allow_zero_integral: true

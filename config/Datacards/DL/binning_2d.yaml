@@ -1,0 +1,32 @@
+# rebin_2d.py binning (the DL card's earlier preprocessing): x = DNN score, cut into slices that
+# become categories; y = HME, rebinned within each slice. Key names: no infix = summed background,
+# _each = per background, _neff = effective MC entries.
+
+# --- the sliced axis (x = DNN score) ---
+n_slices: 4
+# must match the reading card's category_pattern
+category_pattern: "{base_category}_dnn{slice_idx}"
+slice_var: DNN
+
+# a slice needs background that is there (yield) and measured (N_eff), or the significance favours
+# downward fluctuations
+min_slice_bkg_sum: 1.0
+min_slice_bkg_neff: 4.0
+
+# the same per background (a negative one hides in a healthy total); the N_eff floor is off, as it
+# costs too much where DY is sparse
+min_slice_bkg_each: 0.01
+min_slice_bkg_each_neff: 0.0
+
+# --- the rebinned axis (y = HME mass) ---
+max_bins_per_slice: 10
+# summed background per y bin (overrides max_bins_per_slice): without it, edges follow MC fluctuations
+bkg_per_bin: 5.0
+min_bin_bkg_each: 0.01
+min_bin_bkg_neff: 4.0
+
+# --- both axes ---
+# backgrounds below this fraction of the category are exempt from the per-process floors
+min_bkg_frac: 0.05
+min_signal: 0.5
+significance_mode: asimov

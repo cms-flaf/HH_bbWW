@@ -1,0 +1,28 @@
+# DL: DNN-shape uncertainties of the binned control regions.
+uncertainties:
+  # A tilt of the CR's main process along the DNN (+-4 % DY, +-2 % TT at the ends), one per jet
+  # category; absorbs CR shape mis-modelling (binning_eqsig_DL_v2610.yaml: control_region_shapes).
+  - name: CMS_bbww_dycr_shape_res2b
+    type: shape
+    processes: [ DY ]
+    categories: [ DY_res2b ]
+  - name: CMS_bbww_ttcr_shape_res2b
+    type: shape
+    processes: [ TT ]
+    categories: [ TT_res2b ]
+  - name: CMS_bbww_dycr_shape_recovery
+    type: shape
+    processes: [ DY ]
+    categories: [ DY_recovery ]
+  - name: CMS_bbww_ttcr_shape_recovery
+    type: shape
+    processes: [ TT ]
+    categories: [ TT_recovery ]
+  - name: CMS_bbww_dycr_shape_boosted
+    type: shape
+    processes: [ DY ]
+    categories: [ DY_boosted ]
+  - name: CMS_bbww_ttcr_shape_boosted
+    type: shape
+    processes: [ TT ]
+    categories: [ TT_boosted ]

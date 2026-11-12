@@ -1,0 +1,124 @@
+# HH->bbWW DL datacards: the settings shared by dl_spin0.yaml and dl_spin2.yaml, which include
+# it with the uncertainty files. Not a card on its own. The merge is strict: anything set in two
+# files is an error, so a setting that differs between the spins goes in the spin cards.
+analysis: hh_bbww
+type: resonant
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+signalFractionForRelevantBins: 0.2
+# Every listed era gets its own binning, datacards and limit; only the four-era combination is
+# built. Run3_22_23 is global.yaml's meta-era (its plot style is used by the shape plots).
+eras:
+  # - Run3_2022
+  # - Run3_2022EE
+  # - Run3_2023
+  # - Run3_2023BPix
+  - Run3_22_23
+era_groups:
+  Run3_22_23:
+    - Run3_2022
+    - Run3_2022EE
+    - Run3_2023
+    - Run3_2023BPix
+channels:
+  - muMu
+  - eMu
+  - eE
+# SR (equal-signal DNN bins) and the TT/DY control regions (5 equal-background bins), each in its
+# jet category's HME window. No "/" in the names: they become bin and MC-stat nuisance names,
+# which dhi's impact merging cannot handle with a "/"; input_categories maps them to the inputs.
+categories:
+  - SR_res2b
+  - SR_boosted
+  - SR_recovery
+  - TT_res2b
+  - TT_boosted
+  - TT_recovery
+  - DY_res2b
+  - DY_boosted
+  - DY_recovery
+input_categories:
+  SR_res2b: SR/res2b
+  SR_boosted: SR/boosted
+  SR_recovery: SR/recovery
+  TT_res2b: TT_CR/res2b
+  TT_boosted: TT_CR/boosted
+  TT_recovery: TT_CR/recovery
+  DY_res2b: DY_CR/res2b
+  DY_boosted: DY_CR/boosted
+  DY_recovery: DY_CR/recovery
+
+# Cuts the HME windows, merges the backgrounds and bins the DNN (see docs/stat_inference.md).
+# Needs Run3_Model_DYSplit inputs with TT_CR and DY_CR. --jobs: masses in parallel; on condor
+# give the task as many CPUs (--PreprocessShapesTask-n-cpus 8).
+preprocess:
+  script: Analysis/EqualSignalBinning.py
+  args:
+    - --binning-config
+    - config/Datacards/DL/binning_eqsig_DL_v2610.yaml
+    - --jobs
+    - "8"
+
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+
+  # Made by the preprocess step (binning_eqsig_DL_v2610.yaml: backgrounds): TT = TT + ttV,
+  # DY = DY_M_10to50 + DY_M_50, Minor = VV + VVV + H + W. The binning already keeps them free of
+  # negative bins; the tolerances are a safety net.
+  - process: TT
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+
+  # in all three channels: in eMu (DY->tautau) it is not negligible where the signal is
+  - process: DY
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+
+  - process: ST
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+
+  - process: Minor
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+
+# The uncertainties are in ../systematics/ (shared with SL) and systematics/ (DL only).
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+
+campaigns:
+  # dhi's key for the four eras combined (its luminosity label)
+  Run3_22_23: run3_early
+  Run3_2022: "2022preEE"
+  Run3_2022EE: "2022postEE"
+  Run3_2023: "2023preBPix"
+  Run3_2023BPix: "2023postBPix"
+
+# Pulls and impacts on the combined card (no `glob:`); see docs/stat_inference.md.
+impact_plots:
+  - name: combined
+    masses: [ 300, 600, 800 ]
+    # the expected limit at each mass (r=1 is far from it); changing it does not move the outputs,
+    # see docs/stat_inference.md
+    poi_value: limit
+    # Simplex fallback: Migrad fails on a few fits from a bad seed, and dhi then drops the merge
+    fit_args:
+      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+    plot_params:
+      # one fit per nuisance: `robust` (one Hessian) silently drops parameters it cannot invert
+      method: default
+      order_by_impact: true
+      # with mc_stats, also set parameters_per_page (~460 parameters)
+      mc_stats: false

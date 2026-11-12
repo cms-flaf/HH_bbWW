@@ -1,0 +1,44 @@
+# DL: the DY templates and the low-mass DY estimate.
+uncertainties:
+  # Each template window's fit uncertainty, one per channel (binning_eqsig_DL_v2610.yaml: dy_template).
+  - name: CMS_bbww_dy_fit_eE_res2b
+    type: shape
+    processes: [ DY ]
+    channels: [ eE ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_dy_fit_muMu_res2b
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_dy_fit_eE_recovery
+    type: shape
+    processes: [ DY ]
+    channels: [ eE ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_dy_fit_muMu_recovery
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_dy_fit_eE_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ eE ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_dy_fit_muMu_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ muMu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_dy_fit_eMu_boosted
+    type: shape
+    processes: [ DY ]
+    channels: [ eMu ]
+    categories: [ SR_boosted ]
+
+  # +-100 % on the low-mass DY estimate in SR boosted (from SR recovery)
+  - name: CMS_bbww_dy_lowmass
+    type: shape
+    processes: [ DY ]
+    categories: [ SR_boosted ]

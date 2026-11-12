@@ -1,0 +1,23 @@
+# What the two CI cards share besides ../systematics/ (which they include too).
+analysis: hh_bbww
+type: resonant
+signalFractionForRelevantBins: 0.2
+eras:
+  - Run3_2022
+  - Run3_2022EE
+  - Run3_2023
+  - Run3_2023BPix
+
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true

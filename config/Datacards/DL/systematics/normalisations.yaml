@@ -1,0 +1,47 @@
+# DL normalisations: TT/DY from the control regions, low-mass DY, Minor members.
+uncertainties:
+  - name: CMS_bbww_minor_norm_VV
+    type: shape
+    processes: [ Minor ]
+  - name: CMS_bbww_minor_norm_VVV
+    type: shape
+    processes: [ Minor ]
+  - name: CMS_bbww_minor_norm_H
+    type: shape
+    processes: [ Minor ]
+
+  # W is only in recovery (binning_eqsig_DL_v2610.yaml: drop), in every region
+  - name: CMS_bbww_minor_norm_W
+    type: shape
+    processes: [ Minor ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
+
+  # Low-mass DY is in no control region: a prior of its own on top of DY's normalisation (not in
+  # SR boosted, where CMS_bbww_dy_lowmass applies).
+  - name: CMS_bbww_norm_DY_lowmass
+    type: shape
+    processes: [ DY ]
+    categories: [ SR_res2b, SR_recovery ]
+
+  # TT and DY normalisations: generous priors, constrained by TT_CR / DY_CR in the fit (as good as
+  # free rateParams); boosted shares res2b's (too few CR events).
+  - name: CMS_bbww_norm_TT_res2b
+    type: lnN
+    processes: [ TT ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    value: 0.10
+  - name: CMS_bbww_norm_TT_recovery
+    type: lnN
+    processes: [ TT ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
+    value: 0.10
+  - name: CMS_bbww_norm_DY_res2b
+    type: lnN
+    processes: [ DY ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    value: 0.20
+  - name: CMS_bbww_norm_DY_recovery
+    type: lnN
+    processes: [ DY ]
+    categories: [ SR_recovery, TT_recovery, DY_recovery ]
+    value: 0.20

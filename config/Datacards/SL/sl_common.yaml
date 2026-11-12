@@ -1,0 +1,91 @@
+# HH->bbWW SL datacards: the settings shared by sl_spin0.yaml and sl_spin2.yaml (as DL/dl_common.yaml).
+# SKELETON: not in `cards:`, not built or validated; binning, backgrounds and SL uncertainties are
+# placeholders. x_hh_bbww_SL_run3.yaml (the earlier single-file SL card) is kept for reference.
+analysis: hh_bbww
+type: resonant
+model:
+  parameters: [ MX ]
+  param_dependent_bkg: true
+  # The binary score of the two-stage SL DNN (a logit, -23.5:23.5), parametrised in the mass. 1D.
+  input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
+signalFractionForRelevantBins: 0.2
+eras:
+  - Run3_22_23
+era_groups:
+  Run3_22_23:
+    - Run3_2022
+    - Run3_2022EE
+    - Run3_2023
+    - Run3_2023BPix
+channels:
+  - e
+  - mu
+# The jet categories of the mass-independent SR_SL (#191); CR_SL_<class> would follow the same way.
+categories:
+  - SR_res2b
+  - SR_recovery
+  - SR_boosted
+input_categories:
+  SR_res2b: SR_SL/res2b
+  SR_recovery: SR_SL/recovery
+  SR_boosted: SR_SL/boosted
+
+# No `preprocess:` (binning) step yet: the shapes are read as produced.
+
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+
+  # Placeholder backgrounds (those of the previous SL card); to be fixed with the SL merging.
+  - process: TT
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: W
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: ST
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+  - process: DY
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+  - process: VV
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+  - process: H
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    allow_zero_integral: true
+
+# SL-specific uncertainties go here; the shared ones are in ../systematics/.
+uncertainties: [ ]
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+
+campaigns:
+  Run3_22_23: run3_early
+  Run3_2022: "2022preEE"
+  Run3_2022EE: "2022postEE"
+  Run3_2023: "2023preBPix"
+  Run3_2023BPix: "2023postBPix"
+
+impact_plots:
+  - name: combined
+    masses: [ 300, 600, 800 ]
+    poi_value: limit
+    fit_args:
+      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+    plot_params:
+      method: default
+      order_by_impact: true
+      mc_stats: false

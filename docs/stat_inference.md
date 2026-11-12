@@ -46,21 +46,88 @@ task shells out to for the band plots.
 tree it *reads*, so a re-binning or a re-fit does not require the input histograms to be
 reproduced under a new name.
 
-The analysis configuration is [`config/Datacards/x_hh_bbww_DL_run3.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/x_hh_bbww_DL_run3.yaml),
-selected by `StatInference.config` in `config/global.yaml`. It declares the eras,
-channels, categories, mass points, processes and uncertainties — the chain reads them
-from there, not from `global.yaml`'s own variable lists.
+The datacard configuration is a set of *cards*, listed by name under `StatInference.cards`
+in `config/global.yaml` (`StatInference.config` instead names a single card file):
+
+```yaml
+StatInference:
+  cards:
+    DL_spin0: config/Datacards/DL/dl_spin0.yaml
+    DL_spin2: config/Datacards/DL/dl_spin2.yaml
+```
+
+Each card — `DL_spin0`
+([`DL/dl_spin0.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/dl_spin0.yaml))
+and `DL_spin2` (`DL/dl_spin2.yaml`) — declares the eras, channels, categories, mass points,
+processes and uncertainties; the chain reads them from there, not from `global.yaml`'s
+own variable lists. Each card gets its own datacards, limits and plots, under
+`Datacards/<card>/<era>/`, `ResonantLimitsTask/<card>/` and so on.
+
+The cards are built from shared files, each card listing the ones it uses under `include:`:
+
+```
+config/Datacards/
+  systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
+    luminosity.yaml           luminosity and pileup
+    leptons.yaml              muon and electron ID, isolation and trigger; electron scale and resolution
+    jets.yaml                 JES, JER, AK4 b-tagging, AK8 Hbb, Hcc, tau21
+    parton_shower.yaml        ISR, FSR
+  DL/systematics/           the DL-only uncertainties:
+    theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)
+    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
+    dy_template.yaml          the DY templates and the low-mass DY estimate
+    normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
+    cr_shapes.yaml            the control regions' DNN-shape nuisances
+  DL/dl_common.yaml         the other settings the DL spin cards share
+  DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
+                            their BR uncertainties and the limit plots
+  SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
+  SL/sl_spin{0,2}.yaml
+```
+
+Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
+another version of one of them). `test/test_datacard_includes.py` checks that the cards of one
+kind include the same topics, and every card every topic of `systematics/`, so a file forgotten
+in one card does not go unnoticed. The merge is
+strict: a top-level setting is made in one file only, and an entry of `processes`,
+`uncertainties`, `limit_plots` or `impact_plots` is defined once — anything set twice
+stops the chain with an error naming both files, never an override. A setting that
+differs between the spins therefore lives in each spin card, and one that differs between DL
+and SL in that channel's own files, not in `systematics/`.
+Include paths are relative to the including file. To see a card as the chain reads it:
+
+```bash
+python3 StatInference/common/card_config.py config/Datacards/DL/dl_spin0.yaml
+```
+
+prints each setting and entry with the file it comes from; every datacard and preprocess
+output also keeps the merged card it was built from, as `card_config.yaml`.
+
+`ResonantLimitsTask`, `PlotResonantLimitsTask` and `PlotPullsAndImpactsTask` run for every
+card, or with `--card DL_spin0` for that card only: they then build, preprocess and fit just
+its datacards, so another card neither has to run nor can block it. Without `--card`, the plot
+tasks leave out (and name) a card that declares no plots. The `StatInference` block's
+`param_values` and `hist_bins` apply to every card; `param_values` builds each card for the
+requested masses it declares.
+
+!!! warning "Outputs from before the cards need a new `--version`"
+    Every output path now has a `<card>` level (`Datacards/<card>/<era>/…`,
+    `ResonantLimitsTask/<card>/…`, `LimitPlots/<card>`, `ImpactPlots/<card>`). Run under a new
+    `--version`: in one produced before, `ResonantLimitsAndHistPlotTask`'s marker is already
+    complete (it does not look at cards or eras), and old plot directories or HTCondor job
+    files can be taken for the new ones.
 
 !!! warning "`--era` must hold every era behind the datacards"
     Which eras get datacards and limits comes from the configuration's `eras:` and
     `era_groups:` blocks, not from `--era`. A real era listed inside an `era_groups:` entry
     is covered by that meta-era and is not built standalone, so with the Run 3
-    configuration the chain builds the `Run3_Early` combination of all four eras. `--era`
-    must name every real era those cards read — here the four of `Run3_Early` — or the
-    run stops with `the cards of … need Run3_Early: …, which --era does not include`.
+    configuration the chain builds the `Run3_22_23` combination of all four eras. `--era`
+    must name every real era those cards read — here the four of `Run3_22_23` — or the
+    run stops with `the cards need DL_spin0 Run3_22_23: …, which --era does not include`.
+    This holds with `--card` too: the datacard workflows' branch maps cover every card.
     Further eras are allowed and are not carded. `CreateDatacardsTask` and
-    `PreprocessShapesTask` are one workflow each, with one branch per card, and their
-    outputs (`Datacards/<card>`, `Hists_preprocessed/<card>`) do not depend on `--era`
+    `PreprocessShapesTask` are one workflow each, with one branch per card and era (and mass), and their
+    outputs (`Datacards/<card>/<era>`, `Hists_preprocessed/<card>/<era>`) do not depend on `--era`
     ([FLAF → Eras](https://cms-flaf.github.io/FLAF/concepts/eras/#which-tasks-take-several-eras)).
 
 ### Where the shape uncertainties come from
@@ -129,7 +196,7 @@ Two consequences worth knowing:
   at merge time. Cross-check every card's `type: shape` entries against the producers of
   each era it declares before merging a correlation change.
 
-For a meta-era such as `Run3_Early`, a nuisance scoped to one sub-era still applies: it
+For a meta-era such as `Run3_22_23`, a nuisance scoped to one sub-era still applies: it
 varies that sub-era's contribution to the summed shape while the others contribute their
 nominal. The same holds for an `lnN` whose value differs per sub-era — `lumi_1_13p6TeV` is
 written into the card as a shape for exactly that reason, since one log-normal on the
@@ -221,51 +288,72 @@ A configuration with no `preprocess:` block skips the task entirely and the data
 built from the merged histograms unchanged, so an analysis that needs no preprocessing is
 unaffected.
 
-This analysis plugs in `StatInference/bin_opt_2d/rebin_2d.py`, which derives the binning
-from the shapes themselves. The DL card uses its `window` strategy (`window_axis: y`): for
-each mass, channel and base category, one HME window around the resonance with the DNN
-score binned inside it; events outside the window are dropped. Each base category
-`SR/res2b` becomes the single datacard bin `SR/res2b_hmebox0`.
+The DL cards (`DL/dl_spin0.yaml` and `DL/dl_spin2.yaml`, through their shared
+`DL/dl_common.yaml`) plug in `Analysis/EqualSignalBinning.py`. For every mass, channel and category it:
+
+- cuts the category's frozen HME window
+  ([`config/Datacards/DL/hme_windows_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/hme_windows_DL_v2610.yaml))
+  out of the 2D `DNN_m<MX>_vs_HME` histograms. The control regions use their jet category's
+  window, and events outside the window are dropped;
+- merges the processes into the card's backgrounds (TT, DY, ST, Minor) and writes the
+  members' theory and normalisation uncertainties as shapes;
+- replaces the sparse, partly negative-weight DY MC with a smooth fit template
+  (`Analysis/DYTemplate.py`) in the same-flavour resolved SR and in SR boosted. Each template
+  is compared with the raw MC it replaces, bin by bin (`template_pulls` in `binning.json`,
+  with a warning beyond `guard_sigma`);
+- bins the DNN score from the top down: the SR into equal-signal bins, the control
+  regions into `control_region_bins` (5) bins of equal background. A bin closes only
+  once every background passes the statistics and positivity gates, for the nominal and
+  every variation.
 
 ```yaml
 preprocess:
-  script: StatInference/bin_opt_2d/rebin_2d.py
+  script: Analysis/EqualSignalBinning.py
   args:
     - --binning-config
-    - config/Datacards/binning_hmebox.yaml
+    - config/Datacards/DL/binning_eqsig_DL_v2610.yaml
+    - --jobs
+    - 8
 ```
 
-The alternative, `config/Datacards/binning_2d.yaml`, cuts each base category into DNN
-slices (`SR/res2b_dnn0…dnn3`) with HME bins inside each; the window gives a ~5% better
-expected limit with about a third fewer fit bins.
+`--jobs` bins that many masses in parallel, one process each. On HTCondor, give
+`PreprocessShapesTask` as many CPUs (`--PreprocessShapesTask-n-cpus 8`, or through `LAW__`).
+The task stages every mass's inputs (~50 GB for 25 masses), so a local run needs
+`LAW_TARGET_TMP_DIR` on a large disk rather than the shared `/tmp`.
 
-The two halves live in different places on purpose. The **knobs** — strategy, slice count,
-bin budget, and the minimum signal/background yields and effective-entry floors a bin must
-satisfy — are analysis configuration, versioned with the card in
-[`config/Datacards/binning_hmebox.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/binning_hmebox.yaml).
-The **derived** `binning.json` is a product, not configuration, and is written into the
-task's output on EOS beside the shapes it produced.
+The two halves live in different places on purpose. The **knobs** — HME windows, bin
+targets, gates, process merging, control-region binning and shape nuisances, the DY
+templates and the member uncertainties, each with its reason — are analysis configuration,
+versioned with the card in
+[`config/Datacards/DL/binning_eqsig_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/binning_eqsig_DL_v2610.yaml).
+The **derived** `binning.json` (edges, yields and template pulls per window) is a product,
+not configuration, and is written into the task's output beside the shapes it produced.
 
-Every era in `eras:` is binned on its own statistics and gets its own limit; a group era
-from `era_groups:` is binned on its members' summed statistics, and its output keeps the
-sub-eras separate (`Run3_Early/{Run3_2022,Run3_2022EE,…}`) so the per-era uncertainties
+A group era from `era_groups:` is binned on its members' summed statistics. Its output keeps
+the sub-eras separate (`Run3_22_23/{Run3_2022,Run3_2022EE,…}`) so the per-era uncertainties
 survive to be combined in the datacard maker.
 
-`rebin_2d.py` is a plain executable, so a binning can be inspected without going through
-the chain by calling it with the same four arguments the task passes:
+`EqualSignalBinning.py` is a plain executable (run it in the CMSSW environment, which has
+`iminuit`), so a binning can be inspected without going through the chain:
 
 ```sh
-python3 StatInference/bin_opt_2d/rebin_2d.py \
+cmsEnv python3 Analysis/EqualSignalBinning.py \
   --input  "$ANALYSIS_BIG_DATA_PATH/VERSION_OF_THE_MERGED_HISTS/Hists_merged" \
-  --output /tmp/$USER/rebin_Run3_Early \
-  --era    Run3_Early \
-  --config config/Datacards/x_hh_bbww_DL_run3.yaml \
-  --binning-config config/Datacards/binning_hmebox.yaml
+  --output /tmp/$USER/eqsig_Run3_22_23 \
+  --era    Run3_22_23 \
+  --config config/Datacards/DL/dl_spin0.yaml \
+  --binning-config config/Datacards/DL/binning_eqsig_DL_v2610.yaml \
+  --masses 300,800 --jobs 2
 ```
 
-The datacard configuration then lists the written names in `categories:`
-(`SR/res2b_hmebox0`, …) and repeats the `category_pattern` used to write them, which is
-how the per-category limits group the bins of one base category back together.
+The datacard bins are named without a `/` (`SR_res2b`, `TT_res2b`, `DY_res2b`, …), because
+dhi's impact merging cannot handle one. `input_categories` maps each name to its directory in
+the histogram files (`SR_res2b: SR/res2b`, `TT_res2b: TT_CR/res2b`, …).
+
+The generic `StatInference/bin_opt_2d/rebin_2d.py` (with `config/Datacards/DL/binning_hmebox.yaml`
+or `DL/binning_2d.yaml`) was the DL card's earlier preprocessing step. It is still available
+to a card that wants an HME window or DNN slices without the control regions and DY
+templates.
 
 There is also `StatInference/bin_opt/`, an offline combine-driven search over candidate
 binnings feeding the `hist_bins` option. This analysis does not use it, and leaves
@@ -279,7 +367,7 @@ To build cards outside the chain — a quick check on shapes that are already re
 cmsEnv python3 StatInference/dc_make/create_datacards.py \
   --input  PATH_TO_REBINNED_SHAPES \
   --output PATH_TO_CARDS \
-  --config config/Datacards/x_hh_bbww_DL_run3.yaml
+  --config config/Datacards/DL/dl_spin0.yaml
 ```
 
 ## 2. Run limits on existing datacards
@@ -300,7 +388,8 @@ Hints:
 ## 3. Pulls & impacts
 
 Declared in the datacard configuration's `impact_plots` block and drawn by
-`PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<mass>/` on `fs_default`
+`PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`
+on `fs_default`
 beside the limit plots:
 
 ```sh
@@ -338,10 +427,11 @@ limits already merged for those cards; a number sets it directly.
     `POITask` hard-codes both the joined values and the postfix, dropping it silently.
 
 Each entry becomes one dhi `PlotPullsAndImpacts` per era and mass, and the plots land in
-`<version>/ImpactPlots/<name>/<era>/<mass>/`.
+`<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`, with the card in the file name too (the
+default `plot_postfix`).
 
 With no `glob:`, an entry uses the combined card `ResonantLimitsTask` writes at
-`data/<version>/Datacards/combined/combined_<mass>.txt` — every era and category in one
+`data/<version>/Datacards/<card>/combined/combined_<mass>.txt` — every era and category in one
 fit, which is the ranking that describes the result. It is drawn once and labelled
 `combined`.
 
@@ -366,18 +456,19 @@ resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt
 and `C2V`, against a workspace other than the one the chain built.
 
 !!! warning "What a mass costs depends on `method`"
-    With `method: robust` — what this analysis uses — dhi runs **one** fit per mass and
-    reads every impact off the inverted Hessian, so all three masses take minutes.
-    `method: default` instead fits each nuisance separately, roughly two combine jobs per
-    nuisance per mass (~160 here), and only that case is worth sending to a batch system.
+    With `method: default` — what this analysis uses — dhi fits each nuisance separately,
+    roughly two combine jobs per nuisance per mass (~160 here), so it is worth sending to a
+    batch system. `method: robust` instead runs **one** fit per mass and reads every impact
+    off the inverted Hessian (minutes for all three masses), but can drop parameters (below).
     `create_branch_map` in `dhi/tasks/pulls_impacts.py` is where the difference lives.
-    Pass `--redraw` to redraw without refitting.
+    To redraw without refitting, pass `--redraw` together with `--remove-output 0,a,y` (and
+    `--card`): once a card's plots exist the task is complete, and `--redraw` alone does nothing.
 
 !!! danger "`method: robust` can silently drop a nuisance"
     robustHesse removes parameters it cannot invert, logging `Dropping <name> from the
     hessian` and then exiting successfully. The dropped nuisance is simply **absent** from
-    the plot and the merged JSON, with nothing marking its absence — on the Run3_Early
-    cards this happens to `CMS_res_j`. The task diffs the fitted parameters against the
+    the plot and the merged JSON, with nothing marking its absence — on the earlier
+    `Run3_Early` cards this happened to `CMS_res_j`. The task diffs the fitted parameters against the
     card's own nuisance lines afterwards and warns, naming what went missing; take that
     warning seriously before reading a ranking as complete.
 

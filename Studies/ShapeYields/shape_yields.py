@@ -22,7 +22,7 @@ judgement about which bins are acceptable -- the numbers are the report.
 Usage:
     python3 Studies/ShapeYields/shape_yields.py \\
         --input /eos/user/d/daebi/HH_bbWW/uncv2/Hists_preprocessed/Run3_Early \\
-        --config config/Datacards/x_hh_bbww_DL_run3.yaml \\
+        --config config/Datacards/DL/dl_spin0.yaml \\
         --output Studies/ShapeYields/output/uncv2
 """
 
@@ -42,6 +42,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+
+# The datacard configuration is read through StatInference's loader, so a card that
+# includes shared files (config/Datacards/DL/dl_spin0.yaml) is read merged.
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir)
+)
+from StatInference.common.card_config import load_card_config  # noqa: E402
 
 # --- palette -----------------------------------------------------------------------
 #
@@ -66,6 +73,12 @@ DERIVED_FILL = "#f0efec"
 
 
 def load_config(path):
+    """The datacard card, merged with its includes."""
+    return load_card_config(path)
+
+
+def load_yaml(path):
+    """Any other YAML file (the binning configuration is not a card)."""
     with open(path) as f:
         return yaml.safe_load(f)
 
@@ -73,7 +86,7 @@ def load_config(path):
 class CategoryNaming:
     """Take a sliced category name apart with the pattern that put it together.
 
-    The same pattern rebin_2d.py names its output with (config/Datacards/binning_2d.yaml,
+    The same pattern rebin_2d.py names its output with (config/Datacards/DL/binning_2d.yaml,
     echoed by the datacard configuration's `category_pattern`). Kept here rather than
     imported so this tool reads only the configuration and the files, and cannot be
     broken by a change to the binner's internals.
@@ -769,7 +782,7 @@ def main():
         "era_group": group,
     }
     if args.binning_config:
-        b = load_config(args.binning_config)
+        b = load_yaml(args.binning_config)
         knobs["category_pattern"] = b.get("category_pattern", knobs["category_pattern"])
         knobs["slice_var"] = b.get("slice_var", knobs["slice_var"])
 
