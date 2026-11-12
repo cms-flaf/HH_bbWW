@@ -22,9 +22,15 @@ PDF members) are carried to the output in the final bins, per member, for the da
 reduce; they do not take part in the gates, which hold for the nominal and the Up/Down
 variations.
 
-What is merged, dropped and estimated, the windows, the gates and the target number of bins per
-window are all in the binning configuration (--binning-config); see
-config/Datacards/DL/binning_eqsig_DL_v2610.yaml for what each entry means.
+Two configurations, with no overlap (Analysis/preprocess_config.py reads and checks both):
+- the card: what is merged and dropped, the DY template and low-mass DY settings (the
+  `preprocess:` blocks of its background processes), and every uncertainty the step builds,
+  with its name, scope and value (the `preprocess:` blocks of its shape uncertainties: member
+  values, control-region tilts, the DY templates' bands, the low-mass DY factors). They are
+  all rebuilt in the bins of every run, whatever the binning.
+- the binning: the target number of bins per window, the gates, the control-region bins and,
+  for 2D inputs, the windows (--binning-config, config/Datacards/DL/binning_eqsig_DL_v2610.yaml);
+  or saved edges (--edges, a binning.json this step wrote), applied as they are.
 """
 
 import argparse
@@ -42,6 +48,11 @@ import yaml
 import ROOT
 
 from DYTemplate import fit_template, lowmass_boost_shape, tail_template
+from preprocess_config import (
+    PreprocessModel,
+    check_binning_config,
+    read_saved_edges,
+)
 
 ROOT.gROOT.SetBatch(True)
 # config/... paths are relative to the analysis area this script belongs to
@@ -59,13 +70,6 @@ WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+_m[0-9]+$")
 
 def analysis_file(path):
     return path if os.path.isabs(path) else os.path.join(ANALYSIS_PATH, path)
-
-
-def signed(value):
-    """[down, up] relative shifts of a member uncertainty; a single number v is [-v, v]."""
-    if isinstance(value, (list, tuple)):
-        return float(value[0]), float(value[1])
-    return -float(value), float(value)
 
 
 def cumulative(arr):
@@ -142,6 +146,8 @@ class Card:
                     )
                 )
         self.pattern = model["input_file_pattern"]
+        # the process model and the uncertainties the preprocess step builds
+        self.model = PreprocessModel(cfg)
         self.signals, self.backgrounds, self.data, masses = [], [], [], set()
         for p in cfg["processes"]:
             if isinstance(p, str):
@@ -206,7 +212,11 @@ class Card:
 
 
 class Binning:
-    def __init__(self, card, era, cfg, input_dir, output_dir):
+    def __init__(self, card, era, cfg, input_dir, output_dir, saved=None):
+        """`cfg`: the binning configuration (None with `saved`); `saved`: the binning of this
+        era from a binning.json ({mass: {channel: {category: record}}}), whose edges are
+        applied instead of searched for (the gates of `cfg`, if given, only warn then).
+        """
         self.card, self.era, self.input_dir, self.output_dir = (
             card,
             era,
@@ -214,6 +224,10 @@ class Binning:
             output_dir,
         )
         self.cfg = cfg
+        self.saved = saved
+        if cfg is None and saved is None:
+            raise ValueError("a binning configuration or saved edges are needed")
+        cfg = cfg or {}
         # 2D inputs: the HME windows to cut out of them; 1D inputs are already windowed
         self.windows = (
             self.load_windows(analysis_file(cfg["windows"]))
@@ -221,41 +235,25 @@ class Binning:
             else None
         )
         self.member_suffix_seen = set()  # member variations met, kept out of the gates
-        self.n_bins = cfg["n_bins"]
-        self.gates = dict(cfg["gates"])
-        # A background holding at least exempt_fraction of its window's background has to hold at
-        # least that fraction of the smallest background a bin may have: its floor is not a free
-        # number but min_bkg x exempt_fraction (0.2 x 0.05 = 0.01).
-        if "min_each" in self.gates:
-            raise ValueError(
-                "gates: min_each is no longer configurable; the per-background floor is "
-                "min_bkg x exempt_fraction. Remove it from the binning configuration."
+        self.n_bins = cfg.get("n_bins")
+        self.gates = dict(cfg["gates"]) if cfg.get("gates") else None
+        if self.gates is not None:
+            # A background holding at least exempt_fraction of its window's background has to
+            # hold at least that fraction of the smallest background a bin may have: its floor
+            # is not a free number but min_bkg x exempt_fraction (0.2 x 0.05 = 0.01).
+            self.gates["min_each"] = (
+                self.gates["min_bkg"] * self.gates["exempt_fraction"]
             )
-        self.gates["min_each"] = self.gates["min_bkg"] * self.gates["exempt_fraction"]
-        self.members = {
-            b: cfg.get("backgrounds", {}).get(b, [b]) for b in card.backgrounds
-        }
-        self.drop = cfg.get("drop") or {}
-        if "single_bin_regions" in cfg:
-            raise ValueError(
-                "single_bin_regions is replaced by control_region_bins: {region: number of bins}"
-            )
+        model = card.model
+        self.members = {b: model.members[b] for b in card.backgrounds}
         # control regions: n bins of equal total background each (1 = the whole window)
         self.cr_bins = dict(cfg.get("control_region_bins") or {})
-        self.cr_shapes = dict(cfg.get("control_region_shapes") or {})
-        self.lowmass = cfg.get("lowmass_dy")
-        if self.lowmass is not None:
-            # the process that carries the estimate (DY when the low-mass sample is a member of it)
-            self.lowmass.setdefault("output", "DY")
-            self.lowmass.setdefault("nuisance_factors", [0.0, 2.0])
-        self.dy_template = cfg.get("dy_template")
+        self.lowmass = model.lowmass
+        self.dy_template = model.dy_template
         self.pooled = (
             {}
         )  # (mass, directory, channels) -> fitted DY shape of fit-only windows
-        self.member_uncs = {
-            name: [(t["member"], signed(t["value"])) for t in terms]
-            for name, terms in (cfg.get("member_uncertainties") or {}).items()
-        }
+        self.member_uncs = model.member_uncs
         self.record = {}
 
     @staticmethod
@@ -296,50 +294,36 @@ class Binning:
             w = next(iter(w.values()))
         return tuple(w)
 
-    def lowmass_applies(self, directory):
-        lm = self.lowmass
-        return (
-            lm is not None
-            and self.window_key(directory) in lm["categories"]
-            and ("regions" not in lm or self.region(directory) in lm["regions"])
-        )
+    def lowmass_applies(self, channel, category):
+        """Whether the low-mass DY estimate replaces the low-mass MC here (the scope of the
+        uncertainty with preprocess: lowmass_dy)."""
+        return self.card.model.lowmass_applies(channel, category)
 
-    def template_mode(self, channel, directory):
-        """'tail', 'fit_only' or None: how dy_template replaces the DY MC of a category."""
-        t = self.dy_template
-        if t is None:
-            return None
-        key, region = self.window_key(directory), self.region(directory)
-        for mode in ("tail", "fit_only"):
-            m = t.get(mode)
-            if (
-                m
-                and key in m["categories"]
-                and region in m.get("regions", [region])
-                and channel in m.get("channels", self.card.channels)
-            ):
-                return mode
-        return None
+    def template_mode(self, channel, category):
+        """'tail', 'fit_only' or None: how the DY template replaces the DY MC of a category
+        (the uncertainty with preprocess: dy_template covering it)."""
+        return self.card.model.template(channel, category)[0]
 
-    def pooled_shape(self, mass, channel, directory, files, window, x):
+    def pooled_shape(self, mass, channel, category, directory, files, window, x):
         """(channels fitted, (shape, up, down)) of the fit-only DY template, each normalised to
         the nominal's sum: one fit to the DY MC summed over the eras and over the channels pooled
         with `channel`."""
         t = self.dy_template
         group = next(
-            (tuple(g) for g in t["fit_only"].get("pool", []) if channel in g),
+            (tuple(g) for g in t["pool"] if channel in g),
             (channel,),
         )
         key = (mass, directory, group)
         if key not in self.pooled:
-            proc, lowmass = t["process"], self.lowmass_applies(directory)
+            proc = t["process"]
             y, w = np.zeros(len(x)), np.zeros(len(x))
             for ch in group:
+                lowmass = self.lowmass_applies(ch, category)
                 raw, _ = self.read(
                     files, ch, directory, window, only=set(self.members[proc])
                 )
                 for r in raw.values():
-                    p = self.build_processes(r, directory, lowmass, mass).get(proc)
+                    p = self.build_processes(r, category, lowmass, mass).get(proc)
                     if p:
                         y, w = y + p[""][0], w + p[""][1]
             # the shape only: normalised below, and apply_template adds each channel's own yield
@@ -357,7 +341,7 @@ class Binning:
         return group, self.pooled[key]
 
     def apply_template(
-        self, mode, per_era, raw, mass, channel, directory, files, window, x
+        self, mode, per_era, raw, mass, channel, category, directory, files, window, x
     ):
         """Replace the DY MC of every era by its smooth template (in place); returns the
         fit-only shape (None for 'tail').
@@ -370,8 +354,9 @@ class Binning:
         The total is shared out to the eras by their share_by window yield. Each DY variation of
         an era is the template times that era's (varied / nominal) window yield, except a member
         uncertainty, which moves its own member's template (tail). The template's band is the
-        shape nuisance <nuisance>_<channel>_<category>; the fitted part's MC statistical error
-        is negligible (the band replaces it)."""
+        shape nuisance of the uncertainty with preprocess: dy_template covering this channel and
+        category; the fitted part's MC statistical error is negligible (the band replaces it).
+        """
         t = self.dy_template
         proc = t["process"]
         eras = [e for e, p in per_era.items() if proc in p]
@@ -387,10 +372,11 @@ class Binning:
             members = [
                 m
                 for m in self.members[proc]
-                if m not in self.dropped_in(directory)
+                if m not in self.dropped_in(category)
                 and any(m in raw[e] for e in eras)
                 and not (
-                    self.lowmass_applies(directory) and m == self.lowmass["process"]
+                    self.lowmass_applies(channel, category)
+                    and m == self.lowmass["process"]
                 )
             ]
             total, up, down = zero, zero, zero
@@ -409,7 +395,7 @@ class Binning:
                 raw_var = raw_var + np.where(tail, 0.0, w)
         else:
             _, (shape, s_up, s_down) = self.pooled_shape(
-                mass, channel, directory, files, window, x
+                mass, channel, category, directory, files, window, x
             )
             n = sum(float(per_era[e][proc][""][0].sum()) for e in eras)
             w_n = sum(float(per_era[e][proc][""][1].sum()) for e in eras)
@@ -434,7 +420,7 @@ class Binning:
                         (v[k] * member_tmpl[m] for m, v in terms if m in member_tmpl),
                         zero,
                     )
-        nuisance = f"_{t['nuisance']}_{channel}_{self.window_key(directory)}"
+        nuisance = "_" + self.card.model.template(channel, category)[1]
         # a variation scales the template by varied / nominal window yield, summed over the eras
         # that have the variation: one era's own ratio, with few heavy events, is noisy; an era's
         # own nuisance (e.g. _2022) is still only that era's
@@ -492,19 +478,17 @@ class Binning:
             out[era] = {n: project(d[n], mask) for n in names}
         return out, x_edges
 
-    def dropped_in(self, directory):
-        """Inputs left out of a category: `drop` lists, per input, jet categories (res2b), regions
-        (TT_CR) or region/category directories (TT_CR/res2b)."""
-        keys = {self.window_key(directory), self.region(directory), directory}
-        return {m for m, cats in self.drop.items() if keys & set(cats)}
+    def dropped_in(self, category):
+        """Inputs left out of a card category (preprocess: drop of the card's backgrounds)."""
+        return self.card.model.dropped_in(category)
 
-    def build_processes(self, raw, directory, lowmass, mass):
+    def build_processes(self, raw, category, lowmass, mass):
         """{output process: {suffix: (values, variances)}} of one era, suffix '' = nominal.
 
         With `lowmass` the low-mass member's MC is left out of its output process here (which
         keeps that member's variations, so it exists even if the member was its only one); the
         estimate is added per bin range from the transfer (see bin_window)."""
-        dropped = self.dropped_in(directory)
+        dropped = self.dropped_in(category)
         out = {}
         for proc, members in self.members.items():
             members = [m for m in members if m in raw and m not in dropped]
@@ -579,20 +563,21 @@ class Binning:
         factors[f"_{lm['nuisance']}_Down"] = float(down)
         return factors
 
-    def add_cr_shape(self, per_era, directory):
-        """The DNN-shape uncertainty of a control region's main process (control_region_shapes):
-        a linear tilt along the DNN score, nominal x (1 +- size x (2t - 1)), t from 0 to 1 between
-        the fine bins holding 1% and 99% of that process's yield in the window (eras summed). It is
-        a variation of that process like any other, `<nuisance>_<jet category>`, so the gates and
-        the writer treat it as such. It lets the binned control region's data / MC slope along the
+    def add_cr_shape(self, per_era, channel, category):
+        """The DNN-shape uncertainties of a control region's main process (the uncertainties with
+        preprocess: cr_tilt covering the category): a linear tilt along the DNN score, nominal x
+        (1 +- size x (2t - 1)), t from 0 to 1 between the fine bins holding 1% and 99% of that
+        process's yield in the window (eras summed). It is a variation of that process like any
+        other, named after its uncertainty, so the gates and the writer treat it as such. It lets the binned control region's data / MC slope along the
         score be absorbed there instead of pulling the shape nuisances it shares with the SR. Each
         tilted variation is rescaled to the nominal's window total (eras summed), so it moves the
         shape only: the yield is the normalisations' (CMS_bbww_norm_*).
         """
-        spec = self.cr_shapes.get(self.region(directory))
-        if not spec:
-            return
-        proc = spec["process"]
+        for name, proc, size in self.card.model.tilts(channel, category):
+            self.add_tilt(per_era, name, proc, size)
+
+    @staticmethod
+    def add_tilt(per_era, name, proc, size):
         parts = [p[proc][""][0] for p in per_era.values() if proc in p]
         if not parts:
             return
@@ -603,8 +588,7 @@ class Binning:
         lo = int(np.searchsorted(c, 0.01 * c[-1]))
         hi = max(int(np.searchsorted(c, 0.99 * c[-1])), lo + 1)
         t = np.clip((np.arange(len(c)) - lo) / (hi - lo), 0.0, 1.0)
-        tilt = float(spec["size"]) * (2.0 * t - 1.0)
-        name = f"{spec['nuisance']}_{self.window_key(directory)}"
+        tilt = float(size) * (2.0 * t - 1.0)
         factors = {}
         for sign, direction in ((1, "Up"), (-1, "Down")):
             f = 1.0 + sign * tilt
@@ -619,17 +603,57 @@ class Binning:
             for direction, f in factors.items():
                 p[proc][f"_{name}_{direction}"] = (v * f, w * f * f)
 
+    def saved_record(self, mass, channel, category):
+        """The saved binning.json record of a window (with --edges), else None."""
+        if self.saved is None:
+            return None
+        try:
+            return self.saved[str(mass)][channel][category]
+        except KeyError:
+            raise RuntimeError(
+                f"--edges: no saved binning for MX={mass} {channel}/{category}"
+            ) from None
+
+    @staticmethod
+    def saved_bins(record, x_edges, mass, channel, category):
+        """(bins as fine-bin index ranges, target) of a saved record; its edges have to be
+        edges of the input's fine binning, spanning all of it."""
+        (piece,) = record["slices"]
+        edges = piece["edges"]
+        idx = []
+        for e in edges:
+            i = int(np.argmin(np.abs(x_edges - e)))
+            if abs(x_edges[i] - e) > 1e-9 * max(1.0, abs(e)):
+                raise RuntimeError(
+                    f"--edges: MX={mass} {channel}/{category}: edge {e} is not an edge of "
+                    "the input's fine binning"
+                )
+            idx.append(i)
+        if idx[0] != 0 or idx[-1] != len(x_edges) - 1 or idx != sorted(set(idx)):
+            raise RuntimeError(
+                f"--edges: MX={mass} {channel}/{category}: the edges {edges} do not span "
+                f"the input's [{x_edges[0]}, {x_edges[-1]}] in increasing order"
+            )
+        bins = [(idx[k], idx[k + 1] - 1) for k in range(len(idx) - 1)]
+        return bins, record.get("n_bins_target", len(bins))
+
     def bin_window(self, mass, channel, category, directory, files):
         key = self.window_key(directory)
         window = self.window(mass, directory)
+        if window is None and self.windows is None and self.saved is not None:
+            # 2D inputs with saved edges only: the window the edges were made in
+            y_range = self.saved_record(mass, channel, category)["slices"][0].get(
+                "y_range"
+            )
+            window = tuple(y_range) if y_range else None
         raw, x_edges = self.read(files, channel, directory, window)
         nb = len(x_edges) - 1
-        lowmass = self.lowmass_applies(directory)
+        lowmass = self.lowmass_applies(channel, category)
         per_era = {
-            e: self.build_processes(r, directory, lowmass, mass) for e, r in raw.items()
+            e: self.build_processes(r, category, lowmass, mass) for e, r in raw.items()
         }
         x = 0.5 * (x_edges[1:] + x_edges[:-1])
-        mode = self.template_mode(channel, directory)
+        mode = self.template_mode(channel, category)
         template_shape = None
         raw_dy = None
         if mode:
@@ -639,9 +663,9 @@ class Binning:
             parts = [p[proc][""] for p in per_era.values() if proc in p]
             raw_dy = (sum(p[0] for p in parts), sum(p[1] for p in parts))
             template_shape = self.apply_template(
-                mode, per_era, raw, mass, channel, directory, files, window, x
+                mode, per_era, raw, mass, channel, category, directory, files, window, x
             )
-        self.add_cr_shape(per_era, directory)
+        self.add_cr_shape(per_era, channel, category)
         bkgs = [b for b in self.members if any(b in p for p in per_era.values())]
         signals = self.card.resolved(self.card.signals, mass)
 
@@ -752,9 +776,11 @@ class Binning:
         }
         g = self.gates
         totals = {b: get(b, "", 0, nb - 1)[0] for b in bkgs}
-        exempt = {
-            b for b in bkgs if totals[b] < g["exempt_fraction"] * sum(totals.values())
-        }
+        exempt = (
+            {b for b in bkgs if totals[b] < g["exempt_fraction"] * sum(totals.values())}
+            if g
+            else set()
+        )
 
         def failure(i, j):
             """Why fine bins i..j fail the gates, or None if they pass."""
@@ -794,59 +820,78 @@ class Binning:
         def passes(i, j):
             return failure(i, j) is None
 
-        # SR: bins of equal signal. Control regions carry no signal: bins of equal total
-        # background (control_region_bins), so they constrain the shapes along the score too.
-        region = self.region(directory)
-        is_cr = region in self.cr_bins
-        n = int(self.cr_bins[region]) if is_cr else self.n_bins[mass][key]
-        c_share = (
-            cumulative(
-                np.clip(sum(summed(b, "")[0] for b in bkgs), 0.0, None)
-                if bkgs
-                else np.zeros(nb)
+        def search():
+            """(bins, target): from the top of the score down, each bin as narrow as the gates
+            allow. SR: bins of equal signal. Control regions carry no signal: bins of equal total
+            background (control_region_bins), so they constrain the shapes along the score too.
+            """
+            region = self.region(directory)
+            is_cr = region in self.cr_bins
+            n = int(self.cr_bins[region]) if is_cr else self.n_bins[mass][key]
+            c_share = (
+                cumulative(
+                    np.clip(sum(summed(b, "")[0] for b in bkgs), 0.0, None)
+                    if bkgs
+                    else np.zeros(nb)
+                )
+                if is_cr
+                else c_sig
             )
-            if is_cr
-            else c_sig
-        )
-        bins, hi = [], nb - 1
-        # from the top of the score down, each bin as narrow as the gates allow
-        while hi >= 0 and len(bins) < n - 1:
-            target = in_range(c_share, 0, hi) / (n - len(bins))
-            found = next(
-                (
-                    i
-                    for i in range(hi, -1, -1)
-                    if in_range(c_share, i, hi) >= target and passes(i, hi)
-                ),
-                None,
-            )
-            if found is None or found == 0:
-                break
-            bins.append((found, hi))
-            hi = found - 1
-        if hi >= 0:
-            # the rest of the window is the lowest bin; merge upwards until it passes
-            last = (0, hi)
-            while not passes(*last):
-                if not bins:
-                    why = failure(0, nb - 1)
-                    neg = negative(0, nb - 1)
-                    if neg:
-                        # a negative background cannot be written, at any binning
-                        raise RuntimeError(
-                            f"{channel}/{directory} MX={mass}: the whole window fails "
-                            f"the gates: {why}; {neg}"
+            bins, hi = [], nb - 1
+            # from the top of the score down, each bin as narrow as the gates allow
+            while hi >= 0 and len(bins) < n - 1:
+                target = in_range(c_share, 0, hi) / (n - len(bins))
+                found = next(
+                    (
+                        i
+                        for i in range(hi, -1, -1)
+                        if in_range(c_share, i, hi) >= target and passes(i, hi)
+                    ),
+                    None,
+                )
+                if found is None or found == 0:
+                    break
+                bins.append((found, hi))
+                hi = found - 1
+            if hi >= 0:
+                # the rest of the window is the lowest bin; merge upwards until it passes
+                last = (0, hi)
+                while not passes(*last):
+                    if not bins:
+                        why = failure(0, nb - 1)
+                        neg = negative(0, nb - 1)
+                        if neg:
+                            # a negative background cannot be written, at any binning
+                            raise RuntimeError(
+                                f"{channel}/{directory} MX={mass}: the whole window fails "
+                                f"the gates: {why}; {neg}"
+                            )
+                        # too few events for any finer binning: the window is one bin
+                        print(
+                            f"WARNING: {channel}/{directory} MX={mass}: the whole window "
+                            f"fails the gates ({why}); it is one bin",
+                            flush=True,
                         )
-                    # too few events for any finer binning: the window is one bin
+                        break
+                    last = (0, bins.pop()[1])
+                bins.append(last)
+            bins.sort()
+            return bins, n
+
+        saved = self.saved_record(mass, channel, category)
+        if saved is not None:
+            # saved edges, applied as they are; the gates (if configured) only warn
+            bins, n = self.saved_bins(saved, x_edges, mass, channel, category)
+            for k, (i, j) in enumerate(bins if g else []):
+                why = failure(i, j)
+                if why:
                     print(
-                        f"WARNING: {channel}/{directory} MX={mass}: the whole window "
-                        f"fails the gates ({why}); it is one bin",
+                        f"WARNING: {channel}/{directory} MX={mass}: saved bin {k} fails "
+                        f"the gates: {why}",
                         flush=True,
                     )
-                    break
-                last = (0, bins.pop()[1])
-            bins.append(last)
-        bins.sort()
+        else:
+            bins, n = search()
         edges = [float(x_edges[i]) for i, _ in bins] + [float(x_edges[-1])]
 
         self.record.setdefault(str(mass), {}).setdefault(channel, {})[category] = {
@@ -899,7 +944,7 @@ class Binning:
         t = self.dy_template
         proc = t["process"]
         tmpl, _ = summed(proc, "")
-        up, _ = summed(proc, f"_{t['nuisance']}_{channel}_{key}_Up")
+        up, _ = summed(proc, f"_{self.card.model.template(channel, category)[1]}_Up")
         pulls = []
         for i, j in bins:
             r, v = float(raw_dy[0][i : j + 1].sum()), float(raw_dy[1][i : j + 1].sum())
@@ -907,7 +952,7 @@ class Binning:
             err = np.sqrt(max(v, 0.0) + (u - y) ** 2)
             pulls.append(round((r - y) / err, 3) if err > 0 else 0.0)
         self.record[str(mass)][channel][category]["template_pulls"] = pulls
-        limit = t.get("guard_sigma", 3.0)
+        limit = t["guard_sigma"]
         bad = [(k, p) for k, p in enumerate(pulls) if abs(p) > limit]
         if bad:
             print(
@@ -962,7 +1007,15 @@ class Binning:
         masses = self.card.masses
         if jobs > 1 and len(masses) > 1:
             args = [
-                (self.card, self.era, self.cfg, self.input_dir, self.output_dir, m)
+                (
+                    self.card,
+                    self.era,
+                    self.cfg,
+                    self.input_dir,
+                    self.output_dir,
+                    self.saved,
+                    m,
+                )
                 for m in masses
             ]
             # spawned, not forked: ROOT's state does not survive a fork
@@ -1013,8 +1066,8 @@ class Binning:
 
 
 def _run_mass(args):
-    card, era, cfg, input_dir, output_dir, mass = args
-    return Binning(card, era, cfg, input_dir, output_dir).run_mass(mass)
+    card, era, cfg, input_dir, output_dir, saved, mass = args
+    return Binning(card, era, cfg, input_dir, output_dir, saved).run_mass(mass)
 
 
 def main():
@@ -1027,7 +1080,16 @@ def main():
         "--era", required=True, help="the card's era (a group era is summed)"
     )
     ap.add_argument("--config", required=True, help="the datacard configuration")
-    ap.add_argument("--binning-config", required=True)
+    ap.add_argument(
+        "--binning-config",
+        help="the binning (n_bins, gates, control_region_bins, windows); optional with "
+        "--edges, where its gates only warn",
+    )
+    ap.add_argument(
+        "--edges",
+        help="a binning.json this step wrote: apply its edges (of --era) instead of "
+        "searching for them; every shape and uncertainty is still rebuilt in them",
+    )
     ap.add_argument(
         "--masses",
         default="",
@@ -1041,16 +1103,20 @@ def main():
     )
     args = ap.parse_args()
 
+    if not args.binning_config and not args.edges:
+        ap.error("--binning-config or --edges is required")
+    binning_cfg, saved = None, None
+    if args.binning_config:
+        path = analysis_file(args.binning_config)
+        binning_cfg = yaml.safe_load(open(path))
+        check_binning_config(binning_cfg, path)
+    if args.edges:
+        path = analysis_file(args.edges)
+        saved = read_saved_edges(json.load(open(path)), args.era, path)
     card = Card(args.config, args.era)
     if args.masses:
         card.masses = [int(m) for m in args.masses.split(",")]
-    binning = Binning(
-        card,
-        args.era,
-        yaml.safe_load(open(analysis_file(args.binning_config))),
-        args.input,
-        args.output,
-    )
+    binning = Binning(card, args.era, binning_cfg, args.input, args.output, saved)
     os.makedirs(args.output, exist_ok=True)
     binning.run(args.jobs)
 

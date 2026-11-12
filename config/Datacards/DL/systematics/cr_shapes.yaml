@@ -1,28 +1,39 @@
 # DL: DNN-shape uncertainties of the binned control regions.
 uncertainties:
-  # A tilt of the CR's main process along the DNN (+-4 % DY, +-2 % TT at the ends), one per jet
-  # category; absorbs CR shape mis-modelling (binning_eqsig_DL_v2610.yaml: control_region_shapes).
+  # A tilt of the CR's main process along the DNN, built by the preprocess step: nominal x
+  # (1 +- size x (2t - 1)), `preprocess: cr_tilt: <size>`, one nuisance per jet category; absorbs
+  # CR shape mis-modelling, so the CR slope does not pull the shape nuisances shared with the SR.
+  # size = the observed data/MC end-to-end slope. Measured (v2610 loose, MX 300, 5 equal-MC
+  # bins), data/MC first -> last bin:
+  #   TT_CR res2b 1.005 -> 0.980, recovery 1.008 -> 0.970   (size 0.02)
+  #   DY_CR res2b 1.025 -> 0.955, recovery 1.027 -> 0.958   (size 0.04)
   - name: CMS_bbww_dycr_shape_res2b
     type: shape
     processes: [ DY ]
     categories: [ DY_res2b ]
+    preprocess: &dycr_tilt { cr_tilt: 0.04 }
   - name: CMS_bbww_ttcr_shape_res2b
     type: shape
     processes: [ TT ]
     categories: [ TT_res2b ]
+    preprocess: &ttcr_tilt { cr_tilt: 0.02 }
   - name: CMS_bbww_dycr_shape_recovery
     type: shape
     processes: [ DY ]
     categories: [ DY_recovery ]
+    preprocess: *dycr_tilt
   - name: CMS_bbww_ttcr_shape_recovery
     type: shape
     processes: [ TT ]
     categories: [ TT_recovery ]
+    preprocess: *ttcr_tilt
   - name: CMS_bbww_dycr_shape_boosted
     type: shape
     processes: [ DY ]
     categories: [ DY_boosted ]
+    preprocess: *dycr_tilt
   - name: CMS_bbww_ttcr_shape_boosted
     type: shape
     processes: [ TT ]
     categories: [ TT_boosted ]
+    preprocess: *ttcr_tilt

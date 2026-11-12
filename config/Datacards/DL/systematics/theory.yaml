@@ -7,25 +7,53 @@ uncertainties:
     value: [ -0.022, +0.022 ]
     # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
 
-  # Members of the merged backgrounds: each a shape of the merged process moving only its member
-  # (values and sources in binning_eqsig_DL_v2610.yaml: member_uncertainties).
+  # Members of the merged backgrounds: each a shape of the merged process moving only its member,
+  # built by the preprocess step: nominal + value x member nominal, `preprocess: member_values`
+  # {merged-histogram process: value v (for [-v, v]) or [down, up]}. `processes` are the card
+  # backgrounds holding those members.
+
+  # TT: crossSec 923.6 pb,
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO#Updated_reference_cross_sections
+  # unc: +22.6 -33.4 (scale) +/- 22.8 (PDF alphas) -24.6 +25.4 (mass)
   - name: QCD_scale_TT
     type: shape
     processes: [ TT ]
+    preprocess:
+      member_values: { TT: [ -0.036, 0.025 ] }
 
+  # DY NNLO QCD + NLO EW, 2094.2 x 3 pb, +0.7 -1.1 %:
+  # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
   # DY_M_50 only: low-mass DY has its own prior (CMS_bbww_norm_DY_lowmass)
   - name: QCD_scale_DY
     type: shape
     processes: [ DY ]
+    preprocess:
+      member_values: { DY_M_50: [ -0.011, 0.007 ] }
+  # ttV (ttZ + ttW): there is no LHC Top WG 13.6 TeV recommendation yet. +-12 % covers the NLO QCD
+  # scale uncertainty of both ttZ and ttW; replace with the official numbers once they exist.
   - name: QCD_scale_ttV
     type: shape
     processes: [ TT ]
+    preprocess:
+      member_values: { ttV: 0.12 }
+  # ST: taken from tW for now (largest)
   - name: top_mass
     type: shape
     processes: [ TT, ST ]
+    preprocess:
+      member_values: { TT: [ -0.027, 0.028 ], ST: [ -0.015, 0.015 ] }
+  # H: ttH's (https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap)
   - name: PDF_alphas
     type: shape
     processes: [ TT, ST, DY, Minor ]
+    preprocess:
+      member_values:
+        TT: 0.025
+        ttV: 0.03
+        ST: 0.027
+        DY_M_10to50: 0.01
+        DY_M_50: 0.01
+        H: 0.035
 
   # QCD scale and PDF shapes, one nuisance each per merged-histogram process (the physics
   # model's processes, not the card's backgrounds): the merged histograms keep every member
