@@ -1,0 +1,8 @@
+# Parton shower ISR/FSR (shared by all cards).
+uncertainties:
+  # one nuisance each, every process and era; shape-only (acceptance), so autolnNThr may drop it
+  # where the acceptance barely moves
+  - name: ps_isr
+    type: shape
+  - name: ps_fsr
+    type: shape

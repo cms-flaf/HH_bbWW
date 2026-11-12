@@ -1,0 +1,119 @@
+# DL process theory: QCD scale, PDF+alpha_s, top mass; QCD-scale / PDF shapes per process.
+uncertainties:
+  - name: QCD_scale_ST
+    type: lnN
+    processes:
+      - ST
+    value: [ -0.022, +0.022 ]
+    # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
+
+  # Members of the merged backgrounds: each a shape of the merged process moving only its member
+  # (values and sources in binning_eqsig_DL_v2610.yaml: member_uncertainties).
+  - name: QCD_scale_TT
+    type: shape
+    processes: [ TT ]
+
+  # DY_M_50 only: low-mass DY has its own prior (CMS_bbww_norm_DY_lowmass)
+  - name: QCD_scale_DY
+    type: shape
+    processes: [ DY ]
+  - name: QCD_scale_ttV
+    type: shape
+    processes: [ TT ]
+  - name: top_mass
+    type: shape
+    processes: [ TT, ST ]
+  - name: PDF_alphas
+    type: shape
+    processes: [ TT, ST, DY, Minor ]
+
+  # QCD scale and PDF shapes, one nuisance each per merged-histogram process (the physics
+  # model's processes, not the card's backgrounds): the merged histograms keep every member
+  # (<process>_QCDscale_shape_<process>_<muR..._muF...>, <process>_pdf_shape_<process>_<k>),
+  # the preprocess step carries them to the final bins inside the card background holding that
+  # process, and the datacard maker reduces them on the summed eras (StatInference
+  # dc_make/member_reduction.py). The weights are normalised to the nominal sum of weights of
+  # each sample, so these are shape and acceptance effects; the cross-section uncertainties are
+  # the lnN / member terms above (the signals' are in the spin cards). QCD scale: 7-point envelope (the 6 points without the
+  # opposite muR, muF variations). PDF: the Hessian sum of members 1-100 around the nominal
+  # (member 0 equals it), plus alpha_s from 101/102 where the sample has them -- ST and VVV do
+  # not (4-flavour t-channel / no alpha_s weights; theirs are NaN).
+  - name: QCDscale_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &qcd_scale_7point
+      reduction: envelope
+      names: [ muR0p5_muF0p5, muR0p5_muF1, muR1_muF0p5, muR1_muF2, muR2_muF1, muR2_muF2 ]
+  - name: pdf_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &pdf_hessian_alphas
+      reduction: hessian
+      names: { first: 1, last: 100 }
+      alpha_s: [ 101, 102 ]
+  - name: QCDscale_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: &pdf_hessian
+      reduction: hessian
+      names: { first: 1, last: 100 }
+  - name: QCDscale_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian
+  - name: QCDscale_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_W
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_W
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas

@@ -37,10 +37,15 @@ def createKeyFilterDict(global_params, era):
         custom_categories = list(global_params.get(custom_categories_name, []))
         if not custom_categories:
             print("No custom categories found")
-    ### regions: the histTuple flavour's, as FLAF's Setup resolves them
-    custom_regions = list(global_params.get("histTuple_regions") or [])
-    if not custom_regions:
-        print("No regions found")
+    ### regions
+    custom_regions = []
+    custom_regions_name = global_params.get(
+        "custom_regions", None
+    )  # can be extended to list of names, if for example adding QCD regions + other control regions
+    if custom_regions_name:
+        custom_regions = list(global_params.get(custom_regions_name, []))
+        if not custom_regions:
+            print("No custom regions found")
     all_categories = categories + custom_categories
     custom_subcategories = list(global_params.get("custom_subcategories", []))
     triggers_dict = global_params["triggers"]
@@ -271,10 +276,12 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
             (lep1_pt >= lep2_pt ? 1 : 2)
             """,
         )
+        # needed to invert isolation req for electrons or tight ID reqs for muons
         self.df = self.df.Define(
-            "event_selection",
-            "leadingleppT &&  subleadleppT && Single_lep_trg && tightlep && ( lep2_legType < 1 ||  ll_mass > 12 )",
+            "base_event_selection",
+            "leadingleppT &&  subleadleppT && Single_lep_trg && ( lep2_legType < 1 ||  ll_mass > 12 )",
         )
+        self.df = self.df.Define("event_selection", "base_event_selection && tightlep")
 
     def defineQCDRegions(self):
         self.DefineAndAppend(
@@ -309,7 +316,7 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
         self.DefineAndAppend("W_CR", f"lep1_MT > 50 && OS_Iso")
 
         SL_CR_active = False
-        for QCDReg in self.config.get("histTuple_regions") or []:
+        for QCDReg in self.config["QCDRegions"]:
             # The regions are named SR_SL and CR_SL_<class> below.
             if QCDReg.startswith("SR_SL") or QCDReg.startswith("CR_SL"):
                 SL_CR_active = True
@@ -338,8 +345,16 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
                 )
 
             self.DefineAndAppend(
-                "OS_AntiIso_SR",
-                "return predicted_class == 0 && OS_AntiIso && tau_veto;",
+                "SR_SL_Fakeable",
+                """
+                    if (!(SL && predicted_class == 0 && base_event_selection && tau_veto))
+                        return false;
+                    if (lep1_legType == 1)
+                        return lep1_Electron_mvaIso > -0.9 && lep1_Electron_mvaIso_WP80 != 1;
+                    if (lep1_legType == 2)
+                        return lep1_Muon_tightId == 1 && lep1_Muon_pfRelIso04_all > 0.15 && lep1_Muon_pfRelIso04_all < 0.4;
+                    return false;
+                """,
             )
 
     def calculateMT(self):

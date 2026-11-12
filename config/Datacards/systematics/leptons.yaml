@@ -1,0 +1,124 @@
+# Muon and electron ID, isolation and trigger; electron scale and resolution (shared by all
+# cards).
+uncertainties:
+  # Muon ID
+  - name: CMS_eff_m_id_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_eff_m_id_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_eff_m_id_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_eff_m_id_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
+  # Muon Iso
+  - name: CMS_eff_m_id_iso_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_eff_m_id_iso_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_eff_m_id_iso_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_eff_m_id_iso_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
+  # Ele ID and Iso
+  - name: EleID_TightIDIso_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: EleID_TightIDIso_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: EleID_TightIDIso_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: EleID_TightIDIso_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
+  # Ele Trigger
+  - name: SingleEleTrg_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: SingleEleTrg_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: SingleEleTrg_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: SingleEleTrg_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
+  # Muon Trigger
+  - name: SingleMuonTrg_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: SingleMuonTrg_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: SingleMuonTrg_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: SingleMuonTrg_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_scale_e_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_res_e_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_scale_e_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_res_e_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_scale_e_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_res_e_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_scale_e_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+  - name: CMS_res_e_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix

@@ -67,21 +67,33 @@ The cards are built from shared files, each card listing the ones it uses under 
 
 ```
 config/Datacards/
-  systematics.yaml          the uncertainties shared by DL and SL: luminosity, pileup, lepton,
-                            b-tagging, AK8, jet and electron, parton shower
-  DL/dl_common.yaml         everything else the DL spin cards share
-  DL/dl_spin{0,2}.yaml      include ../systematics.yaml and dl_common.yaml; add the signals,
+  systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
+    luminosity.yaml           luminosity and pileup
+    leptons.yaml              muon and electron ID, isolation and trigger; electron scale and resolution
+    jets.yaml                 JES, JER, AK4 b-tagging, AK8 Hbb, Hcc, tau21
+    parton_shower.yaml        ISR, FSR
+  DL/systematics/           the DL-only uncertainties:
+    theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)
+    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
+    dy_template.yaml          the DY templates and the low-mass DY estimate
+    normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
+    cr_shapes.yaml            the control regions' DNN-shape nuisances
+  DL/dl_common.yaml         the other settings the DL spin cards share
+  DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
                             their BR uncertainties and the limit plots
   SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
   SL/sl_spin{0,2}.yaml
 ```
 
-Includes do not nest, which is why each card lists both shared files. The merge is
+Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
+another version of one of them). `test/test_datacard_includes.py` checks that the cards of one
+kind include the same topics, and every card every topic of `systematics/`, so a file forgotten
+in one card does not go unnoticed. The merge is
 strict: a top-level setting is made in one file only, and an entry of `processes`,
 `uncertainties`, `limit_plots` or `impact_plots` is defined once — anything set twice
 stops the chain with an error naming both files, never an override. A setting that
 differs between the spins therefore lives in each spin card, and one that differs between DL
-and SL in that channel's common file, not in `systematics.yaml`.
+and SL in that channel's own files, not in `systematics/`.
 Include paths are relative to the including file. To see a card as the chain reads it:
 
 ```bash
@@ -448,10 +460,10 @@ resonant search, and the dhi default would otherwise fit `r` alongside `kl`, `kt
 and `C2V`, against a workspace other than the one the chain built.
 
 !!! warning "What a mass costs depends on `method`"
-    With `method: robust` — what this analysis uses — dhi runs **one** fit per mass and
-    reads every impact off the inverted Hessian, so all three masses take minutes.
-    `method: default` instead fits each nuisance separately, roughly two combine jobs per
-    nuisance per mass (~160 here), and only that case is worth sending to a batch system.
+    With `method: default` — what this analysis uses — dhi fits each nuisance separately,
+    roughly two combine jobs per nuisance per mass (~160 here), so it is worth sending to a
+    batch system. `method: robust` instead runs **one** fit per mass and reads every impact
+    off the inverted Hessian (minutes for all three masses), but can drop parameters (below).
     `create_branch_map` in `dhi/tasks/pulls_impacts.py` is where the difference lives.
     To redraw without refitting, pass `--redraw` together with `--remove-output 0,a,y` (and
     `--card`): once a card's plots exist the task is complete, and `--redraw` alone does nothing.

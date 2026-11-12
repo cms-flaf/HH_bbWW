@@ -1,0 +1,43 @@
+# Luminosity and pileup (shared by all cards).
+uncertainties:
+  # Run 3 scheme: lumi_1 correlated across all eras (size per year group, written as a shape under
+  # a meta-era), lumi_2 for 2023 only.
+  # https://twiki.cern.ch/twiki/bin/viewauth/CMS/LumiRecommendationsRun3?extralog=-%20caching%20topic#Correlations_between_years_and_c
+  - name: lumi_1_13p6TeV
+    hasMultipleValues: True
+    type: lnN
+    value:
+      - value: 0.0138
+        type: lnN
+        eras:
+          - Run3_2022
+          - Run3_2022EE
+      - value: 0.0017
+        type: lnN
+        eras:
+          - Run3_2023
+          - Run3_2023BPix
+  - name: lumi_2_13p6TeV
+    type: lnN
+    eras:
+      - Run3_2023
+      - Run3_2023BPix
+    value: 0.0127
+
+  # Pileup
+  - name: CMS_pileup_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: CMS_pileup_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: CMS_pileup_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: CMS_pileup_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix

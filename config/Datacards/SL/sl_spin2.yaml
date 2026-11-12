@@ -1,15 +1,14 @@
-# HH->bbWW SL resonant datacards, spin-2 (graviton) signal hypothesis. SKELETON, see sl_common.yaml.
-# Everything but the signal processes, their branching-ratio uncertainties and the limit
-# plots is in sl_common.yaml (SL) and ../systematics.yaml (DL and SL), shared with the
-# spin-0 card sl_spin0.yaml.
-# ${MX} and ${ERA} are filled by StatInference.
+# HH->bbWW SL datacards, spin-2 (graviton) signal hypothesis. SKELETON, see sl_common.yaml.
 include:
-  - ../systematics.yaml
+  # uncertainties shared by all cards (every file of ../systematics/)
+  - ../systematics/luminosity.yaml
+  - ../systematics/leptons.yaml
+  - ../systematics/jets.yaml
+  - ../systematics/parton_shower.yaml
   - sl_common.yaml
 
 processes:
-  # The spin-2 (graviton) X->HH signal: the samples are split by the generated decay, not by
-  # channel, so the two-lepton sample contributes events that lose a lepton.
+  # 2L events that lose a lepton are selected too, so the 2L sample is a signal here
   - process: GluGluToBulkGraviton_bbWW_1L_${MX}
     hist_name: GluGluToBulkGraviton_bbWW_1L_${MX}
     param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
@@ -27,9 +26,7 @@ processes:
     allow_zero_integral: true
 
 uncertainties:
-  # Higgs branching ratios, as in the DL cards (values from
-  # https://gitlab.cern.ch/hh/naming-conventions#experimental-uncertainties). The process
-  # patterns are regexes matched against the mass-resolved signal names.
+  # Higgs BRs as in the DL cards (regexes: the signal names carry the resolved mass)
   - name: BR_hbb
     type: lnN
     processes:
