@@ -1,0 +1,9 @@
+# CI sub-region cuts (flavour CI, sub-region CISub): the whole DeepHME_mass range, so the CI cards
+# read 1D DNN shapes from a sub-region the way the DL cards do (hme_DL_v2610.yaml), with every
+# event kept. A bin-form interval from the first to the last edge of the stored grid (0-2000 GeV)
+# also takes the underflow and the overflow, so nothing is cut -- the same events as the single
+# full HME window of the 2D CI shapes.
+parameters: [ mass ]
+region_name: "{region}_{name}_m{mass}"
+cuts:
+  300: { res2b: { DeepHME_mass: [ 0, 2000 ] }, recovery: { DeepHME_mass: [ 0, 2000 ] } }

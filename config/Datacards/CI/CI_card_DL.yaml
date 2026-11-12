@@ -1,4 +1,5 @@
-# The CI double-lepton card (CI_DL in ci_custom.yaml), with the preprocess step.
+# The CI double-lepton card (CI_DL in ci_custom.yaml): the 1D DNN score in the CI sub-region,
+# as the DL cards read theirs (HMESub).
 include:
   # uncertainties shared by all cards (every file of ../systematics/)
   - ../systematics/luminosity.yaml
@@ -9,26 +10,20 @@ include:
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
 channels:
   - muMu
   - eMu
   - eE
-# One bin per channel and base category (CI_binning_2d.yaml's single window).
+# One bin per channel and category: at --test statistics anything finer is empty or negative.
 categories:
-  - OS_Iso/res2b_hmebox0
-  - OS_Iso/recovery_hmebox0
-
-# must match CI_binning_2d.yaml's category_pattern
-category_pattern: "{base_category}_hmebox{slice_idx}"
-
-# The production chain (rebin_2d.py on the 2D plane), with a one-bin binning: at --test
-# statistics anything finer is empty or negative.
-preprocess:
-  script: StatInference/bin_opt_2d/rebin_2d.py
-  args:
-    - --binning-config
-    - config/Datacards/CI/CI_binning_2d.yaml
+  - OS_Iso/res2b
+  - OS_Iso/recovery
+# CISub: OS_Iso over the whole HME range (config/sub_regions/ci_full_hme.yaml), from the CI flavour.
+input_categories:
+  OS_Iso/res2b: OS_Iso_CISub_m${MX}/res2b
+  OS_Iso/recovery: OS_Iso_CISub_m${MX}/recovery
+hist_bins: [ -15.0, 15.0 ]
 processes:
   - process: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
     hist_name: XtoHHto2B2W_2L_${MX} # GluGluToRadion_bbWW_2L_${MX}
