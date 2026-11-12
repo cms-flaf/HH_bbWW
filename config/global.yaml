@@ -1113,6 +1113,15 @@ histTuple_flavors:
     # The CI chain: OS_Iso and the mass-independent single-lepton signal region of the two-stage
     # DNN, produced and plotted; the CI_SL card reads the looser OS_Iso (see CI/CI_card_SL.yaml).
     regions: [ OS_Iso, SR_SL ]
+    # The limit inputs of both CI cards come from a sub-region of OS_Iso, as the DL cards' do
+    # (HMESub): OS_Iso_CISub_m300/<category>. Its cut is the whole DeepHME_mass range
+    # (config/sub_regions/ci_full_hme.yaml), so it keeps every event and only exercises the
+    # sub-region machinery.
+    sub_regions:
+      - name: CISub
+        cuts: config/sub_regions/ci_full_hme.yaml
+        regions: [ OS_Iso ]
+        points: all
     # One fullres variable, to keep that path tested.
     fullResolution_variables:
       - lep1_pt
@@ -1128,8 +1137,9 @@ histTuple_flavors:
       - DeepHME_mass
       - CosThetaStar_HH
 
-      # Limit inputs at the CI's MX=300: the CI_SL card (CI/CI_card_SL.yaml) reads the
-      # binary score, the CI_DL card (CI/CI_card_DL.yaml) the DNN-vs-HME plane.
+      # Limit inputs at the CI's MX=300, read in OS_Iso_CISub_m300: the CI_SL card
+      # (CI/CI_card_SL.yaml) the binary score, the CI_DL card (CI/CI_card_DL.yaml) DNN_M300_Signal.
+      # The DNN-vs-HME plane stays, to keep the 2D histograms and plots tested.
       - TwoStageDNN_M300_binary
       - DNN_M300_Signal
       - name: DNN_m300_vs_HME

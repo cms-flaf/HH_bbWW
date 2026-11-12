@@ -13,11 +13,11 @@ histTuple_flavor: CI
 StatInference:
   # Both CI cards, each with its own datacards and limit, as the analysis lists its cards.
   # They share CI_common.yaml through `include:`, so the CI also exercises the include merge.
-  #   CI_DL: the double-lepton card, with the `preprocess:` step (rebin_2d.py, one bin per
-  #          channel and category, per CI/CI_binning_2d.yaml)
-  #   CI_SL: the single-lepton card, read from OS_Iso through its input_categories;
-  #          no preprocess step, it sets its own hist_bins
-  # hist_bins is unset here, as in global.yaml.
+  #   CI_DL: the double-lepton card, the 1D DNN_M300_Signal
+  #   CI_SL: the single-lepton card, the binary score TwoStageDNN_M300_binary
+  # Both read the CI sub-region OS_Iso_CISub_m300 (the whole HME range, CI flavour in
+  # global.yaml) through their input_categories, as the DL cards read HMESub, with no preprocess
+  # step and one bin per channel and category (their own hist_bins). hist_bins is unset here.
   cards:
     CI_DL: config/Datacards/CI/CI_card_DL.yaml
     CI_SL: config/Datacards/CI/CI_card_SL.yaml
