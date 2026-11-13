@@ -66,8 +66,9 @@ preprocess:
   args:
     - --binning-config
     - config/Datacards/DL/binning_eqsig_DL_v2610.yaml
-    - --jobs
-    - "8"
+    # one mass per PreprocessShapesTask branch (${MX} = the branch's mass)
+    - --masses
+    - ${MX}
 
 processes:
   - process: data_obs
