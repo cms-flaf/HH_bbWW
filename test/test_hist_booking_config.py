@@ -21,7 +21,12 @@ if repo not in sys.path:
 from Analysis import hist_booking as HB  # noqa: E402
 
 SL_FLAVOUR = "Signal_Extraction_SL_window"
-SL_REGIONS = ("SR_SL", "SR_SL_Fakeable")
+SB_REGIONS = (
+    "SR_SL",
+    "SR_SL_Fakeable",
+)  # the fake-estimate regions: window and sidebands
+CR_REGIONS = tuple(f"CR_SL_{c}" for c in ("TT", "ST", "WJets", "DY", "H", "VV"))
+WINDOW_REGIONS = SB_REGIONS + CR_REGIONS
 SB_LABELS = ("L2", "L1", "H1", "H2")
 # a sub-region name the datacard tools map to its base region (Analysis/EqualSignalBinning.py)
 WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+_m[0-9]+$")
@@ -113,11 +118,17 @@ class SingleLeptonWindows(unittest.TestCase):
         masses = sorted({s["point"]["mass"] for s in self.subs})
         self.assertEqual(len(masses), 25)
         for s in self.subs:
-            self.assertIn(s["base_region"], SL_REGIONS)
+            bases = WINDOW_REGIONS if s["sub_region"] == "HMESub" else SB_REGIONS
+            self.assertIn(s["base_region"], bases, s["name"])
             self.assertEqual({ch for _, ch in s["cuts"]} - {"e", "mu"}, set())
         for mass in masses:
-            for reg in SL_REGIONS:
+            for reg in WINDOW_REGIONS:
                 self.assertTrue(self.cuts("HMESub", reg, mass), f"{reg} {mass}")
+            for reg in CR_REGIONS:
+                for lab in SB_LABELS:
+                    self.assertFalse(
+                        self.cuts("HMESB" + lab, reg, mass), f"{reg} {mass}"
+                    )
 
     def test_sidebands_next_to_the_window_on_the_grid(self):
         n_checked = 0
@@ -162,7 +173,7 @@ class SingleLeptonWindows(unittest.TestCase):
         keys = [
             ((ch, reg, cat), "true")
             for ch in ("e", "mu")
-            for reg in SL_REGIONS
+            for reg in WINDOW_REGIONS
             for cat in GLOBAL["categories"]
         ]
         for block in HB.booking(setup, keys, variables(SL_FLAVOUR)):

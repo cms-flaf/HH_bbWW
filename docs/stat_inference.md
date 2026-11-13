@@ -78,7 +78,9 @@ config/Datacards/
     dy_template.yaml          the DY templates and the low-mass DY estimate
     normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
     cr_shapes.yaml            the control regions' DNN-shape nuisances
-  DL/dl_common.yaml         the other settings the DL spin cards share
+  DL/dl_common.yaml         the other settings the DL spin cards share, with the process model
+                            of the preprocess step (members, drop, DY estimate settings)
+  DL/binning_eqsig_DL_v2610.yaml  the DL binning only (see "Where the binning is decided")
   DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
                             their BR uncertainties and the limit plots
   SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
@@ -300,7 +302,8 @@ The DL cards (`DL/dl_spin0.yaml` and `DL/dl_spin2.yaml`, through their shared
 - carries the members of the QCD-scale and PDF uncertainties (`members:` in the cards) to the
   final bins; the datacard maker reduces them (7-point envelope, Hessian) on the summed eras;
 - merges the processes into the card's backgrounds (TT, DY, ST, Minor) and writes the
-  members' theory and normalisation uncertainties as shapes;
+  members' theory and normalisation uncertainties, and the control regions' DNN tilts, as
+  shapes;
 - replaces the sparse, partly negative-weight DY MC with a smooth fit template
   (`Analysis/DYTemplate.py`) in the same-flavour resolved SR and in SR boosted. Each template
   is compared with the raw MC it replaces, bin by bin (`template_pulls` in `binning.json`,
@@ -325,11 +328,48 @@ preprocess:
 The task stages every mass's inputs (~50 GB for 25 masses), so a local run needs
 `LAW_TARGET_TMP_DIR` on a large disk rather than the shared `/tmp`.
 
-The two halves live in different places on purpose. The **knobs** — HME windows, bin
-targets, gates, process merging, control-region binning and shape nuisances, the DY
-templates and the member uncertainties, each with its reason — are analysis configuration,
-versioned with the card in
-[`config/Datacards/DL/binning_eqsig_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/binning_eqsig_DL_v2610.yaml).
+#### What is configured where
+
+Every run of the step rebuilds every shape and every uncertainty in the bins it applies, per
+era, from the merged histograms and the card. Its configuration is in three places, with no
+overlap (`Analysis/preprocess_config.py` reads and checks them, and raises on an unknown key):
+
+| what | where |
+|---|---|
+| the binning: bin targets `n_bins`, `gates`, `control_region_bins` (and `windows` for 2D inputs) | the binning file, [`DL/binning_eqsig_DL_v2610.yaml`](https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/binning_eqsig_DL_v2610.yaml) (`--binning-config`), or saved edges (`--edges`) |
+| the process model: which merged-histogram processes make each background (`members`), where a member is left out (`drop`, card categories), the DY template and low-mass DY settings | `preprocess:` of the background processes in `DL/dl_common.yaml` |
+| every uncertainty the step builds: its name, scope (`processes`, `channels`, `categories`) and value | `preprocess:` of the `type: shape` uncertainties in `DL/systematics/` |
+
+An uncertainty's `preprocess:` holds exactly one of:
+
+```yaml
+preprocess: { member_values: { TT: 0.025, ttV: [ -0.03, 0.03 ] } }  # nominal + value x member nominal
+preprocess: { cr_tilt: 0.04 }                  # DNN tilt of its one process in its categories
+preprocess: { dy_template: tail }              # (or fit_only) the DY template in its channels and
+                                               # categories; the nuisance is the template's band
+preprocess: { lowmass_dy: [ 0.0, 2.0 ] }       # the low-mass DY estimate in its categories, scaled
+                                               # by these factors for Down / Up
+```
+
+The name of the entry is the nuisance written. For `cr_tilt`, `dy_template` and `lowmass_dy`
+its scope is where it is built: a DY template or the low-mass estimate is applied exactly where
+its nuisance is declared. A `member_values` variation is built in every category of the
+backgrounds holding its members (and is checked by the binning gates there); its `categories:`
+and `channels:` only decide where the datacard maker applies it. The
+datacard maker reads entries with `.get()` and ignores `preprocess:`. A mistyped
+`preprocess` key on an uncertainty is not silent either: the step then writes no histograms
+for it, and the datacard maker stops on the missing shape.
+
+- **To change an uncertainty**, change its entry in the systematics file; the next preprocess
+  run rebuilds it. Changing a value can move the bin edges through the gates (which hold for
+  every variation); to keep the edges, reuse them with `--edges`.
+- **To rebin**, change the binning file only (other `n_bins` targets or `gates`).
+- **To reuse a binning**, give the step a `binning.json` it wrote, `--edges <file>` (relative
+  paths starting with `config/` are resolved in the analysis area, so commit it under
+  `config/Datacards/DL/`), in place of or next to `--binning-config`. The edges of the card's
+  era are applied as they are; with a binning configuration too, a bin that fails its gates is
+  only a warning. Recomputing the edges stays the default.
+
 The **derived** `binning.json` (edges, yields and template pulls per window) is a product,
 not configuration, and is written into the task's output beside the shapes it produced.
 
