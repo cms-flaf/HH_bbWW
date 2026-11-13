@@ -6,7 +6,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
 signalFractionForRelevantBins: 0.2
 # Every listed era gets its own binning, datacards and limit; only the four-era combination is
 # built. Run3_22_23 is global.yaml's meta-era (its plot style is used by the shape plots).
@@ -27,8 +27,10 @@ channels:
   - eMu
   - eE
 # SR (equal-signal DNN bins) and the TT/DY control regions (5 equal-background bins), each in its
-# jet category's HME window. No "/" in the names: they become bin and MC-stat nuisance names,
-# which dhi's impact merging cannot handle with a "/"; input_categories maps them to the inputs.
+# jet category's HME window: the sub-regions <region>_HMESub_m<MX> (Analysis/hist_booking.py,
+# config/sub_regions/hme_DL_v2610.yaml), where DNN_M<MX>_Signal holds the events inside the window
+# of MX. No "/" in the names: they become bin and MC-stat nuisance names, which dhi's impact
+# merging cannot handle with a "/"; input_categories maps them to the inputs.
 categories:
   - SR_res2b
   - SR_boosted
@@ -40,19 +42,20 @@ categories:
   - DY_boosted
   - DY_recovery
 input_categories:
-  SR_res2b: SR/res2b
-  SR_boosted: SR/boosted
-  SR_recovery: SR/recovery
-  TT_res2b: TT_CR/res2b
-  TT_boosted: TT_CR/boosted
-  TT_recovery: TT_CR/recovery
-  DY_res2b: DY_CR/res2b
-  DY_boosted: DY_CR/boosted
-  DY_recovery: DY_CR/recovery
+  SR_res2b: SR_HMESub_m${MX}/res2b
+  SR_boosted: SR_HMESub_m${MX}/boosted
+  SR_recovery: SR_HMESub_m${MX}/recovery
+  TT_res2b: TT_CR_HMESub_m${MX}/res2b
+  TT_boosted: TT_CR_HMESub_m${MX}/boosted
+  TT_recovery: TT_CR_HMESub_m${MX}/recovery
+  DY_res2b: DY_CR_HMESub_m${MX}/res2b
+  DY_boosted: DY_CR_HMESub_m${MX}/boosted
+  DY_recovery: DY_CR_HMESub_m${MX}/recovery
 
-# Cuts the HME windows, merges the backgrounds and bins the DNN (see docs/stat_inference.md).
-# Needs Run3_Model_DYSplit inputs with TT_CR and DY_CR. --jobs: masses in parallel; on condor
-# give the task as many CPUs (--PreprocessShapesTask-n-cpus 8).
+# Merges the backgrounds, bins the DNN score of each sub-region and carries the QCD-scale / PDF
+# members to the final bins for the datacard maker to reduce (see docs/stat_inference.md). Needs
+# Run3_Model_DYSplit inputs of the flavour Signal_Extraction_DL_window, with TT_CR and DY_CR.
+# --jobs: masses in parallel; on condor give the task as many CPUs (--PreprocessShapesTask-n-cpus 8).
 preprocess:
   script: Analysis/EqualSignalBinning.py
   args:

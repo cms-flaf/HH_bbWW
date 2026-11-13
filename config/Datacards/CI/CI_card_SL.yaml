@@ -15,13 +15,14 @@ channels:
   - e
   - mu
 # Read from OS_Iso (one lepton: isolated + event selection, i.e. SR_SL without the DNN class and
-# tau veto): SR_SL alone leaves bins with no background at --test statistics.
+# tau veto): SR_SL alone leaves bins with no background at --test statistics. Through the CI
+# sub-region OS_Iso_CISub_m<MX> (the whole HME range, config/sub_regions/ci_full_hme.yaml).
 categories:
   - SR/res2b
   - SR/recovery
 input_categories:
-  SR/res2b: OS_Iso/res2b
-  SR/recovery: OS_Iso/recovery
+  SR/res2b: OS_Iso_CISub_m${MX}/res2b
+  SR/recovery: OS_Iso_CISub_m${MX}/recovery
 
 # One bin over the binary score's histogram range (it is an unbounded logit; anything outside
 # is in the flow bins, empty at MX 300).

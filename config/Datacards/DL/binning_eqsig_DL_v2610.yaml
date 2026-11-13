@@ -1,9 +1,11 @@
 # Equal-signal binning of the DL fit inputs (Analysis/EqualSignalBinning.py, the DL cards' preprocess
-# step): each category is its HME window of DNN_m<MX>_vs_HME, binned in the DNN score from the top
-# into bins of equal signal; a bin closes only once the backgrounds pass the gates.
+# step): each category is its HME sub-region <region>_HMESub_m<MX> (1D DNN_M<MX>_Signal), binned in
+# the DNN score from the top into bins of equal signal; a bin closes only once the backgrounds pass
+# the gates.
 
-# [low, high] HME window per mass and category, in GeV.
-windows: config/Datacards/DL/hme_windows_DL_v2610.yaml
+# 1D inputs need no windows. For the 2D DNN_m<MX>_vs_HME inputs (input_categories without the
+# sub-regions), name the windows to cut out of them:
+# windows: config/sub_regions/hme_DL_v2610.yaml
 
 # Target bins per window (n <= 20, best TT-only expected sensitivity); the gates may merge fewer.
 n_bins:
