@@ -1122,6 +1122,19 @@ histTuple_flavors:
         cuts: config/sub_regions/ci_full_hme.yaml
         regions: [ OS_Iso ]
         points: all
+      # The single-lepton HME window of MX=300 and its sidebands in SR_SL and SR_SL_Fakeable, as in
+      # Signal_Extraction_SL_window (e and mu only), so the sideband sub-regions are exercised.
+      - name: HMESub
+        cuts: config/sub_regions/hme_SL_v2610.yaml
+        regions: [ SR_SL, SR_SL_Fakeable ]
+        points: [ { mass: 300 } ]
+        channels: [ e, mu ]
+      - name: HMESB
+        cuts: config/sub_regions/hme_SL_v2610.yaml
+        regions: [ SR_SL, SR_SL_Fakeable ]
+        points: [ { mass: 300 } ]
+        channels: [ e, mu ]
+        sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
     # One fullres variable, to keep that path tested.
     fullResolution_variables:
       - lep1_pt
@@ -1482,6 +1495,61 @@ histTuple_flavors:
       - DNN_M1300_Other
       - DNN_M1400_Other
       - DNN_M1500_Other
+
+  Signal_Extraction_SL_window:
+    # The single-lepton inputs in HME sub-regions, without 2D histograms: the binary DNN of mass MX
+    # (signal_params in histograms.yaml) and DeepHME_mass are also filled, in e and mu, in the SL HME
+    # window of MX (config/sub_regions/hme_SL_v2610.yaml: <REG>_HMESub_m<MX>) and in the two HME
+    # sidebands on each side of it (<REG>_HMESB{L2,L1,H1,H2}_m<MX>, derived from the same windows per
+    # category), of the isolated SR_SL and the anti-isolated SR_SL_Fakeable: the inputs of the
+    # single-lepton fake estimate. No DNN cut is applied here.
+    fullResolution_variables: [ ]
+
+    regions: [ SR_SL, SR_SL_Fakeable ]
+    sub_regions:
+      - name: HMESub
+        cuts: config/sub_regions/hme_SL_v2610.yaml
+        regions: [ SR_SL, SR_SL_Fakeable ]
+        points: all
+        channels: [ e, mu ]
+      # Two sidebands per side, each ending at the nearest bin edge >= 50 GeV beyond the previous one
+      # (one bin each where the grid does not allow it); none on a side that leaves [240, 2000] GeV,
+      # 240 GeV being the DeepHME turn-on.
+      - name: HMESB
+        cuts: config/sub_regions/hme_SL_v2610.yaml
+        regions: [ SR_SL, SR_SL_Fakeable ]
+        points: all
+        channels: [ e, mu ]
+        sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
+
+    variables:
+      - DeepHME_mass
+
+      - TwoStageDNN_M250_binary
+      - TwoStageDNN_M260_binary
+      - TwoStageDNN_M270_binary
+      - TwoStageDNN_M280_binary
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M320_binary
+      - TwoStageDNN_M350_binary
+      - TwoStageDNN_M360_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M450_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M750_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M850_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+      - TwoStageDNN_M1100_binary
+      - TwoStageDNN_M1200_binary
+      - TwoStageDNN_M1300_binary
+      - TwoStageDNN_M1400_binary
+      - TwoStageDNN_M1500_binary
 
   TwoStageDNN_Outputs:
     regions: *all_regions

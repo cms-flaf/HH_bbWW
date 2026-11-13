@@ -2514,6 +2514,7 @@ DNN_m1500_vs_HME:
 # Two-stage DNN, scores saved as recomputed logits bounded by +-23.03
 # (logit_clip_eps 1e-10 in config/global.yaml)
 TwoStageDNN_M250_binary:
+  signal_params: { mass: 250 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M250 logit
   y_title: Events
@@ -2522,6 +2523,7 @@ TwoStageDNN_M250_binary:
   blind: True
 
 TwoStageDNN_M260_binary:
+  signal_params: { mass: 260 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M260 logit
   y_title: Events
@@ -2530,6 +2532,7 @@ TwoStageDNN_M260_binary:
   blind: True
 
 TwoStageDNN_M270_binary:
+  signal_params: { mass: 270 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M270 logit
   y_title: Events
@@ -2538,6 +2541,7 @@ TwoStageDNN_M270_binary:
   blind: True
 
 TwoStageDNN_M280_binary:
+  signal_params: { mass: 280 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M280 logit
   y_title: Events
@@ -2546,6 +2550,7 @@ TwoStageDNN_M280_binary:
   blind: True
 
 TwoStageDNN_M300_binary:
+  signal_params: { mass: 300 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M300 logit
   y_title: Events
@@ -2554,6 +2559,7 @@ TwoStageDNN_M300_binary:
   blind: True
 
 TwoStageDNN_M320_binary:
+  signal_params: { mass: 320 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M320 logit
   y_title: Events
@@ -2562,6 +2568,7 @@ TwoStageDNN_M320_binary:
   blind: True
 
 TwoStageDNN_M350_binary:
+  signal_params: { mass: 350 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M350 logit
   y_title: Events
@@ -2570,6 +2577,7 @@ TwoStageDNN_M350_binary:
   blind: True
 
 TwoStageDNN_M360_binary:
+  signal_params: { mass: 360 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M360 logit
   y_title: Events
@@ -2578,6 +2586,7 @@ TwoStageDNN_M360_binary:
   blind: True
 
 TwoStageDNN_M400_binary:
+  signal_params: { mass: 400 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M400 logit
   y_title: Events
@@ -2586,6 +2595,7 @@ TwoStageDNN_M400_binary:
   blind: True
 
 TwoStageDNN_M450_binary:
+  signal_params: { mass: 450 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M450 logit
   y_title: Events
@@ -2594,6 +2604,7 @@ TwoStageDNN_M450_binary:
   blind: True
 
 TwoStageDNN_M500_binary:
+  signal_params: { mass: 500 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M500 logit
   y_title: Events
@@ -2602,6 +2613,7 @@ TwoStageDNN_M500_binary:
   blind: True
 
 TwoStageDNN_M550_binary:
+  signal_params: { mass: 550 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M550 logit
   y_title: Events
@@ -2610,6 +2622,7 @@ TwoStageDNN_M550_binary:
   blind: True
 
 TwoStageDNN_M600_binary:
+  signal_params: { mass: 600 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M600 logit
   y_title: Events
@@ -2618,6 +2631,7 @@ TwoStageDNN_M600_binary:
   blind: True
 
 TwoStageDNN_M650_binary:
+  signal_params: { mass: 650 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M650 logit
   y_title: Events
@@ -2626,6 +2640,7 @@ TwoStageDNN_M650_binary:
   blind: True
 
 TwoStageDNN_M700_binary:
+  signal_params: { mass: 700 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M700 logit
   y_title: Events
@@ -2634,6 +2649,7 @@ TwoStageDNN_M700_binary:
   blind: True
 
 TwoStageDNN_M750_binary:
+  signal_params: { mass: 750 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M750 logit
   y_title: Events
@@ -2642,6 +2658,7 @@ TwoStageDNN_M750_binary:
   blind: True
 
 TwoStageDNN_M800_binary:
+  signal_params: { mass: 800 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M800 logit
   y_title: Events
@@ -2650,6 +2667,7 @@ TwoStageDNN_M800_binary:
   blind: True
 
 TwoStageDNN_M850_binary:
+  signal_params: { mass: 850 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M850 logit
   y_title: Events
@@ -2658,6 +2676,7 @@ TwoStageDNN_M850_binary:
   blind: True
 
 TwoStageDNN_M900_binary:
+  signal_params: { mass: 900 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M900 logit
   y_title: Events
@@ -2666,6 +2685,7 @@ TwoStageDNN_M900_binary:
   blind: True
 
 TwoStageDNN_M1000_binary:
+  signal_params: { mass: 1000 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1000 logit
   y_title: Events
@@ -2674,6 +2694,7 @@ TwoStageDNN_M1000_binary:
   blind: True
 
 TwoStageDNN_M1100_binary:
+  signal_params: { mass: 1100 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1100 logit
   y_title: Events
@@ -2682,6 +2703,7 @@ TwoStageDNN_M1100_binary:
   blind: True
 
 TwoStageDNN_M1200_binary:
+  signal_params: { mass: 1200 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1200 logit
   y_title: Events
@@ -2690,6 +2712,7 @@ TwoStageDNN_M1200_binary:
   blind: True
 
 TwoStageDNN_M1300_binary:
+  signal_params: { mass: 1300 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1300 logit
   y_title: Events
@@ -2698,6 +2721,7 @@ TwoStageDNN_M1300_binary:
   blind: True
 
 TwoStageDNN_M1400_binary:
+  signal_params: { mass: 1400 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1400 logit
   y_title: Events
@@ -2706,6 +2730,7 @@ TwoStageDNN_M1400_binary:
   blind: True
 
 TwoStageDNN_M1500_binary:
+  signal_params: { mass: 1500 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1500 logit
   y_title: Events
@@ -2714,6 +2739,7 @@ TwoStageDNN_M1500_binary:
   blind: True
 
 TwoStageDNN_M1600_binary:
+  signal_params: { mass: 1600 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1600 logit
   y_title: Events
@@ -2722,6 +2748,7 @@ TwoStageDNN_M1600_binary:
   blind: True
 
 TwoStageDNN_M1700_binary:
+  signal_params: { mass: 1700 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1700 logit
   y_title: Events
@@ -2730,6 +2757,7 @@ TwoStageDNN_M1700_binary:
   blind: True
 
 TwoStageDNN_M1800_binary:
+  signal_params: { mass: 1800 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1800 logit
   y_title: Events
@@ -2738,6 +2766,7 @@ TwoStageDNN_M1800_binary:
   blind: True
 
 TwoStageDNN_M1900_binary:
+  signal_params: { mass: 1900 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M1900 logit
   y_title: Events
@@ -2746,6 +2775,7 @@ TwoStageDNN_M1900_binary:
   blind: True
 
 TwoStageDNN_M2000_binary:
+  signal_params: { mass: 2000 }
   x_bins: "94|-23.5:23.5"
   x_title: Binary DNN M2000 logit
   y_title: Events
