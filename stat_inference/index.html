@@ -1,0 +1,1340 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="HH -> bb WW analysis built on the FLAF framework. Analysis-specific setup, observables and statistical inference. The common pipeline is documented in the FLAF docs.">
+      
+      
+      
+      
+        <link rel="prev" href="../analysis/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Statistical inference - HH->bbWW</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#statistical-inference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="HH-&gt;bbWW" class="md-header__button md-logo" aria-label="HH->bbWW" data-md-component="logo">
+      
+  <img src="https://cms.cern/sites/default/files/logo/cms_logo_neg03_2.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HH->bbWW
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Statistical inference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/cms-flaf/HH_bbWW" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cms-flaf/HH_bbWW
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../setup/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Setup
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../analysis/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Running the analysis
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Statistical inference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HH-&gt;bbWW" class="md-nav__button md-logo" aria-label="HH->bbWW" data-md-component="logo">
+      
+  <img src="https://cms.cern/sites/default/files/logo/cms_logo_neg03_2.png" alt="logo">
+
+    </a>
+    HH->bbWW
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/cms-flaf/HH_bbWW" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cms-flaf/HH_bbWW
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running the analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistical inference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistical inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-make-datacards-and-run-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Make datacards and run limits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Make datacards and run limits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-the-shape-uncertainties-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the shape uncertainties come from
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where the shape uncertainties come from">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#correlating-and-decorrelating-across-eras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlating and decorrelating across eras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-tagging-shape-calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        b-tagging shape calibration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ak8-fatbjet-calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AK8 (fatbjet) calibration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-the-binning-is-decided" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the binning is decided
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where the binning is decided">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-configured-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is configured where
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datacards-on-their-own" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datacards on their own
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-run-limits-on-existing-datacards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Run limits on existing datacards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-pulls-impacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Pulls &amp; impacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-make-datacards-and-run-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Make datacards and run limits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Make datacards and run limits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-the-shape-uncertainties-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the shape uncertainties come from
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where the shape uncertainties come from">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#correlating-and-decorrelating-across-eras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Correlating and decorrelating across eras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-tagging-shape-calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        b-tagging shape calibration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ak8-fatbjet-calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AK8 (fatbjet) calibration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-the-binning-is-decided" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where the binning is decided
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Where the binning is decided">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-configured-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is configured where
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datacards-on-their-own" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Datacards on their own
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-run-limits-on-existing-datacards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Run limits on existing datacards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-pulls-impacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Pulls &amp; impacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/cms-flaf/HH_bbWW/edit/main/docs/stat_inference.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/cms-flaf/HH_bbWW/raw/main/docs/stat_inference.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="statistical-inference">Statistical inference<a class="headerlink" href="#statistical-inference" title="Permanent link">&para;</a></h1>
+<p>The final step turns the merged histograms into <strong>datacards</strong> and runs limits with
+<a href="https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/">Combine</a>, via the <code>StatInference</code> and
+<code>inference</code> submodules. See
+<a href="https://cms-flaf.github.io/FLAF/workflow/walkthrough/#stage-5-statistical-inference">FLAF → walkthrough, stage 5</a>
+for where this sits in the pipeline.</p>
+<p>These commands run inside CMSSW/Combine, so prefix them with <code>cmsEnv</code> (or open one subshell):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cmsEnv<span class="w"> </span>/bin/zsh<span class="w">        </span><span class="c1"># a CMSSW+Combine subshell</span>
+</code></pre></div>
+<h2 id="1-make-datacards-and-run-limits">1. Make datacards and run limits<a class="headerlink" href="#1-make-datacards-and-run-limits" title="Permanent link">&para;</a></h2>
+<p>One law chain takes the merged histograms all the way to the overlay limit plots. The
+datacard step itself consumes 1D shapes and does no rebinning of its own; the shapes this
+analysis feeds it are cut from the 2D DNN-vs-HME plane by a configurable preprocessing
+step the chain runs first — see <a href="#where-the-binning-is-decided">Where the binning is decided</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>law<span class="w"> </span>run<span class="w"> </span>PlotResonantLimitsTask<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>--version<span class="w"> </span>dev<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--hists-version<span class="w"> </span>VERSION_OF_THE_MERGED_HISTS<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>--era<span class="w"> </span>Run3_2022,Run3_2022EE,Run3_2023,Run3_2023BPix<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>--workflow<span class="w"> </span><span class="nb">local</span>
+</code></pre></div>
+<p>It runs, in order:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PreprocessShapesTask</code></td>
+<td>runs the configuration's <code>preprocess:</code> step, if it declares one</td>
+</tr>
+<tr>
+<td><code>CreateDatacardsTask</code></td>
+<td>builds the datacards from the resulting shapes</td>
+</tr>
+<tr>
+<td><code>ResonantLimitsTask</code></td>
+<td>runs combine and combines the per-era cards per mass point</td>
+</tr>
+<tr>
+<td><code>PlotResonantLimitsTask</code></td>
+<td>draws the plots declared in the configuration's <code>limit_plots</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>limit_plots</code> entry becomes one overlay of its datacard globs. An entry that also
+sets <code>bands: true</code> gets, in addition, the standard single-curve plot with the ±1σ/±2σ
+bands for each of its curves — the overlay draws expected lines only. Note the dhi task
+of almost the same name below (<code>PlotResonantLimits</code>, no <code>Task</code>): that is the one this
+task shells out to for the band plots.</p>
+<p><code>--version</code> names what the chain <em>writes</em>; <code>--hists-version</code> names the <code>Hists_merged</code>
+tree it <em>reads</em>, so a re-binning or a re-fit does not require the input histograms to be
+reproduced under a new name.</p>
+<p>The datacard configuration is a set of <em>cards</em>, listed by name under <code>StatInference.cards</code>
+in <code>config/global.yaml</code> (<code>StatInference.config</code> instead names a single card file):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">StatInference</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">cards</span><span class="p">:</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">DL_spin0</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/Datacards/DL/dl_spin0.yaml</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">DL_spin2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/Datacards/DL/dl_spin2.yaml</span>
+</code></pre></div>
+<p>Each card — <code>DL_spin0</code>
+(<a href="https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/dl_spin0.yaml"><code>DL/dl_spin0.yaml</code></a>)
+and <code>DL_spin2</code> (<code>DL/dl_spin2.yaml</code>) — declares the eras, channels, categories, mass points,
+processes and uncertainties; the chain reads them from there, not from <code>global.yaml</code>'s
+own variable lists. Each card gets its own datacards, limits and plots, under
+<code>Datacards/&lt;card&gt;/&lt;era&gt;/</code>, <code>ResonantLimitsTask/&lt;card&gt;/</code> and so on.</p>
+<p>The cards are built from shared files, each card listing the ones it uses under <code>include:</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>config/Datacards/
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    luminosity.yaml           luminosity and pileup
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    leptons.yaml              muon and electron ID, isolation and trigger; electron scale and resolution
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    jets.yaml                 JES, JER, AK4 b-tagging, AK8 Hbb, Hcc, tau21
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    parton_shower.yaml        ISR, FSR
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  DL/systematics/           the DL-only uncertainties:
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    dy_template.yaml          the DY templates and the low-mass DY estimate
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    cr_shapes.yaml            the control regions' DNN-shape nuisances
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  DL/dl_common.yaml         the other settings the DL spin cards share, with the process model
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>                            of the preprocess step (members, drop, DY estimate settings)
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>  DL/binning_eqsig_DL_v2610.yaml  the DL binning only (see "Where the binning is decided")
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>  DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>                            their BR uncertainties and the limit plots
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>  SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>  SL/sl_spin{0,2}.yaml
+</code></pre></div>
+<p>Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
+another version of one of them). <code>test/test_datacard_includes.py</code> checks that the cards of one
+kind include the same topics, and every card every topic of <code>systematics/</code>, so a file forgotten
+in one card does not go unnoticed. The merge is
+strict: a top-level setting is made in one file only, and an entry of <code>processes</code>,
+<code>uncertainties</code>, <code>limit_plots</code> or <code>impact_plots</code> is defined once — anything set twice
+stops the chain with an error naming both files, never an override. A setting that
+differs between the spins therefore lives in each spin card, and one that differs between DL
+and SL in that channel's own files, not in <code>systematics/</code>.
+Include paths are relative to the including file. To see a card as the chain reads it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>StatInference/common/card_config.py<span class="w"> </span>config/Datacards/DL/dl_spin0.yaml
+</code></pre></div>
+<p>prints each setting and entry with the file it comes from; every datacard and preprocess
+output also keeps the merged card it was built from, as <code>card_config.yaml</code>.</p>
+<p><code>ResonantLimitsTask</code>, <code>PlotResonantLimitsTask</code> and <code>PlotPullsAndImpactsTask</code> run for every
+card, or with <code>--card DL_spin0</code> for that card only: they then build, preprocess and fit just
+its datacards, so another card neither has to run nor can block it. Without <code>--card</code>, the plot
+tasks leave out (and name) a card that declares no plots. The <code>StatInference</code> block's
+<code>param_values</code> and <code>hist_bins</code> apply to every card; <code>param_values</code> builds each card for the
+requested masses it declares.</p>
+<div class="admonition warning">
+<p class="admonition-title">Outputs from before the cards need a new <code>--version</code></p>
+<p>Every output path now has a <code>&lt;card&gt;</code> level (<code>Datacards/&lt;card&gt;/&lt;era&gt;/…</code>,
+<code>ResonantLimitsTask/&lt;card&gt;/…</code>, <code>LimitPlots/&lt;card&gt;</code>, <code>ImpactPlots/&lt;card&gt;</code>). Run under a new
+<code>--version</code>: in one produced before, <code>ResonantLimitsAndHistPlotTask</code>'s marker is already
+complete (it does not look at cards or eras), and old plot directories or HTCondor job
+files can be taken for the new ones.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>--era</code> must hold every era behind the datacards</p>
+<p>Which eras get datacards and limits comes from the configuration's <code>eras:</code> and
+<code>era_groups:</code> blocks, not from <code>--era</code>. A real era listed inside an <code>era_groups:</code> entry
+is covered by that meta-era and is not built standalone, so with the Run 3
+configuration the chain builds the <code>Run3_22_23</code> combination of all four eras. <code>--era</code>
+must name every real era those cards read — here the four of <code>Run3_22_23</code> — or the
+run stops with <code>the cards need DL_spin0 Run3_22_23: …, which --era does not include</code>.
+This holds with <code>--card</code> too: the datacard workflows' branch maps cover every card.
+Further eras are allowed and are not carded. <code>CreateDatacardsTask</code> and
+<code>PreprocessShapesTask</code> are one workflow each, with one branch per card and era (and mass), and their
+outputs (<code>Datacards/&lt;card&gt;/&lt;era&gt;</code>, <code>Hists_preprocessed/&lt;card&gt;/&lt;era&gt;</code>) do not depend on <code>--era</code>
+(<a href="https://cms-flaf.github.io/FLAF/concepts/eras/#which-tasks-take-several-eras">FLAF → Eras</a>).</p>
+</div>
+<h3 id="where-the-shape-uncertainties-come-from">Where the shape uncertainties come from<a class="headerlink" href="#where-the-shape-uncertainties-come-from" title="Permanent link">&para;</a></h3>
+<p>A <code>type: shape</code> entry in the configuration's <code>uncertainties:</code> list is only a <em>declaration</em>
+— it names a histogram the merger must already have written. What actually produces that
+histogram is the corresponding entry in <code>config/Run3_&lt;era&gt;/weights.yaml</code>, whose <code>name:</code>
+field is the datacard nuisance name plus a <code>_{}</code> placeholder for <code>Up</code>/<code>Down</code>. Adding a
+nuisance to the datacard configuration without adding it there fails with
+<code>Cannot find histogram ...</code>; adding it to <code>weights.yaml</code> without an <code>expression:</code> is worse,
+because the variation is then produced but is byte-identical to the nominal shape, giving a
+nuisance that constrains nothing and looks fine.</p>
+<p>A <code>shape:</code> entry costs more than a <code>norm:</code> one, and in a way that is easy to get wrong. A
+<code>norm:</code> entry is a weight expression evaluated on the central tree, so registering one and
+re-running the histTuple step is enough. A <code>shape:</code> entry names a <em>shifted tree</em>, and
+<code>HistTupleProducer</code> opens that tree in the anaTuple <strong>and in every AnalysisCache it reads</strong>
+(DNN, DeepHME). A source can therefore be present in the anaTuples and still fail, because
+the caches were produced before it was registered — the symptom is
+<code>ERROR: tree Events__&lt;source&gt;__Up not found in file ...</code> pointing at a <code>luigi-tmp</code> cache
+file, not at the anaTuple. Checking the anaTuple alone is not sufficient. Adding a new
+<code>shape:</code> source means regenerating the caches, so it belongs with an anaTuple production
+rather than a weights-only re-run.</p>
+<p>An event that only a shift moves into the selection (typically JES or JER) enters that shift's
+template with its real weight. The generator-level inputs of <code>weight_base</code> are listed in
+<code>anaTuple_shift_invariant_columns</code> (see <a href="../analysis/#columns-taken-from-the-central-tree">Analysis</a>),
+so the central tree carries them for that event too and the merge computes its <code>weight_base</code>. In
+anaTuples produced before that list existed such events had weight 0, so they were missing from the
+shifted templates.</p>
+<h4 id="correlating-and-decorrelating-across-eras">Correlating and decorrelating across eras<a class="headerlink" href="#correlating-and-decorrelating-across-eras" title="Permanent link">&para;</a></h4>
+<p>There is no <code>correlated:</code> switch. Combine correlates two entries when they carry the
+<strong>same nuisance name</strong> and treats them as independent when the names differ, so the whole
+correlation model is expressed by naming — and, because the nuisance name <em>is</em> the
+histogram name, it is <code>weights.yaml</code> that decides it, not the datacard configuration.</p>
+<p>A source decorrelated per era carries the era in its producer name, so the four eras write
+four different histograms:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># config/Run3_2022/weights.yaml          config/Run3_2023/weights.yaml</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CMS_scale_j_2022_{}                name</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CMS_scale_j_2023_{}</span>
+</code></pre></div>
+<p>and the datacard configuration then declares one entry per era, each scoped with <code>eras:</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CMS_scale_j_2022</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shape</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">eras</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">Run3_2022</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>A correlated source keeps one name in every era's <code>weights.yaml</code> (<code>CMS_btag_LF_{}</code>) and
+one entry in the datacard configuration <strong>with no <code>eras:</code> field at all</strong> — an empty era
+list matches everything, which is what makes it apply to all four.</p>
+<p>Two consequences worth knowing:</p>
+<ul>
+<li>Renaming a source to decorrelate it changes a histogram name, so it costs a HistMerger
+  re-run. It does not need a new anaTuple production: the shifted trees are unchanged.</li>
+<li>The two files must change together. Splitting <code>weights.yaml</code> without splitting the
+  datacard configuration leaves the card asking for a histogram nobody writes any more
+  (<code>Cannot find histogram ... CMS_scale_j_Up</code>), and it fails at datacard time rather than
+  at merge time. Cross-check every card's <code>type: shape</code> entries against the producers of
+  each era it declares before merging a correlation change.</li>
+</ul>
+<p>For a meta-era such as <code>Run3_22_23</code>, a nuisance scoped to one sub-era still applies: it
+varies that sub-era's contribution to the summed shape while the others contribute their
+nominal. The same holds for an <code>lnN</code> whose value differs per sub-era — <code>lumi_1_13p6TeV</code> is
+written into the card as a shape for exactly that reason, since one log-normal on the
+summed yield cannot express a factor that changes between eras. An <code>lnN</code> that does not
+depend on the era stays an <code>lnN</code>.</p>
+<h4 id="b-tagging-shape-calibration">b-tagging shape calibration<a class="headerlink" href="#b-tagging-shape-calibration" title="Permanent link">&para;</a></h4>
+<p>The BTV shape calibration contributes eight nuisances — <code>CMS_btag_LF</code>, <code>CMS_btag_HF</code>,
+<code>CMS_btag_{lf,hf}stats{1,2}</code> and <code>CMS_btag_cferr{1,2}</code> — registered under <code>norm:</code> in each
+era's <code>weights.yaml</code>. Two things about them are deliberate:</p>
+<p><em>Boosted events are excluded at weight level.</em> <code>GetWeight</code> in <code>Analysis/hh_bbww.py</code> folds
+<code>weight_bTagShape_Central</code> into the resolved branch only of its <code>boosted ? ... : ...</code>
+expression; boosted events carry <code>weight_FatJetSF_Central</code> instead. The variation
+expressions therefore read <code>(boosted ? 1.0f : weight_bTagShape_&lt;src&gt;{scale}_rel) *
+final_weight</code>, so a boosted event's varied weight equals its nominal weight and
+<code>DatacardMaker</code>'s <code>canIgnore</code> threshold drops the nuisance from boosted categories on its
+own. Do not reach for <code>unc_to_not_consider_boosted</code> for this — that mechanism is commented
+out in <code>FLAF/Analysis/HistMergerFromHists.py</code>, so no code reads the key.</p>
+<p><em>The four <code>*stats*</code> sources are decorrelated per era, the other four are not.</em> That
+follows the BTV prescription: <code>LF</code>, <code>HF</code> and the two <code>cferr</code> sources describe a common
+calibration and stay correlated; the <code>{lf,hf}stats{1,2}</code> sources are statistical and get
+one nuisance per era.</p>
+<p>How the split is expressed is worth understanding, because it is not a datacard-only
+change. The nuisance name is also the histogram name — <code>DatacardMaker</code> reads
+<code>&lt;process&gt;_&lt;name&gt;_&lt;Up|Down&gt;</code> — so <strong>an era-specific nuisance has to be named by the
+producer</strong>. Each era's <code>weights.yaml</code> writes <code>name: CMS_btag_lfstats1_2022_{}</code> and the
+datacard declares one entry per era scoped with <code>eras:</code>. A source that stays correlated
+keeps a single unsuffixed name in all four files. There is no separate "decorrelate" switch:
+whether a source is split is visible from what the merger writes.</p>
+<p>Two consequences to keep in mind. Renaming here is a <strong>merge-stage</strong> change only —
+<code>HistTupleProducer</code> keys off the <code>weights.yaml</code> <em>keys</em> (<code>bTagShape_lfstats1</code>, <code>JER</code>), and
+<code>name:</code> is read in exactly one place, <code>FLAF/Analysis/HistMergerFromHists.py</code>, so
+re-producing the histograms does not mean re-producing the shifted trees. And the two
+halves cannot drift silently: suffix the producer without the datacard, or the reverse,
+and the build stops with <code>Cannot find histogram ...</code>.</p>
+<p>On the <code>dc_make</code> side this needs two things, both of which treat a real era as a
+one-element meta-era so configurations without <code>era_groups:</code> are untouched.
+<code>DatacardMaker.uncAppliesTo</code> registers the nuisance on the meta-era bin when any
+sub-era matches — <code>Uncertainty.appliesTo</code> compares against the meta-era name and would
+otherwise drop the entry silently, which is why the <code>CMS_pileup_&lt;era&gt;</code> block in the
+datacard configuration used to be commented out. <code>getCombinedShape</code> then varies only the
+matching sub-eras and takes the rest at nominal, which is what the lnN path has always
+done in <code>_getSubEraLnNVariedShapes</code>.</p>
+<p>lnN uncertainties needed neither change and can be split with no producer involvement at
+all: <code>lumi_13p6TeV</code> is two entries, <code>eras: [Run3_2022, Run3_2022EE]</code> and
+<code>eras: [Run3_2023, Run3_2023BPix]</code>, because the luminosity calibration is a per-year
+measurement rather than a per-era one.</p>
+<p>Note also that <code>config/Run3_2024/weights.yaml</code> has <strong>no</strong> btag entries on purpose:
+<code>config/Run3_2024/global.yaml</code> overrides btag to <code>HistTuple: none</code>, so the
+<code>weight_bTagShape_*_rel</code> columns do not exist for that era.</p>
+<h4 id="ak8-fatbjet-calibration">AK8 (fatbjet) calibration<a class="headerlink" href="#ak8-fatbjet-calibration" title="Permanent link">&para;</a></h4>
+<p><code>Corrections/fatjet.py</code> supplies the mirror image for boosted events: three sources
+<code>Hbb</code>, <code>Hcc</code> and <code>tau21</code> (<code>FatJetCorrProducer.fatjet_Sources</code>), registered as
+<code>CMS_bbww_ak8_{Hbb,Hcc,tau21}</code>. Because <code>GetWeight</code> puts <code>weight_FatJetSF_Central</code> in the
+<em>boosted</em> branch, the guard runs the other way — <code>(boosted ?
+weight_FatJetSF_&lt;src&gt;{scale}_rel : 1.0f) * final_weight</code> — so it is the resolved events
+that are neutralised, and <code>canIgnore</code> drops these nuisances from resolved categories.</p>
+<p>Two differences from the btag block are worth knowing when reading the resulting
+nuisances rather than fixing them:</p>
+<ul>
+<li>There is no renormalisation step. btagShape has <code>UpdateBtagWeight</code> restoring the
+  per-(channel, nJet) yield; the AK8 SFs have no equivalent and need none, so these
+  nuisances legitimately carry a normalisation component.</li>
+<li><code>Hbb</code> applies only to <code>hadronFlavour == 5</code> and <code>Hcc</code> only to <code>== 4</code>
+  (<code>FatJetCorrProvider::sourceApplies</code>, <code>Corrections/fatjet.h</code>). <code>Hcc</code> is therefore tiny
+  for most processes and will fall under the <code>canIgnore</code> threshold in many categories.</li>
+</ul>
+<p>The calibration files are per-era and cover the four 2022/2023 eras only, so as with btag
+there is nothing to register for <code>Run3_2024</code>. They are decorrelated per era for the same
+reason the btag <code>*stats*</code> sources are: four separate files means four independent fits.</p>
+<h3 id="where-the-binning-is-decided">Where the binning is decided<a class="headerlink" href="#where-the-binning-is-decided" title="Permanent link">&para;</a></h3>
+<p>By a <strong>preprocessing step the datacard configuration declares</strong>, not by anything in the
+chain's own logic. <code>PreprocessShapesTask</code> runs whatever <code>preprocess:</code> names, supplying
+<code>--input</code>, <code>--output</code>, <code>--era</code> and <code>--config</code>; it knows nothing about what the step does.
+A configuration with no <code>preprocess:</code> block skips the task entirely and the datacards are
+built from the merged histograms unchanged, so an analysis that needs no preprocessing is
+unaffected.</p>
+<p>The DL cards (<code>DL/dl_spin0.yaml</code> and <code>DL/dl_spin2.yaml</code>, through their shared
+<code>DL/dl_common.yaml</code>) plug in <code>Analysis/EqualSignalBinning.py</code>. For every mass, channel and category it:</p>
+<ul>
+<li>reads the DNN score <code>DNN_M&lt;MX&gt;_Signal</code> in the category's frozen HME window: the
+  sub-regions <code>&lt;region&gt;_HMESub_m&lt;MX&gt;</code> (Analysis/hist_booking.py) of the flavour <code>Signal_Extraction_DL_window</code>
+  (<a href="https://github.com/cms-flaf/HH_bbWW/blob/main/config/sub_regions/hme_DL_v2610.yaml"><code>config/sub_regions/hme_DL_v2610.yaml</code></a>).
+  The control regions use their jet category's window. The sub-region histograms are filled only
+  with events inside the window, so there is nothing to cut here. With <code>windows:</code> in the binning
+  configuration it instead cuts the windows out of the 2D <code>DNN_m&lt;MX&gt;_vs_HME</code> histograms;</li>
+<li>carries the members of the QCD-scale and PDF uncertainties (<code>members:</code> in the cards) to the
+  final bins; the datacard maker reduces them (7-point envelope, Hessian) on the summed eras;</li>
+<li>merges the processes into the card's backgrounds (TT, DY, ST, Minor) and writes the
+  members' theory and normalisation uncertainties, and the control regions' DNN tilts, as
+  shapes;</li>
+<li>replaces the sparse, partly negative-weight DY MC with a smooth fit template
+  (<code>Analysis/DYTemplate.py</code>) in the same-flavour resolved SR and in SR boosted. Each template
+  is compared with the raw MC it replaces, bin by bin (<code>template_pulls</code> in <code>binning.json</code>,
+  with a warning beyond <code>guard_sigma</code>);</li>
+<li>bins the DNN score from the top down: the SR into equal-signal bins, the control
+  regions into <code>control_region_bins</code> (5) bins of equal background. A bin closes only
+  once every background passes the statistics and positivity gates, for the nominal and
+  every variation.</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">preprocess</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Analysis/EqualSignalBinning.py</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">args</span><span class="p">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--binning-config</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config/Datacards/DL/binning_eqsig_DL_v2610.yaml</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--jobs</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+</code></pre></div>
+<p><code>--jobs</code> bins that many masses in parallel, one process each. On HTCondor, give
+<code>PreprocessShapesTask</code> as many CPUs (<code>--PreprocessShapesTask-n-cpus 8</code>, or through <code>LAW__</code>).
+The task stages every mass's inputs (~50 GB for 25 masses), so a local run needs
+<code>LAW_TARGET_TMP_DIR</code> on a large disk rather than the shared <code>/tmp</code>.</p>
+<h4 id="what-is-configured-where">What is configured where<a class="headerlink" href="#what-is-configured-where" title="Permanent link">&para;</a></h4>
+<p>Every run of the step rebuilds every shape and every uncertainty in the bins it applies, per
+era, from the merged histograms and the card. Its configuration is in three places, with no
+overlap (<code>Analysis/preprocess_config.py</code> reads and checks them, and raises on an unknown key):</p>
+<table>
+<thead>
+<tr>
+<th>what</th>
+<th>where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the binning: bin targets <code>n_bins</code>, <code>gates</code>, <code>control_region_bins</code> (and <code>windows</code> for 2D inputs)</td>
+<td>the binning file, <a href="https://github.com/cms-flaf/HH_bbWW/blob/main/config/Datacards/DL/binning_eqsig_DL_v2610.yaml"><code>DL/binning_eqsig_DL_v2610.yaml</code></a> (<code>--binning-config</code>), or saved edges (<code>--edges</code>)</td>
+</tr>
+<tr>
+<td>the process model: which merged-histogram processes make each background (<code>members</code>), where a member is left out (<code>drop</code>, card categories), the DY template and low-mass DY settings</td>
+<td><code>preprocess:</code> of the background processes in <code>DL/dl_common.yaml</code></td>
+</tr>
+<tr>
+<td>every uncertainty the step builds: its name, scope (<code>processes</code>, <code>channels</code>, <code>categories</code>) and value</td>
+<td><code>preprocess:</code> of the <code>type: shape</code> uncertainties in <code>DL/systematics/</code></td>
+</tr>
+</tbody>
+</table>
+<p>An uncertainty's <code>preprocess:</code> holds exactly one of:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">preprocess</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> member_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> TT</span><span class="p">:</span><span class="w"> </span><span class="nv">0.025</span><span class="p p-Indicator">,</span><span class="nt"> ttV</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">-0.03</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.03</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">  </span><span class="c1"># nominal + value x member nominal</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">preprocess</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> cr_tilt</span><span class="p">:</span><span class="w"> </span><span class="nv">0.04</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">                  </span><span class="c1"># DNN tilt of its one process in its categories</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">preprocess</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> dy_template</span><span class="p">:</span><span class="w"> </span><span class="nv">tail</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">              </span><span class="c1"># (or fit_only) the DY template in its channels and</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">                                               </span><span class="c1"># categories; the nuisance is the template's band</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nt">preprocess</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> lowmass_dy</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2.0</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">       </span><span class="c1"># the low-mass DY estimate in its categories, scaled</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">                                               </span><span class="c1"># by these factors for Down / Up</span>
+</code></pre></div>
+<p>The name of the entry is the nuisance written. For <code>cr_tilt</code>, <code>dy_template</code> and <code>lowmass_dy</code>
+its scope is where it is built: a DY template or the low-mass estimate is applied exactly where
+its nuisance is declared. A <code>member_values</code> variation is built in every category of the
+backgrounds holding its members (and is checked by the binning gates there); its <code>categories:</code>
+and <code>channels:</code> only decide where the datacard maker applies it. The
+datacard maker reads entries with <code>.get()</code> and ignores <code>preprocess:</code>. A mistyped
+<code>preprocess</code> key on an uncertainty is not silent either: the step then writes no histograms
+for it, and the datacard maker stops on the missing shape.</p>
+<ul>
+<li><strong>To change an uncertainty</strong>, change its entry in the systematics file; the next preprocess
+  run rebuilds it. Changing a value can move the bin edges through the gates (which hold for
+  every variation); to keep the edges, reuse them with <code>--edges</code>.</li>
+<li><strong>To rebin</strong>, change the binning file only (other <code>n_bins</code> targets or <code>gates</code>).</li>
+<li><strong>To reuse a binning</strong>, give the step a <code>binning.json</code> it wrote, <code>--edges &lt;file&gt;</code> (relative
+  paths starting with <code>config/</code> are resolved in the analysis area, so commit it under
+  <code>config/Datacards/DL/</code>), in place of or next to <code>--binning-config</code>. The edges of the card's
+  era are applied as they are; with a binning configuration too, a bin that fails its gates is
+  only a warning. Recomputing the edges stays the default.</li>
+</ul>
+<p>The <strong>derived</strong> <code>binning.json</code> (edges, yields and template pulls per window) is a product,
+not configuration, and is written into the task's output beside the shapes it produced.</p>
+<p>A group era from <code>era_groups:</code> is binned on its members' summed statistics. Its output keeps
+the sub-eras separate (<code>Run3_22_23/{Run3_2022,Run3_2022EE,…}</code>) so the per-era uncertainties
+survive to be combined in the datacard maker.</p>
+<p><code>EqualSignalBinning.py</code> is a plain executable (run it in the CMSSW environment, which has
+<code>iminuit</code>), so a binning can be inspected without going through the chain:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>cmsEnv<span class="w"> </span>python3<span class="w"> </span>Analysis/EqualSignalBinning.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--input<span class="w">  </span><span class="s2">"</span><span class="nv">$ANALYSIS_BIG_DATA_PATH</span><span class="s2">/VERSION_OF_THE_MERGED_HISTS/Hists_merged"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--output<span class="w"> </span>/tmp/<span class="nv">$USER</span>/eqsig_Run3_22_23<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--era<span class="w">    </span>Run3_22_23<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--config<span class="w"> </span>config/Datacards/DL/dl_spin0.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span>--binning-config<span class="w"> </span>config/Datacards/DL/binning_eqsig_DL_v2610.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span>--masses<span class="w"> </span><span class="m">300</span>,800<span class="w"> </span>--jobs<span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<p>The datacard bins are named without a <code>/</code> (<code>SR_res2b</code>, <code>TT_res2b</code>, <code>DY_res2b</code>, …), because
+dhi's impact merging cannot handle one. <code>input_categories</code> maps each name to its directory in
+the histogram files, the sub-region of the mass being built (<code>SR_res2b: SR_HMESub_m${MX}/res2b</code>,
+<code>TT_res2b: TT_CR_HMESub_m${MX}/res2b</code>, …); StatInference substitutes <code>${MX}</code>.</p>
+<p>The generic <code>StatInference/bin_opt_2d/rebin_2d.py</code> (with <code>config/Datacards/DL/binning_hmebox.yaml</code>
+or <code>DL/binning_2d.yaml</code>) was the DL card's earlier preprocessing step. It is still available
+to a card that wants an HME window or DNN slices without the control regions and DY
+templates.</p>
+<p>There is also <code>StatInference/bin_opt/</code>, an offline combine-driven search over candidate
+binnings feeding the <code>hist_bins</code> option. This analysis does not use it, and leaves
+<code>hist_bins</code> unset.</p>
+<h3 id="datacards-on-their-own">Datacards on their own<a class="headerlink" href="#datacards-on-their-own" title="Permanent link">&para;</a></h3>
+<p>To build cards outside the chain — a quick check on shapes that are already rebinned:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>cmsEnv<span class="w"> </span>python3<span class="w"> </span>StatInference/dc_make/create_datacards.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>--input<span class="w">  </span>PATH_TO_REBINNED_SHAPES<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>--output<span class="w"> </span>PATH_TO_CARDS<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>--config<span class="w"> </span>config/Datacards/DL/dl_spin0.yaml
+</code></pre></div>
+<h2 id="2-run-limits-on-existing-datacards">2. Run limits on existing datacards<a class="headerlink" href="#2-run-limits-on-existing-datacards" title="Permanent link">&para;</a></h2>
+<p>For cards you already have on disk, the dhi task can be called directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>law<span class="w"> </span>run<span class="w"> </span>PlotResonantLimits<span class="w"> </span>--version<span class="w"> </span>dev<span class="w"> </span>--datacards<span class="w"> </span><span class="s1">'PATH_TO_CARDS/*.txt'</span><span class="w"> </span>--xsec<span class="w"> </span>fb<span class="w"> </span>--y-log
+</code></pre></div>
+<p>Hints:</p>
+<ul>
+<li>add <code>--workflow htcondor</code> to submit to the batch system (local by default);</li>
+<li>add <code>--remove-output 4,a,y</code> to clear previous outputs;</li>
+<li>add <code>--print-status 0</code> to get the workflow status and the output file name;</li>
+<li>options and background: the <a href="https://cms-hh.web.cern.ch/tools/inference/">cms-hh inference documentation</a>.</li>
+</ul>
+<h2 id="3-pulls-impacts">3. Pulls &amp; impacts<a class="headerlink" href="#3-pulls-impacts" title="Permanent link">&para;</a></h2>
+<p>Declared in the datacard configuration's <code>impact_plots</code> block and drawn by
+<code>PlotPullsAndImpactsTask</code>, which writes to <code>&lt;version&gt;/ImpactPlots/&lt;card&gt;/&lt;name&gt;/&lt;era&gt;/&lt;mass&gt;/</code>
+on <code>fs_default</code>
+beside the limit plots:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>law<span class="w"> </span>run<span class="w"> </span>PlotPullsAndImpactsTask<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>--version<span class="w"> </span>dev<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>--hists-version<span class="w"> </span>VERSION_OF_THE_MERGED_HISTS<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span>--era<span class="w"> </span>Run3_2022,Run3_2022EE,Run3_2023,Run3_2023BPix
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">impact_plots</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">combined</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">masses</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">300</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">600</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">800</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">poi_value</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">limit</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="nt">plot_params</span><span class="p">:</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">      </span><span class="nt">order_by_impact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">      </span><span class="nt">mc_stats</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<p><code>poi_value</code> is the signal strength the Asimov dataset is built at, and it has to be near
+the limit to mean anything. dhi's default is <code>r=1</code>, which on this scan is an almost
+invisible signal at 300 (limit ~6.8) and ten times more than can be excluded at 800
+(limit ~0.065) — the first gives a background-only ranking, the second pins <code>r</code> and
+collapses every impact to ~0. <code>limit</code> reads the expected limit for each mass from the
+limits already merged for those cards; a number sets it directly.</p>
+<div class="admonition danger">
+<p class="admonition-title">Changing <code>poi_value</code> does not move the outputs</p>
+<p>It reaches combine as <code>--expectSignal</code> through <code>PullsAndImpacts</code>' <code>custom_args</code>, which
+is significant for task identity but <strong>not</strong> part of the store path — every value
+writes to the same file. Clear <code>PullsAndImpacts</code>, <code>MergePullsAndImpacts</code> and
+<code>PlotPullsAndImpacts</code> for that version under <code>inference/data/store</code> before re-running
+with a different one, or law reports the old fit as complete and you get the previous
+ranking. It cannot go through dhi's <code>parameter_values</code> either: with <code>hh_model=NO_STR</code>,
+<code>POITask</code> hard-codes both the joined values and the postfix, dropping it silently.</p>
+</div>
+<p>Each entry becomes one dhi <code>PlotPullsAndImpacts</code> per era and mass, and the plots land in
+<code>&lt;version&gt;/ImpactPlots/&lt;card&gt;/&lt;name&gt;/&lt;era&gt;/&lt;mass&gt;/</code>, with the card in the file name too (the
+default <code>plot_postfix</code>).</p>
+<p>With no <code>glob:</code>, an entry uses the combined card <code>ResonantLimitsTask</code> writes at
+<code>data/&lt;version&gt;/Datacards/&lt;card&gt;/combined/combined_&lt;mass&gt;.txt</code> — every era and category in one
+fit, which is the ranking that describes the result. It is drawn once and labelled
+<code>combined</code>.</p>
+<p>To rank a single category instead, give the entry a <code>glob:</code>, resolved against that era's
+datacard directory with <code>${ERA}</code> substituted, the same idiom <code>limit_plots</code> uses:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">res2b</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="nt">glob</span><span class="p">:</span><span class="w"> </span><span class="s">"${ERA}/categories/SR_res2b/*.txt"</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">masses</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">300</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">600</span><span class="w"> </span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>The glob and the mass must select <strong>exactly one</strong> card: <code>PullsAndImpacts</code> fits a single
+workspace, one combine job per parameter, so it cannot be handed a set. If it matches none
+or several, the error names the directory and lists what is in it. Note dhi draws one plot
+per card — it cannot split a card into per-category panels — so per-category rankings come
+from pointing at the per-category cards, which the chain already writes.</p>
+<p><code>plot_params</code> accepts any <code>PlotPullsAndImpacts</code> parameter and is checked against them, so
+a typo is refused rather than ignored. <code>hh_model</code> is pinned to <code>NO_STR</code>: this is a
+resonant search, and the dhi default would otherwise fit <code>r</code> alongside <code>kl</code>, <code>kt</code>, <code>CV</code>
+and <code>C2V</code>, against a workspace other than the one the chain built.</p>
+<div class="admonition warning">
+<p class="admonition-title">What a mass costs depends on <code>method</code></p>
+<p>With <code>method: default</code> — what this analysis uses — dhi fits each nuisance separately,
+roughly two combine jobs per nuisance per mass (~160 here), so it is worth sending to a
+batch system. <code>method: robust</code> instead runs <strong>one</strong> fit per mass and reads every impact
+off the inverted Hessian (minutes for all three masses), but can drop parameters (below).
+<code>create_branch_map</code> in <code>dhi/tasks/pulls_impacts.py</code> is where the difference lives.
+To redraw without refitting, pass <code>--redraw</code> together with <code>--remove-output 0,a,y</code> (and
+<code>--card</code>): once a card's plots exist the task is complete, and <code>--redraw</code> alone does nothing.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title"><code>method: robust</code> can silently drop a nuisance</p>
+<p>robustHesse removes parameters it cannot invert, logging <code>Dropping &lt;name&gt; from the
+hessian</code> and then exiting successfully. The dropped nuisance is simply <strong>absent</strong> from
+the plot and the merged JSON, with nothing marking its absence — on the earlier
+<code>Run3_Early</code> cards this happened to <code>CMS_res_j</code>. The task diffs the fitted parameters against the
+card's own nuisance lines afterwards and warns, naming what went missing; take that
+warning seriously before reading a ranking as complete.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title"><code>mc_stats</code> needs <code>parameters_per_page</code></p>
+<p>The combined cards carry a few hundred <code>autoMCStats</code> bins, so <code>mc_stats: true</code> puts
+~460 parameters on the plot. <code>parameters_per_page</code> defaults to <code>-1</code>, meaning a single
+page, and the result is an unreadable hairline strip rather than an error — so the
+task refuses the combination. Set <code>parameters_per_page: 25</code> alongside it.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../analysis/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running the analysis">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Running the analysis
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.action.edit", "content.action.view", "content.code.copy", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@9.3/dist/mermaid.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
