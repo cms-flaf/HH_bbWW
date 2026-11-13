@@ -6,7 +6,7 @@ type: resonant
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  input_file_pattern: ${ERA}/DNN_m${MX}_vs_HME/DNN_m${MX}_vs_HME.root
+  input_file_pattern: ${ERA}/DNN_M${MX}_Signal/DNN_M${MX}_Signal.root
 signalFractionForRelevantBins: 0.2
 # Every listed era gets its own binning, datacards and limit; only the four-era combination is
 # built. Run3_22_23 is global.yaml's meta-era (its plot style is used by the shape plots).
@@ -27,8 +27,10 @@ channels:
   - eMu
   - eE
 # SR (equal-signal DNN bins) and the TT/DY control regions (5 equal-background bins), each in its
-# jet category's HME window. No "/" in the names: they become bin and MC-stat nuisance names,
-# which dhi's impact merging cannot handle with a "/"; input_categories maps them to the inputs.
+# jet category's HME window: the sub-regions <region>_HMESub_m<MX> (Analysis/hist_booking.py,
+# config/sub_regions/hme_DL_v2610.yaml), where DNN_M<MX>_Signal holds the events inside the window
+# of MX. No "/" in the names: they become bin and MC-stat nuisance names, which dhi's impact
+# merging cannot handle with a "/"; input_categories maps them to the inputs.
 categories:
   - SR_res2b
   - SR_boosted
@@ -40,19 +42,25 @@ categories:
   - DY_boosted
   - DY_recovery
 input_categories:
-  SR_res2b: SR/res2b
-  SR_boosted: SR/boosted
-  SR_recovery: SR/recovery
-  TT_res2b: TT_CR/res2b
-  TT_boosted: TT_CR/boosted
-  TT_recovery: TT_CR/recovery
-  DY_res2b: DY_CR/res2b
-  DY_boosted: DY_CR/boosted
-  DY_recovery: DY_CR/recovery
+  SR_res2b: SR_HMESub_m${MX}/res2b
+  SR_boosted: SR_HMESub_m${MX}/boosted
+  SR_recovery: SR_HMESub_m${MX}/recovery
+  TT_res2b: TT_CR_HMESub_m${MX}/res2b
+  TT_boosted: TT_CR_HMESub_m${MX}/boosted
+  TT_recovery: TT_CR_HMESub_m${MX}/recovery
+  DY_res2b: DY_CR_HMESub_m${MX}/res2b
+  DY_boosted: DY_CR_HMESub_m${MX}/boosted
+  DY_recovery: DY_CR_HMESub_m${MX}/recovery
 
-# Cuts the HME windows, merges the backgrounds and bins the DNN (see docs/stat_inference.md).
-# Needs Run3_Model_DYSplit inputs with TT_CR and DY_CR. --jobs: masses in parallel; on condor
-# give the task as many CPUs (--PreprocessShapesTask-n-cpus 8).
+# Merges the backgrounds, bins the DNN score of each sub-region and carries the QCD-scale / PDF
+# members to the final bins for the datacard maker to reduce (see docs/stat_inference.md). Needs
+# Run3_Model_DYSplit inputs of the flavour Signal_Extraction_DL_window, with TT_CR and DY_CR.
+# --jobs: masses in parallel; on condor give the task as many CPUs (--PreprocessShapesTask-n-cpus 8).
+# The binning configuration holds the binning only. To reuse saved edges instead, replace it by
+# --edges config/Datacards/DL/<a binning.json of this step> (or give both: its gates then warn).
+# What the step merges and estimates, and every uncertainty it builds, is in the `preprocess:`
+# blocks of the processes below and of the uncertainties (systematics/); the datacard maker
+# ignores those blocks (Analysis/preprocess_config.py reads and checks them).
 preprocess:
   script: Analysis/EqualSignalBinning.py
   args:
@@ -66,17 +74,48 @@ processes:
     is_data: true
     is_asimov_data: true
 
-  # Made by the preprocess step (binning_eqsig_DL_v2610.yaml: backgrounds): TT = TT + ttV,
-  # DY = DY_M_10to50 + DY_M_50, Minor = VV + VVV + H + W. The binning already keeps them free of
-  # negative bins; the tolerances are a safety net.
+  # Made by the preprocess step as sums of merged-histogram processes, `preprocess: members` (a
+  # member lacking a variation enters at its nominal); `drop`: members left out of those card
+  # categories. ttV and low-mass DY alone have too few, too heavy events to pass the gates. The
+  # binning already keeps them free of negative bins; the tolerances are a safety net.
   - process: TT
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
+    preprocess:
+      members: [ TT, ttV ]
 
   # in all three channels: in eMu (DY->tautau) it is not negligible where the signal is
   - process: DY
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
+    preprocess:
+      members: [ DY_M_10to50, DY_M_50 ]
+      # m_ll < 50 is outside the CRs by construction. In SR_boosted the low-mass estimate leaves
+      # its MC out of DY; SR_boosted is not listed, as the earlier `SR/boosted` never matched
+      # the sub-region inputs (known issue, to be fixed separately).
+      drop:
+        DY_M_10to50: [ TT_res2b, TT_boosted, TT_recovery, DY_res2b, DY_boosted, DY_recovery ]
+      # Smooth DY templates (Analysis/DYTemplate.py, exp(polynomial) fits in effective counts) in
+      # place of the DY MC where it is a few heavy, partly negative weights; where, and how (tail
+      # or fit_only), is set by their nuisances (systematics/dy_template.yaml). tail: raw MC below
+      # the fitted peak + shift, fit above. fit_only: fitted throughout, the channels of one
+      # `pool` group fitted together, times each channel's MC yield. share_by: the member whose
+      # window yield shares the total out to the eras. guard_sigma: template vs raw MC pull per
+      # bin, warned beyond it (binning.json: template_pulls); eMu SR boosted warns at several
+      # masses, kept (<= 0.6 % on limits).
+      dy_template:
+        share_by: DY_M_50
+        fit: { deg: 3, shift: 1.0, merge: true }
+        guard_sigma: 3.0
+        pool: [ [ eE, muMu ], [ eMu ] ]
+      # Low-mass DY where its nuisance applies (SR boosted, systematics/dy_template.yaml),
+      # estimated from the `reference` jet category of the same region:
+      # L = process(ref) x transfer(cat) / transfer(ref), in the window, summed over eras; added
+      # to DY.
+      lowmass_dy:
+        process: DY_M_10to50
+        transfer: DY_M_50
+        reference: recovery
 
   - process: ST
     allow_negative_bins_within_error: true
@@ -86,6 +125,11 @@ processes:
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
     allow_zero_integral: true
+    preprocess:
+      members: [ VV, VVV, H, W ]
+      # W is ~0 there and its heavy events break the gates (kept in recovery)
+      drop:
+        W: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
 
 # The uncertainties are in ../systematics/ (shared with SL) and systematics/ (DL only).
 

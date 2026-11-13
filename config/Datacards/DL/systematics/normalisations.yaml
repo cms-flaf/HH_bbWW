@@ -1,27 +1,48 @@
 # DL normalisations: TT/DY from the control regions, low-mass DY, Minor members.
 uncertainties:
+  # The members of Minor (and low-mass DY), as shapes of the merged process moving only that
+  # member: nominal + value x member nominal (`preprocess: member_values`, as in theory.yaml).
+
+  # WARNING: only XSDB's MC-integration error, not a QCD scale uncertainty (that is several %):
+  # to be replaced with a diboson theory number.
   - name: CMS_bbww_minor_norm_VV
     type: shape
     processes: [ Minor ]
+    preprocess:
+      member_values: { VV: 0.005 }
+  # VVV: no theory reference collected. PROPOSAL, to be confirmed.
   - name: CMS_bbww_minor_norm_VVV
     type: shape
     processes: [ Minor ]
+    preprocess:
+      member_values: { VVV: 0.15 }
+  # Single Higgs is one process: ttH's QCD scale (the largest, dominant here):
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap (13.6 TeV, mH = 125),
+  # ttH +6.0 -9.3 % (QCD scale), +-3.5 % (PDF+alpha_s, in PDF_alphas, theory.yaml).
   - name: CMS_bbww_minor_norm_H
     type: shape
     processes: [ Minor ]
+    preprocess:
+      member_values: { H: [ -0.093, 0.06 ] }
 
-  # W is only in recovery (binning_eqsig_DL_v2610.yaml: drop), in every region
+  # W+jets enters a dilepton selection through a nonprompt lepton, which MC models poorly; this is
+  # a normalisation uncertainty on that, not a cross-section one. PROPOSAL, to be confirmed.
+  # W is only in recovery (dl_common.yaml: Minor's drop), in every region.
   - name: CMS_bbww_minor_norm_W
     type: shape
     processes: [ Minor ]
     categories: [ SR_recovery, TT_recovery, DY_recovery ]
+    preprocess:
+      member_values: { W: 0.3 }
 
   # Low-mass DY is in no control region: a prior of its own on top of DY's normalisation (not in
-  # SR boosted, where CMS_bbww_dy_lowmass applies).
+  # SR boosted, where CMS_bbww_dy_lowmass applies). PROPOSAL, to be revisited.
   - name: CMS_bbww_norm_DY_lowmass
     type: shape
     processes: [ DY ]
     categories: [ SR_res2b, SR_recovery ]
+    preprocess:
+      member_values: { DY_M_10to50: 0.30 }
 
   # TT and DY normalisations: generous priors, constrained by TT_CR / DY_CR in the fit (as good as
   # free rateParams); boosted shares res2b's (too few CR events).

@@ -1,44 +1,58 @@
 # DL: the DY templates and the low-mass DY estimate.
 uncertainties:
-  # Each template window's fit uncertainty, one per channel (binning_eqsig_DL_v2610.yaml: dy_template).
+  # The DY templates (settings: dl_common.yaml, DY's preprocess: dy_template): each nuisance is
+  # the band of the template of its channels and categories, and says how the template replaces
+  # the DY MC there, `preprocess: dy_template: tail | fit_only`. A channel and category without
+  # one keeps its DY MC. tail (eE, muMu resolved): raw MC below the fitted peak, fit above;
+  # fit_only (SR boosted, eMu too): fitted throughout.
   - name: CMS_bbww_dy_fit_eE_res2b
     type: shape
     processes: [ DY ]
     channels: [ eE ]
     categories: [ SR_res2b ]
+    preprocess: { dy_template: tail }
   - name: CMS_bbww_dy_fit_muMu_res2b
     type: shape
     processes: [ DY ]
     channels: [ muMu ]
     categories: [ SR_res2b ]
+    preprocess: { dy_template: tail }
   - name: CMS_bbww_dy_fit_eE_recovery
     type: shape
     processes: [ DY ]
     channels: [ eE ]
     categories: [ SR_recovery ]
+    preprocess: { dy_template: tail }
   - name: CMS_bbww_dy_fit_muMu_recovery
     type: shape
     processes: [ DY ]
     channels: [ muMu ]
     categories: [ SR_recovery ]
+    preprocess: { dy_template: tail }
   - name: CMS_bbww_dy_fit_eE_boosted
     type: shape
     processes: [ DY ]
     channels: [ eE ]
     categories: [ SR_boosted ]
+    preprocess: { dy_template: fit_only }
   - name: CMS_bbww_dy_fit_muMu_boosted
     type: shape
     processes: [ DY ]
     channels: [ muMu ]
     categories: [ SR_boosted ]
+    preprocess: { dy_template: fit_only }
   - name: CMS_bbww_dy_fit_eMu_boosted
     type: shape
     processes: [ DY ]
     channels: [ eMu ]
     categories: [ SR_boosted ]
+    preprocess: { dy_template: fit_only }
 
-  # +-100 % on the low-mass DY estimate in SR boosted (from SR recovery)
+  # The low-mass DY estimate (settings: dl_common.yaml, DY's preprocess: lowmass_dy) replaces the
+  # low-mass MC in this nuisance's categories (SR boosted, from SR recovery); the nuisance scales
+  # the estimate by [Down, Up] factors, +-100 %.
   - name: CMS_bbww_dy_lowmass
     type: shape
     processes: [ DY ]
     categories: [ SR_boosted ]
+    preprocess: { lowmass_dy: [ 0.0, 2.0 ] }
