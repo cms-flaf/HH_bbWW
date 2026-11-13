@@ -86,8 +86,10 @@ the optional `channels` (its keys in these channels only) and `sidebands` (the s
 file's window instead of the window: `<name>L<i>` below, `<name>H<i>` above, `i = 1` the nearest).
 Invariants a diff must keep:
 
-- Sub-region names match `<base>_<word>_m<int>` (no underscore in the word): StatInference's
-  `EqualSignalBinning` maps a sub-region to its base region by that pattern.
+- Sub-region names match `<base>_<word>_m<int>` (no underscore in the word):
+  `Analysis/EqualSignalBinning.py` maps a sub-region to its base region by that pattern.
+- Every base region of a flavour's sub-regions is also in its `regions:` (booked): an unbooked one is
+  still plotted (`HistPlotTask` targets), and HistPlotter finds no histograms there.
 - Bin-form cuts sit on the stored bin edges of `config/plot/histograms.yaml`; a binning change there
   moves every bin-form cut, and the plugin refuses an edge that is not one.
 - A variable is booked in a model point's sub-regions only through `signal_params`; a per-mass variable
@@ -96,7 +98,9 @@ Invariants a diff must keep:
 - The single-lepton sidebands (`Signal_Extraction_SL_window`, `HMESB`) are derived from the SL window
   file `config/sub_regions/hme_SL_v2610.yaml` with the rule of the SL fake estimate (2 per side of
   ≥ 50 GeV, one bin each where the grid does not allow it, none on a side leaving [240, 2000] GeV):
-  do not propose a separate sideband file, which would let windows and sidebands drift apart.
+  do not propose a separate sideband file, which would let windows and sidebands drift apart. The CI
+  flavour books the same at MX = 300 from its own window file (`config/sub_regions/ci_sl_hme.yaml`),
+  so a change of the SL windows does not change the CI.
 - `test/test_hist_booking_config.py` expands the real configuration: keep it passing when a flavour,
   a cuts file or `histograms.yaml` changes.
 

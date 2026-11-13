@@ -1,0 +1,12 @@
+# CI sub-region cuts (flavour CI, sub-regions HMESub and HMESB): an HME window at MX=300 per category,
+# on the stored DeepHME_mass grid, so the CI exercises the single-lepton window and the sidebands
+# derived from it (the HMESB entry) as Signal_Extraction_SL_window does with the SL windows
+# (hme_SL_v2610.yaml). Not a physics window: the CI keeps its own file so that a change of the SL
+# windows does not change the CI.
+parameters: [ mass ]
+region_name: "{region}_{name}_m{mass}"
+cuts:
+  300:
+    res2b: { DeepHME_mass: [ 250, 400 ] }
+    recovery: { DeepHME_mass: [ 250, 400 ] }
+    boosted: { DeepHME_mass: [ 260, 470 ] }

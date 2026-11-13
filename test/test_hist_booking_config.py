@@ -23,7 +23,7 @@ from Analysis import hist_booking as HB  # noqa: E402
 SL_FLAVOUR = "Signal_Extraction_SL_window"
 SL_REGIONS = ("SR_SL", "SR_SL_Fakeable")
 SB_LABELS = ("L2", "L1", "H1", "H2")
-# a sub-region name the datacard tools map to its base region (StatInference EqualSignalBinning)
+# a sub-region name the datacard tools map to its base region (Analysis/EqualSignalBinning.py)
 WINDOW_REGION = re.compile(r"_[A-Za-z0-9]+_m[0-9]+$")
 
 
@@ -73,6 +73,17 @@ class Flavours(unittest.TestCase):
                 self.assertTrue(subs)
                 for s in subs:
                     self.assertRegex(s["name"], WINDOW_REGION)
+
+    def test_every_sub_region_base_region_is_booked(self):
+        # an unbooked base region is still a region of the flavour (regions()), so HistPlotTask makes
+        # plot targets for it, and HistPlotter finds no histograms there
+        for flavour, cfg in GLOBAL["histTuple_flavors"].items():
+            if not cfg.get("sub_regions"):
+                continue
+            with self.subTest(flavour=flavour):
+                self.assertEqual(
+                    sorted(HB.regions(setup_for(flavour))), sorted(cfg["regions"])
+                )
 
     def test_within_the_cap_with_every_channel_and_category(self):
         for flavour in (SL_FLAVOUR, "CI"):

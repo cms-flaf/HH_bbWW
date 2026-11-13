@@ -1110,9 +1110,10 @@ histTuple_flavors:
   # Every variable is booked per variation, channel and category, so `default` does not
   # fit the CI pod's memory once a process has more than one dataset.
   CI:
-    # The CI chain: OS_Iso and the mass-independent single-lepton signal region of the two-stage
-    # DNN, produced and plotted; the CI_SL card reads the looser OS_Iso (see CI/CI_card_SL.yaml).
-    regions: [ OS_Iso, SR_SL ]
+    # The CI chain: OS_Iso, the mass-independent single-lepton signal region of the two-stage DNN
+    # and its anti-isolated twin, produced and plotted; the CI_SL card reads the looser OS_Iso (see
+    # CI/CI_card_SL.yaml).
+    regions: [ OS_Iso, SR_SL, SR_SL_Fakeable ]
     # The limit inputs of both CI cards come from a sub-region of OS_Iso, as the DL cards' do
     # (HMESub): OS_Iso_CISub_m300/<category>. Its cut is the whole DeepHME_mass range
     # (config/sub_regions/ci_full_hme.yaml), so it keeps every event and only exercises the
@@ -1122,15 +1123,16 @@ histTuple_flavors:
         cuts: config/sub_regions/ci_full_hme.yaml
         regions: [ OS_Iso ]
         points: all
-      # The single-lepton HME window of MX=300 and its sidebands in SR_SL and SR_SL_Fakeable, as in
-      # Signal_Extraction_SL_window (e and mu only), so the sideband sub-regions are exercised.
+      # A single-lepton HME window at MX=300 and its sidebands in SR_SL and SR_SL_Fakeable, as in
+      # Signal_Extraction_SL_window (e and mu only), so the sideband sub-regions are exercised; with
+      # a CI window file of its own (config/sub_regions/ci_sl_hme.yaml).
       - name: HMESub
-        cuts: config/sub_regions/hme_SL_v2610.yaml
+        cuts: config/sub_regions/ci_sl_hme.yaml
         regions: [ SR_SL, SR_SL_Fakeable ]
         points: [ { mass: 300 } ]
         channels: [ e, mu ]
       - name: HMESB
-        cuts: config/sub_regions/hme_SL_v2610.yaml
+        cuts: config/sub_regions/ci_sl_hme.yaml
         regions: [ SR_SL, SR_SL_Fakeable ]
         points: [ { mass: 300 } ]
         channels: [ e, mu ]

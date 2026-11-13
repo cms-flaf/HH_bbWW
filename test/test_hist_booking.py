@@ -514,6 +514,12 @@ class SidebandSlices(unittest.TestCase):
         # 400 -> 500 (the last edge) -> beyond the grid; one bin: 500, then off the grid
         self.assertEqual(self.slices(400, +1), [])
 
+    def test_more_than_two_per_side(self):
+        self.assertEqual(
+            self.slices(260, -1, count=3, width=10.0, low=200.0),
+            [(250, 260), (240, 250), (230, 240)],
+        )
+
     def test_gap(self):
         # the first sideband starts at the nearest edge >= 15 GeV beyond the window edge
         self.assertEqual(self.slices(300, +1, gap=15.0), [(320, 340), (340, 360)])
@@ -684,6 +690,26 @@ class SidebandGuards(BookingTestBase):
             cut="[ { DeepHME_mass: [ 260, 300 ] }, { DeepHME_mass: [ 250, 300 ] } ]",
         )
         self.refused("not a bin edge", cut="{ DeepHME_mass: [ 255, 300 ] }")
+        self.refused(
+            "the C\\+\\+ part 'DeepHME_mass > 255' uses DeepHME_mass",
+            cut='[ { DeepHME_mass: [ 260, 300 ] }, "DeepHME_mass > 255" ]',
+        )
+
+    def test_three_per_side(self):
+        self.write_cuts(
+            HEADER + "cuts:\n  300:\n    res2b: { DeepHME_mass: [ 260, 300 ] }\n"
+        )
+        spec = dict(SB, count=3, min_width=10, low_limit=200)
+        names = [
+            s["name"]
+            for s in HB.sub_regions(
+                self.setup_for(entries=[self.entry(sidebands=spec)])
+            )
+        ]
+        self.assertEqual(
+            names,
+            [f"SR_HMESub{lab}_m300" for lab in ("L3", "L2", "L1", "H1", "H2", "H3")],
+        )
 
 
 class EntryChannels(BookingTestBase):

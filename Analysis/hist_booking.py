@@ -71,9 +71,10 @@ interval [lo, hi] (the window). Each side gets ``count`` sidebands, nearest firs
 edge (or, with ``gap`` > 0, at the nearest bin edge at least ``gap`` beyond it), each ends at the nearest
 bin edge at least ``min_width`` beyond the previous one. Where these do not all lie within [``low_limit``,
 ``high_limit``] (default: the first and the last bin edge), the sidebands are one bin each; where that does
-not fit either, the side has none. A sideband's cut is the window's cut with the interval replaced; its
-name is the entry's name and ``L<i>`` (below the window) or ``H<i>`` (above), i = 1 the nearest: with the
-region name pattern ``{region}_{name}_m{mass}``, ``SR_SL_HMESBL1_m300``.
+not fit either, the side has none. A sideband's cut is the window's cut with the interval replaced (a
+C++ part naming ``variable`` is an error); like any bin-form interval, one ending at the last bin edge
+takes the overflow too. Its name is the entry's name and ``L<i>`` (below the window) or ``H<i>`` (above),
+i = 1 the nearest: with the region name pattern ``{region}_{name}_m{mass}``, ``SR_SL_HMESBL1_m300``.
 
 Every ambiguity is an error, and a job refuses more sub-region (key, variable) pairs than
 ``sub_regions_max_key_vars`` (default 5000; 0 disables the check).
@@ -496,6 +497,12 @@ def _window_interval(cut, variable, what):
     """``(parts, i_part, (lo, hi))``: the parts of a cut, the index of the bin-form part holding
     ``variable`` and its single interval."""
     parts = cut if isinstance(cut, list) else [cut]
+    for p in parts:
+        if isinstance(p, str) and variable in cpp_variables(p):
+            raise HistBookingError(
+                f"{what}: the C++ part '{p}' uses {variable}, which the sidebands replace in the "
+                "bin-form part only: put the window of the cut in its bin-form part"
+            )
     holders = [i for i, p in enumerate(parts) if isinstance(p, dict) and variable in p]
     if len(holders) != 1:
         raise HistBookingError(

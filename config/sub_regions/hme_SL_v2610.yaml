@@ -1,6 +1,7 @@
 # PLACEHOLDER: HME windows for the SL channel, v2610 -- a copy of hme_DL_v2610.yaml with the
 # same bounds, so the SL side has a cuts file to point at. The SL windows are still to be
-# derived (Artem); replace the cuts below then. Nothing references this file yet.
+# derived (Artem); replace the cuts below then. Signal_Extraction_SL_window books its windows
+# (HMESub) and the sidebands derived from them (HMESB); the edges must be bin edges of DeepHME_mass.
 #
 # Copied from hme_DL_v2610.yaml:
 # Frozen HME windows for the DL channel, v2610 (decided 2026-10-16).
