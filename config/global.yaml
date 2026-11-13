@@ -1591,6 +1591,46 @@ histTuple_flavors:
       # - name: binary_DNN_m2000_vs_HME
       #   vars: [ TwoStageDNN_M2000_binary, DeepHME_mass ]
 
+  Signal_Extraction_SL_window:
+    regions: [ SR_SL, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV ]
+    sub_regions:
+      - name: HMESub
+        cuts: config/sub_regions/hme_SL_v2610.yaml
+        regions: [ SR_SL, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV ]
+        points: all
+
+    # DNN Outputs (Shapes)
+    fullResolution_variables: [ ]
+
+    variables:
+      - DeepHME_mass
+
+      - TwoStageDNN_M250_binary
+      - TwoStageDNN_M260_binary
+      - TwoStageDNN_M270_binary
+      - TwoStageDNN_M280_binary
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M320_binary
+      - TwoStageDNN_M350_binary
+      - TwoStageDNN_M360_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M450_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M750_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M850_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+      - TwoStageDNN_M1100_binary
+      - TwoStageDNN_M1200_binary
+      - TwoStageDNN_M1300_binary
+      - TwoStageDNN_M1400_binary
+      - TwoStageDNN_M1500_binary
+
 StatInference:
   # The cards to build, by name: each gets its own datacards, limits and plots, under
   # Datacards/<card>/<era>/, ResonantLimitsTask/<card>/, ... The limit and plot tasks take
