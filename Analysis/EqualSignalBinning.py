@@ -50,6 +50,7 @@ import ROOT
 from DYTemplate import fit_template, lowmass_boost_shape, tail_template
 from preprocess_config import (
     PreprocessModel,
+    matches,
     check_binning_config,
     read_saved_edges,
 )
@@ -196,10 +197,7 @@ class Card:
         for unc_name, members, procs in self.member_uncs:
             if "{process}" in members.histogram:
                 continue
-            if procs and not any(
-                re.match(p, card_process) if p.startswith("^") else p == card_process
-                for p in procs
-            ):
+            if procs and not matches(card_process, procs):
                 continue
             out |= {
                 "_" + members.histogram_name(unc_name, card_process, m)
@@ -640,6 +638,15 @@ class Binning:
     def bin_window(self, mass, channel, category, directory, files):
         key = self.window_key(directory)
         window = self.window(mass, directory)
+        if window is not None and self.saved is not None:
+            saved_y = self.saved_record(mass, channel, category)["slices"][0].get(
+                "y_range"
+            )
+            if saved_y and any(abs(a - b) > 1e-6 for a, b in zip(saved_y, window)):
+                raise RuntimeError(
+                    f"--edges: MX={mass} {channel}/{category}: the saved edges were made in "
+                    f"the HME window {saved_y}, the binning configuration has {list(window)}"
+                )
         if window is None and self.windows is None and self.saved is not None:
             # 2D inputs with saved edges only: the window the edges were made in
             y_range = self.saved_record(mass, channel, category)["slices"][0].get(
@@ -1109,7 +1116,7 @@ def main():
     if args.binning_config:
         path = analysis_file(args.binning_config)
         binning_cfg = yaml.safe_load(open(path))
-        check_binning_config(binning_cfg, path)
+        check_binning_config(binning_cfg, path, edges=bool(args.edges))
     if args.edges:
         path = analysis_file(args.edges)
         saved = read_saved_edges(json.load(open(path)), args.era, path)

@@ -19,8 +19,10 @@ Two inputs, with no overlap:
       preprocess: { cr_tilt: <size> }
       preprocess: { dy_template: tail | fit_only }
       preprocess: { lowmass_dy: [ <factor Down>, <factor Up> ] }
-    The entry's name is the nuisance written, and its processes / channels / categories are
-    where it is built (for dy_template and lowmass_dy: where the estimate replaces the MC).
+    The entry's name is the nuisance written. For cr_tilt, dy_template and lowmass_dy its
+    processes / channels / categories are where it is built (for dy_template and lowmass_dy:
+    where the estimate replaces the MC); a member_values variation is built for its backgrounds
+    in every category, its scope only says where the datacard maker applies it.
 
 * The **binning configuration** (--binning-config) holds the binning only: n_bins, gates,
   control_region_bins and, for 2D inputs, windows.
@@ -100,8 +102,9 @@ def signed(value, what):
     return pair
 
 
-def check_binning_config(cfg, path="the binning configuration"):
-    """Raise unless `cfg` holds binning only."""
+def check_binning_config(cfg, path="the binning configuration", edges=False):
+    """Raise unless `cfg` holds binning only. With saved edges (`edges`), n_bins and gates are
+    optional: the edges are not searched for, and the gates only warn."""
     if not isinstance(cfg, dict):
         raise PreprocessConfigError(f"{path}: expected a mapping")
     moved = [k for k in cfg if k in MOVED_BINNING_KEYS]
@@ -122,7 +125,7 @@ def check_binning_config(cfg, path="the binning configuration"):
         raise PreprocessConfigError(
             f"{path}: unknown keys {unknown}; allowed: {sorted(BINNING_KEYS)}"
         )
-    missing = sorted({"n_bins", "gates"} - set(cfg))
+    missing = [] if edges else sorted({"n_bins", "gates"} - set(cfg))
     if missing:
         raise PreprocessConfigError(f"{path}: {missing} are required")
     if "min_each" in (cfg.get("gates") or {}):
@@ -149,6 +152,11 @@ class PreprocessModel:
     def __init__(self, cfg):
         self.channels = list(cfg["channels"])
         self.categories = list(cfg["categories"])
+        # card category -> its input directory (the last part is the jet category)
+        self.input_categories = {
+            c: (cfg.get("input_categories") or {}).get(c, c) for c in self.categories
+        }
+        self.card_name = {}  # background histogram name -> card process name
         self.members, self.drop = {}, {}
         self.dy_template, self.lowmass = None, None
         self._read_processes(cfg.get("processes") or [])
@@ -174,8 +182,11 @@ class PreprocessModel:
         for p in processes:
             if isinstance(p, str):
                 self.members[p] = [p]
+                self.card_name[p] = p
                 continue
             name = p.get("hist_name", p["process"])
+            if not (p.get("is_signal") or p.get("is_data")):
+                self.card_name[name] = p["process"]
             pre = p.get("preprocess")
             if p.get("is_signal") or p.get("is_data"):
                 if pre is not None:
@@ -314,7 +325,12 @@ class PreprocessModel:
             raise PreprocessConfigError(
                 f"{what}: unknown key {key}; allowed: {sorted(UNCERTAINTY_KEYS)}"
             )
-        procs = [b for b in self.members if matches(b, pattern_list(u, "processes"))]
+        # scoped by card process name, as the datacard maker matches them
+        procs = [
+            b
+            for b in self.members
+            if matches(self.card_name.get(b, b), pattern_list(u, "processes"))
+        ]
         channels = pattern_list(u, "channels")
         cats = [c for c in self.categories if matches(c, pattern_list(u, "categories"))]
         if key == "member_values":
@@ -447,6 +463,26 @@ class PreprocessModel:
             lm["nuisance_factors"] = [float(f) for f in factors]
             lm["channels"] = channels
             lm["categories"] = set(cats)
+            # a pooled DY template fit sums the DY of its channels: they must all treat the
+            # low-mass DY the same way
+            if t is not None:
+                for group in t["pool"]:
+                    if len({matches(ch, channels) for ch in group}) > 1:
+                        raise PreprocessConfigError(
+                            f"uncertainty {name}: the low-mass estimate's channels split the "
+                            f"DY template pool {group}; scope it to whole pool groups"
+                        )
+            # the reference is another jet category of the same region
+            ref = [
+                c
+                for c in cats
+                if self.input_categories[c].rsplit("/", 1)[-1] == lm["reference"]
+            ]
+            if ref:
+                raise PreprocessConfigError(
+                    f"uncertainty {name}: the low-mass estimate applies in {ref}, its own "
+                    f"reference category ({lm['reference']})"
+                )
 
     # -- queries ---------------------------------------------------------------------
 

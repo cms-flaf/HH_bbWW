@@ -351,8 +351,11 @@ preprocess: { lowmass_dy: [ 0.0, 2.0 ] }       # the low-mass DY estimate in its
                                                # by these factors for Down / Up
 ```
 
-The name of the entry is the nuisance written, and its scope is where it is built: a DY
-template or the low-mass estimate is applied exactly where its nuisance is declared. The
+The name of the entry is the nuisance written. For `cr_tilt`, `dy_template` and `lowmass_dy`
+its scope is where it is built: a DY template or the low-mass estimate is applied exactly where
+its nuisance is declared. A `member_values` variation is built in every category of the
+backgrounds holding its members (and is checked by the binning gates there); its `categories:`
+and `channels:` only decide where the datacard maker applies it. The
 datacard maker reads entries with `.get()` and ignores `preprocess:`. A mistyped
 `preprocess` key on an uncertainty is not silent either: the step then writes no histograms
 for it, and the datacard maker stops on the missing shape.

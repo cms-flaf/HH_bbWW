@@ -293,11 +293,45 @@ class Strict(unittest.TestCase):
         entry(cfg, "CMS_bbww_dycr_shape_res2b")["categories"] = ["DY_res2"]
         self.assertRaisesWith("match no card category", cfg)
 
+    def test_lowmass_scope(self):
+        cfg = card()
+        entry(cfg, "CMS_bbww_dy_lowmass")["channels"] = ["eE"]
+        self.assertRaisesWith("split the DY template pool", cfg)
+        cfg = card()
+        entry(cfg, "CMS_bbww_dy_lowmass")["categories"] = ["SR_boosted", "SR_recovery"]
+        self.assertRaisesWith("its own reference category", cfg)
+
+    def test_scope_by_card_process_name(self):
+        """`processes:` names the card process, as the datacard maker matches it, also when
+        its histogram name differs."""
+        cfg = card()
+        tt = process(cfg, "TT")
+        tt["process"], tt["hist_name"] = "TTbar", "TT"
+        for u in cfg["uncertainties"]:
+            procs = u.get("processes")
+            if isinstance(procs, list) and "TT" in procs:
+                u["processes"] = ["TTbar" if q == "TT" else q for q in procs]
+        model = PreprocessModel(cfg)
+        self.assertEqual(model.members["TT"], ["TT", "ttV"])
+        self.assertIn("PDF_alphas", model.member_uncs)
+        self.assertIn(
+            ("CMS_bbww_ttcr_shape_res2b", "TT", 0.02), model.tilts("eE", "TT_res2b")
+        )
+
     def test_card_is_not_modified(self):
         cfg = card()
         before = copy.deepcopy(cfg)
         PreprocessModel(cfg)
         self.assertEqual(cfg, before)
+
+
+class BinningFile(unittest.TestCase):
+    def test_n_bins_and_gates_optional_with_saved_edges(self):
+        only_windows = {"windows": "config/sub_regions/hme_DL_v2610.yaml"}
+        check_binning_config(only_windows, edges=True)
+        with self.assertRaises(PreprocessConfigError) as ctx:
+            check_binning_config(only_windows)
+        self.assertIn("are required", str(ctx.exception))
 
 
 class SavedEdges(unittest.TestCase):
