@@ -21,7 +21,33 @@ import yaml
 ANA = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ANA)
 sys.path.insert(0, os.path.join(ANA, "Analysis"))
-from StatInference.common.card_config import load_card_config  # noqa: E402
+try:
+    from StatInference.common.card_config import load_card_config
+except ImportError:
+    # The unit-tests workflow checks out the FLAF submodule only. Then the cards are merged
+    # here by the same rule (StatInference/common/card_config.py): the included files first,
+    # the named lists joined, every other top-level key set in one file only.
+    _LISTS = ("processes", "uncertainties", "limit_plots", "impact_plots")
+
+    def load_card_config(path):
+        with open(path) as f:
+            top = yaml.safe_load(f) or {}
+        merged = {}
+        base = os.path.dirname(path)
+        for part in [os.path.join(base, inc) for inc in top.get("include") or []] + [path]:
+            with open(part) as f:
+                cfg = top if part == path else (yaml.safe_load(f) or {})
+            for key, value in cfg.items():
+                if key == "include":
+                    continue
+                if key in _LISTS:
+                    merged.setdefault(key, []).extend(value or [])
+                elif key in merged:
+                    raise RuntimeError(f"{key} is set twice (again in {part})")
+                else:
+                    merged[key] = value
+        return merged
+
 from preprocess_config import (  # noqa: E402
     PreprocessConfigError,
     PreprocessModel,
