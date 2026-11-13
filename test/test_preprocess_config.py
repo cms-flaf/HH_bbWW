@@ -34,7 +34,9 @@ except ImportError:
             top = yaml.safe_load(f) or {}
         merged = {}
         base = os.path.dirname(path)
-        for part in [os.path.join(base, inc) for inc in top.get("include") or []] + [path]:
+        for part in [os.path.join(base, inc) for inc in top.get("include") or []] + [
+            path
+        ]:
             with open(part) as f:
                 cfg = top if part == path else (yaml.safe_load(f) or {})
             for key, value in cfg.items():
@@ -47,6 +49,7 @@ except ImportError:
                 else:
                     merged[key] = value
         return merged
+
 
 from preprocess_config import (  # noqa: E402
     PreprocessConfigError,
