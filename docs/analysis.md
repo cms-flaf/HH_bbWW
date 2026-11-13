@@ -175,6 +175,28 @@ the plots) gets them from there.
   with the variables of their model point (`signal_params` in `config/plot/histograms.yaml`;
   variables without `signal_params` go in every point). The plugin's docstring describes the cut
   forms.
+- **Channels:** an entry with `channels: [e, mu]` books its sub-region keys in these channels only.
+- **Sidebands:** an entry with `sidebands:` books, instead of its cuts file's window, the sidebands
+  of that window per model point, category and channel: `count` per side, each ending at the nearest
+  bin edge at least `min_width` beyond the previous one (one bin each where the grid does not allow
+  it), starting at the window edge or `gap` beyond it; a side that does not fit within
+  [`low_limit`, `high_limit`] has none. They are named after the entry with `L<i>` below and `H<i>`
+  above the window, `i = 1` the nearest (`SR_SL_HMESBL1_m300`). A sideband's cut is the window's cut
+  with the window interval replaced, so other parts of the cut (e.g. a DNN cut) apply to it too; as
+  any bin-form interval, a sideband ending at the last bin edge takes the overflow.
+- **Single lepton** (`Signal_Extraction_SL_window`): `DeepHME_mass` and the binary DNN of mass MX
+  (`TwoStageDNN_M<MX>_binary`, booked at its own mass only) in e and μ, in the SL HME window of MX
+  (`config/sub_regions/hme_SL_v2610.yaml`, the [16, 84] % signal window per category,
+  `<REG>_HMESub_m<MX>`) of `SR_SL`, the six `CR_SL_*` and the anti-isolated `SR_SL_Fakeable`, and in two
+  sidebands of ≥ 50 GeV on each side of the window (`<REG>_HMESB{L2,L1,H1,H2}_m<MX>`; one 10 GeV bin each
+  where 50 GeV sidebands would leave [240, 2000] GeV, none on a side where that does not fit either,
+  240 GeV being the DeepHME turn-on) of `SR_SL` and `SR_SL_Fakeable`: the inputs of the single-lepton fit
+  and of its fake-lepton estimate, as 1D histograms instead of the 2D `binary_DNN_m<MX>_vs_HME`. No DNN
+  cut is applied in these sub-regions. The sidebands follow the
+  windows of the cuts file per category: a new window file changes them with it. The CI flavour books
+  the same sub-regions at MX = 300 from a window file of its own (`config/sub_regions/ci_sl_hme.yaml`),
+  and books `SR_SL_Fakeable`: every base region of a flavour's sub-regions must be in its `regions:`,
+  or the plots of that region find no histograms.
 
 ## Choosing which variables to histogram
 

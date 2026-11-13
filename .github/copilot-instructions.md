@@ -77,6 +77,33 @@ these files is an error, never an override. Two things about them:
   way. Do not suggest adding it back, and treat any new `allow_negative_*` flag as needing an
   explicit justification.
 
+### Booking plugin and sub-regions
+
+`Analysis/hist_booking.py` is the FLAF booking plugin (`hist_booking_module` in `config/global.yaml`):
+the regions come from the active flavour's `regions:` and the base regions of its `sub_regions:`, so a
+`QCDRegions` in a user_custom has no effect. A sub-region entry is `{name, cuts, regions, points}` plus
+the optional `channels` (its keys in these channels only) and `sidebands` (the sidebands of the cuts
+file's window instead of the window: `<name>L<i>` below, `<name>H<i>` above, `i = 1` the nearest).
+Invariants a diff must keep:
+
+- Sub-region names match `<base>_<word>_m<int>` (no underscore in the word):
+  `Analysis/EqualSignalBinning.py` maps a sub-region to its base region by that pattern.
+- Every base region of a flavour's sub-regions is also in its `regions:` (booked): an unbooked one is
+  still plotted (`HistPlotTask` targets), and HistPlotter finds no histograms there.
+- Bin-form cuts sit on the stored bin edges of `config/plot/histograms.yaml`; a binning change there
+  moves every bin-form cut, and the plugin refuses an edge that is not one.
+- A variable is booked in a model point's sub-regions only through `signal_params`; a per-mass variable
+  without it is booked in every point (25 times), which the per-job cap `sub_regions_max_key_vars`
+  (5000 pairs) is there to stop. `TwoStageDNN_M<MX>_binary` and `DNN_M<MX>_*` carry it.
+- The single-lepton sidebands (`Signal_Extraction_SL_window`, `HMESB`) are derived from the SL window
+  file `config/sub_regions/hme_SL_v2610.yaml` with the rule of the SL fake estimate (2 per side of
+  ≥ 50 GeV, one bin each where the grid does not allow it, none on a side leaving [240, 2000] GeV):
+  do not propose a separate sideband file, which would let windows and sidebands drift apart. The CI
+  flavour books the same at MX = 300 from its own window file (`config/sub_regions/ci_sl_hme.yaml`),
+  so a change of the SL windows does not change the CI.
+- `test/test_hist_booking_config.py` expands the real configuration: keep it passing when a flavour,
+  a cuts file or `histograms.yaml` changes.
+
 ### Integration test
 
 `TestModel` runs `custom_CI_Background_TT`, `custom_CI_Background_DY` and
@@ -154,7 +181,7 @@ Verified 2026-10-23 (Tests row 2026-10-29); re-check before relying on any of it
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026 |
 | Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/` (the cards listed in `global.yaml`'s `StatInference.cards`: `DL/dl_spin{0,2}.yaml`, each including the topic files of `systematics/` (shared with SL), `DL/systematics/` (DL only) and `DL/dl_common.yaml`, listed explicitly; `test/test_datacard_includes.py` checks the lists agree; an SL skeleton in `SL/`, not listed yet; CI: `CI/CI_card_{DL,SL}.yaml` including `systematics/` and `CI/CI_common.yaml`) |
 | Large files | DNN `.onnx` payloads are tracked with Git LFS; never commit a binary directly |
-| Tests | `test/test_plot_config.py`: the control-plot configuration, checked through FLAF's plot rules (`FLAF/Common/PlotGroups.py`) in every era, the Run3_22_23 meta-era and both DY models, without ROOT; `test/test_studies_hist_ownership.py` (`needs_root`, so run locally after `source env.sh`): the `Studies/DY_fit` and `Studies/ModelValidation` functions free the histograms they read, clone, rebin or project. A `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker, and a ROOT stand-in is withdrawn after the import it serves (FLAF's `docs/contributing.md`, Unit tests). Otherwise validation is the integration test and physics checks; the framework's suites live in `FLAF/test/` |
+| Tests | (2026-11-13) `test/test_hist_booking.py`: the booking plugin on a stand-in setup (cut forms, model points, channels, sidebands, guards); `test/test_hist_booking_config.py`: the plugin on the real configuration (every flavour's sub-regions expand, the SL and CI flavours within the cap, the SL sidebands next to their windows on the grid, the binary DNNs at their own mass); `test/test_plot_config.py`: the control-plot configuration, checked through FLAF's plot rules (`FLAF/Common/PlotGroups.py`) in every era, the Run3_22_23 meta-era and both DY models, without ROOT; `test/test_studies_hist_ownership.py` (`needs_root`, so run locally after `source env.sh`): the `Studies/DY_fit` and `Studies/ModelValidation` functions free the histograms they read, clone, rebin or project. A `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker, and a ROOT stand-in is withdrawn after the import it serves (FLAF's `docs/contributing.md`, Unit tests). Otherwise validation is the integration test and physics checks; the framework's suites live in `FLAF/test/` |
 | Workflows | `formatting-check`, `unit-tests` (FLAF's, over `test/` with the pinned FLAF, `test/test_plot_config.py` included), `repo-sanity-checks` (FLAF's sanity checks and FLAF's `run_tools/check_era_rename.py` for leftovers of the `period` → `era` rename), `test-setup-loading`, `test-era-dimension` (FLAF's `test/test_era_dimension.py` over the seven Run 3 eras: every stage built over all eras at once and taken through what the scheduler does before anything runs, and the settings that must agree between eras), `deploy-docs`, `trigger-flaf-integration`. Formatting, era loading, the multi-era construction and the control-plot configuration are checked automatically — do not comment on them |
 | Integration test | Triggered by `@cms-flaf-bot please test`; its configuration lives in `cms-flaf/FLAF_ci`, **not** in this repo. There is no `.github/integration_cfg.yaml` here |
 | Docs | `docs/`, plus the shared framework docs in `FLAF/docs/` |
