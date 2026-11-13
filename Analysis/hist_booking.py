@@ -13,12 +13,17 @@ A flavour::
     histTuple_flavors:
       Signal_Extraction_DL_window:
         variables: [ ... ]
-        regions: [ SR, TT_CR, DY_CR ]            # booked; [ ] books sub-regions only
+        regions: [ SR, TT_CR, DY_CR ]            # booked; must hold every sub-region's base region
         sub_regions:
           - name: HMESub
             cuts: config/sub_regions/hme_DL_v2610.yaml
-            regions: [ SR, TT_CR, DY_CR ]         # the base regions it restricts (booked or not)
+            regions: [ SR, TT_CR, DY_CR ]         # the base regions it restricts
             points: all                           # or a list of model points, e.g. [ { mass: 300 } ]
+
+``regions()`` returns the base regions of the sub-regions whether booked or not, and HistPlotTask plots
+every region it returns: a base region missing from the flavour's ``regions`` has plot targets but no
+histograms, and the plots fail. So keep every base region in ``regions``; ``[ ]`` (sub-regions only)
+suits a flavour that is never plotted.
 
 **Model points.** A sub-region family is indexed by the model points of its cuts file: any parameters
 (the resonance mass, its spin, couplings, ...). The file declares them and the region names::
@@ -186,7 +191,7 @@ def _booked_regions(setup, flavour):
     if not isinstance(booked, list) or not all(isinstance(r, str) for r in booked):
         raise HistBookingError(
             f"histTuple flavor {setup.histTuple_flavor}: `regions` must be a list of region names "
-            f"([ ] for sub-regions only), got {booked!r}"
+            f"([ ] books sub-regions only; such a flavour cannot be plotted), got {booked!r}"
         )
     return booked
 
