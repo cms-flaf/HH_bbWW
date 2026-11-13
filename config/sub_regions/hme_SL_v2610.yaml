@@ -1,30 +1,31 @@
 # Frozen HME windows for the SL channel, v2610
 # defined as [16, 84] signal DeepHME window for each mass
+# window cuts calculated using only Run3_2022 of v2610
 parameters: [ mass ]
 region_name: "{region}_{name}_m{mass}"
 cuts:
-  250: { res2b: { DeepHME_mass: [ 255, 303 ] }, recovery: { DeepHME_mass: [ 255, 303 ] }, boosted: { DeepHME_mass: [ 262, 392 ] } }
-  260: { res2b: { DeepHME_mass: [ 259, 321 ] }, recovery: { DeepHME_mass: [ 259, 321 ] }, boosted: { DeepHME_mass: [ 269, 411 ] } }
-  270: { res2b: { DeepHME_mass: [ 263, 331 ] }, recovery: { DeepHME_mass: [ 263, 331 ] }, boosted: { DeepHME_mass: [ 271, 383 ] } }
-  280: { res2b: { DeepHME_mass: [ 269, 356 ] }, recovery: { DeepHME_mass: [ 269, 356 ] }, boosted: { DeepHME_mass: [ 274, 420 ] } }
-  300: { res2b: { DeepHME_mass: [ 284, 375 ] }, recovery: { DeepHME_mass: [ 284, 375 ] }, boosted: { DeepHME_mass: [ 291, 496 ] } }
-  320: { res2b: { DeepHME_mass: [ 292, 404 ] }, recovery: { DeepHME_mass: [ 292, 404 ] }, boosted: { DeepHME_mass: [ 306, 498 ] } }
-  350: { res2b: { DeepHME_mass: [ 317, 449 ] }, recovery: { DeepHME_mass: [ 317, 449 ] }, boosted: { DeepHME_mass: [ 321, 534 ] } }
-  360: { res2b: { DeepHME_mass: [ 324, 456 ] }, recovery: { DeepHME_mass: [ 324, 456 ] }, boosted: { DeepHME_mass: [ 340, 550 ] } }
-  400: { res2b: { DeepHME_mass: [ 363, 484 ] }, recovery: { DeepHME_mass: [ 363, 484 ] }, boosted: { DeepHME_mass: [ 395, 556 ] } }
-  450: { res2b: { DeepHME_mass: [ 409, 545 ] }, recovery: { DeepHME_mass: [ 409, 545 ] }, boosted: { DeepHME_mass: [ 444, 609 ] } }
-  500: { res2b: { DeepHME_mass: [ 448, 585 ] }, recovery: { DeepHME_mass: [ 448, 585 ] }, boosted: { DeepHME_mass: [ 503, 625 ] } }
-  550: { res2b: { DeepHME_mass: [ 484, 624 ] }, recovery: { DeepHME_mass: [ 484, 624 ] }, boosted: { DeepHME_mass: [ 537, 653 ] } }
-  600: { res2b: { DeepHME_mass: [ 517, 673 ] }, recovery: { DeepHME_mass: [ 517, 673 ] }, boosted: { DeepHME_mass: [ 569, 693 ] } }
-  650: { res2b: { DeepHME_mass: [ 552, 717 ] }, recovery: { DeepHME_mass: [ 552, 717 ] }, boosted: { DeepHME_mass: [ 601, 726 ] } }
-  700: { res2b: { DeepHME_mass: [ 582, 769 ] }, recovery: { DeepHME_mass: [ 582, 769 ] }, boosted: { DeepHME_mass: [ 638, 768 ] } }
-  750: { res2b: { DeepHME_mass: [ 612, 813 ] }, recovery: { DeepHME_mass: [ 612, 813 ] }, boosted: { DeepHME_mass: [ 672, 814 ] } }
-  800: { res2b: { DeepHME_mass: [ 635, 867 ] }, recovery: { DeepHME_mass: [ 635, 867 ] }, boosted: { DeepHME_mass: [ 710, 865 ] } }
-  850: { res2b: { DeepHME_mass: [ 676, 916 ] }, recovery: { DeepHME_mass: [ 676, 916 ] }, boosted: { DeepHME_mass: [ 748, 914 ] } }
-  900: { res2b: { DeepHME_mass: [ 702, 972 ] }, recovery: { DeepHME_mass: [ 702, 972 ] }, boosted: { DeepHME_mass: [ 787, 961 ] } }
-  1000: { res2b: { DeepHME_mass: [ 760, 1070 ] }, recovery: { DeepHME_mass: [ 760, 1070 ] }, boosted: { DeepHME_mass: [ 863, 1065 ] } }
-  1100: { res2b: { DeepHME_mass: [ 797, 1112 ] }, recovery: { DeepHME_mass: [ 797, 1112 ] }, boosted: { DeepHME_mass: [ 894, 1125 ] } }
-  1200: { res2b: { DeepHME_mass: [ 883, 1280 ] }, recovery: { DeepHME_mass: [ 883, 1280 ] }, boosted: { DeepHME_mass: [ 1022, 1272 ] } }
-  1300: { res2b: { DeepHME_mass: [ 921, 1387 ] }, recovery: { DeepHME_mass: [ 921, 1387 ] }, boosted: { DeepHME_mass: [ 1114, 1391 ] } }
-  1400: { res2b: { DeepHME_mass: [ 1034, 1476 ] }, recovery: { DeepHME_mass: [ 1034, 1476 ] }, boosted: { DeepHME_mass: [ 1191, 1500 ] } }
-  1500: { res2b: { DeepHME_mass: [ 1049, 1582 ] }, recovery: { DeepHME_mass: [ 1049, 1582 ] }, boosted: { DeepHME_mass: [ 1283, 1611 ] } }
+  250: { res2b: { DeepHME_mass: [ 250, 310 ] }, recovery: { DeepHME_mass: [ 250, 310 ] }, boosted: { DeepHME_mass: [ 260, 400 ] } }
+  260: { res2b: { DeepHME_mass: [ 250, 330 ] }, recovery: { DeepHME_mass: [ 250, 330 ] }, boosted: { DeepHME_mass: [ 260, 420 ] } }
+  270: { res2b: { DeepHME_mass: [ 260, 340 ] }, recovery: { DeepHME_mass: [ 260, 340 ] }, boosted: { DeepHME_mass: [ 270, 390 ] } }
+  280: { res2b: { DeepHME_mass: [ 260, 360 ] }, recovery: { DeepHME_mass: [ 260, 360 ] }, boosted: { DeepHME_mass: [ 270, 420 ] } }
+  300: { res2b: { DeepHME_mass: [ 280, 380 ] }, recovery: { DeepHME_mass: [ 280, 380 ] }, boosted: { DeepHME_mass: [ 290, 500 ] } }
+  320: { res2b: { DeepHME_mass: [ 290, 410 ] }, recovery: { DeepHME_mass: [ 290, 410 ] }, boosted: { DeepHME_mass: [ 300, 500 ] } }
+  350: { res2b: { DeepHME_mass: [ 310, 450 ] }, recovery: { DeepHME_mass: [ 310, 450 ] }, boosted: { DeepHME_mass: [ 320, 540 ] } }
+  360: { res2b: { DeepHME_mass: [ 320, 460 ] }, recovery: { DeepHME_mass: [ 320, 460 ] }, boosted: { DeepHME_mass: [ 340, 550 ] } }
+  400: { res2b: { DeepHME_mass: [ 360, 490 ] }, recovery: { DeepHME_mass: [ 360, 490 ] }, boosted: { DeepHME_mass: [ 390, 560 ] } }
+  450: { res2b: { DeepHME_mass: [ 400, 550 ] }, recovery: { DeepHME_mass: [ 400, 550 ] }, boosted: { DeepHME_mass: [ 440, 610 ] } }
+  500: { res2b: { DeepHME_mass: [ 440, 590 ] }, recovery: { DeepHME_mass: [ 440, 590 ] }, boosted: { DeepHME_mass: [ 500, 630 ] } }
+  550: { res2b: { DeepHME_mass: [ 480, 630 ] }, recovery: { DeepHME_mass: [ 480, 630 ] }, boosted: { DeepHME_mass: [ 530, 660 ] } }
+  600: { res2b: { DeepHME_mass: [ 510, 680 ] }, recovery: { DeepHME_mass: [ 510, 680 ] }, boosted: { DeepHME_mass: [ 560, 700 ] } }
+  650: { res2b: { DeepHME_mass: [ 550, 725 ] }, recovery: { DeepHME_mass: [ 550, 725 ] }, boosted: { DeepHME_mass: [ 600, 750 ] } }
+  700: { res2b: { DeepHME_mass: [ 580, 775 ] }, recovery: { DeepHME_mass: [ 580, 775 ] }, boosted: { DeepHME_mass: [ 630, 775 ] } }
+  750: { res2b: { DeepHME_mass: [ 610, 825 ] }, recovery: { DeepHME_mass: [ 610, 825 ] }, boosted: { DeepHME_mass: [ 670, 825 ] } }
+  800: { res2b: { DeepHME_mass: [ 630, 875 ] }, recovery: { DeepHME_mass: [ 630, 875 ] }, boosted: { DeepHME_mass: [ 700, 875 ] } }
+  850: { res2b: { DeepHME_mass: [ 670, 925 ] }, recovery: { DeepHME_mass: [ 670, 925 ] }, boosted: { DeepHME_mass: [ 725, 925 ] } }
+  900: { res2b: { DeepHME_mass: [ 700, 975 ] }, recovery: { DeepHME_mass: [ 700, 975 ] }, boosted: { DeepHME_mass: [ 775, 975 ] } }
+  1000: { res2b: { DeepHME_mass: [ 750, 1100 ] }, recovery: { DeepHME_mass: [ 750, 1100 ] }, boosted: { DeepHME_mass: [ 850, 1100 ] } }
+  1100: { res2b: { DeepHME_mass: [ 775, 1150 ] }, recovery: { DeepHME_mass: [ 775, 1150 ] }, boosted: { DeepHME_mass: [ 875, 1150 ] } }
+  1200: { res2b: { DeepHME_mass: [ 875, 1300 ] }, recovery: { DeepHME_mass: [ 875, 1300 ] }, boosted: { DeepHME_mass: [ 1000, 1300 ] } }
+  1300: { res2b: { DeepHME_mass: [ 900, 1400 ] }, recovery: { DeepHME_mass: [ 900, 1400 ] }, boosted: { DeepHME_mass: [ 1100, 1400 ] } }
+  1400: { res2b: { DeepHME_mass: [ 1000, 1500 ] }, recovery: { DeepHME_mass: [ 1000, 1500 ] }, boosted: { DeepHME_mass: [ 1150, 1500 ] } }
+  1500: { res2b: { DeepHME_mass: [ 1000, 1600 ] }, recovery: { DeepHME_mass: [ 1000, 1600 ] }, boosted: { DeepHME_mass: [ 1250, 1700 ] } }
