@@ -204,6 +204,13 @@ ttH:
     - TTHtoNon2B_M125
     - TTHto2B_M125
 
+# Exception: the real 2024 DL production (XtoYHto2W2Bto2L2Nu2B_MX_*_MY_*, the key filled in
+# datasets.yaml) uses a coarser MY grid {200,300,400,500,600,800,1000,...,3500} that does not
+# include MY=125 at all -- confirmed in datasets.yaml, no dasgoclient re-check needed. Since this
+# meta-process's pattern (and 2022/2023's own convention) is MY=125-only, there is nothing to list
+# below; left empty, not an oversight. It also still targets the old, unfilled
+# XtoYHto2B2Wto2B2L2Nu_MX_*_MY_125 key (2022/2023's DL key name), which has no real 2024 dataset
+# either -- this pattern cannot be pointed at the new key without changing what MY it matches.
 XtoHHto2B2W_DoubleLepton:
   name: "XtoHHto2B2W_DoubleLepton"
   color: "kBlack"
@@ -236,6 +243,47 @@ XtoHHto2B2W_SingleLepton:
       - [ '1000' ]
     plot_color: [ "kBlack", "kBlue", "kRed" ]
     channels: [ "e", "mu" ]
+  datasets:
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_300_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_400_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_500_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_550_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_600_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_650_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_700_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_800_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_900_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1000_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1200_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1400_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1600_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_1800_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_2000_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_2500_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_3000_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_3500_MY_125
+    - XtoYHto2B2Wto2B2Q1L1Nu_MX_4000_MY_125
+
+# Exception: no XtoYHto2B2Tau_MX_*_MY_125 dataset exists for 2024 -- confirmed via a live
+# dasgoclient query (2026-11-14): the real production has 265 valid NMSSM-XtoYHto2B2Tau
+# datasets, covering MY in {60,70,80,90,95,100,150,200,300,...,3500}, but genuinely zero at
+# MY=125. Block kept (matching 2022/2023's structure) for parity, with an empty dataset list --
+# not an oversight, nothing to fill until this point is produced.
+XtoHHto2B2Tau:
+  name: "XtoHHto2B2Tau"
+  color: "kBlack"
+  is_meta_process: true
+  meta_setup:
+    dataset_name_pattern: XtoYHto2B2Tau_MX_(\d+)_MY_125
+    parameters: [ MASS ]
+    process_name: XtoHHto2B2Tau_${MASS}
+    name_pattern: Xto2B2Tau ${MASS} GeV (x50)
+    to_plot:
+      - [ '300' ]
+      - [ '600' ]
+      - [ '1000' ]
+    plot_color: [ "kMagenta", "kCyan", "kGreen" ]
+    channels: [ "e", "mu", "eE", "eMu", "muMu" ]
   datasets: [ ]
 
 XtoHHto2Tau2B:
@@ -253,7 +301,26 @@ XtoHHto2Tau2B:
       - [ '1000' ]
     plot_color: [ "kMagenta", "kCyan", "kGreen" ]
     channels: [ "e", "mu", "eE", "eMu", "muMu" ]
-  datasets: [ ]
+  datasets:
+    - XtoYHto2Tau2B_MX_300_MY_125
+    - XtoYHto2Tau2B_MX_400_MY_125
+    - XtoYHto2Tau2B_MX_500_MY_125
+    - XtoYHto2Tau2B_MX_550_MY_125
+    - XtoYHto2Tau2B_MX_600_MY_125
+    - XtoYHto2Tau2B_MX_650_MY_125
+    - XtoYHto2Tau2B_MX_700_MY_125
+    - XtoYHto2Tau2B_MX_800_MY_125
+    - XtoYHto2Tau2B_MX_900_MY_125
+    - XtoYHto2Tau2B_MX_1000_MY_125
+    - XtoYHto2Tau2B_MX_1200_MY_125
+    - XtoYHto2Tau2B_MX_1400_MY_125
+    - XtoYHto2Tau2B_MX_1600_MY_125
+    - XtoYHto2Tau2B_MX_1800_MY_125
+    - XtoYHto2Tau2B_MX_2000_MY_125
+    - XtoYHto2Tau2B_MX_2500_MY_125
+    - XtoYHto2Tau2B_MX_3000_MY_125
+    - XtoYHto2Tau2B_MX_3500_MY_125
+    - XtoYHto2Tau2B_MX_4000_MY_125
 
 GluGluToRadion_bbWW_2L:
   name: "GluGluToRadion_bbWW_2L"
