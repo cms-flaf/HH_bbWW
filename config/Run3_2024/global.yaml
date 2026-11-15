@@ -1,6 +1,11 @@
 triggerFile: config/Run3_2024/triggers.yaml
 nano_version: v15
 met_type: PuppiMET
+# Overrides the base config's `phys_model: Run3_Model`: Run3_Model's private Radion/BulkGraviton
+# signals have zero 2024 mass points produced yet, so use the central X->YH NMSSM signals
+# instead (real 2024 DAS nanoAOD, see config/phys_models.yaml's Run3_2024_XtoYH_Model). Scoped to
+# this era only -- 2022/2023/2025/2026 have no such override and keep using Run3_Model unchanged.
+phys_model: Run3_2024_XtoYH_Model
 nanoAODVersions:
   data: v15
   mc: v15

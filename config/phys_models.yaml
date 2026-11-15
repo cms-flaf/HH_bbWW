@@ -48,6 +48,33 @@ Run3_Model_DYSplit:
   signals: *Run3_Model_signals
   data: *Run3_Model_data
 
+# Run3_2024-only variant of Run3_Model that selects the central X->YH NMSSM resonant signals
+# (populated in config/Run3_2024/processes.yaml, real 2024 DAS nanoAOD) instead of the private
+# Radion/BulkGraviton DSProd samples -- those have zero 2024 mass points produced yet (see the
+# comment at the top of this file). Scoped to 2024 only via config/Run3_2024/global.yaml's
+# `phys_model: Run3_2024_XtoYH_Model` override; 2022/2023/2025/2026 keep using Run3_Model (and
+# its private Radion/BulkGraviton signals) unchanged, since only Run3_2024/global.yaml sets this
+# override. XtoHHto2B2W_DoubleLepton and XtoHHto2B2Tau currently resolve to zero 2024 samples
+# each (confirmed production gaps, see processes.yaml's comments there) but are listed anyway,
+# the same way Run3_Model tolerates its own currently-empty 2024 Radion/Graviton signals.
+Run3_2024_XtoYH_Model:
+  name: "Run 3 2024 model, central X->YH signals"
+  backgrounds:
+    - TT
+    - DY
+    - ST
+    - VV
+    - VVV
+    - ttV
+    - W
+    - H
+  signals:
+    - XtoHHto2B2W_SingleLepton
+    - XtoHHto2B2W_DoubleLepton
+    - XtoHHto2Tau2B
+    - XtoHHto2B2Tau
+  data: *Run3_Model_data
+
 OnlyData:
   name: "Only Data"
   backgrounds: [ ]
