@@ -112,6 +112,7 @@ class BookingTestBase(unittest.TestCase):
         self.write_cuts(HEADER + "cuts:\n  300:\n" + cut_text)
         setup = self.setup_for(entries=[self.entry(points=[{"mass": 300}], **entry)])
         (s,) = HB.sub_regions(setup)
+        self.last_setup = setup
         return s
 
 
@@ -355,13 +356,16 @@ class BinFormCuts(BookingTestBase):
             self.one("    res2b: { lep1_pt: [ 30, 50, 70 ] }\n")
 
 
-class HistTupleColumns(BookingTestBase):
-    """histtuple_columns: the variables of the bin-form cuts, stored as <var>_bin in the histTuples
-    whether the flavour plots them or not."""
+class RequiredColumns(BookingTestBase):
+    """required_columns: the variables the cuts read, bin-form ones stored as <var>_bin and C++ ones at
+    full resolution in the histTuples, whether the flavour lists them or not."""
 
     def test_the_bin_form_cut_variables(self):
         setup = self.setup_for(entries=[self.entry()])
-        self.assertEqual(HB.histtuple_columns(setup), {"binned": ["DeepHME_mass"]})
+        self.assertEqual(
+            HB.required_columns(setup),
+            {"binned": ["DeepHME_mass"], "fullResolution": []},
+        )
 
     def test_a_cut_variable_that_is_not_plotted(self):
         variables = [v for v in VARS if v != "DeepHME_mass"]
@@ -371,7 +375,10 @@ class HistTupleColumns(BookingTestBase):
             subs["SR_HMESub_m300"]["cuts"][("res2b", "eE")],
             ("DeepHME_mass_bin >= 6 && DeepHME_mass_bin < 16", ["DeepHME_mass_bin"]),
         )
-        self.assertEqual(HB.histtuple_columns(setup), {"binned": ["DeepHME_mass"]})
+        self.assertEqual(
+            HB.required_columns(setup),
+            {"binned": ["DeepHME_mass"], "fullResolution": []},
+        )
         # the cut variable is not booked: only the job's variables are
         for block in HB.booking(setup, KEYS, variables):
             self.assertNotIn("DeepHME_mass", block["variables"])
@@ -385,17 +392,19 @@ class HistTupleColumns(BookingTestBase):
             + "    res2b: [ { lep1_pt: [ 30, 200 ] }, 'DeepHME_mass > 250' ]\n"
             + "    boosted: { DeepHME_mass: [ 250, 350 ] }\n"
         )
-        setup = self.setup_for(entries=[self.entry()])
-        # the C++ cut's variable is a full-resolution one, not a bin column
+        setup = self.setup_for(entries=[self.entry()], fullres=())
+        # the C++ cut's variable is a full-resolution column, unlisted in the flavour
         self.assertEqual(
-            HB.histtuple_columns(setup), {"binned": ["lep1_pt", "DeepHME_mass"]}
+            HB.required_columns(setup),
+            {"binned": ["lep1_pt", "DeepHME_mass"], "fullResolution": ["DeepHME_mass"]},
         )
 
     def test_whole_range_and_no_sub_regions_need_nothing(self):
         self.write_cuts(HEADER + "cuts:\n  300:\n    res2b: { lep1_pt: [ 0, 200 ] }\n")
         setup = self.setup_for(entries=[self.entry()])
-        self.assertEqual(HB.histtuple_columns(setup), {"binned": []})
-        self.assertEqual(HB.histtuple_columns(self.setup_for()), {"binned": []})
+        none = {"binned": [], "fullResolution": []}
+        self.assertEqual(HB.required_columns(setup), none)
+        self.assertEqual(HB.required_columns(self.setup_for()), none)
 
 
 class CppAndCombinedCuts(BookingTestBase):
@@ -412,13 +421,12 @@ class CppAndCombinedCuts(BookingTestBase):
         s = self.one('    res2b: "std::abs(DeepHME_mass - 300.f) < 1e2 && true"\n')
         self.assertEqual(s["cuts"][("res2b", "eE")][1], ["DeepHME_mass"])
 
-    def test_a_variable_not_at_full_resolution_is_refused(self):
-        with self.assertRaisesRegex(
-            HB.HistBookingError,
-            "uses lep1_pt, not in fullResolution_variables of flavour F; add it there "
-            "\\(it is not added automatically\\)",
-        ):
-            self.one('    res2b: "lep1_pt > 30"\n')
+    def test_a_variable_not_listed_at_full_resolution_is_required(self):
+        s = self.one('    res2b: "lep1_pt > 30"\n')
+        self.assertEqual(s["cuts"][("res2b", "eE")], ("lep1_pt > 30", ["lep1_pt"]))
+        self.assertEqual(
+            HB.required_columns(self.last_setup)["fullResolution"], ["lep1_pt"]
+        )
 
     def test_a_cpp_part_and_a_bin_form_part(self):
         s = self.one(

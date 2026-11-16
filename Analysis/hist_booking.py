@@ -7,9 +7,11 @@ global.yaml names it (``hist_booking_module: Analysis.hist_booking``). It gives 
   built, and the histTuples keep events, for them;
 - ``booking(setup, keys, variables)``: what a HistFromNtupleProducer job fills: every variable in the
   keys of the flavour's ``regions``, and each sub-region's variables in its own keys;
-- ``histtuple_columns(setup)``: the variables of the bin-form sub-region cuts, whose ``<var>_bin``
-  FLAF then stores in the histTuples (and whose AnalysisCache producer the HistTuple task requires)
-  without histogramming them, so a cut variable need not be one of the flavour's ``variables``.
+- ``required_columns(setup)``: the variables the sub-region cuts read, found from the cuts
+  themselves: ``binned`` for bin-form cuts (FLAF stores ``<var>_bin``), ``fullResolution`` for C++ cuts
+  (FLAF stores the raw column). FLAF stores them in the histTuples, and requires their AnalysisCache
+  producers in the HistTuple task, without histogramming them, so a cut variable need not be one of the
+  flavour's ``variables`` or ``fullResolution_variables``.
 
 A flavour::
 
@@ -48,13 +50,13 @@ point if one entry agrees with the point on every parameter both have; a variabl
 
 - bin form ``{variable: [low, high] or [[low, high], ...]}``: each variable with a binning (``x_bins``)
   in histograms.yaml, every edge a bin edge of that binning, the cut on the stored bin index
-  (``<var>_bin``, stored through ``histtuple_columns`` whether the variable is plotted or not); the
+  (``<var>_bin``, stored through ``required_columns`` whether the variable is plotted or not); the
   intervals of a variable are OR'ed, the variables AND'ed; an interval from the first (to the last) edge
   takes the underflow (overflow) too. No histTuple rerun is needed to change the edges.
-- C++ form, a string: used as written. Every variable it names must be in the flavour's
-  ``fullResolution_variables``; nothing is added automatically, so a variable that is not there is an
-  error. Function names (``abs(``), namespaced names (``std::abs``), numeric literals and ``true``/
-  ``false`` are not variables; a function's arguments are.
+- C++ form, a string: used as written. Every variable it names is stored at full resolution in the
+  histTuples (through ``required_columns``), whether the flavour lists it or not. Function names
+  (``abs(``), namespaced names (``std::abs``), numeric literals and ``true``/``false`` are not
+  variables; a function's arguments are.
 
 A dict whose keys are all channels is a channel map, one whose keys are all variables with a binning a
 bin-form cut; anything else is an error. A channel missing from a map, or a category missing from a
@@ -155,11 +157,15 @@ def booking(setup, keys, variables):
     return blocks
 
 
-def histtuple_columns(setup):
-    """The variables of the flavour's bin-form sub-region cuts: FLAF stores their ``<var>_bin`` in the
-    histTuples (not histogrammed), plotted variables of the flavour or not."""
+def required_columns(setup):
+    """The variables the flavour's sub-region cuts read: ``binned`` those of bin-form cuts (FLAF stores
+    their ``<var>_bin``), ``fullResolution`` those of C++ cuts (FLAF stores the raw column). Stored in
+    the histTuples, not histogrammed, whether the flavour lists them or not."""
     sub_regions(setup)
-    return {"binned": list(setup.__dict__["_bbww_bin_cut_vars"])}
+    return {
+        "binned": list(setup.__dict__["_bbww_bin_cut_vars"]),
+        "fullResolution": list(setup.__dict__["_bbww_fullres_cut_vars"]),
+    }
 
 
 # ---------------------------------------------------------------- the flavour
@@ -353,20 +359,14 @@ def cpp_variables(expr):
     return names
 
 
-def cpp_cut(expr, fullres, what, flavour):
-    """A C++ part and its columns; every variable it names must be a full-resolution variable."""
+def cpp_cut(expr, what):
+    """A C++ part and its columns, the variables it names (stored at full resolution through
+    ``required_columns``)."""
     if not expr.strip():
         raise HistBookingError(f"{what}: empty cut")
     names = cpp_variables(expr)
     if not names:
         raise HistBookingError(f"{what}: the cut '{expr}' uses no variable")
-    missing = [n for n in names if n not in fullres]
-    if missing:
-        raise HistBookingError(
-            f"{what}: the cut '{expr}' uses {', '.join(missing)}, not in fullResolution_variables "
-            f"of flavour {flavour}; add {'it' if len(missing) == 1 else 'them'} there (it is not "
-            "added automatically)"
-        )
     return expr, names
 
 
@@ -409,7 +409,10 @@ def cut_expression(cut, ctx, what):
                     ctx["bin_vars"].append(col[: -len("_bin")])
         elif isinstance(part, str):
             text = _substitute(part, ctx["point"], part_what)
-            expr, cols = cpp_cut(text, ctx["fullres"], part_what, ctx["flavour"])
+            expr, cols = cpp_cut(text, part_what)
+            for col in cols:
+                if col not in ctx["fullres_vars"]:
+                    ctx["fullres_vars"].append(col)
         else:
             raise HistBookingError(
                 f"{part_what}: a cut part is a {{variable: [low, high]}} dict or a C++ string, "
@@ -524,7 +527,6 @@ def sub_regions(setup):
     entries = flavour.get("sub_regions") or []
     if not isinstance(entries, list):
         raise HistBookingError(f"flavour {flavour_name}: sub_regions must be a list")
-    fullres = set(flavour.get("fullResolution_variables") or [])
     categories = _categories(setup)
     channels = _channels(setup)
 
@@ -534,7 +536,7 @@ def sub_regions(setup):
             raise HistBookingError(f"{var} has no x_bins in histograms.yaml")
         return axis_edges(entry["x_bins"])
 
-    out, bin_vars = [], []
+    out, bin_vars, fullres_vars = [], [], []
     names_seen = set(_booked_regions(setup, flavour))
     for i_entry, entry in enumerate(entries):
         what = f"flavour {flavour_name} sub_regions[{i_entry}]"
@@ -588,8 +590,7 @@ def sub_regions(setup):
                 "edges": edges_of,
                 "has_binning": lambda var: _has_binning(setup, var),
                 "bin_vars": bin_vars,
-                "fullres": fullres,
-                "flavour": flavour_name,
+                "fullres_vars": fullres_vars,
                 "point": point,
             }
             point_cuts = {}
@@ -625,5 +626,6 @@ def sub_regions(setup):
                     }
                 )
     setup.__dict__["_bbww_bin_cut_vars"] = bin_vars
+    setup.__dict__["_bbww_fullres_cut_vars"] = fullres_vars
     setup.__dict__["_bbww_sub_regions"] = out
     return out

@@ -1368,7 +1368,7 @@ histTuple_flavors:
     # base region within the frozen HME range of MX (config/sub_regions/hme_DL_v2610.yaml);
     # DNN_M<MX>_Signal there is the slice of the 2D. DeepHME_mass is not plotted (it was filled in
     # every sub-region, HH_bbWW#211): the booking plugin stores its DeepHME_mass_bin, which the cuts
-    # read, in the histTuples (histtuple_columns in Analysis/hist_booking.py).
+    # read, in the histTuples (required_columns in Analysis/hist_booking.py).
     fullResolution_variables: [ ]
 
     regions: [ SR, TT_CR, DY_CR ]
