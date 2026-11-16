@@ -7,6 +7,8 @@ nanoAODVersions:
 # Everything not listed here comes from the top-level corrections block.
 corrections:
   <<: *corrections_default
+  # the 2025 EGM electron.json used here has no RecoBelow20 working point
+  ele: { stages: [ HistTuple, AnalysisCache ], reco_sf: false }
   btag:
     stages: [ AnaTuple, HistTuple, AnalysisCache ]
     modes:
