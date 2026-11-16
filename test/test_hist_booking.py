@@ -505,14 +505,19 @@ class SidebandSlices(unittest.TestCase):
         self.assertEqual(self.slices(300, +1), [(300, 320), (320, 340)])
         self.assertEqual(self.slices(300, +1, count=1, width=15), [(300, 320)])
 
-    def test_one_bin_each_where_they_do_not_fit(self):
-        # 240 -> 220 -> 200, below the low limit: one 10 GeV bin each
-        self.assertEqual(self.slices(240, -1), [(230, 240), (220, 230)])
+    def test_a_side_keeps_the_sidebands_that_fit(self):
+        # 240 -> 220 -> 200, below the low limit: the first only, never narrower ones
+        self.assertEqual(self.slices(240, -1), [(220, 240)])
+        # 400 -> 500 (the last edge, the nearest >= 20 GeV beyond) -> off the grid
+        self.assertEqual(self.slices(400, +1), [(400, 500)])
+        self.assertEqual(self.slices(320, +1, high=360), [(320, 340), (340, 360)])
+        self.assertEqual(self.slices(320, +1, high=350), [(320, 340)])
 
-    def test_no_side_where_one_bin_does_not_fit_either(self):
+    def test_no_side_where_the_first_does_not_fit(self):
         self.assertEqual(self.slices(230, -1), [])
-        # 400 -> 500 (the last edge) -> beyond the grid; one bin: 500, then off the grid
-        self.assertEqual(self.slices(400, +1), [])
+        self.assertEqual(self.slices(220, -1), [])
+        self.assertEqual(self.slices(500, +1), [])
+        self.assertEqual(self.slices(300, +1, high=310), [])
 
     def test_more_than_two_per_side(self):
         self.assertEqual(
@@ -523,19 +528,21 @@ class SidebandSlices(unittest.TestCase):
     def test_gap(self):
         # the first sideband starts at the nearest edge >= 15 GeV beyond the window edge
         self.assertEqual(self.slices(300, +1, gap=15.0), [(320, 340), (340, 360)])
-        self.assertEqual(
-            self.slices(260, -1, gap=25.0, low=200.0), [(220, 230), (210, 220)]
-        )
+        # 260 - 25 -> 230 -> 210 -> 190 (no edge between 0 and 200)
+        self.assertEqual(self.slices(260, -1, gap=25.0, low=200.0), [(210, 230)])
         self.assertEqual(self.slices(260, -1, gap=25.0), [])
+        # a gap that leaves the limits leaves no sideband
+        self.assertEqual(self.slices(300, +1, gap=15.0, high=310), [])
 
-    def test_the_rule_of_the_sl_fake_study_on_the_hme_grid(self):
-        # the slices of the HH_bbWW_dev SL-fake study (hh_bbww/sl_fakes_tsdnn/windows.py, an independent
-        # implementation): 2 sidebands of >= 50 GeV per side within [240, 2000], nearest first
+    def test_two_of_50_gev_per_side_on_the_hme_grid(self):
+        # up to 2 sidebands of >= 50 GeV per side within [240, 2000], nearest first, as the F50x
+        # scheme of the HH_bbWW_dev sideband-width study (hh_bbww/sl_fakes_tsdnn/sideband_width.py)
         cases = [
-            ((270, 380), 0, [(260, 270), (250, 260)], [(380, 430), (430, 480)]),
+            ((270, 380), 0, [], [(380, 430), (430, 480)]),
             ((250, 310), 0, [], [(310, 360), (360, 410)]),
+            ((300, 400), 0, [(250, 300)], [(400, 450), (450, 500)]),
             ((350, 510), 0, [(300, 350), (250, 300)], [(510, 560), (560, 610)]),
-            ((350, 510), 50, [(290, 300), (280, 290)], [(560, 610), (610, 660)]),
+            ((350, 510), 50, [(250, 300)], [(560, 610), (610, 660)]),
             ((590, 775), 0, [(540, 590), (490, 540)], [(775, 825), (825, 875)]),
             ((800, 1100), 50, [(700, 750), (650, 700)], [(1150, 1200), (1200, 1250)]),
             (
@@ -556,7 +563,7 @@ class SidebandEntries(BookingTestBase):
     WINDOWS = HEADER + """cuts:
   300:
     res2b: { DeepHME_mass: [ 260, 300 ] }
-    boosted: [ { DeepHME_mass: [ 250, 300 ], DNN_M300_Signal: [ 0.5, 1.0 ] }, "lep1_pt > 30" ]
+    boosted: [ { DeepHME_mass: [ 270, 300 ], DNN_M300_Signal: [ 0.5, 1.0 ] }, "lep1_pt > 30" ]
 """
     # the sidebands of WINDOWS written as windows: the cuts every sideband must have
     AS_WINDOWS = """
@@ -564,8 +571,8 @@ class SidebandEntries(BookingTestBase):
     boosted: [ {{ DeepHME_mass: {boosted}, DNN_M300_Signal: [ 0.5, 1.0 ] }}, "lep1_pt > 30" ]
 """
     EXPECTED = {
-        "L2": {"res2b": [220, 240], "boosted": [230, 240]},
-        "L1": {"res2b": [240, 260], "boosted": [240, 250]},
+        "L2": {"res2b": [220, 240], "boosted": [230, 250]},
+        "L1": {"res2b": [240, 260], "boosted": [250, 270]},
         "H1": {"res2b": [300, 320], "boosted": [300, 320]},
         "H2": {"res2b": [320, 340], "boosted": [320, 340]},
     }
@@ -630,13 +637,36 @@ class SidebandEntries(BookingTestBase):
         self.assertNotIn(("eE", "SR_HMESBL1_m300", "recovery"), sub_keys)
 
     def test_a_side_without_sidebands_defines_no_sub_region(self):
+        for low, labels in ((230, ["H1", "H2"]), (240, ["L1", "H1", "H2"])):
+            with self.subTest(window_low=low):
+                self.write_cuts(
+                    HEADER
+                    + f"cuts:\n  300:\n    res2b: {{ DeepHME_mass: [ {low}, 300 ] }}\n"
+                )
+                names = [
+                    s["name"]
+                    for s in self.expand([self.entry(name="HMESB", sidebands=SB)])
+                ]
+                self.assertEqual(names, [f"SR_HMESB{lab}_m300" for lab in labels])
+
+    def test_a_sideband_only_where_its_category_has_one(self):
+        # res2b [260, 300] has L2 (220-240), boosted [240, 300] L1 only: L2 has no boosted key
         self.write_cuts(
-            HEADER + "cuts:\n  300:\n    res2b: { DeepHME_mass: [ 230, 300 ] }\n"
+            HEADER
+            + "cuts:\n  300:\n    res2b: { DeepHME_mass: [ 260, 300 ] }\n"
+            + "    boosted: { DeepHME_mass: [ 240, 300 ] }\n"
         )
-        names = [
-            s["name"] for s in self.expand([self.entry(name="HMESB", sidebands=SB)])
-        ]
-        self.assertEqual(names, ["SR_HMESBH1_m300", "SR_HMESBH2_m300"])
+        subs = {
+            s["name"]: s for s in self.expand([self.entry(name="HMESB", sidebands=SB)])
+        }
+        self.assertEqual(
+            sorted(subs["SR_HMESBL2_m300"]["cuts"]),
+            [("res2b", ch) for ch in sorted(CHANNELS)],
+        )
+        self.assertEqual(
+            sorted({cat for cat, _ in subs["SR_HMESBL1_m300"]["cuts"]}),
+            ["boosted", "res2b"],
+        )
 
     def test_sidebands_per_channel_of_a_channel_map(self):
         self.write_cuts(
@@ -738,6 +768,56 @@ class EntryChannels(BookingTestBase):
                 "channels must be a non-empty list of configured channels",
             ):
                 HB.sub_regions(self.setup_for(entries=[self.entry(channels=channels)]))
+
+
+class EntryVariables(BookingTestBase):
+    def blocks(self, *entries):
+        return HB.booking(self.setup_for(entries=list(entries)), KEYS, VARS)
+
+    def test_only_the_listed_variables_in_the_sub_regions(self):
+        blocks = self.blocks(self.entry(variables=["DNN_M{mass}_Signal"]))
+        self.assertEqual(blocks[0]["variables"], VARS)
+        self.assertEqual(
+            {b["keys"][0][0][1]: b["variables"] for b in blocks[1:]},
+            {
+                "SR_HMESub_m300": ["DNN_M300_Signal"],
+                "SR_HMESub_m400": ["DNN_M400_Signal"],
+            },
+        )
+
+    def test_per_entry(self):
+        blocks = self.blocks(
+            self.entry(variables=["DNN_M{mass}_Signal"]),
+            self.entry(name="All", points=[{"mass": 300}]),
+        )
+        self.assertEqual(
+            {b["keys"][0][0][1]: b["variables"] for b in blocks[1:]},
+            {
+                "SR_HMESub_m300": ["DNN_M300_Signal"],
+                "SR_HMESub_m400": ["DNN_M400_Signal"],
+                "SR_All_m300": ["DeepHME_mass", "lep1_pt", "DNN_M300_Signal"],
+            },
+        )
+
+    def test_a_variable_without_signal_params_in_every_point(self):
+        blocks = self.blocks(self.entry(variables=["lep1_pt"]))
+        self.assertEqual([b["variables"] for b in blocks[1:]], [["lep1_pt"]] * 2)
+
+    def test_guards(self):
+        for variables, msg in (
+            ("lep1_pt", "variables must be a non-empty list of names"),
+            ([], "variables must be a non-empty list of names"),
+            ([300], "variables must be a non-empty list of names"),
+            (["jet1_pt"], "'jet1_pt' \\(point \\{'mass': 300\\}\\) is not a variable"),
+            (["DNN_M300_Signal"], "'DNN_M300_Signal' \\(point \\{'mass': 400\\}\\)"),
+            (["DNN_M{spin}_Signal"], "unknown placeholder\\(s\\) \\['spin'\\]"),
+        ):
+            with self.subTest(variables=variables), self.assertRaisesRegex(
+                HB.HistBookingError, msg
+            ):
+                HB.sub_regions(
+                    self.setup_for(entries=[self.entry(variables=variables)])
+                )
 
 
 if __name__ == "__main__":

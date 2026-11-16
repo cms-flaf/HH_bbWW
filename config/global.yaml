@@ -1124,18 +1124,21 @@ histTuple_flavors:
         regions: [ OS_Iso ]
         points: all
       # A single-lepton HME window at MX=300 and its sidebands in SR_SL and SR_SL_Fakeable, as in
-      # Signal_Extraction_SL_window (e and mu only), so the sideband sub-regions are exercised; with
-      # a CI window file of its own (config/sub_regions/ci_sl_hme.yaml).
+      # Signal_Extraction_SL_window (e and mu only, the binary DNN only), so the sideband sub-regions
+      # are exercised; with a CI window file of its own (config/sub_regions/ci_sl_hme.yaml), whose
+      # windows leave room for no, one and two sidebands below.
       - name: HMESub
         cuts: config/sub_regions/ci_sl_hme.yaml
         regions: [ SR_SL, SR_SL_Fakeable ]
         points: [ { mass: 300 } ]
         channels: [ e, mu ]
+        variables: [ "TwoStageDNN_M{mass}_binary" ]
       - name: HMESB
         cuts: config/sub_regions/ci_sl_hme.yaml
         regions: [ SR_SL, SR_SL_Fakeable ]
         points: [ { mass: 300 } ]
         channels: [ e, mu ]
+        variables: [ "TwoStageDNN_M{mass}_binary" ]
         sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
     # One fullres variable, to keep that path tested.
     fullResolution_variables:
@@ -1608,12 +1611,13 @@ histTuple_flavors:
 
   Signal_Extraction_SL_window:
     # The single-lepton inputs in HME sub-regions, without 2D histograms: the binary DNN of mass MX
-    # (signal_params in histograms.yaml) and DeepHME_mass are also filled, in e and mu, in the SL HME
-    # window of MX (config/sub_regions/hme_SL_v2610.yaml: <REG>_HMESub_m<MX>) of the single-lepton
-    # signal and control regions and of the anti-isolated SR_SL_Fakeable, and in the two HME sidebands
-    # on each side of the window (<REG>_HMESB{L2,L1,H1,H2}_m<MX>, derived from the same windows per
-    # category) of SR_SL and SR_SL_Fakeable: the inputs of the single-lepton fit and of its fake-lepton
-    # estimate. No DNN cut is applied in the sub-regions.
+    # (signal_params in histograms.yaml) is also filled, in e and mu, in the SL HME window of MX
+    # (config/sub_regions/hme_SL_v2610.yaml: <REG>_HMESub_m<MX>) of the single-lepton signal and
+    # control regions and of the anti-isolated SR_SL_Fakeable, and in up to two HME sidebands on each
+    # side of the window (<REG>_HMESB{L2,L1,H1,H2}_m<MX>, derived from the same windows per category)
+    # of SR_SL and SR_SL_Fakeable: the inputs of the single-lepton fit and of its fake-lepton
+    # estimate. No DNN cut is applied in the sub-regions. DeepHME_mass is filled in the base regions
+    # only: in a sub-region it would be the base region's histogram restricted to the HME interval.
     regions: [ SR_SL, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV, SR_SL_Fakeable ]
     sub_regions:
       - name: HMESub
@@ -1621,14 +1625,15 @@ histTuple_flavors:
         regions: [ SR_SL, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV, SR_SL_Fakeable ]
         points: all
         channels: [ e, mu ]
-      # Two sidebands per side, each ending at the nearest bin edge >= 50 GeV beyond the previous one
-      # (one bin each where the grid does not allow it); none on a side that leaves [240, 2000] GeV,
-      # 240 GeV being the DeepHME turn-on.
+        variables: [ "TwoStageDNN_M{mass}_binary" ]
+      # Up to two sidebands per side, each ending at the nearest bin edge >= 50 GeV beyond the
+      # previous one; a side keeps those within [240, 2000] GeV, 240 GeV being the DeepHME turn-on.
       - name: HMESB
         cuts: config/sub_regions/hme_SL_v2610.yaml
         regions: [ SR_SL, SR_SL_Fakeable ]
         points: all
         channels: [ e, mu ]
+        variables: [ "TwoStageDNN_M{mass}_binary" ]
         sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
 
     # DNN Outputs (Shapes)

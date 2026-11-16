@@ -2,8 +2,10 @@
 """The booking of this analysis' own configuration (config/global.yaml, config/plot/histograms.yaml,
 config/sub_regions/), not of a stand-in: every flavour's sub-regions expand; the single-lepton window
 flavour and the CI flavour stay within sub_regions_max_key_vars with every configured channel and
-category; the SL HME sidebands lie next to their windows, on the DeepHME_mass grid and above the DeepHME
-turn-on; each binary DNN of the two-stage DNN is filled at its own mass only. Plain Python.
+category; the SL HME sidebands lie next to their windows, on the DeepHME_mass grid, are at least 50 GeV
+wide and missing only where they would leave [240, 2000] GeV (the DeepHME turn-on below); the SL
+sub-regions book only the binary DNN of their own mass; the CI windows leave room for no, one and two
+lower sidebands. Plain Python.
 """
 
 import os
@@ -133,7 +135,7 @@ class SingleLeptonWindows(unittest.TestCase):
     def test_sidebands_next_to_the_window_on_the_grid(self):
         n_checked = 0
         for s in self.subs:
-            if s["sub_region"] != "HMESub":
+            if s["sub_region"] != "HMESub" or s["base_region"] not in SB_REGIONS:
                 continue
             mass, reg = s["point"]["mass"], s["base_region"]
             for (cat, ch), (expr, _) in s["cuts"].items():
@@ -148,23 +150,25 @@ class SingleLeptonWindows(unittest.TestCase):
                     if c is not None
                 }
                 what = (reg, mass, cat, ch)
-                # below: L2 | L1 | window; above: window | H1 | H2 (each side all or nothing)
-                if "L1" in side:
-                    (_, l2_hi), (l1_lo, l1_hi) = side["L2"], side["L1"]
-                    self.assertEqual((l1_hi, l2_hi), (lo, l1_lo), what)
-                else:
-                    self.assertNotIn("L2", side, what)
-                if "H1" in side:
-                    (h1_lo, h1_hi), (h2_lo, _) = side["H1"], side["H2"]
-                    self.assertEqual((h1_lo, h2_lo), (hi, h1_hi), what)
-                else:
-                    self.assertNotIn("H2", side, what)
+                # below: L2 | L1 | window; above: window | H1 | H2; a side keeps those that fit,
+                # nearest first, and stops at the first that would leave [240, 2000] GeV
+                for near, d, labels in ((lo, -1, ("L1", "L2")), (hi, +1, ("H1", "H2"))):
+                    x = near
+                    for label in labels:
+                        far = HB.far_edge(self.edges, x, d, 50.0)
+                        fits = far is not None and 240.0 <= far <= 2000.0
+                        self.assertEqual(label in side, fits, (what, label))
+                        if not fits:
+                            for rest in labels[labels.index(label) :]:
+                                self.assertNotIn(rest, side, (what, rest))
+                            break
+                        self.assertEqual(side[label], tuple(sorted((x, far))), what)
+                        x = far
                 for label, (x, y) in side.items():
                     self.assertGreaterEqual(x, 240.0, (what, label))
                     self.assertIn(x, self.edges)
                     self.assertIn(y, self.edges)
-                    one_bin = self.edges.index(y) - self.edges.index(x) == 1
-                    self.assertTrue(y - x >= 50.0 or one_bin, (what, label, x, y))
+                    self.assertGreaterEqual(y - x, 50.0, (what, label, x, y))
                     n_checked += 1
         self.assertGreater(n_checked, 0)
 
@@ -180,15 +184,35 @@ class SingleLeptonWindows(unittest.TestCase):
             if "columns" not in block:
                 continue
             mass = int(re.search(r"_m(\d+)$", block["keys"][0][0][1]).group(1))
-            self.assertEqual(
-                block["variables"], ["DeepHME_mass", f"TwoStageDNN_M{mass}_binary"]
-            )
+            self.assertEqual(block["variables"], [f"TwoStageDNN_M{mass}_binary"])
 
     def test_signal_params_of_the_binary_dnns(self):
         for name, entry in HISTS.items():
             m = re.fullmatch(r"TwoStageDNN_M(\d+)_binary", name)
             if m:
                 self.assertEqual(entry.get("signal_params"), {"mass": int(m.group(1))})
+
+
+class CiWindows(unittest.TestCase):
+    def test_no_one_and_two_lower_sidebands(self):
+        subs = HB.sub_regions(setup_for("CI"))
+        lower = {
+            cat: sorted(
+                s["sub_region"]
+                for s in subs
+                if s["base_region"] == "SR_SL"
+                and s["sub_region"] in ("HMESBL1", "HMESBL2")
+                and (cat, "e") in s["cuts"]
+            )
+            for cat in ("res2b", "recovery", "boosted")
+        }
+        self.assertEqual(
+            lower,
+            {"res2b": [], "recovery": ["HMESBL1"], "boosted": ["HMESBL1", "HMESBL2"]},
+        )
+        for s in subs:
+            if s["base_region"] in SB_REGIONS:
+                self.assertEqual(s["variables"], ["TwoStageDNN_M300_binary"], s["name"])
 
 
 if __name__ == "__main__":

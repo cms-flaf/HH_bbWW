@@ -62,6 +62,10 @@ cut; anything else is an error. A channel missing from a map, or a category miss
 sub-region key.
 
 **Optional entry keys.** ``channels: [e, mu]`` keeps the sub-region keys of these channels only.
+``variables: [ TwoStageDNN_M{mass}_binary ]`` books only these variables in the entry's sub-regions
+(names, ``{<parameter>}`` replaced by the point's value as in region names; each must be a variable of the
+flavour that belongs to the point), e.g. not ``DeepHME_mass``, whose sub-region histograms would be the
+base region's restricted to the window.
 ``sidebands`` books, instead of the cut itself, the sidebands of an interval of the cut, e.g. the HME
 sidebands of a window::
 
@@ -72,14 +76,14 @@ sidebands of a window::
             sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
 
 In every (point, category, channel), the cut must hold ``variable`` in exactly one bin-form part, with one
-interval [lo, hi] (the window). Each side gets ``count`` sidebands, nearest first: starting at the window
-edge (or, with ``gap`` > 0, at the nearest bin edge at least ``gap`` beyond it), each ends at the nearest
-bin edge at least ``min_width`` beyond the previous one. Where these do not all lie within [``low_limit``,
-``high_limit``] (default: the first and the last bin edge), the sidebands are one bin each; where that does
-not fit either, the side has none. A sideband's cut is the window's cut with the interval replaced (a
-C++ part naming ``variable`` is an error); like any bin-form interval, one ending at the last bin edge
-takes the overflow too. Its name is the entry's name and ``L<i>`` (below the window) or ``H<i>`` (above),
-i = 1 the nearest: with the region name pattern ``{region}_{name}_m{mass}``, ``SR_SL_HMESBL1_m300``.
+interval [lo, hi] (the window). Each side gets up to ``count`` sidebands, nearest first: starting at the
+window edge (or, with ``gap`` > 0, at the nearest bin edge at least ``gap`` beyond it), each ends at the
+nearest bin edge at least ``min_width`` beyond the previous one. The first sideband that would not lie
+within [``low_limit``, ``high_limit``] (default: the first and the last bin edge) ends the side: a side
+keeps the sidebands that fit, possibly none. A sideband's cut is the window's cut with the interval
+replaced (a C++ part naming ``variable`` is an error); like any bin-form interval, one ending at the last
+bin edge takes the overflow too. Its name is the entry's name and ``L<i>`` (below the window) or ``H<i>``
+(above), i = 1 the nearest: with the region name pattern ``{region}_{name}_m{mass}``, ``SR_SL_HMESBL1_m300``.
 
 Every ambiguity is an error, and a job refuses more sub-region (key, variable) pairs than
 ``sub_regions_max_key_vars`` (default 5000; 0 disables the check).
@@ -92,7 +96,7 @@ import yaml
 
 DEFAULT_MAX_SUB_REGION_KEY_VARS = 5000
 ENTRY_KEYS = {"name", "cuts", "regions", "points"}
-OPTIONAL_ENTRY_KEYS = {"channels", "sidebands"}
+OPTIONAL_ENTRY_KEYS = {"channels", "sidebands", "variables"}
 SIDEBAND_KEYS = {"variable", "count", "min_width", "gap", "low_limit", "high_limit"}
 SIDEBAND_REQUIRED = {"variable", "count", "min_width"}
 # words of a C++ cut that are not column names
@@ -146,7 +150,12 @@ def booking(setup, keys, variables):
         blocks.append({"keys": base_keys, "variables": variables})
     n_pairs = 0
     for sreg in sub_regions(setup):
-        block_vars = [v for v in variables if _in_point(setup, v, sreg["point"])]
+        block_vars = [
+            v
+            for v in variables
+            if _in_point(setup, v, sreg["point"])
+            and (sreg["variables"] is None or v in sreg["variables"])
+        ]
         if not block_vars:
             continue
         block_keys, columns = [], []
@@ -472,30 +481,25 @@ def far_edge(edges, near, direction, width):
 
 
 def sideband_slices(edges, near, direction, count, min_width, gap, low, high):
-    """The ``count`` sidebands beyond the window edge ``near`` (direction -1: below the window, +1: above),
-    nearest first, as (low, high) intervals; [] if the side has none (see the module docstring).
+    """The sidebands beyond the window edge ``near`` (direction -1: below the window, +1: above), nearest
+    first, as (low, high) intervals: at most ``count``, each ending at the nearest bin edge at least
+    ``min_width`` beyond the previous one; the first that would not lie within [low, high] ends the side.
     """
 
     def inside(x):
         return x is not None and low - _tol(low) <= x <= high + _tol(high)
 
-    inner = near if gap == 0 else far_edge(edges, near, direction, gap)
-    if inner is None:
-        return []
-    far, x = [], inner
+    x = near if gap == 0 else far_edge(edges, near, direction, gap)
+    out = []
+    if not inside(x):
+        return out
     for _ in range(count):
-        x = far_edge(edges, x, direction, min_width) if x is not None else None
-        far.append(x)
-    if not all(inside(f) for f in far):
-        k = edge_index(edges, inner, "sideband inner edge")
-        far = [
-            edges[k + direction * i] if 0 <= k + direction * i < len(edges) else None
-            for i in range(1, count + 1)
-        ]
-        if not all(inside(f) for f in far):
-            return []
-    bounds = [inner] + far
-    return [tuple(sorted((bounds[i], bounds[i + 1]))) for i in range(count)]
+        y = far_edge(edges, x, direction, min_width)
+        if not inside(y):
+            break
+        out.append(tuple(sorted((x, y))))
+        x = y
+    return out
 
 
 def _window_interval(cut, variable, what):
@@ -668,7 +672,8 @@ def load_cuts(path, ana_path, what):
 def sub_regions(setup):
     """The sub-regions of the flavour, cached on the setup: a list of
     ``{"name", "sub_region", "base_region", "point": {parameter: value},
-    "cuts": {(category, channel): (expression, columns)}}``."""
+    "cuts": {(category, channel): (expression, columns)}, "variables": [names] or None (all)}``.
+    """
     cache = setup.__dict__.get("_bbww_sub_regions")
     if cache is not None:
         return cache
@@ -677,8 +682,9 @@ def sub_regions(setup):
     entries = flavour.get("sub_regions") or []
     if not isinstance(entries, list):
         raise HistBookingError(f"flavour {flavour_name}: sub_regions must be a list")
-    binned = set()
+    binned, names = set(), set()
     for v in flavour.get("variables") or []:
+        names.add(v["name"] if isinstance(v, dict) else v)
         if isinstance(v, dict) and "vars" in v:
             binned.update(v["vars"])
         else:
@@ -718,6 +724,15 @@ def sub_regions(setup):
             raise HistBookingError(
                 f"{what}: channels must be a non-empty list of configured channels ({channels}), "
                 f"got {entry_channels!r}"
+            )
+        var_names = entry.get("variables")
+        if var_names is not None and (
+            not isinstance(var_names, list)
+            or not var_names
+            or not all(isinstance(v, str) for v in var_names)
+        ):
+            raise HistBookingError(
+                f"{what}: variables must be a non-empty list of names, got {var_names!r}"
             )
         sidebands = None
         if "sidebands" in entry:
@@ -764,6 +779,18 @@ def sub_regions(setup):
                 "flavour": flavour_name,
                 "point": point,
             }
+            name_values = {k: name_value(v) for k, v in point.items()}
+            point_vars = None
+            if var_names is not None:
+                point_vars = []
+                for template in var_names:
+                    var = _substitute(template, name_values, f"{what} variables")
+                    if var not in names or not _in_point(setup, var, point):
+                        raise HistBookingError(
+                            f"{what}: variable '{var}' (point {point}) is not a variable of the "
+                            "flavour that belongs to the point"
+                        )
+                    point_vars.append(var)
             point_cuts = {}
             for cat, value in points[values].items():
                 if cat not in categories:
@@ -799,7 +826,6 @@ def sub_regions(setup):
                     for label in labels
                     if per_label[label]
                 }
-            name_values = {k: name_value(v) for k, v in point.items()}
             for family, cuts in families.items():
                 if not cuts:
                     continue  # no key in the entry's channels
@@ -821,6 +847,7 @@ def sub_regions(setup):
                             "base_region": reg,
                             "point": dict(point),
                             "cuts": dict(cuts),
+                            "variables": point_vars,
                         }
                     )
     setup.__dict__["_bbww_sub_regions"] = out
