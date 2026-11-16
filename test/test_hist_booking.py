@@ -355,6 +355,49 @@ class BinFormCuts(BookingTestBase):
             self.one("    res2b: { lep1_pt: [ 30, 50, 70 ] }\n")
 
 
+class HistTupleColumns(BookingTestBase):
+    """histtuple_columns: the variables of the bin-form cuts, stored as <var>_bin in the histTuples
+    whether the flavour plots them or not."""
+
+    def test_the_bin_form_cut_variables(self):
+        setup = self.setup_for(entries=[self.entry()])
+        self.assertEqual(HB.histtuple_columns(setup), {"binned": ["DeepHME_mass"]})
+
+    def test_a_cut_variable_that_is_not_plotted(self):
+        variables = [v for v in VARS if v != "DeepHME_mass"]
+        setup = self.setup_for(entries=[self.entry()], variables=variables)
+        subs = {s["name"]: s for s in HB.sub_regions(setup)}
+        self.assertEqual(
+            subs["SR_HMESub_m300"]["cuts"][("res2b", "eE")],
+            ("DeepHME_mass_bin >= 6 && DeepHME_mass_bin < 16", ["DeepHME_mass_bin"]),
+        )
+        self.assertEqual(HB.histtuple_columns(setup), {"binned": ["DeepHME_mass"]})
+        # the cut variable is not booked: only the job's variables are
+        for block in HB.booking(setup, KEYS, variables):
+            self.assertNotIn("DeepHME_mass", block["variables"])
+            if block["keys"][0][0][1].startswith("SR_HMESub"):
+                self.assertEqual(block["columns"], ["DeepHME_mass_bin"])
+
+    def test_several_variables_and_cpp_cuts(self):
+        self.write_cuts(
+            HEADER
+            + "cuts:\n  300:\n"
+            + "    res2b: [ { lep1_pt: [ 30, 200 ] }, 'DeepHME_mass > 250' ]\n"
+            + "    boosted: { DeepHME_mass: [ 250, 350 ] }\n"
+        )
+        setup = self.setup_for(entries=[self.entry()])
+        # the C++ cut's variable is a full-resolution one, not a bin column
+        self.assertEqual(
+            HB.histtuple_columns(setup), {"binned": ["lep1_pt", "DeepHME_mass"]}
+        )
+
+    def test_whole_range_and_no_sub_regions_need_nothing(self):
+        self.write_cuts(HEADER + "cuts:\n  300:\n    res2b: { lep1_pt: [ 0, 200 ] }\n")
+        setup = self.setup_for(entries=[self.entry()])
+        self.assertEqual(HB.histtuple_columns(setup), {"binned": []})
+        self.assertEqual(HB.histtuple_columns(self.setup_for()), {"binned": []})
+
+
 class CppAndCombinedCuts(BookingTestBase):
     def test_used_as_written_with_the_parameters(self):
         s = self.one(
@@ -459,7 +502,15 @@ class Guards(BookingTestBase):
 
     def test_variable_not_binned(self):
         self.write_cuts(HEADER + "cuts:\n  300:\n    res2b: { mbb: [ 70, 150 ] }\n")
-        self.refused("neither all channels .* nor all binned variables")
+        self.refused("neither all channels .* nor all variables with a binning")
+        # a binning entry without x_bins
+        self.write_cuts(HEADER + "cuts:\n  300:\n    res2b: { mbb: [ 70, 150 ] }\n")
+        setup = self.setup_for(entries=[self.entry()])
+        setup.hists.config_dict["mbb"] = {"y_bins": "10|0:200"}
+        with self.assertRaisesRegex(
+            HB.HistBookingError, "nor all variables with a binning"
+        ):
+            HB.sub_regions(setup)
 
     def test_region_defined_twice(self):
         with self.assertRaisesRegex(HB.HistBookingError, "defined twice"):
