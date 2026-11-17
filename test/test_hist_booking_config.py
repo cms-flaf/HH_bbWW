@@ -180,11 +180,14 @@ class SingleLeptonWindows(unittest.TestCase):
             for reg in WINDOW_REGIONS
             for cat in GLOBAL["categories"]
         ]
+        n_blocks = 0
         for block in HB.booking(setup, keys, variables(SL_FLAVOUR)):
             if "columns" not in block:
                 continue
+            n_blocks += 1
             mass = int(re.search(r"_m(\d+)$", block["keys"][0][0][1]).group(1))
             self.assertEqual(block["variables"], [f"TwoStageDNN_M{mass}_binary"])
+        self.assertEqual(n_blocks, len(HB.sub_regions(setup)))
 
     def test_signal_params_of_the_binary_dnns(self):
         for name, entry in HISTS.items():

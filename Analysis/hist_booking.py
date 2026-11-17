@@ -140,8 +140,8 @@ def regions(setup):
 
 def booking(setup, keys, variables):
     """The blocks of a HistFromNtupleProducer job: every variable in the keys of the booked regions, and
-    one block per sub-region with the variables of its point, in its keys (a base key's filter and the
-    cut)."""
+    one block per sub-region with the variables of its point (only its entry's ``variables`` if given), in
+    its keys (a base key's filter and the cut)."""
     booked = set(_booked_regions(setup, _flavour(setup)))
     variables = list(variables)
     blocks = []

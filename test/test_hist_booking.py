@@ -518,6 +518,9 @@ class SidebandSlices(unittest.TestCase):
         self.assertEqual(self.slices(220, -1), [])
         self.assertEqual(self.slices(500, +1), [])
         self.assertEqual(self.slices(300, +1, high=310), [])
+        # a window edge beyond the limit on the other side: no sideband straddles the limit
+        self.assertEqual(self.slices(210, +1), [])
+        self.assertEqual(self.slices(400, -1, high=380), [])
 
     def test_more_than_two_per_side(self):
         self.assertEqual(
@@ -802,6 +805,40 @@ class EntryVariables(BookingTestBase):
     def test_a_variable_without_signal_params_in_every_point(self):
         blocks = self.blocks(self.entry(variables=["lep1_pt"]))
         self.assertEqual([b["variables"] for b in blocks[1:]], [["lep1_pt"]] * 2)
+
+    def test_parameter_values_as_in_region_names(self):
+        self.write_cuts(
+            'parameters: [ kl ]\nregion_name: "{region}_{name}_kl{kl}"\n'
+            "cuts:\n  2.45: { res2b: { DeepHME_mass: [ 250, 350 ] } }\n"
+        )
+        variables = ["DeepHME_mass", "DNN_kl2p45"]
+        setup = self.setup_for(
+            entries=[self.entry(name="HHSub", variables=["DNN_kl{kl}"])],
+            variables=variables,
+        )
+        (s,) = HB.sub_regions(setup)
+        self.assertEqual(s["variables"], ["DNN_kl2p45"])
+
+    def test_a_2d_variable_by_its_name(self):
+        hist2d = {
+            "name": "DNN_M300_vs_HME",
+            "vars": ["DNN_M300_Signal", "DeepHME_mass"],
+        }
+        variables = ["lep1_pt", hist2d]
+        setup = self.setup_for(
+            entries=[self.entry(variables=["DNN_M300_vs_HME"], points=[{"mass": 300}])],
+            variables=variables,
+        )
+        setup.hists.config_dict["DNN_M300_vs_HME"] = {"signal_params": {"mass": 300}}
+        (s,) = HB.sub_regions(setup)
+        self.assertEqual(s["variables"], ["DNN_M300_vs_HME"])
+        # a variable that is only an axis of a 2D histogram is not a variable of the flavour
+        setup = self.setup_for(
+            entries=[self.entry(variables=["DNN_M300_Signal"], points=[{"mass": 300}])],
+            variables=variables,
+        )
+        with self.assertRaisesRegex(HB.HistBookingError, "'DNN_M300_Signal'"):
+            HB.sub_regions(setup)
 
     def test_guards(self):
         for variables, msg in (
