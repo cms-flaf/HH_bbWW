@@ -444,7 +444,9 @@ class Guards(BookingTestBase):
             HB.sub_regions(self.setup_for(entries=[e]))
 
     def test_name_must_be_a_word(self):
-        self.refused("name must be a word", name="HME Sub")
+        for name in ("HME Sub", "HME_Sub", 3):
+            with self.subTest(name=name):
+                self.refused("name must be a word of letters and digits", name=name)
 
     def test_cuts_file_missing_or_empty(self):
         self.refused("not found", cuts="config/none.yaml")
@@ -703,6 +705,7 @@ class SidebandGuards(BookingTestBase):
         self.refused("low_limit < high_limit", low_limit=400, high_limit=300)
         self.refused("must be a number", gap="none")
         self.refused("not a binned variable", variable="lep1_pt_x")
+        self.refused("not a binned variable", variable=["DeepHME_mass"])
         self.write_cuts(
             HEADER + "cuts:\n  300:\n    res2b: { DeepHME_mass: [ 260, 300 ] }\n"
         )
@@ -765,7 +768,7 @@ class EntryChannels(BookingTestBase):
         )
 
     def test_guards(self):
-        for channels in (["e"], [], "eE"):
+        for channels in (["e"], [], "eE", [["eE"], "muMu"]):
             with self.subTest(channels=channels), self.assertRaisesRegex(
                 HB.HistBookingError,
                 "channels must be a non-empty list of configured channels",

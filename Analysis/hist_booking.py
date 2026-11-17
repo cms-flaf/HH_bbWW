@@ -563,7 +563,7 @@ def _sideband_spec(spec, edges_of, binned, what):
             f"{what}: sidebands: unknown keys {sorted(unknown)}, missing keys {sorted(missing)}"
         )
     variable = spec["variable"]
-    if variable not in binned:
+    if not isinstance(variable, str) or variable not in binned:
         raise HistBookingError(
             f"{what}: sidebands variable {variable} is not a binned variable of the flavour"
         )
@@ -712,13 +712,18 @@ def sub_regions(setup):
                 f"{what}: unknown keys {sorted(unknown)}, missing keys {sorted(missing)}"
             )
         name = entry["name"]
-        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_]+", name):
-            raise HistBookingError(f"{what}: name must be a word, got {name!r}")
+        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9]+", name):
+            # Analysis/EqualSignalBinning.py maps <base>_<name>_m<mass> to its base region by the
+            # last two underscores
+            raise HistBookingError(
+                f"{what}: name must be a word of letters and digits (no underscore), got {name!r}"
+            )
         what = f"{what} ({name})"
         entry_channels = entry.get("channels", channels)
         if (
             not isinstance(entry_channels, list)
             or not entry_channels
+            or not all(isinstance(ch, str) for ch in entry_channels)
             or not set(entry_channels) <= set(channels)
         ):
             raise HistBookingError(

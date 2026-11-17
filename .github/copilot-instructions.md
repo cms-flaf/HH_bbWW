@@ -88,7 +88,8 @@ window instead of the window: `<name>L<i>` below, `<name>H<i>` above, `i = 1` th
 Invariants a diff must keep:
 
 - Sub-region names match `<base>_<word>_m<int>` (no underscore in the word):
-  `Analysis/EqualSignalBinning.py` maps a sub-region to its base region by that pattern.
+  `Analysis/EqualSignalBinning.py` maps a sub-region to its base region by that pattern, and the plugin
+  refuses an entry name with an underscore.
 - Every base region of a flavour's sub-regions is also in its `regions:` (booked): an unbooked one is
   still plotted (`HistPlotTask` targets), and HistPlotter finds no histograms there.
 - Bin-form cuts sit on the stored bin edges of `config/plot/histograms.yaml`; a binning change there
