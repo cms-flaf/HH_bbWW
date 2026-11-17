@@ -67,24 +67,36 @@ The cards are built from shared files, each card listing the ones it uses under 
 
 ```
 config/Datacards/
+  common.yaml               the settings of every card: eras, era groups, the lnN thresholds,
+                            autoMCStats, the campaigns and the impact plots
+  signals/spin{0,2}.yaml    the signals of one spin (2L, 1L, bbtautau), with their BR and their
+                            QCD-scale / PDF shape uncertainties, shared by the DL and SL cards
   systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
     luminosity.yaml           luminosity and pileup
     leptons.yaml              muon and electron ID, isolation and trigger; electron scale and resolution
     jets.yaml                 JES, JER, AK4 b-tagging, AK8 Hbb, Hcc, tau21
     parton_shower.yaml        ISR, FSR
+    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
   DL/systematics/           the DL-only uncertainties:
     theory.yaml               process theory (QCD scale, PDF+alpha_s, top mass)
-    dy_reweighting.yaml       the DY reweighting's fit statistics and model variations
     dy_template.yaml          the DY templates and the low-mass DY estimate
     normalisations.yaml       TT/DY control-region normalisations, low-mass DY, Minor members
     cr_shapes.yaml            the control regions' DNN-shape nuisances
-  DL/dl_common.yaml         the other settings the DL spin cards share, with the process model
-                            of the preprocess step (members, drop, DY estimate settings)
+  DL/dl_common.yaml         the other settings the DL spin cards share: the inputs, channels,
+                            categories, the preprocess step and its process model (members, drop,
+                            DY estimate settings)
   DL/binning_eqsig_DL_v2610.yaml  the DL binning only (see "Where the binning is decided")
-  DL/dl_spin{0,2}.yaml      include every file above, then dl_common.yaml; add the signals,
-                            their BR uncertainties and the limit plots
-  SL/sl_common.yaml         the same for SL -- a skeleton for now, not in `cards:`
-  SL/sl_spin{0,2}.yaml
+  DL/dl_spin{0,2}.yaml      include common.yaml, every file of systematics/ and DL/systematics/,
+                            dl_common.yaml and the signals of their spin; add the limit plots
+  SL/systematics/           the SL-only uncertainties:
+    theory.yaml               DL's process theory numbers and names, for the SL backgrounds
+                              (W on its own, DY not mass-split); keep the two in step
+    normalisations.yaml       TT / W+jets control-region normalisations, DY, Minor members
+  SL/sl_common.yaml         as dl_common.yaml for SL: SR and the TT / W+jets CRs in the HME
+                            windows, TwoStageDNN_M<MX>_binary inputs (Run3_Model)
+  SL/binning_eqsig_SL_v2610.yaml  the SL binning only
+  SL/sl_spin{0,2}.yaml      as the DL spin cards, with SL/; not in `cards:` yet (no fake
+                            background in the inputs: expected limits only)
 ```
 
 Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
@@ -94,8 +106,9 @@ in one card does not go unnoticed. The merge is
 strict: a top-level setting is made in one file only, and an entry of `processes`,
 `uncertainties`, `limit_plots` or `impact_plots` is defined once — anything set twice
 stops the chain with an error naming both files, never an override. A setting that
-differs between the spins therefore lives in each spin card, and one that differs between DL
-and SL in that channel's own files, not in `systematics/`.
+differs between the spins therefore lives in each spin card (or the signals file of the spin),
+and one that differs between DL and SL in that channel's own files, not in `common.yaml` or
+`systematics/`.
 Include paths are relative to the including file. To see a card as the chain reads it:
 
 ```bash

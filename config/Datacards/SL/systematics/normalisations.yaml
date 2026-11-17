@@ -1,0 +1,69 @@
+# SL normalisations: TT and W+jets from the control regions, DY, Minor members.
+uncertainties:
+  # The members of Minor, as shapes of Minor moving only that member (`preprocess: member_values`,
+  # as in theory.yaml). The same names and values as DL/systematics/normalisations.yaml (they are
+  # cross-section terms, correlated between the channels); keep the two in step.
+
+  # WARNING: only XSDB's MC-integration error, not a QCD scale uncertainty (that is several %):
+  # to be replaced with a diboson theory number.
+  - name: CMS_bbww_minor_norm_VV
+    type: shape
+    processes: [ Minor ]
+    preprocess:
+      member_values: { VV: 0.005 }
+  # VVV: no theory reference collected. PROPOSAL, to be confirmed.
+  - name: CMS_bbww_minor_norm_VVV
+    type: shape
+    processes: [ Minor ]
+    preprocess:
+      member_values: { VVV: 0.15 }
+  # Single Higgs is one process: ttH's QCD scale (the largest, dominant here):
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap (13.6 TeV, mH = 125),
+  # ttH +6.0 -9.3 % (QCD scale), +-3.5 % (PDF+alpha_s, in PDF_alphas, theory.yaml).
+  - name: CMS_bbww_minor_norm_H
+    type: shape
+    processes: [ Minor ]
+    preprocess:
+      member_values: { H: [ -0.093, 0.06 ] }
+
+  # DY (0.4-4 % of the SR background) has no control region here. PROPOSAL, to be revisited: the
+  # DL DY CR prior; the DL DY non-closure (MC over data by 5-35 % at high DNN) is within it.
+  - name: CMS_bbww_SL_norm_DY
+    type: lnN
+    processes: [ DY ]
+    value: 0.20
+
+  # TT and W+jets normalisations: generous priors, constrained by the TT and W+jets CRs in the
+  # fit (as good as free rateParams), one per jet category (unlike DL, the SL CRs are large in
+  # boosted too: TT CR boosted ~90k, W CR boosted ~4.5k MC-weighted events over the four eras at
+  # MX 300). SL names of their own: a different selection from DL's TT / DY normalisations.
+  - name: CMS_bbww_SL_norm_TT_res2b
+    type: lnN
+    processes: [ TT ]
+    categories: [ SR_res2b, TT_res2b, W_res2b ]
+    value: 0.10
+  - name: CMS_bbww_SL_norm_TT_recovery
+    type: lnN
+    processes: [ TT ]
+    categories: [ SR_recovery, TT_recovery, W_recovery ]
+    value: 0.10
+  - name: CMS_bbww_SL_norm_TT_boosted
+    type: lnN
+    processes: [ TT ]
+    categories: [ SR_boosted, TT_boosted, W_boosted ]
+    value: 0.10
+  - name: CMS_bbww_SL_norm_W_res2b
+    type: lnN
+    processes: [ W ]
+    categories: [ SR_res2b, TT_res2b, W_res2b ]
+    value: 0.20
+  - name: CMS_bbww_SL_norm_W_recovery
+    type: lnN
+    processes: [ W ]
+    categories: [ SR_recovery, TT_recovery, W_recovery ]
+    value: 0.20
+  - name: CMS_bbww_SL_norm_W_boosted
+    type: lnN
+    processes: [ W ]
+    categories: [ SR_boosted, TT_boosted, W_boosted ]
+    value: 0.20

@@ -1,0 +1,56 @@
+# HH->bbWW datacards: the settings every card shares (DL/dl_spin*.yaml and SL/sl_spin*.yaml
+# include it), so the DL and SL cards are built, combined and fitted the same way. Not a card on
+# its own. The merge is strict (StatInference/common/card_config.py): a setting written here
+# cannot be set again in a card or another include, so one that differs between the channels
+# goes in the channel's <channel>_common.yaml instead.
+analysis: hh_bbww
+type: resonant
+signalFractionForRelevantBins: 0.2
+# Every listed era gets its own binning, datacards and limit; only the four-era combination is
+# built. Run3_22_23 is global.yaml's meta-era (its plot style is used by the shape plots).
+eras:
+  # - Run3_2022
+  # - Run3_2022EE
+  # - Run3_2023
+  # - Run3_2023BPix
+  - Run3_22_23
+era_groups:
+  Run3_22_23:
+    - Run3_2022
+    - Run3_2022EE
+    - Run3_2023
+    - Run3_2023BPix
+
+autolnNThr: 0.1
+asymlnNThr: 0.001
+ignorelnNThr: 0.001
+autoMCStats:
+  apply: true
+  threshold: 20
+  apply_to_signal: true
+  mode: 1
+
+campaigns:
+  # dhi's key for the four eras combined (its luminosity label)
+  Run3_22_23: run3_early
+  Run3_2022: "2022preEE"
+  Run3_2022EE: "2022postEE"
+  Run3_2023: "2023preBPix"
+  Run3_2023BPix: "2023postBPix"
+
+# Pulls and impacts on the combined card (no `glob:`); see docs/stat_inference.md.
+impact_plots:
+  - name: combined
+    masses: [ 300, 600, 800 ]
+    # the expected limit at each mass (r=1 is far from it); changing it does not move the outputs,
+    # see docs/stat_inference.md
+    poi_value: limit
+    # Simplex fallback: Migrad fails on a few fits from a bad seed, and dhi then drops the merge
+    fit_args:
+      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+    plot_params:
+      # one fit per nuisance: `robust` (one Hessian) silently drops parameters it cannot invert
+      method: default
+      order_by_impact: true
+      # with mc_stats, also set parameters_per_page (~460 parameters)
+      mc_stats: false

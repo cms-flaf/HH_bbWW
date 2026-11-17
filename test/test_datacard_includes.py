@@ -2,14 +2,14 @@
 """The datacard cards' `include:` lists agree, so no uncertainty file is forgotten in one card.
 
 The cards list the files they include explicitly (StatInference's includes do not nest), one per
-uncertainty topic: config/Datacards/systematics/ (shared by DL, SL and the CI cards) and
-config/Datacards/DL/systematics/ (DL only). A file left out of one card's list is no error for
+uncertainty topic: config/Datacards/systematics/ (shared by DL, SL and the CI cards),
+config/Datacards/DL/systematics/ (DL only) and config/Datacards/SL/systematics/ (SL only). A file left out of one card's list is no error for
 StatInference -- the card just fits without those uncertainties -- so this checks:
 
 - every included file exists;
 - the cards of one kind (the DL spin cards, the SL spin cards) include the same topics;
-- every card includes every topic of systematics/, and every DL card every topic of
-  DL/systematics/.
+- every card includes every topic of systematics/, every DL card every topic of
+  DL/systematics/ and every SL card every topic of SL/systematics/.
 
 A topic is a file name without a version suffix (`_v<digits>...`), so a card may point to another
 version of a topic file. Only PyYAML is needed.
@@ -34,13 +34,21 @@ KINDS = {
     "CI": ["CI/CI_card_DL.yaml", "CI/CI_card_SL.yaml"],
 }
 #: topic folders, relative to config/Datacards, and the kinds of card that include all of them
-TOPIC_DIRS = {"systematics": ["DL", "SL", "CI"], "DL/systematics": ["DL"]}
+TOPIC_DIRS = {
+    "systematics": ["DL", "SL", "CI"],
+    "DL/systematics": ["DL"],
+    "SL/systematics": ["SL"],
+}
 
 
 def topic(path):
-    """(folder relative to config/Datacards, file stem without a version suffix)."""
+    """(folder relative to config/Datacards, file stem without a version suffix). The signals of
+    a card (signals/spin<J>.yaml) are one topic whatever the spin, so the spin cards of one kind
+    agree."""
     folder = os.path.relpath(os.path.dirname(path), DATACARDS)
     stem = os.path.splitext(os.path.basename(path))[0]
+    if folder == "signals":
+        return folder, "spin"
     return folder, re.sub(r"_v\d\w*$", "", stem)
 
 

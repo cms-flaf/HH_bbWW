@@ -82,8 +82,10 @@ Two networks consume that grid, and they do not cover the same part of it:
 - the **single-lepton two-stage DNN** has a binary stage that is parametric too, evaluated at the
   `TwoStageDNN.masses` in `config/global.yaml`: the 30 produced points from 250 GeV to 2 TeV. Its
   multiclass stage does not depend on the mass, so neither do the SL signal and control regions
-  (see [below](#single-lepton-two-stage-dnn)). The SL cards are a skeleton for now
-  (`config/Datacards/SL/`, reading the mass-independent `SR_SL`, not yet in `StatInference.cards`);
+  (see [below](#single-lepton-two-stage-dnn)). The SL cards (`config/Datacards/SL/`)
+  fit `SR_SL` and the TT and W+jets classes `CR_SL_TT`, `CR_SL_WJets` in the HME window of each
+  mass (`<region>_HMESub_m<MX>`), with the DL preprocess step; expected limits only, and not yet
+  in `StatInference.cards`, until the fake background is part of the inputs;
   the earlier single-file SL card, `config/Datacards/x_hh_bbww_SL_run3.yaml`, is kept for
   reference only and still reads the per-mass regions `SR_SL_M${MX}` that no longer exist.
 

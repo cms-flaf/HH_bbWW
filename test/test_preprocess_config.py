@@ -125,6 +125,48 @@ class DLCards(unittest.TestCase):
             check_binning_config(yaml.safe_load(f), BINNING)
 
 
+SL = os.path.join(ANA, "config", "Datacards", "SL")
+SL_BINNING = os.path.join(SL, "binning_eqsig_SL_v2610.yaml")
+
+
+class SLCards(unittest.TestCase):
+    def test_both_spins_parse(self):
+        for spin in (0, 2):
+            PreprocessModel(load_card_config(os.path.join(SL, f"sl_spin{spin}.yaml")))
+
+    def test_model(self):
+        m = PreprocessModel(load_card_config(os.path.join(SL, "sl_spin0.yaml")))
+        self.assertEqual(
+            m.members,
+            {
+                "TT": ["TT", "ttV"],
+                "W": ["W"],
+                "ST": ["ST"],
+                "DY": ["DY"],
+                "Minor": ["VV", "VVV", "H"],
+            },
+        )
+        # the DL numbers, with the SL process names
+        self.assertEqual(m.member_uncs["QCD_scale_TT"], [("TT", (-0.036, 0.025))])
+        self.assertEqual(m.member_uncs["QCD_scale_DY"], [("DY", (-0.011, 0.007))])
+        self.assertEqual(len(m.member_uncs["PDF_alphas"]), 5)
+        # no DY template, low-mass estimate or CR tilt (yet)
+        self.assertEqual(m.templates, {})
+        self.assertIsNone(m.lowmass)
+        self.assertEqual(m.tilts("e", "TT_res2b"), [])
+
+    def test_binning_file_is_binning_only(self):
+        with open(SL_BINNING) as f:
+            cfg = yaml.safe_load(f)
+        check_binning_config(cfg, SL_BINNING)
+        # the CRs are named by their base region, as Binning.region() reads the inputs
+        card = load_card_config(os.path.join(SL, "sl_spin0.yaml"))
+        bases = {d.split("_HMESub_")[0] for d in card["input_categories"].values()} - {
+            "SR_SL"
+        }
+        self.assertEqual(set(cfg["control_region_bins"]), bases)
+
+
 class Strict(unittest.TestCase):
     def assertRaisesWith(self, text, cfg):
         with self.assertRaises(PreprocessConfigError) as ctx:
