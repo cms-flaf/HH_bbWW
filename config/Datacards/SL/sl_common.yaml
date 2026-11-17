@@ -76,15 +76,17 @@ processes:
     max_n_sigma_for_negative_bins: 2
 
   # not mass-split (Run3_Model), unlike DL's DY_M_10to50 + DY_M_50
+  # 0.1-0.6 % of the TT CR, a few heavy, partly negative events: in the e channel at MX 1200, 1300
+  # and 1500 a variation (at 1500 the nominal) sums below zero over the whole window, which no
+  # binning can pass. Left out of the TT CR: `drop` for the preprocess step (which then writes no
+  # DY there) and `categories` for the datacard maker (which then does not look for it); kept in
+  # the SR and the W+jets CR (6-8 % there).
   - process: DY
+    categories: [ SR_res2b, SR_boosted, SR_recovery, W_res2b, W_boosted, W_recovery ]
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
-    allow_zero_integral: true
     preprocess:
       members: [ DY ]
-      # 0.1-0.6 % of the TT CR, a few heavy, partly negative events: in the e channel at MX 1200,
-      # 1300 and 1500 a variation (at 1500 the nominal) sums below zero over the whole window,
-      # which no binning can pass. Left out there, as DL's W is; kept in SR and the W+jets CR.
       drop:
         DY: [ TT_res2b, TT_boosted, TT_recovery ]
 
