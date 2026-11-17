@@ -18,19 +18,22 @@ include:
   # the signals of this spin, with their uncertainties (shared with DL/dl_spin0.yaml)
   - ../signals/spin0.yaml
 
-# No Run 2 SL reference in run2_external_limits.json yet (its SL entry is empty).
+# Compared with the Run 2 SL expected limit of the same spin (run2_external_limits.json, SL/: recomputed from the
+# HIG-21-005 SL cards, which include a data-driven fake background; the Run 3 SL inputs have none yet).
 limit_plots:
   - name: spin0_sl
     bands: true
     datacards:
       - { name: "Early Run 3 SL spin-0 (radion)", glob: "*.txt" }
+    external_limits:
+      - { file: config/Datacards/run2_external_limits.json, key: "SL/spin0" }
     plot_params: &limit_plot_style
       xsec: pb
       y_log: true
       x_min: 200
       x_max: 1500
       y_min: 0.001
-      y_max: 100
+      y_max: 1000  # the SL limit peaks at ~10 pb: below the legend at 1000, faded under it at 100
 
   - name: spin0_channels
     datacards:

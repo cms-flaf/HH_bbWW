@@ -102,7 +102,8 @@ config/Datacards/
                             sigma(pp->X->HH) in pb, the same quantity as r (the signals are
                             normalised to sigma(X->HH) = 1 pb): DL/ recomputed from the Run 2 DL
                             cards; COMB/ the SL+DL combination from HEPData (ins2768920, tables
-                            resonant_spin0/2, fb / 1000); SL/ empty so far
+                            resonant_spin0/2, fb / 1000); SL/ recomputed from the Run 2 SL cards
+                            (with their data-driven fakes; their workspace needs ulimit -s unlimited)
 ```
 
 Includes do not nest, so each card lists every file it uses, explicitly (a card can point to
