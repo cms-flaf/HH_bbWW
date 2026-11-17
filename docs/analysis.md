@@ -174,7 +174,8 @@ the plots) gets them from there.
   filled in HistFromNtupleProducer, as keys of their own (`<channel>/SR_HMESub_m<MX>/<category>`),
   with the variables of their model point (`signal_params` in `config/plot/histograms.yaml`;
   variables without `signal_params` go in every point). The plugin's docstring describes the cut
-  forms.
+  forms. An entry's `name` is letters and digits only: `Analysis/EqualSignalBinning.py` maps
+  `<base>_<name>_m<MX>` back to its base region by the last two underscores.
 - **Channels:** an entry with `channels: [e, mu]` books its sub-region keys in these channels only.
 - **Variables:** an entry with `variables: [ "TwoStageDNN_M{mass}_binary" ]` books only these
   variables in its sub-regions (`{<parameter>}` replaced by the model point's value); each must be a

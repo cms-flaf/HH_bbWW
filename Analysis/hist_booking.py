@@ -15,7 +15,7 @@ A flavour::
         variables: [ ... ]
         regions: [ SR, TT_CR, DY_CR ]            # booked; must hold every sub-region's base region
         sub_regions:
-          - name: HMESub
+          - name: HMESub                        # letters and digits, no underscore
             cuts: config/sub_regions/hme_DL_v2610.yaml
             regions: [ SR, TT_CR, DY_CR ]         # the base regions it restricts
             points: all                           # or a list of model points, e.g. [ { mass: 300 } ]
