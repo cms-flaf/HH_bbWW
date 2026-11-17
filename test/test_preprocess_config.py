@@ -146,6 +146,10 @@ class SLCards(unittest.TestCase):
                 "Minor": ["VV", "VVV", "H"],
             },
         )
+        # DY: a trace in the TT CR whose heavy events break the gates there
+        self.assertEqual(m.dropped_in("TT_boosted"), {"DY"})
+        self.assertEqual(m.dropped_in("W_recovery"), set())
+        self.assertEqual(m.dropped_in("SR_res2b"), set())
         # the DL numbers, with the SL process names
         self.assertEqual(m.member_uncs["QCD_scale_TT"], [("TT", (-0.036, 0.025))])
         self.assertEqual(m.member_uncs["QCD_scale_DY"], [("DY", (-0.011, 0.007))])
