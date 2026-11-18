@@ -6,19 +6,29 @@ global.yaml names it (``hist_booking_module: Analysis.hist_booking``). It gives 
   of its sub-regions; FLAF puts them in the list ``custom_regions`` names, so the selection keys are
   built, and the histTuples keep events, for them;
 - ``booking(setup, keys, variables)``: what a HistFromNtupleProducer job fills: every variable in the
-  keys of the flavour's ``regions``, and each sub-region's variables in its own keys.
+  keys of the flavour's ``regions``, and each sub-region's variables in its own keys;
+- ``required_columns(setup)``: the variables the sub-region cuts read, found from the cuts
+  themselves: ``binned`` for bin-form cuts (FLAF stores ``<var>_bin``), ``fullResolution`` for C++ cuts
+  (FLAF stores the raw column). FLAF stores them in the histTuples, and requires their AnalysisCache
+  producers in the HistTuple task, without histogramming them, so a cut variable need not be one of the
+  flavour's ``variables`` or ``fullResolution_variables``.
 
 A flavour::
 
     histTuple_flavors:
       Signal_Extraction_DL_window:
         variables: [ ... ]
-        regions: [ SR, TT_CR, DY_CR ]            # booked; [ ] books sub-regions only
+        regions: [ SR, TT_CR, DY_CR ]            # booked; must hold every sub-region's base region
         sub_regions:
-          - name: HMESub
+          - name: HMESub                        # letters and digits, no underscore
             cuts: config/sub_regions/hme_DL_v2610.yaml
-            regions: [ SR, TT_CR, DY_CR ]         # the base regions it restricts (booked or not)
+            regions: [ SR, TT_CR, DY_CR ]         # the base regions it restricts
             points: all                           # or a list of model points, e.g. [ { mass: 300 } ]
+
+``regions()`` returns the base regions of the sub-regions whether booked or not, and HistPlotTask plots
+every region it returns: a base region missing from the flavour's ``regions`` has plot targets but no
+histograms, and the plots fail. So keep every base region in ``regions``; ``[ ]`` (sub-regions only)
+suits a flavour that is never plotted.
 
 **Model points.** A sub-region family is indexed by the model points of its cuts file: any parameters
 (the resonance mass, its spin, couplings, ...). The file declares them and the region names::
@@ -43,18 +53,43 @@ point if one entry agrees with the point on every parameter both have; a variabl
 
 **Cuts.** A cut is one part or a list of parts, all required:
 
-- bin form ``{variable: [low, high] or [[low, high], ...]}``: each variable a binned variable of the
-  flavour, every edge a bin edge of its binning, the cut on the stored bin index (``<var>_bin``); the
+- bin form ``{variable: [low, high] or [[low, high], ...]}``: each variable with a binning (``x_bins``)
+  in histograms.yaml, every edge a bin edge of that binning, the cut on the stored bin index
+  (``<var>_bin``, stored through ``required_columns`` whether the variable is plotted or not); the
   intervals of a variable are OR'ed, the variables AND'ed; an interval from the first (to the last) edge
-  takes the underflow (overflow) too. No histTuple rerun is needed to change it.
-- C++ form, a string: used as written. Every variable it names must be in the flavour's
-  ``fullResolution_variables``; nothing is added automatically, so a variable that is not there is an
-  error. Function names (``abs(``), namespaced names (``std::abs``), numeric literals and ``true``/
-  ``false`` are not variables; a function's arguments are.
+  takes the underflow (overflow) too. No histTuple rerun is needed to change the edges.
+- C++ form, a string: used as written. Every variable it names is stored at full resolution in the
+  histTuples (through ``required_columns``), whether the flavour lists it or not. Function names
+  (``abs(``), namespaced names (``std::abs``), numeric literals and ``true``/``false`` are not
+  variables; a function's arguments are.
 
-A dict whose keys are all channels is a channel map, one whose keys are all binned variables a bin-form
-cut; anything else is an error. A channel missing from a map, or a category missing from a point, has no
-sub-region key.
+A dict whose keys are all channels is a channel map, one whose keys are all variables with a binning a
+bin-form cut; anything else is an error. A channel missing from a map, or a category missing from a
+point, has no sub-region key.
+
+**Optional entry keys.** ``channels: [e, mu]`` keeps the sub-region keys of these channels only.
+``variables: [ TwoStageDNN_M{mass}_binary ]`` books only these variables in the entry's sub-regions
+(names, ``{<parameter>}`` replaced by the point's value as in region names; each must be a variable of the
+flavour that belongs to the point), e.g. not ``DeepHME_mass``, whose sub-region histograms would be the
+base region's restricted to the window.
+``sidebands`` books, instead of the cut itself, the sidebands of an interval of the cut, e.g. the HME
+sidebands of a window::
+
+          - name: HMESB
+            cuts: config/sub_regions/hme_SL_v2610.yaml   # the windows
+            regions: [ SR_SL, SR_SL_Fakeable ]
+            points: all
+            sidebands: { variable: DeepHME_mass, count: 2, min_width: 50, gap: 0, low_limit: 240 }
+
+In every (point, category, channel), the cut must hold ``variable`` in exactly one bin-form part, with one
+interval [lo, hi] (the window). Each side gets up to ``count`` sidebands, nearest first: starting at the
+window edge (or, with ``gap`` > 0, at the nearest bin edge at least ``gap`` beyond it), each ends at the
+nearest bin edge at least ``min_width`` beyond the previous one. The first sideband that would not lie
+within [``low_limit``, ``high_limit``] (default: the first and the last bin edge) ends the side: a side
+keeps the sidebands that fit, possibly none. A sideband's cut is the window's cut with the interval
+replaced (a C++ part naming ``variable`` is an error); like any bin-form interval, one ending at the last
+bin edge takes the overflow too. Its name is the entry's name and ``L<i>`` (below the window) or ``H<i>``
+(above), i = 1 the nearest: with the region name pattern ``{region}_{name}_m{mass}``, ``SR_SL_HMESBL1_m300``.
 
 Every ambiguity is an error, and a job refuses more sub-region (key, variable) pairs than
 ``sub_regions_max_key_vars`` (default 5000; 0 disables the check).
@@ -67,6 +102,9 @@ import yaml
 
 DEFAULT_MAX_SUB_REGION_KEY_VARS = 5000
 ENTRY_KEYS = {"name", "cuts", "regions", "points"}
+OPTIONAL_ENTRY_KEYS = {"channels", "sidebands", "variables"}
+SIDEBAND_KEYS = {"variable", "count", "min_width", "gap", "low_limit", "high_limit"}
+SIDEBAND_REQUIRED = {"variable", "count", "min_width"}
 # words of a C++ cut that are not column names
 CPP_WORDS = {
     "true",
@@ -108,8 +146,8 @@ def regions(setup):
 
 def booking(setup, keys, variables):
     """The blocks of a HistFromNtupleProducer job: every variable in the keys of the booked regions, and
-    one block per sub-region with the variables of its point, in its keys (a base key's filter and the
-    cut)."""
+    one block per sub-region with the variables of its point (only its entry's ``variables`` if given), in
+    its keys (a base key's filter and the cut)."""
     booked = set(_booked_regions(setup, _flavour(setup)))
     variables = list(variables)
     blocks = []
@@ -118,7 +156,12 @@ def booking(setup, keys, variables):
         blocks.append({"keys": base_keys, "variables": variables})
     n_pairs = 0
     for sreg in sub_regions(setup):
-        block_vars = [v for v in variables if _in_point(setup, v, sreg["point"])]
+        block_vars = [
+            v
+            for v in variables
+            if _in_point(setup, v, sreg["point"])
+            and (sreg["variables"] is None or v in sreg["variables"])
+        ]
         if not block_vars:
             continue
         block_keys, columns = [], []
@@ -151,6 +194,17 @@ def booking(setup, keys, variables):
     return blocks
 
 
+def required_columns(setup):
+    """The variables the flavour's sub-region cuts read: ``binned`` those of bin-form cuts (FLAF stores
+    their ``<var>_bin``), ``fullResolution`` those of C++ cuts (FLAF stores the raw column). Stored in
+    the histTuples, not histogrammed, whether the flavour lists them or not."""
+    sub_regions(setup)
+    return {
+        "binned": list(setup.__dict__["_bbww_bin_cut_vars"]),
+        "fullResolution": list(setup.__dict__["_bbww_fullres_cut_vars"]),
+    }
+
+
 # ---------------------------------------------------------------- the flavour
 
 
@@ -163,7 +217,7 @@ def _booked_regions(setup, flavour):
     if not isinstance(booked, list) or not all(isinstance(r, str) for r in booked):
         raise HistBookingError(
             f"histTuple flavor {setup.histTuple_flavor}: `regions` must be a list of region names "
-            f"([ ] for sub-regions only), got {booked!r}"
+            f"([ ] books sub-regions only; such a flavour cannot be plotted), got {booked!r}"
         )
     return booked
 
@@ -190,6 +244,15 @@ def _hist_entry(setup, var):
             f"{var}: {'no' if not matches else 'more than one'} histograms.yaml entry matches it"
         )
     return hists.config_dict[matches[0]]
+
+
+def _has_binning(setup, var):
+    """Whether a variable has a histograms.yaml entry with ``x_bins`` (so a ``<var>_bin`` column can be
+    stored); more than one matching entry is an error."""
+    matches = [p for p in setup.hists.config_dict if re.fullmatch(p, var)]
+    if len(matches) > 1:
+        raise HistBookingError(f"{var}: more than one histograms.yaml entry matches it")
+    return bool(matches) and "x_bins" in setup.hists.config_dict[matches[0]]
 
 
 def _same(a, b):
@@ -290,13 +353,13 @@ def _intervals(value, what):
     )
 
 
-def dict_cut(cut, edges_of, binned, what):
+def dict_cut(cut, edges_of, has_binning, what):
     """The bin-index cut of a bin-form part ``{variable: intervals}`` and its columns."""
     parts, columns = [], []
     for var, value in cut.items():
-        if var not in binned:
+        if not has_binning(var):
             raise HistBookingError(
-                f"{what}: {var} is not a binned variable of the flavour, so it has no bin column "
+                f"{what}: {var} has no binning (x_bins) in histograms.yaml, so it has no bin column "
                 "to cut on"
             )
         edges = edges_of(var)
@@ -333,20 +396,14 @@ def cpp_variables(expr):
     return names
 
 
-def cpp_cut(expr, fullres, what, flavour):
-    """A C++ part and its columns; every variable it names must be a full-resolution variable."""
+def cpp_cut(expr, what):
+    """A C++ part and its columns, the variables it names (stored at full resolution through
+    ``required_columns``)."""
     if not expr.strip():
         raise HistBookingError(f"{what}: empty cut")
     names = cpp_variables(expr)
     if not names:
         raise HistBookingError(f"{what}: the cut '{expr}' uses no variable")
-    missing = [n for n in names if n not in fullres]
-    if missing:
-        raise HistBookingError(
-            f"{what}: the cut '{expr}' uses {', '.join(missing)}, not in fullResolution_variables "
-            f"of flavour {flavour}; add {'it' if len(missing) == 1 else 'them'} there (it is not "
-            "added automatically)"
-        )
     return expr, names
 
 
@@ -383,10 +440,16 @@ def cut_expression(cut, ctx, what):
         if isinstance(part, dict):
             if not part:
                 raise HistBookingError(f"{part_what}: empty cut")
-            expr, cols = dict_cut(part, ctx["edges"], ctx["binned"], part_what)
+            expr, cols = dict_cut(part, ctx["edges"], ctx["has_binning"], part_what)
+            for col in cols:  # <var>_bin
+                if col[: -len("_bin")] not in ctx["bin_vars"]:
+                    ctx["bin_vars"].append(col[: -len("_bin")])
         elif isinstance(part, str):
             text = _substitute(part, ctx["point"], part_what)
-            expr, cols = cpp_cut(text, ctx["fullres"], part_what, ctx["flavour"])
+            expr, cols = cpp_cut(text, part_what)
+            for col in cols:
+                if col not in ctx["fullres_vars"]:
+                    ctx["fullres_vars"].append(col)
         else:
             raise HistBookingError(
                 f"{part_what}: a cut part is a {{variable: [low, high]}} dict or a C++ string, "
@@ -407,7 +470,7 @@ def _category_cuts(value, ctx, channels, what):
     if isinstance(value, dict) and value:
         keys = set(value)
         is_channels = keys <= set(channels)
-        is_vars = keys <= ctx["binned"]
+        is_vars = all(ctx["has_binning"](k) for k in keys)
         if is_channels and is_vars:
             raise HistBookingError(
                 f"{what}: {sorted(keys)} are both channels and variables: ambiguous"
@@ -419,11 +482,154 @@ def _category_cuts(value, ctx, channels, what):
             }
         if not is_vars:
             raise HistBookingError(
-                f"{what}: {sorted(keys)} are neither all channels ({channels}) nor all binned "
-                "variables of the flavour"
+                f"{what}: {sorted(keys)} are neither all channels ({channels}) nor all variables "
+                "with a binning (x_bins) in histograms.yaml"
             )
     expr = cut_expression(value, ctx, what)
     return {ch: expr for ch in channels}
+
+
+# ---------------------------------------------------------------- sidebands
+
+
+def _tol(x):
+    return 1e-6 * max(1.0, abs(x))
+
+
+def far_edge(edges, near, direction, width):
+    """The bin edge nearest to ``near`` that lies at least ``width`` beyond it (direction +1: above, -1:
+    below); None if there is none."""
+    if direction > 0:
+        cand = [e for e in edges if e >= near + width - _tol(near)]
+        return min(cand) if cand else None
+    cand = [e for e in edges if e <= near - width + _tol(near)]
+    return max(cand) if cand else None
+
+
+def sideband_slices(edges, near, direction, count, min_width, gap, low, high):
+    """The sidebands beyond the window edge ``near`` (direction -1: below the window, +1: above), nearest
+    first, as (low, high) intervals: at most ``count``, each ending at the nearest bin edge at least
+    ``min_width`` beyond the previous one; the first that would not lie within [low, high] ends the side.
+    """
+
+    def inside(x):
+        return x is not None and low - _tol(low) <= x <= high + _tol(high)
+
+    x = near if gap == 0 else far_edge(edges, near, direction, gap)
+    out = []
+    if not inside(x):
+        return out
+    for _ in range(count):
+        y = far_edge(edges, x, direction, min_width)
+        if not inside(y):
+            break
+        out.append(tuple(sorted((x, y))))
+        x = y
+    return out
+
+
+def _window_interval(cut, variable, what):
+    """``(parts, i_part, (lo, hi))``: the parts of a cut, the index of the bin-form part holding
+    ``variable`` and its single interval."""
+    parts = cut if isinstance(cut, list) else [cut]
+    for p in parts:
+        if isinstance(p, str) and variable in cpp_variables(p):
+            raise HistBookingError(
+                f"{what}: the C++ part '{p}' uses {variable}, which the sidebands replace in the "
+                "bin-form part only: put the window of the cut in its bin-form part"
+            )
+    holders = [i for i, p in enumerate(parts) if isinstance(p, dict) and variable in p]
+    if len(holders) != 1:
+        raise HistBookingError(
+            f"{what}: sidebands need {variable} in exactly one bin-form part of the cut, found "
+            f"{len(holders)} in {cut!r}"
+        )
+    intervals = _intervals(parts[holders[0]][variable], f"{what} {variable}")
+    if len(intervals) != 1:
+        raise HistBookingError(
+            f"{what}: sidebands need one {variable} interval (the window), got {intervals}"
+        )
+    return parts, holders[0], intervals[0]
+
+
+def sideband_cuts(cut, spec, edges, what):
+    """``{label: cut}`` of the sidebands of a cut's window: the cut with the window interval of
+    ``spec['variable']`` replaced by each sideband's, labelled ``L<i>`` (below) and ``H<i>`` (above).
+    """
+    variable = spec["variable"]
+    parts, i_part, (lo, hi) = _window_interval(cut, variable, what)
+    out = {}
+    for direction, side, near in ((-1, "L", lo), (+1, "H", hi)):
+        for i, interval in enumerate(
+            sideband_slices(
+                edges,
+                near,
+                direction,
+                spec["count"],
+                spec["min_width"],
+                spec["gap"],
+                spec["low_limit"],
+                spec["high_limit"],
+            ),
+            start=1,
+        ):
+            new_parts = list(parts)
+            new_parts[i_part] = dict(parts[i_part], **{variable: list(interval)})
+            out[f"{side}{i}"] = new_parts if isinstance(cut, list) else new_parts[0]
+    return out
+
+
+def _sideband_spec(spec, edges_of, has_binning, what):
+    """The checked ``sidebands`` of an entry, with the defaults filled in."""
+    if not isinstance(spec, dict):
+        raise HistBookingError(f"{what}: sidebands must be a mapping, got {spec!r}")
+    unknown, missing = set(spec) - SIDEBAND_KEYS, SIDEBAND_REQUIRED - set(spec)
+    if unknown or missing:
+        raise HistBookingError(
+            f"{what}: sidebands: unknown keys {sorted(unknown)}, missing keys {sorted(missing)}"
+        )
+    variable = spec["variable"]
+    if not isinstance(variable, str) or not has_binning(variable):
+        raise HistBookingError(
+            f"{what}: sidebands variable {variable} has no binning (x_bins) in histograms.yaml"
+        )
+    edges = edges_of(variable)
+
+    def number(key, default):
+        value = spec.get(key, default)
+        if not isinstance(value, (int, float)) or isinstance(value, bool):
+            raise HistBookingError(
+                f"{what}: sidebands {key} must be a number, got {value!r}"
+            )
+        return float(value)
+
+    count = spec["count"]
+    if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+        raise HistBookingError(
+            f"{what}: sidebands count must be a positive integer, got {count!r}"
+        )
+    out = {
+        "variable": variable,
+        "count": count,
+        "min_width": number("min_width", None),
+        "gap": number("gap", 0.0),
+        "low_limit": number("low_limit", edges[0]),
+        "high_limit": number("high_limit", edges[-1]),
+    }
+    if out["min_width"] <= 0 or out["gap"] < 0 or out["low_limit"] >= out["high_limit"]:
+        raise HistBookingError(
+            f"{what}: sidebands need min_width > 0, gap >= 0 and low_limit < high_limit, got "
+            f"{spec!r}"
+        )
+    return out, edges
+
+
+def _split_channels(value, has_binning, channels):
+    """``{channel: cut}`` of a category's value: a channel map as is, any other cut for every channel."""
+    if isinstance(value, dict) and value and set(value) <= set(channels):
+        if not all(has_binning(k) for k in value):
+            return dict(value)
+    return {ch: value for ch in channels}
 
 
 # ---------------------------------------------------------------- cuts files and sub-regions
@@ -492,7 +698,8 @@ def load_cuts(path, ana_path, what):
 def sub_regions(setup):
     """The sub-regions of the flavour, cached on the setup: a list of
     ``{"name", "sub_region", "base_region", "point": {parameter: value},
-    "cuts": {(category, channel): (expression, columns)}}``."""
+    "cuts": {(category, channel): (expression, columns)}, "variables": [names] or None (all)}``.
+    """
     cache = setup.__dict__.get("_bbww_sub_regions")
     if cache is not None:
         return cache
@@ -501,13 +708,14 @@ def sub_regions(setup):
     entries = flavour.get("sub_regions") or []
     if not isinstance(entries, list):
         raise HistBookingError(f"flavour {flavour_name}: sub_regions must be a list")
-    binned = set()
-    for v in flavour.get("variables") or []:
-        if isinstance(v, dict) and "vars" in v:
-            binned.update(v["vars"])
-        else:
-            binned.add(v["name"] if isinstance(v, dict) else v)
-    fullres = set(flavour.get("fullResolution_variables") or [])
+    # an entry's `variables` must be plotted variables of the flavour
+    names = {
+        v["name"] if isinstance(v, dict) else v for v in flavour.get("variables") or []
+    }
+
+    def has_binning(var):
+        return _has_binning(setup, var)
+
     categories = _categories(setup)
     channels = _channels(setup)
 
@@ -517,21 +725,49 @@ def sub_regions(setup):
             raise HistBookingError(f"{var} has no x_bins in histograms.yaml")
         return axis_edges(entry["x_bins"])
 
-    out = []
+    out, bin_vars, fullres_vars = [], [], []
     names_seen = set(_booked_regions(setup, flavour))
     for i_entry, entry in enumerate(entries):
         what = f"flavour {flavour_name} sub_regions[{i_entry}]"
         if not isinstance(entry, dict):
             raise HistBookingError(f"{what}: an entry is a mapping, got {entry!r}")
-        unknown, missing = set(entry) - ENTRY_KEYS, ENTRY_KEYS - set(entry)
+        unknown = set(entry) - ENTRY_KEYS - OPTIONAL_ENTRY_KEYS
+        missing = ENTRY_KEYS - set(entry)
         if unknown or missing:
             raise HistBookingError(
                 f"{what}: unknown keys {sorted(unknown)}, missing keys {sorted(missing)}"
             )
         name = entry["name"]
-        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_]+", name):
-            raise HistBookingError(f"{what}: name must be a word, got {name!r}")
+        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9]+", name):
+            # Analysis/EqualSignalBinning.py maps <base>_<name>_m<mass> to its base region by the
+            # last two underscores
+            raise HistBookingError(
+                f"{what}: name must be a word of letters and digits (no underscore), got {name!r}"
+            )
         what = f"{what} ({name})"
+        entry_channels = entry.get("channels", channels)
+        if (
+            not isinstance(entry_channels, list)
+            or not entry_channels
+            or not all(isinstance(ch, str) for ch in entry_channels)
+            or not set(entry_channels) <= set(channels)
+        ):
+            raise HistBookingError(
+                f"{what}: channels must be a non-empty list of configured channels ({channels}), "
+                f"got {entry_channels!r}"
+            )
+        var_names = entry.get("variables")
+        if var_names is not None and (
+            not isinstance(var_names, list)
+            or not var_names
+            or not all(isinstance(v, str) for v in var_names)
+        ):
+            raise HistBookingError(
+                f"{what}: variables must be a non-empty list of names, got {var_names!r}"
+            )
+        sidebands = None
+        if "sidebands" in entry:
+            sidebands = _sideband_spec(entry["sidebands"], edges_of, has_binning, what)
         parameters, region_name, points, cuts_path = load_cuts(
             entry["cuts"], setup.ana_path, what
         )
@@ -569,11 +805,23 @@ def sub_regions(setup):
             point = dict(zip(parameters, values))
             ctx = {
                 "edges": edges_of,
-                "binned": binned,
-                "fullres": fullres,
-                "flavour": flavour_name,
+                "has_binning": has_binning,
+                "bin_vars": bin_vars,
+                "fullres_vars": fullres_vars,
                 "point": point,
             }
+            name_values = {k: name_value(v) for k, v in point.items()}
+            point_vars = None
+            if var_names is not None:
+                point_vars = []
+                for template in var_names:
+                    var = _substitute(template, name_values, f"{what} variables")
+                    if var not in names or not _in_point(setup, var, point):
+                        raise HistBookingError(
+                            f"{what}: variable '{var}' (point {point}) is not a variable of the "
+                            "flavour that belongs to the point"
+                        )
+                    point_vars.append(var)
             point_cuts = {}
             for cat, value in points[values].items():
                 if cat not in categories:
@@ -584,27 +832,58 @@ def sub_regions(setup):
                 for ch, cut in _category_cuts(
                     value, ctx, channels, f"{what} {point} {cat}"
                 ).items():
-                    point_cuts[(cat, ch)] = cut
-            name_values = {k: name_value(v) for k, v in point.items()}
-            for reg in base_regions:
-                reg_name = _substitute(
-                    region_name,
-                    dict(name_values, region=reg, name=name),
-                    what,
-                )
-                if reg_name in names_seen:
-                    raise HistBookingError(
-                        f"{what}: region name '{reg_name}' is defined twice"
+                    if ch in entry_channels:
+                        point_cuts[(cat, ch)] = cut
+            # {sub-region name: cuts}: the cut itself, or each sideband of its window
+            families = {name: point_cuts}
+            if sidebands is not None:
+                spec, sb_edges = sidebands
+                labels = [f"L{i}" for i in range(spec["count"], 0, -1)]
+                labels += [f"H{i}" for i in range(1, spec["count"] + 1)]
+                per_label = {label: {} for label in labels}
+                for cat, value in points[values].items():
+                    for ch, raw in _split_channels(
+                        value, has_binning, channels
+                    ).items():
+                        if ch not in entry_channels:
+                            continue
+                        cell = f"{what} {point} {cat} {ch}"
+                        for label, cut in sideband_cuts(
+                            raw, spec, sb_edges, cell
+                        ).items():
+                            per_label[label][(cat, ch)] = cut_expression(
+                                cut, ctx, f"{cell} sideband {label}"
+                            )
+                families = {
+                    name + label: per_label[label]
+                    for label in labels
+                    if per_label[label]
+                }
+            for family, cuts in families.items():
+                if not cuts:
+                    continue  # no key in the entry's channels
+                for reg in base_regions:
+                    reg_name = _substitute(
+                        region_name,
+                        dict(name_values, region=reg, name=family),
+                        what,
                     )
-                names_seen.add(reg_name)
-                out.append(
-                    {
-                        "name": reg_name,
-                        "sub_region": name,
-                        "base_region": reg,
-                        "point": dict(point),
-                        "cuts": dict(point_cuts),
-                    }
-                )
+                    if reg_name in names_seen:
+                        raise HistBookingError(
+                            f"{what}: region name '{reg_name}' is defined twice"
+                        )
+                    names_seen.add(reg_name)
+                    out.append(
+                        {
+                            "name": reg_name,
+                            "sub_region": family,
+                            "base_region": reg,
+                            "point": dict(point),
+                            "cuts": dict(cuts),
+                            "variables": point_vars,
+                        }
+                    )
+    setup.__dict__["_bbww_bin_cut_vars"] = bin_vars
+    setup.__dict__["_bbww_fullres_cut_vars"] = fullres_vars
     setup.__dict__["_bbww_sub_regions"] = out
     return out
