@@ -1382,9 +1382,11 @@ histTuple_flavors:
 
   Signal_Extraction_DL_window:
     # Signal_Extraction_DL with the 2D DNN_m<MX>_vs_HME replaced by sub-regions: the variables of
-    # mass MX (signal_params in histograms.yaml) and DeepHME_mass are also filled in
-    # SR/TT_CR/DY_CR_HMESub_m<MX>, the base region within the frozen HME range of MX
-    # (config/sub_regions/hme_DL_v2610.yaml); DNN_M<MX>_Signal there is the slice of the 2D.
+    # mass MX (signal_params in histograms.yaml) are also filled in SR/TT_CR/DY_CR_HMESub_m<MX>, the
+    # base region within the frozen HME range of MX (config/sub_regions/hme_DL_v2610.yaml);
+    # DNN_M<MX>_Signal there is the slice of the 2D. DeepHME_mass is not plotted (it was filled in
+    # every sub-region, HH_bbWW#211): the booking plugin stores its DeepHME_mass_bin, which the cuts
+    # read, in the histTuples (required_columns in Analysis/hist_booking.py).
     fullResolution_variables: [ ]
 
     regions: [ SR, TT_CR, DY_CR ]
@@ -1395,8 +1397,6 @@ histTuple_flavors:
         points: all
 
     variables:
-      - DeepHME_mass
-
       - DNN_M250_Signal
       - DNN_M260_Signal
       - DNN_M270_Signal
