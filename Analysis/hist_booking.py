@@ -483,7 +483,7 @@ def _category_cuts(value, ctx, channels, what):
         if not is_vars:
             raise HistBookingError(
                 f"{what}: {sorted(keys)} are neither all channels ({channels}) nor all variables "
-                "with a binning in histograms.yaml"
+                "with a binning (x_bins) in histograms.yaml"
             )
     expr = cut_expression(value, ctx, what)
     return {ch: expr for ch in channels}
