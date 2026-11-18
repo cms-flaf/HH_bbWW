@@ -161,6 +161,10 @@ impact_plots:
     # Simplex fallback: Migrad fails on a few fits from a bad seed, and dhi then drops the merge
     fit_args:
       - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+      # tighter than combine's default (tolerance 0.1): a nuisance moving r by less than the default precision (e.g.
+      # the TT-CR MC-stat bins, ~0.4% of r) otherwise loses its +-1 sigma crossings and comes back as a failed fit,
+      # and the other impacts carry a few % of numerical noise. ~1.5-2x the fit time.
+      - --cminDefaultMinimizerStrategy 1 --cminDefaultMinimizerTolerance 0.01 --setRobustFitTolerance 0.01
     plot_params:
       # one fit per nuisance: `robust` (one Hessian) silently drops parameters it cannot invert
       method: default
