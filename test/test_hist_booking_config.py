@@ -198,8 +198,8 @@ class SingleLeptonWindows(unittest.TestCase):
 
 class Intervals(unittest.TestCase):
     """Every SL record's DeepHME_mass interval is the one its cut encodes (read back from the
-    bin-index expression, an independent path), and the SL fake estimate finds a cell with an
-    isolated window in every (channel, category) of every mass."""
+    bin-index expression, an independent path); test/test_sl_fakes.py checks the cells the SL fake
+    estimate builds from them."""
 
     def test_intervals_equal_the_cuts(self):
         edges = HB.axis_edges(HISTS["DeepHME_mass"]["x_bins"])
@@ -214,24 +214,6 @@ class Intervals(unittest.TestCase):
                     self.assertEqual(got, interval(expr, edges), (s["name"], key))
                     n += 1
         self.assertGreater(n, 0)
-
-    def test_fake_estimate_cells(self):
-        from Analysis import SL_fakes
-
-        with open(os.path.join(repo, "config", "processes.yaml")) as f:
-            config = yaml.safe_load(f)["Fakes"]["data_driven"]
-        for flavour, mass_list, n_cells in ((SL_FLAVOUR, None, 150), ("CI", [300], 6)):
-            setup = setup_for(flavour)
-            masses = mass_list or sorted(config["split"])
-            total = 0
-            for mass in masses:
-                ctx = types.SimpleNamespace(config=config, setup=setup)
-                cells = SL_fakes._cells(ctx, mass)
-                total += len(cells)
-                for cell in cells.values():
-                    self.assertIsNotNone(cell.window)
-                    self.assertIsNotNone(cell.anti_window)
-            self.assertEqual(total, n_cells, flavour)
 
 
 class CiWindows(unittest.TestCase):

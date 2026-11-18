@@ -121,7 +121,8 @@ Invariants a diff must keep:
   flavour books binary DNNs up to 2000 GeV, the SL windows end at 1500.
 - Every mass of the SL window file has a `split` (a bin edge of the binary DNN) and a `scheme`; every
   physics model listing `Fakes` has a `tt_process`. A scheme without its regions in a cell raises;
-  only too little TT (`min_tt`, decided at the nominal) means "not determined".
+  only too little TT (`min_tt`, decided at the nominal) or, for V, no excess in the anti-isolated
+  sidebands means "not determined".
 - `split`, `scheme` and `min_tt` are physics choices of the analysts, marked provisional: do not
   propose new values.
 

@@ -331,5 +331,56 @@ class Guards(unittest.TestCase):
             self.assertEqual(CONFIG["scheme"][m], "V" if m <= 400 else "H")
 
 
+class RealConfiguration(unittest.TestCase):
+    """The estimator's cells and configuration on the real booking of the SL and CI flavours."""
+
+    def setup_for(self, flavour):
+        with open(os.path.join(ana_path, "config", "global.yaml")) as f:
+            global_params = yaml.safe_load(f)
+        with open(os.path.join(ana_path, "config", "plot", "histograms.yaml")) as f:
+            hists = yaml.safe_load(f)
+        return types.SimpleNamespace(
+            global_params=global_params,
+            histTuple_flavor=flavour,
+            ana_path=ana_path,
+            hists=types.SimpleNamespace(config_dict=hists),
+        )
+
+    def test_a_cell_with_both_windows_in_every_channel_and_category(self):
+        for flavour, masses, n_cells in (
+            ("Signal_Extraction_SL_window", sorted(CONFIG["split"]), 150),
+            ("CI", [300], 6),
+        ):
+            setup = self.setup_for(flavour)
+            total = 0
+            for mass in masses:
+                ctx = types.SimpleNamespace(config=CONFIG, setup=setup)
+                cells = SL_fakes._cells(ctx, mass)
+                total += len(cells)
+                for cell in cells.values():
+                    self.assertIsNotNone(cell.window)
+                    self.assertIsNotNone(cell.anti_window)
+                    # the provisional scheme has its regions in every cell
+                    self.assertTrue(
+                        SL_fakes.Estimate.available(
+                            CONFIG["scheme"].get(mass, "V"), cell
+                        )
+                    )
+            self.assertEqual(total, n_cells, flavour)
+
+    def test_a_tt_process_for_every_model_listing_fakes(self):
+        with open(os.path.join(ana_path, "config", "phys_models.yaml")) as f:
+            models = yaml.safe_load(f)
+        listing = [
+            name
+            for name, model in models.items()
+            if isinstance(model, dict) and "Fakes" in (model.get("backgrounds") or [])
+        ]
+        self.assertTrue(listing)
+        for name in listing:
+            self.assertIn(name, CONFIG["tt_process"], name)
+            self.assertIn(CONFIG["tt_process"][name], models[name]["backgrounds"], name)
+
+
 if __name__ == "__main__":
     unittest.main()

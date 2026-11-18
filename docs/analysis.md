@@ -234,13 +234,15 @@ applied to the TT bins of its part). Two schemes (`scheme` per mass):
 the DeepHME turn-on, H above; the `split` per mass (the cuts of an earlier study, moved to the nearest
 0.5 edge of the DNN axis). Every mass of `config/sub_regions/hme_SL_v2610.yaml` needs a `split` (a bin
 edge of the binary DNN) and a `scheme`, and every physics model listing `Fakes` a `tt_process`
-(`test/test_sl_fakes.py` checks them). A scheme whose regions a cell lacks is a configuration error.
+(`test/test_sl_fakes.py` checks them, and that the scheme's regions exist in every cell). A scheme
+whose regions a cell lacks is a configuration error.
 
 **Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (the statistical error of f, per
 channel, category and era) and `FakesMethodLow/High` (|f of the other scheme − f|, per channel and
 category, correlated across eras; no shift where the other scheme's regions are missing or it is not
-determined). The nominal decides whether TT determines f (`min_tt` weighted events in each region
-group): where it does not, there are no Fakes in that cell, with a message; a variation that leaves no
+determined). The nominal decides whether f is determined (at least `min_tt` weighted TT events in each
+region group and, for V, an excess in the anti-isolated sidebands): where it is not, there are no
+Fakes in that cell, with a message; a variation that leaves no
 TT where the nominal had enough stops the merge. The variations of the simulation enter through D − O
 and T; data stay nominal.
 
