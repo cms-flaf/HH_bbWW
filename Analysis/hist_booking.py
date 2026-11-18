@@ -188,6 +188,20 @@ def booking(setup, keys, variables):
     return blocks
 
 
+def required_columns(setup):
+    """The histTuple columns the sub-region cuts read (FLAF Common/HistBooking.py): ``binned`` the
+    variables of bin-form cuts, ``fullResolution`` the columns of C++ cuts. TEMPORARY, for local
+    runs only: cms-flaf/HH_bbWW#212 adds the plugin's own."""
+    binned, fullres = [], []
+    for sreg in sub_regions(setup):
+        for key, (expr, columns) in sreg["cuts"].items():
+            bin_vars = list(sreg["intervals"][key])
+            binned += [v for v in bin_vars if v not in binned]
+            bin_columns = {f"{v}_bin" for v in bin_vars}
+            fullres += [c for c in columns if c not in bin_columns and c not in fullres]
+    return {"binned": binned, "fullResolution": fullres}
+
+
 # ---------------------------------------------------------------- the flavour
 
 
