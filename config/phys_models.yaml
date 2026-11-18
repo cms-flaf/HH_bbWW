@@ -18,6 +18,7 @@ Run3_Model:
     - ttV
     - W
     - H
+    - Fakes
     # - QCD_PT
   signals: &Run3_Model_signals
     - GluGluToRadion_bbWW_1L
@@ -45,6 +46,7 @@ Run3_Model_DYSplit:
     - ttV
     - W
     - H
+    - Fakes
   signals: *Run3_Model_signals
   data: *Run3_Model_data
 
@@ -61,6 +63,7 @@ TestModel:
     - custom_CI_Background_TT
     - custom_CI_Background_DY
     - custom_CI_Background_W
+    - Fakes
   signals: # WARNING: for 2024 no signal sample available, using a file from bbtt signals..
     - custom_CI_Signal
     - custom_CI_Signal_SL
