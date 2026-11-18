@@ -196,6 +196,44 @@ class SingleLeptonWindows(unittest.TestCase):
                 self.assertEqual(entry.get("signal_params"), {"mass": int(m.group(1))})
 
 
+class Intervals(unittest.TestCase):
+    """Every SL record's DeepHME_mass interval is the one its cut encodes (read back from the
+    bin-index expression, an independent path), and the SL fake estimate finds a cell with an
+    isolated window in every (channel, category) of every mass."""
+
+    def test_intervals_equal_the_cuts(self):
+        edges = HB.axis_edges(HISTS["DeepHME_mass"]["x_bins"])
+        n = 0
+        for flavour in (SL_FLAVOUR, "CI"):
+            for s in HB.sub_regions(setup_for(flavour)):
+                if s["base_region"] not in SB_REGIONS:
+                    continue
+                self.assertEqual(sorted(s["intervals"]), sorted(s["cuts"]), s["name"])
+                for key, (expr, _) in s["cuts"].items():
+                    (got,) = s["intervals"][key]["DeepHME_mass"]
+                    self.assertEqual(got, interval(expr, edges), (s["name"], key))
+                    n += 1
+        self.assertGreater(n, 0)
+
+    def test_fake_estimate_cells(self):
+        from Analysis import SL_fakes
+
+        with open(os.path.join(repo, "config", "processes.yaml")) as f:
+            config = yaml.safe_load(f)["Fakes"]["data_driven"]
+        for flavour, mass_list, n_cells in ((SL_FLAVOUR, None, 150), ("CI", [300], 6)):
+            setup = setup_for(flavour)
+            masses = mass_list or sorted(config["split"])
+            total = 0
+            for mass in masses:
+                ctx = types.SimpleNamespace(config=config, setup=setup)
+                cells = SL_fakes._cells(ctx, mass)
+                total += len(cells)
+                for cell in cells.values():
+                    self.assertIsNotNone(cell.window)
+                    self.assertIsNotNone(cell.anti_window)
+            self.assertEqual(total, n_cells, flavour)
+
+
 class CiWindows(unittest.TestCase):
     def test_no_one_and_two_lower_sidebands(self):
         subs = HB.sub_regions(setup_for("CI"))

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Analysis/SL_fakes.py, the single-lepton fake estimator, on synthetic merged histograms with a known
-excess f in each region, through a stand-in of FLAF's EstimateContext (FLAF Analysis/
-HistMergerFromHists.py) and the real Fakes block of config/processes.yaml.
+excess f in each region, through FLAF's own EstimateContext (FLAF Analysis/HistMergerFromHists.py)
+over a stand-in of the merged file, with the real Fakes block of config/processes.yaml and the
+binning of config/plot/histograms.yaml.
 
 In every region, data = O + (1 + f) T, so f = (D - O)/T - 1 is known by construction, per DNN part
 (below / from the mass's split). Needs ROOT: run inside the analysis environment (source env.sh).
@@ -25,6 +26,7 @@ if ana_path not in sys.path:
 import ROOT  # noqa: E402
 
 from Analysis import SL_fakes  # noqa: E402
+from FLAF.Analysis.HistMergerFromHists import EstimateContext  # noqa: E402
 
 ROOT.gROOT.SetBatch(True)
 
@@ -34,7 +36,10 @@ with open(os.path.join(ana_path, "config", "processes.yaml")) as f:
 MASS = 600
 VAR = f"TwoStageDNN_M{MASS}_binary"
 SPLIT = CONFIG["split"][MASS]
-NB, LO, HI = 94, -23.5, 23.5
+with open(os.path.join(ana_path, "config", "plot", "histograms.yaml")) as f:
+    _n, _range = yaml.safe_load(f)[VAR]["x_bins"].split("|")
+NB = int(_n)
+LO, HI = (float(x) for x in _range.split(":"))
 CH, CAT = "mu", "res2b"
 DATA, TT, W = "Data_Full", "TT", "W"
 UNC = "U1"
@@ -114,13 +119,13 @@ class Store:
                             + (1 + (f_lo if b < b_split else f_hi)) * (10.0 + b % 7)
                         )
 
-    def get(self, process, region, unc, scale):
-        if process == DATA:
-            if region == name("SR_SL", "HMESub"):
-                raise AssertionError("the isolated window's data were read")
-            unc, scale = "Central", "Central"
-        h = self.hists.get((process, region, unc, scale))
-        return None if h is None else h.Clone()
+    def reader(self, process, key_dir, unc, scale):
+        """The merged file as FLAF's EstimateContext reads it (data already at nominal)."""
+        ch, region, cat = key_dir
+        assert (ch, cat) == (CH, CAT)
+        if process == DATA and region == name("SR_SL", "HMESub"):
+            raise AssertionError("the isolated window's data were read")
+        return self.hists.get((process, region, unc, scale))
 
 
 def context(store, unc_source="Central", var=VAR, model="Run3_Model", config=CONFIG):
@@ -129,32 +134,26 @@ def context(store, unc_source="Central", var=VAR, model="Run3_Model", config=CON
         if unc_source == "Central"
         else [(unc_source, "Up"), (unc_source, "Down")]
     )
-
-    def get(process, key_dir, unc="Central", scale="Central"):
-        ch, region, cat = key_dir
-        assert (ch, cat) == (CH, CAT)
-        return store.get(process, region, unc, scale)
-
-    def require(process, key_dir, unc="Central", scale="Central"):
-        h = get(process, key_dir, unc, scale)
-        if h is None:
-            raise KeyError((process, key_dir, unc, scale))
-        return h
-
-    key_dirs = [(CH, n, CAT) for n in {r["name"] for r in records()}]
-    return types.SimpleNamespace(
-        config=config,
+    merge = types.SimpleNamespace(
         var=var,
-        era="Run3_2022",
-        setup=types.SimpleNamespace(phys_model=types.SimpleNamespace(name=model)),
+        setup=types.SimpleNamespace(
+            era="Run3_2022", phys_model=types.SimpleNamespace(name=model)
+        ),
+        channels=[CH],
+        categories=[CAT],
+        scales=["Up", "Down"],
+        data_process_name=DATA,
+    )
+    return EstimateContext(
+        merge=merge,
+        process="Fakes",
+        config=config,
         unc_source=unc_source,
         variations=variations,
-        nominal_pass=unc_source == "Central",
-        key_dirs=key_dirs,
-        data_process=DATA,
+        key_dirs=[(CH, n, CAT) for n in {r["name"] for r in records()}],
         mc_backgrounds=[TT, W],
-        get=get,
-        require=require,
+        signals=[],
+        reader=store.reader,
     )
 
 
@@ -219,6 +218,20 @@ class Schemes(unittest.TestCase):
             contents(out[(KEY, ("Central", "Central"))]), expected(0.25, 0.25)
         )
 
+    def test_v_without_excess_in_the_window_or_the_sidebands_gives_no_fakes(self):
+        config = dict(CONFIG, scheme={**CONFIG["scheme"], MASS: "V"})
+        for iso, window in ((-0.3, -0.5), (0.3, -0.5), (-0.3, 0.5)):
+            with self.subTest(iso=iso, window=window):
+
+                def f_of(base, family):
+                    if base == "SR_SL":
+                        return (iso, iso)
+                    return (window, window) if family == "HMESub" else (0.6, 0.6)
+
+                out = run(Store(f_of), config=config)
+                h = contents(out[(KEY, ("Central", "Central"))])
+                self.assertEqual(h, [0.0] * (NB + 2))
+
     def test_negative_f_gives_no_fakes(self):
         out = run(Store(lambda base, family: (-0.2, 0.4)))
         h = contents(out[(KEY, ("Central", "Central"))])
@@ -264,10 +277,30 @@ class Guards(unittest.TestCase):
         out = run(Store(lambda b, f: (0.3, 0.3), tt_scale=1e-4))
         self.assertEqual(out, {})
 
-    def test_h_without_a_lower_side_is_not_determined(self):
+    def test_a_scheme_without_its_regions_is_a_configuration_error(self):
         upper = {k: v for k, v in SIDEBANDS.items() if k.startswith("H")}
-        out = run(Store(lambda b, f: (0.3, 0.3)), sidebands=upper)
-        self.assertEqual(out, {})
+        with self.assertRaisesRegex(RuntimeError, "scheme H needs regions"):
+            run(Store(lambda b, f: (0.3, 0.3)), sidebands=upper)
+
+    def test_the_other_scheme_missing_gives_no_method_shift(self):
+        # V at a mass without lower sidebands: H is not there for FakesMethod
+        upper = {k: v for k, v in SIDEBANDS.items() if k.startswith("H")}
+        config = dict(CONFIG, scheme={**CONFIG["scheme"], MASS: "V"})
+        out = run(Store(lambda b, f: (0.3, 0.3)), sidebands=upper, config=config)
+        nominal = contents(out[(KEY, ("Central", "Central"))])
+        for part in ("Low", "High"):
+            for scale in ("Up", "Down"):
+                self.assertEqual(
+                    contents(out[(KEY, (f"FakesMethod{part}", scale))]), nominal
+                )
+
+    def test_a_binary_dnn_without_sl_windows_gets_nothing(self):
+        # e.g. TwoStageDNN_M1600_binary of the default flavour: no split, no sub-regions
+        with mock.patch.object(SL_fakes.HB, "sub_regions", lambda setup: []):
+            ctx = context(
+                Store(lambda b, f: (0.3, 0.3)), var="TwoStageDNN_M1600_binary"
+            )
+            self.assertEqual(SL_fakes.estimate(ctx), {})
 
     def test_other_variables_get_nothing(self):
         self.assertEqual(run(Store(lambda b, f: (0.3, 0.3)), var="DeepHME_mass"), {})

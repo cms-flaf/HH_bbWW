@@ -203,6 +203,51 @@ the plots) gets them from there.
   sidebands), and books `SR_SL_Fakeable`: every base region of a flavour's sub-regions must be in its `regions:`,
   or the plots of that region find no histograms.
 
+## Single-lepton fakes
+
+Events with a non-prompt or misidentified lepton in the single-lepton signal region are estimated from
+data: the process `Fakes` ("Non-prompt leptons", `config/processes.yaml`, `Analysis/SL_fakes.py`), a
+[data-driven process](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/#data-driven-processes)
+of FLAF listed among the backgrounds of `Run3_Model`, `Run3_Model_DYSplit` and `TestModel`. It has no
+datasets: `HistMergerTask` computes it after every process is merged, in the merged file of each
+`TwoStageDNN_M<MX>_binary` of `Signal_Extraction_SL_window` (the HME sub-regions of
+[Regions and sub-regions](#regions-and-sub-regions)), when data was merged and the merge is not
+restricted with `--process` or `--dataset`. Other variables, flavours and binary DNNs without SL
+windows (1600–2000 GeV) get none.
+
+In the SL window `SR_SL_HMESub_m<MX>`, per channel (e, μ) and category (res2b, recovery, boosted),
+`Fakes = max(f, 0) × TT` bin by bin, with f the excess of data over the simulation in units of TT,
+
+    f = (D − O) / T − 1      D data, O the simulated backgrounds other than TT, T TT,
+
+measured outside the window, separately below and from the mass's `split` of the DNN (two parts, each
+applied to the TT bins of its part). Two schemes (`scheme` per mass):
+
+- **H:** f from the isolated HME sidebands, `SR_SL_HMESB{L2,L1}_m<MX>` pooled and
+  `SR_SL_HMESB{H1,H2}_m<MX>` pooled, interpolated linearly in HME to the window at the middle of each
+  region's HME interval;
+- **V:** f(isolated sidebands) / f(anti-isolated sidebands) × f(anti-isolated window), the
+  anti-isolated regions being `SR_SL_Fakeable_HMESB*_m<MX>` and `SR_SL_Fakeable_HMESub_m<MX>`; f = 0
+  where the isolated sidebands or the anti-isolated window show no excess.
+
+**Provisional (the analysts' choice):** V up to 400 GeV, where the lower sidebands are missing or sit on
+the DeepHME turn-on, H above; the `split` per mass (the cuts of an earlier study, moved to the nearest
+0.5 edge of the DNN axis). Every mass of `config/sub_regions/hme_SL_v2610.yaml` needs a `split` (a bin
+edge of the binary DNN) and a `scheme`, and every physics model listing `Fakes` a `tt_process`
+(`test/test_sl_fakes.py` checks them). A scheme whose regions a cell lacks is a configuration error.
+
+**Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (the statistical error of f, per
+channel, category and era) and `FakesMethodLow/High` (|f of the other scheme − f|, per channel and
+category, correlated across eras; no shift where the other scheme's regions are missing or it is not
+determined). The nominal decides whether TT determines f (`min_tt` weighted events in each region
+group): where it does not, there are no Fakes in that cell, with a message; a variation that leaves no
+TT where the nominal had enough stops the merge. The variations of the simulation enter through D − O
+and T; data stay nominal.
+
+**Blinding:** data in the isolated window are never read, and the merge prints no data-derived
+number. The sub-regions are not plotted, so Fakes appear on no control plot yet, and the SL datacards
+do not include them yet.
+
 ## Choosing which variables to histogram
 
 As for any FLAF analysis, the variable set is controlled by the `variables:` list in

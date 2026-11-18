@@ -47,6 +47,7 @@ Fakes:
       FakesMethodLow: CMS_bbww_SL_fakes_method_low_{channel}_{category}_{}
       FakesMethodHigh: CMS_bbww_SL_fakes_method_high_{channel}_{category}_{}
     variable: TwoStageDNN_M{mass}_binary
+    hme_variable: DeepHME_mass  # the variable of the windows and sidebands
     iso: SR_SL
     anti: SR_SL_Fakeable
     window: HMESub

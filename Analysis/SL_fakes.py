@@ -14,13 +14,17 @@ measured outside the window, separately in two parts of the DNN axis (below and 
 - H: f from the isolated HME sidebands, lower (L1+L2) and upper (H1+H2) pooled, interpolated
   linearly in HME to the window: f = f_lo + w (f_hi - f_lo), w = (u_win - u_lo) / (u_hi - u_lo),
   u the middle of each region's HME interval;
-- V: f = f_iso(sidebands) / f_anti(sidebands) x f_anti(window), anti = SR_SL_Fakeable.
+- V: f = f_iso(sidebands) / f_anti(sidebands) x f_anti(window), anti = SR_SL_Fakeable; f = 0 where
+  the isolated sidebands or the anti-isolated window show no excess (f_iso <= 0 or f_anti(window)
+  <= 0), not determined where the anti-isolated sidebands show none (f_anti <= 0).
 
-Nuisances (declared in the process's ``nuisances``): FakesStat{Low,High}, f +- its statistical
-error in that part; FakesMethod{Low,High}, f +- |f(other scheme) - f| in that part (nominal where
-the other scheme is not defined). A region group with less TT than ``min_tt`` does not determine
-f: no Fakes in that cell. Data are read in the isolated sidebands and in SR_SL_Fakeable only, never
-in the isolated window; no data-derived number is printed.
+A scheme whose regions are missing is a configuration error. Nuisances (declared in the process's
+``nuisances``): FakesStat{Low,High}, max(f, 0) +- the statistical error of f in that part;
+FakesMethod{Low,High}, max(f, 0) +- |max(f_other, 0) - max(f, 0)| with the other scheme (no shift
+where its regions are missing or it is not determined). A region group with less TT than ``min_tt``
+does not determine f at the nominal: no Fakes in that cell (both parts). Data are read in the
+isolated sidebands and in SR_SL_Fakeable only, never in the isolated window; no data-derived number
+is printed.
 """
 
 import ctypes
@@ -49,7 +53,7 @@ class Cell:
 
 
 def _check_config(cfg, model):
-    required = ("variable", "iso", "anti", "window", "sidebands")
+    required = ("variable", "hme_variable", "iso", "anti", "window", "sidebands")
     required += ("split", "scheme", "min_tt", "tt_process")
     missing = [k for k in required if k not in cfg]
     if missing:
@@ -64,7 +68,7 @@ def _check_config(cfg, model):
 def _cells(ctx, mass):
     """{(channel, category): Cell} of the mass, from the plugin's sub-regions."""
     cfg = ctx.config
-    hme = cfg.get("hme_variable", "DeepHME_mass")
+    hme = cfg["hme_variable"]
     found = {}
     for sreg in HB.sub_regions(ctx.setup):
         if not HB._same(sreg["point"].get("mass"), mass):
@@ -188,6 +192,17 @@ class Estimate:
                 total[i] = total[i] + Yields(D, vD, O, vO, T, vT)
         return total
 
+    @staticmethod
+    def available(scheme, cell):
+        """Whether the cell has the regions of a scheme."""
+        if scheme == "H":
+            return bool(cell.side("L")) and bool(cell.side("H"))
+        return (
+            cell.anti_window is not None
+            and bool(cell.anti_sidebands)
+            and bool(cell.sidebands)
+        )
+
     def f_of(self, scheme, cell, ch, cat, unc, scale):
         """[(f, var) or None for each part] of a scheme in one cell. Whether TT determines f is
         decided at the nominal (min_tt); a variation needs TT > 0 only."""
@@ -195,8 +210,6 @@ class Estimate:
         names = lambda regions: [n for n, _ in regions]  # noqa: E731
         lower, upper = cell.side("L"), cell.side("H")
         if scheme == "H":
-            if not lower or not upper:
-                return [None, None]
             y_lo = self.yields(ch, cat, names(lower), unc, scale)
             y_hi = self.yields(ch, cat, names(upper), unc, scale)
             u_lo = 0.5 * (min(i[0] for _, i in lower) + max(i[1] for _, i in lower))
@@ -217,8 +230,6 @@ class Estimate:
                     )
             return out
         # V
-        if cell.anti_window is None or not cell.anti_sidebands or not cell.sidebands:
-            return [None, None]
         iso = self.yields(ch, cat, names(lower + upper), unc, scale)
         anti = self.yields(
             ch, cat, names(cell.side("L", True) + cell.side("H", True)), unc, scale
@@ -230,7 +241,8 @@ class Estimate:
             if fi is None or fa is None or fw is None or fa[0] <= 0:
                 out.append(None)
                 continue
-            f = fi[0] / fa[0] * fw[0]
+            # no excess in the isolated sidebands or in the anti-isolated window: no fakes
+            f = fi[0] / fa[0] * fw[0] if fi[0] > 0 and fw[0] > 0 else 0.0
             var = (
                 (fw[0] / fa[0]) ** 2 * fi[1]
                 + (fi[0] * fw[0] / fa[0] ** 2) ** 2 * fa[1]
@@ -261,9 +273,17 @@ class Estimate:
             what = f"Fakes {ctx.era} M{self.mass} {ch} {cat}"
             if tuple(key) not in ctx.key_dirs:
                 continue
+            if not self.available(self.scheme, cell):
+                raise RuntimeError(
+                    f"{what}: scheme {self.scheme} needs regions the cell does not have "
+                    "(the sidebands / SR_SL_Fakeable sub-regions of the flavour)"
+                )
             nominal = self.f_of(self.scheme, cell, ch, cat, "Central", "Central")
             if any(f is None for f in nominal):
-                print(f"{what}: not estimated (scheme {self.scheme} not determined)")
+                if ctx.nominal_pass:
+                    print(
+                        f"{what}: not estimated (scheme {self.scheme} not determined)"
+                    )
                 continue
             for unc, scale in ctx.variations:
                 fs = (
@@ -281,7 +301,11 @@ class Estimate:
                 continue
             tt = ctx.require(self.tt, key)
             f_nom = [f for f, _ in nominal]
-            alt = self.f_of(other, cell, ch, cat, "Central", "Central")
+            alt = (
+                self.f_of(other, cell, ch, cat, "Central", "Central")
+                if self.available(other, cell)
+                else [None, None]
+            )
             for i, part in enumerate(PARTS):
                 sigma = nominal[i][1] ** 0.5
                 delta = (
@@ -315,9 +339,10 @@ def estimate(ctx):
     if not match:
         return {}
     mass = int(match.group(1))
-    if mass not in cfg["split"] or mass not in cfg["scheme"]:
-        raise RuntimeError(f"Fakes: no split or scheme for M{mass}")
+    # the masses of the SL windows only: other binary DNNs (e.g. 1600-2000) have no sub-regions
     cells = _cells(ctx, mass)
     if not cells:
         return {}
+    if mass not in cfg["split"] or mass not in cfg["scheme"]:
+        raise RuntimeError(f"Fakes: no split or scheme for M{mass}")
     return Estimate(ctx, mass).run(cells)

@@ -105,6 +105,25 @@ Invariants a diff must keep:
   so a change of the SL windows does not change the CI.
 - `test/test_hist_booking_config.py` expands the real configuration: keep it passing when a flavour,
   a cuts file or `histograms.yaml` changes.
+- Each sub-region record carries `intervals` (the bin-form intervals of its cut per (category,
+  channel)); `Analysis/SL_fakes.py` reads the DeepHME_mass interval of the SL windows and sidebands
+  from it.
+
+### Single-lepton fakes (`Analysis/SL_fakes.py`, `config/processes.yaml` `Fakes`)
+
+`Fakes` is a FLAF data-driven process (no datasets), estimated in the merge of each
+`TwoStageDNN_M<MX>_binary` from the SL sub-regions (docs/analysis.md, Single-lepton fakes).
+Invariants a diff must keep:
+
+- Data in the isolated window `SR_SL_HMESub_m<MX>` are never read (the estimator asserts it), and the
+  merge prints no data-derived number (no f, yield or ratio): the analysis is blind.
+- Every other variable, flavour and mass without SL sub-regions gets `{}` (no error): the default
+  flavour books binary DNNs up to 2000 GeV, the SL windows end at 1500.
+- Every mass of the SL window file has a `split` (a bin edge of the binary DNN) and a `scheme`; every
+  physics model listing `Fakes` has a `tt_process`. A scheme without its regions in a cell raises;
+  only too little TT (`min_tt`, decided at the nominal) means "not determined".
+- `split`, `scheme` and `min_tt` are physics choices of the analysts, marked provisional: do not
+  propose new values.
 
 ### Integration test
 
@@ -114,7 +133,8 @@ the same `processors:` as the real `TT` / DY / W process **of that era** — tha
 real process's processors and leaves the CI counterpart behind silently removes the coverage.
 
 The process names are also listed in `cms-flaf/FLAF_ci`, a **different repository**; renaming or
-adding one here needs that updated in step.
+adding one here needs that updated in step. `Fakes` (in `TestModel`, no datasets) must **not** go
+there: that list drives per-process dataset jobs.
 
 ### Era corrections
 
@@ -181,9 +201,9 @@ Verified 2026-10-23 (Tests row 2026-10-29); re-check before relying on any of it
 | Layout | `AnaProd/` (`anaTupleDef.py`, `baseline.py`), `Analysis/` (`hh_bbww.py`, `histTupleDef.py`, DeepHME/DNN producers), `Studies/`, `config/`, `include/`, `docs/`, `test/` |
 | Submodules | `FLAF`, `Corrections`, `StatInference`, `inference`, `DeepHME`, `SyncTool` |
 | Eras | Run 3: 2022, 2022EE, 2023, 2023BPix, 2024, 2025, 2026 |
-| Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/` (the cards listed in `global.yaml`'s `StatInference.cards`: `DL/dl_spin{0,2}.yaml`, each including the topic files of `systematics/` (shared with SL), `DL/systematics/` (DL only) and `DL/dl_common.yaml`, listed explicitly; `test/test_datacard_includes.py` checks the lists agree; an SL skeleton in `SL/`, not listed yet; CI: `CI/CI_card_{DL,SL}.yaml` including `systematics/` and `CI/CI_common.yaml`) |
+| Configs | `config/global.yaml`, `config/processes.yaml` (processor anchors, the data-driven `Fakes`), `config/phys_models.yaml`, `config/<era>/{datasets,processes}.yaml`, `config/Datacards/` (the cards listed in `global.yaml`'s `StatInference.cards`: `DL/dl_spin{0,2}.yaml`, each including the topic files of `systematics/` (shared with SL), `DL/systematics/` (DL only) and `DL/dl_common.yaml`, listed explicitly; `test/test_datacard_includes.py` checks the lists agree; an SL skeleton in `SL/`, not listed yet; CI: `CI/CI_card_{DL,SL}.yaml` including `systematics/` and `CI/CI_common.yaml`) |
 | Large files | DNN `.onnx` payloads are tracked with Git LFS; never commit a binary directly |
-| Tests | (2026-11-16) `test/test_hist_booking.py`: the booking plugin on a stand-in setup (cut forms, model points, channels, sidebands, guards); `test/test_hist_booking_config.py`: the plugin on the real configuration (every flavour's sub-regions expand, the SL and CI flavours within the cap, the SL sidebands next to their windows on the grid, at least 50 GeV and missing only beyond [240, 2000] GeV, only the own-mass binary DNN in the SL sub-regions, the CI windows' lower sidebands); `test/test_plot_config.py`: the control-plot configuration, checked through FLAF's plot rules (`FLAF/Common/PlotGroups.py`) in every era, the Run3_22_23 meta-era and both DY models, without ROOT; `test/test_studies_hist_ownership.py` (`needs_root`, so run locally after `source env.sh`): the `Studies/DY_fit` and `Studies/ModelValidation` functions free the histograms they read, clone, rebin or project. A `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker, and a ROOT stand-in is withdrawn after the import it serves (FLAF's `docs/contributing.md`, Unit tests). Otherwise validation is the integration test and physics checks; the framework's suites live in `FLAF/test/` |
+| Tests | (2026-11-18) `test/test_hist_booking.py`: the booking plugin on a stand-in setup (cut forms, model points, channels, sidebands, guards); `test/test_hist_booking_config.py`: the plugin on the real configuration (every flavour's sub-regions expand, the SL and CI flavours within the cap, the SL sidebands next to their windows on the grid, at least 50 GeV and missing only beyond [240, 2000] GeV, only the own-mass binary DNN in the SL sub-regions, the CI windows' lower sidebands, the records' `intervals`, the SL fake cells); `test/test_sl_fakes.py` (`needs_root`): the SL fake estimator on synthetic merged histograms through FLAF's `EstimateContext`; `test/test_plot_config.py`: the control-plot configuration, checked through FLAF's plot rules (`FLAF/Common/PlotGroups.py`) in every era, the Run3_22_23 meta-era and both DY models, without ROOT; `test/test_studies_hist_ownership.py` (`needs_root`, so run locally after `source env.sh`): the `Studies/DY_fit` and `Studies/ModelValidation` functions free the histograms they read, clone, rebin or project. A `test/test_*.py` added here runs in `unit-tests` without a workflow change (FLAF's reusable workflow, against the pinned FLAF); a test that needs ROOT, CVMFS or a grid proxy carries the `needs_root`/`needs_cvmfs`/`needs_proxy` marker, and a ROOT stand-in is withdrawn after the import it serves (FLAF's `docs/contributing.md`, Unit tests). Otherwise validation is the integration test and physics checks; the framework's suites live in `FLAF/test/` |
 | Workflows | `formatting-check`, `unit-tests` (FLAF's, over `test/` with the pinned FLAF, `test/test_plot_config.py` included), `repo-sanity-checks` (FLAF's sanity checks and FLAF's `run_tools/check_era_rename.py` for leftovers of the `period` → `era` rename), `test-setup-loading`, `test-era-dimension` (FLAF's `test/test_era_dimension.py` over the seven Run 3 eras: every stage built over all eras at once and taken through what the scheduler does before anything runs, and the settings that must agree between eras), `deploy-docs`, `trigger-flaf-integration`. Formatting, era loading, the multi-era construction and the control-plot configuration are checked automatically — do not comment on them |
 | Integration test | Triggered by `@cms-flaf-bot please test`; its configuration lives in `cms-flaf/FLAF_ci`, **not** in this repo. There is no `.github/integration_cfg.yaml` here |
 | Docs | `docs/`, plus the shared framework docs in `FLAF/docs/` |
