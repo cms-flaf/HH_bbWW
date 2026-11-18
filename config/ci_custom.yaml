@@ -7,7 +7,7 @@ compute_unc_histograms: true
 store_noncentral: true
 phys_model: TestModel
 # The trimmed variable set in global.yaml; `default` runs the CI pod out of memory. Its regions
-# (OS_Iso and SR_SL) are the flavour's.
+# (OS_Iso, SR_SL and SR_SL_Fakeable) are the flavour's.
 histTuple_flavor: CI
 
 StatInference:
