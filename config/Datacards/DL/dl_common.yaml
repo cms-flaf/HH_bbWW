@@ -50,24 +50,16 @@ preprocess:
   args:
     - --binning-config
     - config/Datacards/DL/binning_eqsig_DL_v2610.yaml
-    - --jobs
-    - "8"
+    # one mass per PreprocessShapesTask branch (${MX} = the branch's mass)
+    - --masses
+    - ${MX}
 
+# data_obs, TT and ST are in ../common.yaml (shared with SL). The others are made by the
+# preprocess step as sums of merged-histogram processes, `preprocess: members` (a member lacking
+# a variation enters at its nominal); `drop`: members left out of those card categories. Low-mass
+# DY alone has too few, too heavy events to pass the gates. The binning already keeps them free
+# of negative bins; the tolerances are a safety net.
 processes:
-  - process: data_obs
-    is_data: true
-    is_asimov_data: true
-
-  # Made by the preprocess step as sums of merged-histogram processes, `preprocess: members` (a
-  # member lacking a variation enters at its nominal); `drop`: members left out of those card
-  # categories. ttV and low-mass DY alone have too few, too heavy events to pass the gates. The
-  # binning already keeps them free of negative bins; the tolerances are a safety net.
-  - process: TT
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
-    preprocess:
-      members: [ TT, ttV ]
-
   # in all three channels: in eMu (DY->tautau) it is not negligible where the signal is
   - process: DY
     allow_negative_bins_within_error: true
@@ -100,10 +92,6 @@ processes:
         process: DY_M_10to50
         transfer: DY_M_50
         reference: recovery
-
-  - process: ST
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
 
   - process: Minor
     allow_negative_bins_within_error: true

@@ -52,5 +52,29 @@ impact_plots:
       # one fit per nuisance: `robust` (one Hessian) silently drops parameters it cannot invert
       method: default
       order_by_impact: true
+      # a nuisance with no effect on r (e.g. CMS_eff_m_id_2022, +-0.03%, at MX 600) leaves its +-1 sigma
+      # fits at r_nominal, which dhi counts as a failed fit and refuses to merge; keep the rest. The
+      # task still warns, by name, about every card nuisance missing from the plot.
+      keep_failures: true
       # with mc_stats, also set parameters_per_page (~460 parameters)
       mc_stats: false
+
+# The processes DL and SL define alike; each card adds its own (DL: DY, Minor; SL: W, DY, Minor).
+processes:
+  - process: data_obs
+    is_data: true
+    is_asimov_data: true
+
+  # Made by the preprocess step as sums of merged-histogram processes, `preprocess: members` (a
+  # member lacking a variation enters at its nominal). ttV alone has too few, too heavy events to
+  # pass the gates. The binning already keeps the backgrounds free of negative bins; the
+  # tolerances are a safety net.
+  - process: TT
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    preprocess:
+      members: [ TT, ttV ]
+
+  - process: ST
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2

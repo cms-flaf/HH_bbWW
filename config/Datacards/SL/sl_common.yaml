@@ -50,28 +50,16 @@ preprocess:
   args:
     - --binning-config
     - config/Datacards/SL/binning_eqsig_SL_v2610.yaml
-    - --jobs
-    - "8"
+    # one mass per PreprocessShapesTask branch (${MX} = the branch's mass), as for DL
+    - --masses
+    - ${MX}
 
+# SR window background (4 eras, MX 300 -> 800): TT 77-91 % -> 52-80 %, W 2-11 % -> 9-35 %,
+# ST 6-10 %, DY 0.4-4 %, VV + VVV + ttV + H 1-2 %. Merged as in DL where the processes are the
+# same (TT with ttV; Minor), with W a background of its own (in DL it is in Minor). data_obs, TT
+# and ST are in ../common.yaml (shared with DL).
 processes:
-  - process: data_obs
-    is_data: true
-    is_asimov_data: true
-
-  # SR window background (4 eras, MX 300 -> 800): TT 77-91 % -> 52-80 %, W 2-11 % -> 9-35 %,
-  # ST 6-10 %, DY 0.4-4 %, VV + VVV + ttV + H 1-2 %. Merged as in DL where the processes are the
-  # same (TT with ttV; Minor), with W a background of its own (in DL it is in Minor).
-  - process: TT
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
-    preprocess:
-      members: [ TT, ttV ]
-
   - process: W
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
-
-  - process: ST
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
 

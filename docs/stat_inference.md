@@ -68,7 +68,8 @@ The cards are built from shared files, each card listing the ones it uses under 
 ```
 config/Datacards/
   common.yaml               the settings of every card: eras, era groups, the lnN thresholds,
-                            autoMCStats, the campaigns and the impact plots
+                            autoMCStats, the campaigns, the impact plots, and the processes
+                            DL and SL define alike (data_obs, TT, ST)
   signals/spin{0,2}.yaml    the signals of one spin (2L, 1L, bbtautau), with their BR and their
                             QCD-scale / PDF shape uncertainties, shared by the DL and SL cards
   systematics/              the uncertainties shared by DL, SL and the CI cards, one file per topic:
@@ -339,14 +340,14 @@ preprocess:
   args:
     - --binning-config
     - config/Datacards/DL/binning_eqsig_DL_v2610.yaml
-    - --jobs
-    - 8
+    - --masses
+    - ${MX}
 ```
 
-`--jobs` bins that many masses in parallel, one process each. On HTCondor, give
-`PreprocessShapesTask` as many CPUs (`--PreprocessShapesTask-n-cpus 8`, or through `LAW__`).
-The task stages every mass's inputs (~50 GB for 25 masses), so a local run needs
-`LAW_TARGET_TMP_DIR` on a large disk rather than the shared `/tmp`.
+`PreprocessShapesTask` has one branch per card, era and mass, and a branch stages only the inputs
+of its own mass (~0.65 GB); `${MX}` is replaced by the branch's mass, so `--masses ${MX}` restricts
+the script to it. The branches are independent jobs (`--workflow htcondor`: 50 jobs for the two DL
+cards). Without `--masses` the script would bin every mass of the card from the inputs of one.
 
 #### What is configured where
 
