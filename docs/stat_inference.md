@@ -434,8 +434,8 @@ Hints:
 
 Declared in the datacard configuration's `impact_plots` block and drawn by
 `PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`
-on `fs_default`
-beside the limit plots:
+on `fs_StatInference` (`fs_default` unless set; see FLAF's
+[Storage](https://cms-flaf.github.io/FLAF/concepts/storage/)) beside the limit plots:
 
 ```sh
 law run PlotPullsAndImpactsTask \
