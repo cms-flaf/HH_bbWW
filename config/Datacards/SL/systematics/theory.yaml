@@ -1,7 +1,7 @@
 # SL process theory: QCD scale, PDF+alpha_s, top mass; QCD-scale / PDF shapes per process.
 # The same numbers and nuisance names as DL/systematics/theory.yaml (so the two channels are
 # correlated in a combination), written for the SL backgrounds: W is a background of its own and
-# DY is not mass-split. Keep the two files in step when a number changes.
+# DY is mass-split as in DL (DY_M_10to50 + DY_M_50), with DL's DY names. Keep the two files in step when a number changes.
 uncertainties:
   - name: QCD_scale_ST
     type: lnN
@@ -26,13 +26,12 @@ uncertainties:
 
   # DY NNLO QCD + NLO EW, 2094.2 x 3 pb, +0.7 -1.1 %:
   # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
-  # DL applies it to DY_M_50 only; here DY is not split, so it moves the whole of DY (m_ll < 50
-  # included, which DL gives a 30 % prior of its own).
+  # DY_M_50 only, as in DL (DY_M_10to50 has its PDF+alpha_s and its QCD-scale / PDF shapes below)
   - name: QCD_scale_DY
     type: shape
     processes: [ DY ]
     preprocess:
-      member_values: { DY: [ -0.011, 0.007 ] }
+      member_values: { DY_M_50: [ -0.011, 0.007 ] }
   # ttV (ttZ + ttW): there is no LHC Top WG 13.6 TeV recommendation yet. +-12 % covers the NLO QCD
   # scale uncertainty of both ttZ and ttW; replace with the official numbers once they exist.
   - name: QCD_scale_ttV
@@ -57,7 +56,8 @@ uncertainties:
         TT: 0.025
         ttV: 0.03
         ST: 0.027
-        DY: 0.01
+        DY_M_10to50: 0.01
+        DY_M_50: 0.01
         H: 0.035
 
   # QCD scale and PDF shapes, one nuisance each per merged-histogram process, as in DL (see
@@ -94,12 +94,20 @@ uncertainties:
     type: shape
     processes: [ W ]
     members: *pdf_hessian_alphas
-  # unsplit DY: its own names (DL has QCDscale_shape_DY_M_50 and _DY_M_10to50)
-  - name: QCDscale_shape_DY
+  # DY: the DL names, so the DL and SL DY theory uncertainties are correlated
+  - name: QCDscale_shape_DY_M_50
     type: shape
     processes: [ DY ]
     members: *qcd_scale_7point
-  - name: pdf_shape_DY
+  - name: pdf_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_10to50
     type: shape
     processes: [ DY ]
     members: *pdf_hessian_alphas

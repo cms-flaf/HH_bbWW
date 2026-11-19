@@ -142,18 +142,18 @@ class SLCards(unittest.TestCase):
                 "TT": ["TT", "ttV"],
                 "W": ["W"],
                 "ST": ["ST"],
-                "DY": ["DY"],
+                "DY": ["DY_M_10to50", "DY_M_50"],
                 "Minor": ["VV", "VVV", "H"],
             },
         )
         # DY: a trace in the TT CR whose heavy events break the gates there
-        self.assertEqual(m.dropped_in("TT_boosted"), {"DY"})
+        self.assertEqual(m.dropped_in("TT_boosted"), {"DY_M_10to50", "DY_M_50"})
         self.assertEqual(m.dropped_in("W_recovery"), set())
         self.assertEqual(m.dropped_in("SR_res2b"), set())
         # the DL numbers, with the SL process names
         self.assertEqual(m.member_uncs["QCD_scale_TT"], [("TT", (-0.036, 0.025))])
-        self.assertEqual(m.member_uncs["QCD_scale_DY"], [("DY", (-0.011, 0.007))])
-        self.assertEqual(len(m.member_uncs["PDF_alphas"]), 5)
+        self.assertEqual(m.member_uncs["QCD_scale_DY"], [("DY_M_50", (-0.011, 0.007))])
+        self.assertEqual(len(m.member_uncs["PDF_alphas"]), 6)
         # no DY template, low-mass estimate or CR tilt (yet)
         self.assertEqual(m.templates, {})
         self.assertIsNone(m.lowmass)

@@ -32,7 +32,7 @@ limit_plots:
       y_log: true
       x_min: 200
       x_max: 1500
-      y_min: 0.001
+      y_min: 0.01
       y_max: 1000  # the SL limit peaks at ~10 pb: below the legend at 1000, faded under it at 100
 
   - name: spin0_channels

@@ -91,10 +91,10 @@ config/Datacards/
                             dl_common.yaml and the signals of their spin; add the limit plots
   SL/systematics/           the SL-only uncertainties:
     theory.yaml               DL's process theory numbers and names, for the SL backgrounds
-                              (W on its own, DY not mass-split); keep the two in step
+                              (W on its own; DY split as in DL); keep the two in step
     normalisations.yaml       TT / W+jets control-region normalisations, DY, Minor members
   SL/sl_common.yaml         as dl_common.yaml for SL: SR and the TT / W+jets CRs in the HME
-                            windows, TwoStageDNN_M<MX>_binary inputs (Run3_Model)
+                            windows, TwoStageDNN_M<MX>_binary inputs (Run3_Model_DYSplit)
   SL/binning_eqsig_SL_v2610.yaml  the SL binning only
   SL/sl_spin{0,2}.yaml      as the DL spin cards, with SL/; not in `cards:` yet (no fake
                             background in the inputs: expected limits only)
