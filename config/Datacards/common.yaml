@@ -56,8 +56,13 @@ impact_plots:
       # fits at r_nominal, which dhi counts as a failed fit and refuses to merge; keep the rest. The
       # task still warns, by name, about every card nuisance missing from the plot.
       keep_failures: true
-      # with mc_stats, also set parameters_per_page (~460 parameters)
-      mc_stats: false
+      # the bin-by-bin MC-statistics nuisances (autoMCStats) too: ~230 parameters per SL point, ~460 per DL
+      # point, so 40 per page; the left margin and pad width fit the longest names (the per-bin
+      # prop_bin<card bin>_bin<N> and CMS_bbww_dy_fit_* ones)
+      mc_stats: true
+      parameters_per_page: 40
+      left_margin: 900
+      pad_width: 1700
 
 # The processes DL and SL define alike; each card adds its own (DL: DY, Minor; SL: W, DY, Minor).
 processes:

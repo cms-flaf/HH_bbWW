@@ -473,7 +473,11 @@ impact_plots:
     plot_params:
       method: default
       order_by_impact: true
-      mc_stats: false
+      keep_failures: true
+      mc_stats: true
+      parameters_per_page: 40
+      left_margin: 900
+      pad_width: 1700
 ```
 
 `poi_value` is the signal strength the Asimov dataset is built at, and it has to be near
@@ -542,4 +546,5 @@ and `C2V`, against a workspace other than the one the chain built.
     The combined cards carry a few hundred `autoMCStats` bins, so `mc_stats: true` puts
     ~460 parameters on the plot. `parameters_per_page` defaults to `-1`, meaning a single
     page, and the result is an unreadable hairline strip rather than an error — so the
-    task refuses the combination. Set `parameters_per_page: 25` alongside it.
+    task refuses the combination. The shared default (`common.yaml`) sets `parameters_per_page: 40`
+    alongside it, with `left_margin: 900` and `pad_width: 1700` so the long per-bin names fit.
