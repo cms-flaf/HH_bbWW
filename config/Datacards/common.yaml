@@ -56,13 +56,18 @@ impact_plots:
       # fits at r_nominal, which dhi counts as a failed fit and refuses to merge; keep the rest. The
       # task still warns, by name, about every card nuisance missing from the plot.
       keep_failures: true
-      # the bin-by-bin MC-statistics nuisances (autoMCStats) too: ~230 parameters per SL point, ~460 per DL
-      # point, so 40 per page; the left margin and pad width fit the longest names (the per-bin
-      # prop_bin<card bin>_bin<N> and CMS_bbww_dy_fit_* ones)
+      # the bin-by-bin MC-statistics nuisances (autoMCStats) too: ~230 parameters per SL point, ~400 per DL
+      # point. AN layout (frozen 2026-11-19, as the DL and SL impact figures of the AN): 50 per page,
+      # canvas 1580 px, label margin 590 px, row height 30 px, label size 22, the MC-stat names shortened
+      # for display (impact_labels.py; the longest remaining label, 44 characters, fits). The AN figures
+      # are also cropped to the drawn area, which dhi cannot do (a step after the plot).
       mc_stats: true
-      parameters_per_page: 40
-      left_margin: 900
-      pad_width: 1700
+      parameters_per_page: 50
+      pad_width: 1580
+      left_margin: 590
+      entry_height: 30
+      label_size: 22
+      labels: config/Datacards/impact_labels.py
 
 # The processes DL and SL define alike; each card adds its own (DL: DY, Minor; SL: W, DY, Minor).
 processes:

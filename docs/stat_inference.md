@@ -475,9 +475,12 @@ impact_plots:
       order_by_impact: true
       keep_failures: true
       mc_stats: true
-      parameters_per_page: 40
-      left_margin: 900
-      pad_width: 1700
+      parameters_per_page: 50
+      pad_width: 1580
+      left_margin: 590
+      entry_height: 30
+      label_size: 22
+      labels: config/Datacards/impact_labels.py
 ```
 
 `poi_value` is the signal strength the Asimov dataset is built at, and it has to be near
@@ -546,5 +549,8 @@ and `C2V`, against a workspace other than the one the chain built.
     The combined cards carry a few hundred `autoMCStats` bins, so `mc_stats: true` puts
     ~460 parameters on the plot. `parameters_per_page` defaults to `-1`, meaning a single
     page, and the result is an unreadable hairline strip rather than an error — so the
-    task refuses the combination. The shared default (`common.yaml`) sets `parameters_per_page: 40`
-    alongside it, with `left_margin: 900` and `pad_width: 1700` so the long per-bin names fit.
+    task refuses the combination. The shared default (`common.yaml`) is the AN layout, frozen on
+    2026-11-19: 50 per page, canvas 1580 px, label margin 590 px, row height 30 px, label size 22, and
+    the MC-stat names shortened for display by `config/Datacards/impact_labels.py`
+    (`prop_binRun3_22_23_hh_bbww_<...>` -> `prop_bin_<...>`). The AN figures are also cropped to the
+    drawn area afterwards, which dhi does not do.
