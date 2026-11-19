@@ -85,6 +85,9 @@ impact_plots:
     poi_value: limit
     fit_args:
       - --cminFallbackAlgo Minuit2,Simplex,0:0.1
+      # tighter than combine's default (tolerance 0.1), as for DL: small impacts otherwise lose their +-1 sigma
+      # crossings (failed fits) and the rest carry a few % of numerical noise. ~1.5-2x the fit time.
+      - --cminDefaultMinimizerStrategy 1 --cminDefaultMinimizerTolerance 0.01 --setRobustFitTolerance 0.01
     plot_params:
       method: default
       order_by_impact: true
