@@ -100,7 +100,9 @@ def GetWeight(
 
     for lep_index in [1, 2]:
         if "ele" in weights_this_process:
-            weights_to_apply.append(f"{GetEleWeight(lep_index)}")
+            weights_to_apply.append(
+                GetEleWeight(lep_index, with_reco="eleReco" in weights_this_process)
+            )
         if "mu" in weights_this_process:
             weights_to_apply.append(f"{GetMuWeight(lep_index)}")
     if "trigger" in weights_this_process:
@@ -142,8 +144,12 @@ def GetDYbbwwReweight():
     return DY_bbww_weight
 
 
-def GetEleWeight(lep_index):
-    weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral : 1.0)"
+def GetEleWeight(lep_index, with_reco=False):
+    sf = f"weight_lep{lep_index}_EleSF_wp80iso_EleIDCentral"
+    if with_reco:
+        # EGM reconstruction-efficiency SF (Reco* working point chosen by pT in Corrections)
+        sf += f" * weight_lep{lep_index}_EleSF_Reco_EleRecoCentral"
+    weight_Ele = f"(lep{lep_index}_legType == static_cast<int>(Leg::e) ? {sf} : 1.0)"
     return weight_Ele
 
 

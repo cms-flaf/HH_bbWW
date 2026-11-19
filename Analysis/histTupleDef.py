@@ -103,6 +103,9 @@ def DefineWeightForHistograms(
     )
     if btag_mode not in ("shape", "shape_and_norm", "wp"):
         weights_this_process.discard("btag")
+    # the electron reconstruction SF branches exist only where ele.reco_sf is set
+    if corrections.to_apply.get("ele", {}).get("reco_sf", False):
+        weights_this_process.add("eleReco")
 
     total_weight_expression = (
         analysis.GetWeight(

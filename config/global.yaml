@@ -108,7 +108,8 @@ corrections: &corrections_default
   trigger:
     stages: [ HistTuple, AnalysisCache ]
     mode: SF
-  ele: { stages: [ HistTuple, AnalysisCache ] }
+  # reco_sf: EGM electron reconstruction SFs (Reco* WPs of Electron-ID-SF), uncertainty EleReco
+  ele: { stages: [ HistTuple, AnalysisCache ], reco_sf: true }
   fatjet:
     stages: [ HistTuple, AnalysisCache ] # AnaTuple
     ana: bbWW
