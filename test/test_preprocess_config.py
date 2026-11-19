@@ -92,8 +92,14 @@ class DLCards(unittest.TestCase):
                 "Minor": ["VV", "VVV", "H", "W"],
             },
         )
+        # no boosted control regions: the boosted category is fitted in the SR only
+        categories = card()["categories"]
+        self.assertIn("SR_boosted", categories)
+        self.assertNotIn("TT_boosted", categories)
+        self.assertNotIn("DY_boosted", categories)
         self.assertEqual(m.dropped_in("SR_res2b"), {"W"})
-        self.assertEqual(m.dropped_in("TT_boosted"), {"W", "DY_M_10to50"})
+        self.assertEqual(m.dropped_in("TT_res2b"), {"W", "DY_M_10to50"})
+        self.assertEqual(m.dropped_in("TT_recovery"), {"DY_M_10to50"})
         self.assertEqual(m.dropped_in("SR_recovery"), set())
         self.assertEqual(m.member_uncs["QCD_scale_TT"], [("TT", (-0.036, 0.025))])
         self.assertEqual(m.member_uncs["QCD_scale_ttV"], [("ttV", (-0.12, 0.12))])
@@ -102,7 +108,8 @@ class DLCards(unittest.TestCase):
             m.tilts("eE", "DY_res2b"), [("CMS_bbww_dycr_shape_res2b", "DY", 0.04)]
         )
         self.assertEqual(
-            m.tilts("muMu", "TT_boosted"), [("CMS_bbww_ttcr_shape_boosted", "TT", 0.02)]
+            m.tilts("muMu", "TT_recovery"),
+            [("CMS_bbww_ttcr_shape_recovery", "TT", 0.02)],
         )
         self.assertEqual(m.tilts("eE", "SR_res2b"), [])
         self.assertEqual(len(m.templates), 7)
