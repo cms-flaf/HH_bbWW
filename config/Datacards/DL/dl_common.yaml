@@ -36,20 +36,16 @@ categories:
   - SR_boosted
   - SR_recovery
   - TT_res2b
-  - TT_boosted
   - TT_recovery
   - DY_res2b
-  - DY_boosted
   - DY_recovery
 input_categories:
   SR_res2b: SR_HMESub_m${MX}/res2b
   SR_boosted: SR_HMESub_m${MX}/boosted
   SR_recovery: SR_HMESub_m${MX}/recovery
   TT_res2b: TT_CR_HMESub_m${MX}/res2b
-  TT_boosted: TT_CR_HMESub_m${MX}/boosted
   TT_recovery: TT_CR_HMESub_m${MX}/recovery
   DY_res2b: DY_CR_HMESub_m${MX}/res2b
-  DY_boosted: DY_CR_HMESub_m${MX}/boosted
   DY_recovery: DY_CR_HMESub_m${MX}/recovery
 
 # Merges the backgrounds, bins the DNN score of each sub-region and carries the QCD-scale / PDF
@@ -95,7 +91,7 @@ processes:
       # its MC out of DY; SR_boosted is not listed, as the earlier `SR/boosted` never matched
       # the sub-region inputs (known issue, to be fixed separately).
       drop:
-        DY_M_10to50: [ TT_res2b, TT_boosted, TT_recovery, DY_res2b, DY_boosted, DY_recovery ]
+        DY_M_10to50: [ TT_res2b, TT_recovery, DY_res2b, DY_recovery ]
       # Smooth DY templates (Analysis/DYTemplate.py, exp(polynomial) fits in effective counts) in
       # place of the DY MC where it is a few heavy, partly negative weights; where, and how (tail
       # or fit_only), is set by their nuisances (systematics/dy_template.yaml). tail: raw MC below
@@ -130,7 +126,7 @@ processes:
       members: [ VV, VVV, H, W ]
       # W is ~0 there and its heavy events break the gates (kept in recovery)
       drop:
-        W: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+        W: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted ]
 
 # The uncertainties are in ../systematics/ (shared with SL) and systematics/ (DL only).
 
