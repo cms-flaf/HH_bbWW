@@ -34,8 +34,8 @@ limit_plots:
       xsec: pb
       y_log: true
       x_min: 200
-      x_max: 1500
-      y_min: 0.001
+      x_max: 1600
+      y_min: 0.002
       y_max: 100
 
   - name: spin2_channels
