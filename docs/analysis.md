@@ -305,9 +305,11 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
 - **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
-  threshold per mass (`blind_ranges`), the score range holding the upper half of the signal in the SL
-  datacards' equal-signal binning (the upper 10 of the 20 targeted bins), the lowest such edge over
-  both spins, channels and categories. FLAF applies `blind_ranges` in every region, control regions
+  threshold per mass (`blind_ranges`), from the SR binning of the SL datacards (20 bins of equal signal
+  targeted): in each spin, channel and category the lower edge of the upper 10 final bins, or of the
+  bins holding the upper half of the signal where fewer than 10 bins are left, whichever is lower; the
+  lowest such edge over both spins, channels and categories (the whole axis at 260, 280, 360 and
+  800 GeV, where a cell has exactly 10 bins). FLAF applies `blind_ranges` in every region, control regions
   included; the binary DNNs of other masses stay blinded whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their

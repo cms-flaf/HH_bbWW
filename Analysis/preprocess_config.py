@@ -14,6 +14,7 @@ Two inputs, with no overlap:
         drop: { <member>: [ <card category>, ... ] }   # members left out there
         dy_template: { share_by, fit, guard_sigma, pool }  # settings of the DY templates
         lowmass_dy: { process, transfer, reference }       # settings of the low-mass estimate
+        gates: false                                       # binned, but not in the binning gates
   - a `type: shape` uncertainty entry, exactly one of:
       preprocess: { member_values: { <member>: v or [ down, up ], ... } }
       preprocess: { cr_tilt: <size> }

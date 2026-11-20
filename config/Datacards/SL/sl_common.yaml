@@ -27,7 +27,7 @@ input_categories:
   SR_recovery: SR_SL_HMESub_m${MX}/recovery
 
 # The DL preprocess step (see dl_common.yaml): merges the backgrounds, bins the DNN score of each
-# sub-region (SR: equal signal; CRs: equal background) and carries the QCD-scale / PDF members to
+# SR window into bins of equal signal and carries the QCD-scale / PDF members to
 # the final bins. The binning configuration holds the binning only; to reuse saved edges, replace
 # it by --edges <a binning.json of this step>.
 preprocess:
@@ -64,8 +64,6 @@ processes:
     preprocess:
       members: [ VV, VVV, H ]
 
-# The uncertainties are in ../systematics/ (shared with DL) and systematics/ (SL only).
-
   # The data-driven fake-lepton background (config/processes.yaml Fakes, estimated by HistMergerTask in the
   # SR windows; zero templates in a cell without an estimate) with its four nuisance families
   # (systematics/fakes.yaml). It takes no part in the binning gates: its parts can be empty (f <= 0) and
@@ -76,3 +74,5 @@ processes:
     allow_zero_integral: true
     preprocess:
       gates: false
+
+# The uncertainties are in ../systematics/ (shared with DL) and systematics/ (SL only).

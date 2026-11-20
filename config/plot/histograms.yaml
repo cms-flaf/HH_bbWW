@@ -2513,11 +2513,13 @@ DNN_m1500_vs_HME:
 
 # Two-stage DNN binary: the raw signal-node logit (config/global.yaml binary_output save_as: logit),
 # not bounded: scores outside [-23.5, 23.5] are in the flows
-# Blinding of the 25 binary DNNs with SL windows: data hidden above a threshold per mass, the score
-# range that holds the upper half of the signal in the SR equal-signal binning of the SL datacards
-# (config/Datacards/SL, binning_eqsig_SL_v2610.yaml: 20 bins of equal signal targeted, the upper 10
-# hidden), the lowest such edge over both spins, both channels and the three categories, from the
-# binning of the v2610_sl_v3 SR cards (2026-11-20). FLAF applies blind_ranges in every region.
+# Blinding of the 25 binary DNNs with SL windows (user, 2026-11-20: "blind the last 10 dnn bins"): data
+# hidden above a threshold per mass, from the SR binning of the SL datacards (config/Datacards/SL,
+# binning_eqsig_SL_v2610.yaml, 20 bins of equal signal targeted): in each spin, channel and category, the
+# lower edge of the upper 10 final bins, or of the bins holding the upper half of the signal where the
+# gates left fewer than 10 bins, whichever is lower; the lowest such edge over both spins, channels and
+# categories (a cell with exactly 10 bins hides the whole axis: 260, 280, 360, 800 GeV). From the binning
+# of the v2610_sl_v3 SR cards (2026-11-20). FLAF applies blind_ranges in every region.
 TwoStageDNN_M250_binary:
   signal_params: { mass: 250 }
   x_bins: "94|-23.5:23.5"
@@ -2534,7 +2536,7 @@ TwoStageDNN_M260_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -5.5, 23.5 ]
+  blind_ranges: [ -23.5, 23.5 ]
 
 TwoStageDNN_M270_binary:
   signal_params: { mass: 270 }
@@ -2552,7 +2554,7 @@ TwoStageDNN_M280_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -5.0, 23.5 ]
+  blind_ranges: [ -23.5, 23.5 ]
 
 TwoStageDNN_M300_binary:
   signal_params: { mass: 300 }
@@ -2561,7 +2563,7 @@ TwoStageDNN_M300_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -4.0, 23.5 ]
+  blind_ranges: [ -6.5, 23.5 ]
 
 TwoStageDNN_M320_binary:
   signal_params: { mass: 320 }
@@ -2570,7 +2572,7 @@ TwoStageDNN_M320_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -2.0, 23.5 ]
+  blind_ranges: [ -5.5, 23.5 ]
 
 TwoStageDNN_M350_binary:
   signal_params: { mass: 350 }
@@ -2579,7 +2581,7 @@ TwoStageDNN_M350_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges: [ -5.5, 23.5 ]
 
 TwoStageDNN_M360_binary:
   signal_params: { mass: 360 }
@@ -2588,7 +2590,7 @@ TwoStageDNN_M360_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges: [ -23.5, 23.5 ]
 
 TwoStageDNN_M400_binary:
   signal_params: { mass: 400 }
@@ -2597,7 +2599,7 @@ TwoStageDNN_M400_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges: [ -5.5, 23.5 ]
 
 TwoStageDNN_M450_binary:
   signal_params: { mass: 450 }
@@ -2606,7 +2608,7 @@ TwoStageDNN_M450_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.0, 23.5 ]
+  blind_ranges: [ -4.5, 23.5 ]
 
 TwoStageDNN_M500_binary:
   signal_params: { mass: 500 }
@@ -2615,7 +2617,7 @@ TwoStageDNN_M500_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -0.5, 23.5 ]
+  blind_ranges: [ -3.5, 23.5 ]
 
 TwoStageDNN_M550_binary:
   signal_params: { mass: 550 }
@@ -2624,7 +2626,7 @@ TwoStageDNN_M550_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -0.5, 23.5 ]
+  blind_ranges: [ -3.0, 23.5 ]
 
 TwoStageDNN_M600_binary:
   signal_params: { mass: 600 }
@@ -2633,7 +2635,7 @@ TwoStageDNN_M600_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges: [ -3.0, 23.5 ]
 
 TwoStageDNN_M650_binary:
   signal_params: { mass: 650 }
@@ -2642,7 +2644,7 @@ TwoStageDNN_M650_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges: [ -4.0, 23.5 ]
 
 TwoStageDNN_M700_binary:
   signal_params: { mass: 700 }
@@ -2651,7 +2653,7 @@ TwoStageDNN_M700_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges: [ -2.0, 23.5 ]
 
 TwoStageDNN_M750_binary:
   signal_params: { mass: 750 }
@@ -2660,7 +2662,7 @@ TwoStageDNN_M750_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges: [ -3.0, 23.5 ]
 
 TwoStageDNN_M800_binary:
   signal_params: { mass: 800 }
@@ -2669,7 +2671,7 @@ TwoStageDNN_M800_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges: [ -23.5, 23.5 ]
 
 TwoStageDNN_M850_binary:
   signal_params: { mass: 850 }
@@ -2678,7 +2680,7 @@ TwoStageDNN_M850_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges: [ -3.0, 23.5 ]
 
 TwoStageDNN_M900_binary:
   signal_params: { mass: 900 }
@@ -2687,7 +2689,7 @@ TwoStageDNN_M900_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.0, 23.5 ]
+  blind_ranges: [ -6.0, 23.5 ]
 
 TwoStageDNN_M1000_binary:
   signal_params: { mass: 1000 }
@@ -2696,7 +2698,7 @@ TwoStageDNN_M1000_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.0, 23.5 ]
+  blind_ranges: [ -2.5, 23.5 ]
 
 TwoStageDNN_M1100_binary:
   signal_params: { mass: 1100 }
@@ -2705,7 +2707,7 @@ TwoStageDNN_M1100_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.5, 23.5 ]
+  blind_ranges: [ -1.5, 23.5 ]
 
 TwoStageDNN_M1200_binary:
   signal_params: { mass: 1200 }
@@ -2714,7 +2716,7 @@ TwoStageDNN_M1200_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.5, 23.5 ]
+  blind_ranges: [ -1.0, 23.5 ]
 
 TwoStageDNN_M1300_binary:
   signal_params: { mass: 1300 }
@@ -2723,7 +2725,7 @@ TwoStageDNN_M1300_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.0, 23.5 ]
+  blind_ranges: [ -1.5, 23.5 ]
 
 TwoStageDNN_M1400_binary:
   signal_params: { mass: 1400 }
@@ -2732,7 +2734,7 @@ TwoStageDNN_M1400_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.0, 23.5 ]
+  blind_ranges: [ -2.0, 23.5 ]
 
 TwoStageDNN_M1500_binary:
   signal_params: { mass: 1500 }
@@ -2741,7 +2743,7 @@ TwoStageDNN_M1500_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.5, 23.5 ]
+  blind_ranges: [ -1.5, 23.5 ]
 
 TwoStageDNN_M1600_binary:
   signal_params: { mass: 1600 }

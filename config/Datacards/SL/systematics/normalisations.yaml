@@ -1,4 +1,4 @@
-# SL normalisations: TT and W+jets from the control regions, DY, Minor members.
+# SL normalisations: TT and W+jets priors per jet category (no control region in the fit), DY, Minor members.
 uncertainties:
   # The members of Minor, as shapes of Minor moving only that member (`preprocess: member_values`,
   # as in theory.yaml). The same names and values as DL/systematics/normalisations.yaml (they are
