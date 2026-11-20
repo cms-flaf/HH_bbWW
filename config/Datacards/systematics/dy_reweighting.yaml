@@ -1,4 +1,4 @@
-# DL: the DY reweighting (hh2bbtautau derivation).
+# The DY reweighting (hh2bbtautau derivation), on DY in every card (shared by all cards).
 uncertainties:
   # DY only; fit statistics decorrelated by era, the two fit-model variations correlated.
   - name: CMS_bbww_dy_stat_btag0_2022

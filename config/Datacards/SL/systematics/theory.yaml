@@ -1,0 +1,147 @@
+# SL process theory: QCD scale, PDF+alpha_s, top mass; QCD-scale / PDF shapes per process.
+# The same numbers and nuisance names as DL/systematics/theory.yaml (so the two channels are
+# correlated in a combination), written for the SL backgrounds: W is a background of its own and
+# DY is mass-split as in DL (DY_M_10to50 + DY_M_50), with DL's DY names. Keep the two files in step when a number changes.
+uncertainties:
+  - name: QCD_scale_ST
+    type: lnN
+    processes:
+      - ST
+    value: [ -0.022, +0.022 ]
+    # Taken from ST to tW (largest uncertainty on XS) needs to be updated for each decay process later
+
+  # Members of the merged backgrounds: each a shape of the merged process moving only its member,
+  # built by the preprocess step: nominal + value x member nominal, `preprocess: member_values`
+  # {merged-histogram process: value v (for [-v, v]) or [down, up]}. `processes` are the card
+  # backgrounds holding those members.
+
+  # TT: crossSec 923.6 pb,
+  # https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO#Updated_reference_cross_sections
+  # unc: +22.6 -33.4 (scale) +/- 22.8 (PDF alphas) -24.6 +25.4 (mass)
+  - name: QCD_scale_TT
+    type: shape
+    processes: [ TT ]
+    preprocess:
+      member_values: { TT: [ -0.036, 0.025 ] }
+
+  # DY NNLO QCD + NLO EW, 2094.2 x 3 pb, +0.7 -1.1 %:
+  # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MATRIXCrossSectionsat13p6TeV
+  # DY_M_50 only, as in DL (DY_M_10to50 has its PDF+alpha_s and its QCD-scale / PDF shapes below)
+  - name: QCD_scale_DY
+    type: shape
+    processes: [ DY ]
+    preprocess:
+      member_values: { DY_M_50: [ -0.011, 0.007 ] }
+  # ttV (ttZ + ttW): there is no LHC Top WG 13.6 TeV recommendation yet. +-12 % covers the NLO QCD
+  # scale uncertainty of both ttZ and ttW; replace with the official numbers once they exist.
+  - name: QCD_scale_ttV
+    type: shape
+    processes: [ TT ]
+    preprocess:
+      member_values: { ttV: 0.12 }
+  # ST: taken from tW for now (largest)
+  - name: top_mass
+    type: shape
+    processes: [ TT, ST ]
+    preprocess:
+      member_values: { TT: [ -0.027, 0.028 ], ST: [ -0.015, 0.015 ] }
+  # H: ttH's (https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap)
+  # W: no value in DL either (there W is a nonprompt-lepton normalisation); here its normalisation
+  # is free-floating per category (normalisations.yaml), constrained by the W+jets CR.
+  - name: PDF_alphas
+    type: shape
+    processes: [ TT, ST, DY, Minor ]
+    preprocess:
+      member_values:
+        TT: 0.025
+        ttV: 0.03
+        ST: 0.027
+        DY_M_10to50: 0.01
+        DY_M_50: 0.01
+        H: 0.035
+
+  # QCD scale and PDF shapes, one nuisance each per merged-histogram process, as in DL (see
+  # DL/systematics/theory.yaml): the merged histograms keep every member, the preprocess step
+  # carries them to the final bins inside the card background holding that process, and the
+  # datacard maker reduces them on the summed eras. QCD scale: 7-point envelope. PDF: Hessian sum
+  # of members 1-100, plus alpha_s from 101/102 where the sample has them (not ST, VVV).
+  - name: QCDscale_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &qcd_scale_7point
+      reduction: envelope
+      names: [ muR0p5_muF0p5, muR0p5_muF1, muR1_muF0p5, muR1_muF2, muR2_muF1, muR2_muF2 ]
+  - name: pdf_shape_TT
+    type: shape
+    processes: [ TT ]
+    members: &pdf_hessian_alphas
+      reduction: hessian
+      names: { first: 1, last: 100 }
+      alpha_s: [ 101, 102 ]
+  - name: QCDscale_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ttV
+    type: shape
+    processes: [ TT ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_W
+    type: shape
+    processes: [ W ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_W
+    type: shape
+    processes: [ W ]
+    members: *pdf_hessian_alphas
+  # DY: the DL names, so the DL and SL DY theory uncertainties are correlated
+  - name: QCDscale_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_DY_M_10to50
+    type: shape
+    processes: [ DY ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_ST
+    type: shape
+    processes: [ ST ]
+    members: &pdf_hessian
+      reduction: hessian
+      names: { first: 1, last: 100 }
+  - name: QCDscale_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas
+  - name: QCDscale_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_VVV
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian
+  - name: QCDscale_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *qcd_scale_7point
+  - name: pdf_shape_H
+    type: shape
+    processes: [ Minor ]
+    members: *pdf_hessian_alphas

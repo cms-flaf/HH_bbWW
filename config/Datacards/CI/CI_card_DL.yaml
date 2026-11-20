@@ -6,6 +6,8 @@ include:
   - ../systematics/leptons.yaml
   - ../systematics/jets.yaml
   - ../systematics/parton_shower.yaml
+  # no DY process in the CI cards: included for completeness, it applies nowhere
+  - ../systematics/dy_reweighting.yaml
   - CI_common.yaml
 model:
   parameters: [ MX ]

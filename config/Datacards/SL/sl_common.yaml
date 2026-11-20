@@ -1,91 +1,90 @@
-# HH->bbWW SL datacards: the settings shared by sl_spin0.yaml and sl_spin2.yaml (as DL/dl_common.yaml).
-# SKELETON: not in `cards:`, not built or validated; binning, backgrounds and SL uncertainties are
-# placeholders. x_hh_bbww_SL_run3.yaml (the earlier single-file SL card) is kept for reference.
-analysis: hh_bbww
-type: resonant
+# HH->bbWW SL datacards: the settings shared by sl_spin0.yaml and sl_spin2.yaml (as DL/dl_common.yaml),
+# which include it with ../common.yaml (the settings of every card), the signals and the uncertainty
+# files. Not a card on its own. The merge is strict: anything set in two files is an error.
+#
+# FIRST VERSION, expected (Asimov) limits only: the inputs have no fake / QCD-multijet background
+# yet (the W+jets CR has data/MC 1.3-1.8 in v2610_TwoStageDNN_Outputs_v2), so no observed limit
+# and no fit to CR data until the fake estimate is added as a background.
 model:
   parameters: [ MX ]
   param_dependent_bkg: true
-  # The binary score of the two-stage SL DNN (a logit, -23.5:23.5), parametrised in the mass. 1D.
+  # The binary score of the two-stage SL DNN (a logit, -23.5:23.5), parametrised in the mass, 1D
+  # in each HME sub-region (flavour Signal_Extraction_SL_window, Run3_Model_DYSplit: DY_M_10to50 + DY_M_50).
   input_file_pattern: ${ERA}/TwoStageDNN_M${MX}_binary/TwoStageDNN_M${MX}_binary.root
-signalFractionForRelevantBins: 0.2
-eras:
-  - Run3_22_23
-era_groups:
-  Run3_22_23:
-    - Run3_2022
-    - Run3_2022EE
-    - Run3_2023
-    - Run3_2023BPix
 channels:
   - e
   - mu
-# The jet categories of the mass-independent SR_SL (#191); CR_SL_<class> would follow the same way.
+# SR (equal-signal DNN bins) and the TT / W+jets control regions (equal-background bins), each in
+# its jet category's HME window: the sub-regions <region>_HMESub_m<MX> of the booking plugin
+# (config/sub_regions/hme_SL_v2610.yaml, the [16, 84] % signal window). The CRs are the DNN's TT
+# and W+jets classes (#191) in the same window. No "/" in the names (bin and MC-stat nuisance
+# names); input_categories maps them to the inputs. The other CR_SL_* classes are not fitted:
+# CR_SL_ST and CR_SL_H are ~80-95 % TT, CR_SL_DY and CR_SL_VV mostly W+jets and fakes.
 categories:
   - SR_res2b
-  - SR_recovery
   - SR_boosted
+  - SR_recovery
+  - TT_res2b
+  - TT_boosted
+  - TT_recovery
+  - W_res2b
+  - W_boosted
+  - W_recovery
 input_categories:
-  SR_res2b: SR_SL/res2b
-  SR_recovery: SR_SL/recovery
-  SR_boosted: SR_SL/boosted
+  SR_res2b: SR_SL_HMESub_m${MX}/res2b
+  SR_boosted: SR_SL_HMESub_m${MX}/boosted
+  SR_recovery: SR_SL_HMESub_m${MX}/recovery
+  TT_res2b: CR_SL_TT_HMESub_m${MX}/res2b
+  TT_boosted: CR_SL_TT_HMESub_m${MX}/boosted
+  TT_recovery: CR_SL_TT_HMESub_m${MX}/recovery
+  W_res2b: CR_SL_WJets_HMESub_m${MX}/res2b
+  W_boosted: CR_SL_WJets_HMESub_m${MX}/boosted
+  W_recovery: CR_SL_WJets_HMESub_m${MX}/recovery
 
-# No `preprocess:` (binning) step yet: the shapes are read as produced.
+# The DL preprocess step (see dl_common.yaml): merges the backgrounds, bins the DNN score of each
+# sub-region (SR: equal signal; CRs: equal background) and carries the QCD-scale / PDF members to
+# the final bins. The binning configuration holds the binning only; to reuse saved edges, replace
+# it by --edges <a binning.json of this step>.
+preprocess:
+  script: Analysis/EqualSignalBinning.py
+  args:
+    - --binning-config
+    - config/Datacards/SL/binning_eqsig_SL_v2610.yaml
+    # one mass per PreprocessShapesTask branch (${MX} = the branch's mass), as for DL
+    - --masses
+    - ${MX}
 
+# SR window background (4 eras, MX 300 -> 800): TT 77-91 % -> 52-80 %, W 2-11 % -> 9-35 %,
+# ST 6-10 %, DY 0.4-4 %, VV + VVV + ttV + H 1-2 %. Merged as in DL where the processes are the
+# same (TT with ttV; Minor), with W a background of its own (in DL it is in Minor). data_obs, TT
+# and ST are in ../common.yaml (shared with DL).
 processes:
-  - process: data_obs
-    is_data: true
-    is_asimov_data: true
-
-  # Placeholder backgrounds (those of the previous SL card); to be fixed with the SL merging.
-  - process: TT
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
   - process: W
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
-  - process: ST
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
+
+  # DY_M_10to50 + DY_M_50 (Run3_Model_DYSplit, as DL), so the DY theory nuisances are DL's. No separate
+  # low-mass DY prior (DL's CMS_bbww_norm_DY_lowmass belongs to its DY estimate): DY is 0.4-4 % of the SL
+  # SR background. 0.1-0.6 % of the TT CR, a few heavy, partly negative events: in the e channel at MX
+  # 1200, 1300 and 1500 a variation (at 1500 the nominal) summed below zero over the whole window, which
+  # no binning can pass. Left out of the TT CR: `drop` for the preprocess step (which then writes no DY
+  # there) and `categories` for the datacard maker (which then does not look for it); kept in the SR
+  # and the W+jets CR (6-8 % there).
   - process: DY
+    categories: [ SR_res2b, SR_boosted, SR_recovery, W_res2b, W_boosted, W_recovery ]
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+    preprocess:
+      members: [ DY_M_10to50, DY_M_50 ]
+      drop:
+        DY_M_10to50: [ TT_res2b, TT_boosted, TT_recovery ]
+        DY_M_50: [ TT_res2b, TT_boosted, TT_recovery ]
+
+  - process: Minor
     allow_negative_bins_within_error: true
     max_n_sigma_for_negative_bins: 2
     allow_zero_integral: true
-  - process: VV
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
-    allow_zero_integral: true
-  - process: H
-    allow_negative_bins_within_error: true
-    max_n_sigma_for_negative_bins: 2
-    allow_zero_integral: true
+    preprocess:
+      members: [ VV, VVV, H ]
 
-# SL-specific uncertainties go here; the shared ones are in ../systematics/.
-uncertainties: [ ]
-
-autolnNThr: 0.1
-asymlnNThr: 0.001
-ignorelnNThr: 0.001
-autoMCStats:
-  apply: true
-  threshold: 20
-  apply_to_signal: true
-  mode: 1
-
-campaigns:
-  Run3_22_23: run3_early
-  Run3_2022: "2022preEE"
-  Run3_2022EE: "2022postEE"
-  Run3_2023: "2023preBPix"
-  Run3_2023BPix: "2023postBPix"
-
-impact_plots:
-  - name: combined
-    masses: [ 300, 600, 800 ]
-    poi_value: limit
-    fit_args:
-      - --cminFallbackAlgo Minuit2,Simplex,0:0.1
-    plot_params:
-      method: default
-      order_by_impact: true
-      mc_stats: false
+# The uncertainties are in ../systematics/ (shared with DL) and systematics/ (SL only).

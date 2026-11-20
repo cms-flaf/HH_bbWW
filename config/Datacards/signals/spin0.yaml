@@ -1,0 +1,84 @@
+# Spin-0 (radion) signals of every HH->bbWW card (DL/dl_spin0.yaml, SL/sl_spin0.yaml): the three
+# signal samples, their Higgs BR uncertainties and their QCD-scale / PDF shapes. Shared, so the DL
+# and SL cards carry the same signal model and nuisance names and combine directly.
+processes:
+  # The 2L and 1L samples are both signals in both channels: a 2L event that loses a lepton is
+  # selected by SL, a 1L event with a fake second lepton by DL (~1-5 % of 2L there).
+  - process: GluGluToRadion_bbWW_2L_${MX}
+    hist_name: GluGluToRadion_bbWW_2L_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+
+  # small and partly negative where it enters through a fake lepton (DL); the tolerance is a
+  # safety net elsewhere
+  - process: GluGluToRadion_bbWW_1L_${MX}
+    hist_name: GluGluToRadion_bbWW_1L_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+    allow_negative_bins_within_error: true
+    max_n_sigma_for_negative_bins: 2
+
+  - process: GluGluToRadion_bbTauTau_${MX}
+    hist_name: GluGluToRadion_bbTauTau_${MX}
+    param_values: [ 250, 260, 270, 280, 300, 320, 350, 360, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 1000, 1100, 1200, 1300, 1400, 1500 ]
+    is_signal: true
+    allow_zero_integral: true
+
+uncertainties:
+  # Higgs BRs (hh/naming-conventions), correlated across eras. The process patterns are regexes:
+  # the signal names carry the resolved mass, so a literal name would silently match nothing.
+  - name: BR_hbb
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbWW_2L_
+      - ^GluGluToRadion_bbWW_1L_
+      - ^GluGluToRadion_bbTauTau_
+    value: [ -0.0126, 0.0124 ]
+  - name: BR_hww
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbWW_2L_
+      - ^GluGluToRadion_bbWW_1L_
+    value: [ -0.0152, 0.0153 ]
+  - name: BR_htt
+    type: lnN
+    processes:
+      - ^GluGluToRadion_bbTauTau_
+    value: [ -0.0163, 0.0165 ]
+  # QCD scale and PDF shapes of the signals (see <channel>/systematics/theory.yaml for the
+  # backgrounds'): one nuisance per signal sample, the same name at every mass; the member
+  # histograms carry the mass (<signal>_QCDscale_shape_<signal>_<point>). The weights are
+  # normalised to each sample's nominal sum of weights, so these are acceptance and shape effects
+  # only. No alpha_s: the signal samples have no alpha_s weights (members 101/102 are NaN).
+  - name: QCDscale_shape_GluGluToRadion_bbWW_2L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_2L_ ]
+    members: &sig_qcd_scale
+      reduction: envelope
+      names: [ muR0p5_muF0p5, muR0p5_muF1, muR1_muF0p5, muR1_muF2, muR2_muF1, muR2_muF2 ]
+      histogram: QCDscale_shape_{process}_{member}
+  - name: pdf_shape_GluGluToRadion_bbWW_2L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_2L_ ]
+    members: &sig_pdf_hessian
+      reduction: hessian
+      names: { first: 1, last: 100 }
+      histogram: pdf_shape_{process}_{member}
+  - name: QCDscale_shape_GluGluToRadion_bbWW_1L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_1L_ ]
+    members: *sig_qcd_scale
+  - name: pdf_shape_GluGluToRadion_bbWW_1L
+    type: shape
+    processes: [ ^GluGluToRadion_bbWW_1L_ ]
+    members: *sig_pdf_hessian
+  - name: QCDscale_shape_GluGluToRadion_bbTauTau
+    type: shape
+    processes: [ ^GluGluToRadion_bbTauTau_ ]
+    members: *sig_qcd_scale
+  - name: pdf_shape_GluGluToRadion_bbTauTau
+    type: shape
+    processes: [ ^GluGluToRadion_bbTauTau_ ]
+    members: *sig_pdf_hessian

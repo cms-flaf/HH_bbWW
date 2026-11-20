@@ -1,0 +1,49 @@
+# Equal-signal binning of the SL fit inputs (Analysis/EqualSignalBinning.py, the SL cards' preprocess
+# step, as DL/binning_eqsig_DL_v2610.yaml): each category is its HME sub-region <region>_HMESub_m<MX>
+# (1D TwoStageDNN_M<MX>_binary), binned in the DNN score from the top into bins of equal signal; a
+# bin closes only once the backgrounds pass the gates.
+#
+# The binning only. What is merged and every uncertainty are in the card (SL/sl_common.yaml and the
+# systematics files). See docs/stat_inference.md.
+
+# Target bins per window. FIRST VERSION: 20 everywhere (DL's maximum), the gates merge fewer where
+# the backgrounds need it; not yet optimised per mass as DL's are.
+n_bins:
+  250: { res2b: 20, recovery: 20, boosted: 20 }
+  260: { res2b: 20, recovery: 20, boosted: 20 }
+  270: { res2b: 20, recovery: 20, boosted: 20 }
+  280: { res2b: 20, recovery: 20, boosted: 20 }
+  300: { res2b: 20, recovery: 20, boosted: 20 }
+  320: { res2b: 20, recovery: 20, boosted: 20 }
+  350: { res2b: 20, recovery: 20, boosted: 20 }
+  360: { res2b: 20, recovery: 20, boosted: 20 }
+  400: { res2b: 20, recovery: 20, boosted: 20 }
+  450: { res2b: 20, recovery: 20, boosted: 20 }
+  500: { res2b: 20, recovery: 20, boosted: 20 }
+  550: { res2b: 20, recovery: 20, boosted: 20 }
+  600: { res2b: 20, recovery: 20, boosted: 20 }
+  650: { res2b: 20, recovery: 20, boosted: 20 }
+  700: { res2b: 20, recovery: 20, boosted: 20 }
+  750: { res2b: 20, recovery: 20, boosted: 20 }
+  800: { res2b: 20, recovery: 20, boosted: 20 }
+  850: { res2b: 20, recovery: 20, boosted: 20 }
+  900: { res2b: 20, recovery: 20, boosted: 20 }
+  1000: { res2b: 20, recovery: 20, boosted: 20 }
+  1100: { res2b: 20, recovery: 20, boosted: 20 }
+  1200: { res2b: 20, recovery: 20, boosted: 20 }
+  1300: { res2b: 20, recovery: 20, boosted: 20 }
+  1400: { res2b: 20, recovery: 20, boosted: 20 }
+  1500: { res2b: 20, recovery: 20, boosted: 20 }
+
+# The DL gates (see DL/binning_eqsig_DL_v2610.yaml).
+gates:
+  min_bkg: 0.2
+  min_bkg_neff: 4
+  min_each_neff: 2
+  min_variation_neff: 2
+  exempt_fraction: 0.05
+
+# Control regions (base region names): the window in this many equal-background DNN bins.
+control_region_bins:
+  CR_SL_TT: 5
+  CR_SL_WJets: 5
