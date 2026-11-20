@@ -131,7 +131,7 @@ absolute scale (softmax does not change when the same constant is added to both 
 bound: the binary DNN entries of `config/plot/histograms.yaml` use [−23.5, 23.5] (94 bins in 1D, 47
 on the DNN axis of the plots against DeepHME), and scores outside it are in the under- and overflow,
 which plots drop. The multiclass entries use the same axis, so their probabilities fill its bins
-[0, 0.5) and [0.5, 1]. Storing raw logits cannot be configured for a model that returns
+[0, 0.5), [0.5, 1) and, for p = 1, [1, 1.5). Storing raw logits cannot be configured for a model that returns
 probabilities.
 
 An event that no fold scores stops the producer. A non-finite model output only prints a warning,

@@ -123,8 +123,12 @@ Invariants a diff must keep:
   physics model listing `Fakes` has a `tt_process`. A scheme without its regions in a cell raises;
   only too little TT (`min_tt`, decided at the nominal) or, for V, no excess in the anti-isolated
   sidebands means "not determined".
-- `split`, `scheme` and `min_tt` are physics choices of the analysts, marked provisional: do not
-  propose new values.
+- A cell where f is not determined still gets (zero) templates — nominal, variations, nuisances —
+  because the datacard maker needs the process in every sub-era of a card; a variation that leaves f
+  undetermined in a part keeps the nominal f there; a `split` that leaves one part with too little TT
+  in every cell of a mass while the other part is determined somewhere raises.
+- `split`, `scheme` and `min_tt` are physics choices of the analysts (dated user records in
+  `config/processes.yaml`): do not propose new values.
 
 ### Integration test
 
