@@ -6,7 +6,8 @@ mass point and datacard category it takes the DNN score inside the category's HM
 merges the merged-histogram processes into the card's backgrounds, and bins the score into bins
 of equal signal, from the top of the score down. A bin is only closed once every background in
 it passes the gates of the binning configuration, for the nominal and for every Up/Down
-variation.
+variation; a background with `preprocess: {gates: false}` (the data-driven Fakes, whose parts can
+be empty) is binned but takes no part in the gates.
 
 Input:  <input>/<era>/<variable>/<variable>.root for every era of the card (the merged
         histograms), with <channel>/<input category>/<process>[_<variation>] histograms, either
@@ -244,6 +245,8 @@ class Binning:
             )
         model = card.model
         self.members = {b: model.members[b] for b in card.backgrounds}
+        # backgrounds outside the gates (preprocess: gates: false): binned, never gating
+        self.ungated = set(model.ungated)
         # control regions: n bins of equal total background each (1 = the whole window)
         self.cr_bins = dict(cfg.get("control_region_bins") or {})
         self.lowmass = model.lowmass
@@ -776,27 +779,33 @@ class Binning:
             return y, w
 
         # the gates hold for the nominal and the Up/Down variations; a member of a member
-        # uncertainty is not a variation on its own (the datacard maker reduces them)
+        # uncertainty is not a variation on its own (the datacard maker reduces them). A
+        # background with `gates: false` takes no part in them: the bins are those without it.
+        gate_bkgs = [b for b in bkgs if b not in self.ungated]
         gated = {
             b: [s for s in suffixes[b] if s not in self.member_suffix_seen]
-            for b in bkgs
+            for b in gate_bkgs
         }
         g = self.gates
-        totals = {b: get(b, "", 0, nb - 1)[0] for b in bkgs}
+        totals = {b: get(b, "", 0, nb - 1)[0] for b in gate_bkgs}
         exempt = (
-            {b for b in bkgs if totals[b] < g["exempt_fraction"] * sum(totals.values())}
+            {
+                b
+                for b in gate_bkgs
+                if totals[b] < g["exempt_fraction"] * sum(totals.values())
+            }
             if g
             else set()
         )
 
         def failure(i, j):
             """Why fine bins i..j fail the gates, or None if they pass."""
-            nominal = {b: get(b, "", i, j) for b in bkgs}
+            nominal = {b: get(b, "", i, j) for b in gate_bkgs}
             bt = sum(v[0] for v in nominal.values())
             bw = sum(v[1] for v in nominal.values())
             if bt < g["min_bkg"] or bw <= 0 or bt * bt / bw < g["min_bkg_neff"]:
                 return f"total background {bt:.3g}, N_eff {bt * bt / bw if bw > 0 else 0:.2f}"
-            for b in bkgs:
+            for b in gate_bkgs:
                 y, w = nominal[b]
                 if y < -1e-12:
                     return f"{b} {y:.3g} < 0"
@@ -817,7 +826,7 @@ class Binning:
             """The first background (nominal or variation) below 0 in fine bins i..j, or None.
             failure() can stop at an earlier gate, so its message does not say whether one is.
             """
-            for b in bkgs:
+            for b in gate_bkgs:
                 for s in [""] + gated[b]:
                     y = get(b, s, i, j)[0]
                     if y < -1e-12:

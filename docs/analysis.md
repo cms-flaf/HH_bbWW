@@ -83,9 +83,11 @@ Two networks consume that grid, and they do not cover the same part of it:
   `TwoStageDNN.masses` in `config/global.yaml`: the 30 produced points from 250 GeV to 2 TeV. Its
   multiclass stage does not depend on the mass, so neither do the SL signal and control regions
   (see [below](#single-lepton-two-stage-dnn)). The SL cards (`config/Datacards/SL/`)
-  fit `SR_SL` and the TT and W+jets classes `CR_SL_TT`, `CR_SL_WJets` in the HME window of each
-  mass (`<region>_HMESub_m<MX>`), with the DL preprocess step; expected limits only, and not yet
-  in `StatInference.cards`, until the fake background is part of the inputs;
+  fit `SR_SL` alone, in the HME window of each mass (`SR_SL_HMESub_m<MX>`), with the data-driven
+  Fakes as a background ([Single-lepton fakes](#single-lepton-fakes)) and the DL preprocess step; no
+  TT or W+jets control region is fitted, as they have no fake estimate. Expected limits only; they are
+  not in `StatInference.cards` (they read the SL production, see
+  [Statistical inference](stat_inference.md));
   the earlier single-file SL card, `config/Datacards/x_hh_bbww_SL_run3.yaml`, is kept for
   reference only and still reads the per-mass regions `SR_SL_M${MX}` that no longer exist.
 
@@ -268,8 +270,9 @@ The variations of the simulation enter through D − O and T; data stay nominal.
 **Blinding:** the estimator never reads the data of the isolated window. The merged file holds them,
 as FLAF merges data in every region; the sub-regions are not plotted. The merge prints, per cell, the
 scheme used or that the cell is not estimated, and no number; in V, "not determined" with enough TT
-means that the anti-isolated sidebands show no excess in a part. Fakes appear on no control plot yet,
-and the SL datacards do not include them yet.
+means that the anti-isolated sidebands show no excess in a part. Fakes appear on no control plot yet;
+the SL datacards include them (`config/Datacards/SL/`, with the nuisances of
+`config/Datacards/SL/systematics/fakes.yaml`).
 
 ## Choosing which variables to histogram
 
@@ -301,6 +304,11 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
 - **Control regions** (`plot_control_regions: [ TT_CR, DY_CR ]`): no signal is drawn, and the
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
+- **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
+  threshold per mass (`blind_ranges`), the score range holding the upper half of the signal in the SL
+  datacards' equal-signal binning (the upper 10 of the 20 targeted bins), the lowest such edge over
+  both spins, channels and categories. FLAF applies `blind_ranges` in every region, control regions
+  included; the binary DNNs of other masses stay blinded whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their
   units.

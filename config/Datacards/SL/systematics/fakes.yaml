@@ -1,0 +1,352 @@
+# The nuisances of the data-driven Fakes (config/processes.yaml, Fakes.data_driven.nuisances):
+# the statistical uncertainty of f per channel, category and era, the method uncertainty (the other
+# scheme) per channel and category, each for the low and the high part of the DNN score.
+uncertainties:
+  - name: CMS_bbww_SL_fakes_stat_low_e_res2b_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_res2b_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_res2b_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_res2b_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_method_low_e_res2b
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_recovery_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_recovery_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_recovery_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_recovery_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_method_low_e_recovery
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_boosted_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_boosted_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_boosted_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_e_boosted_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_method_low_e_boosted
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_res2b_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_res2b_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_res2b_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_res2b_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_method_low_mu_res2b
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_recovery_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_recovery_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_recovery_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_recovery_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_method_low_mu_recovery
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_boosted_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_boosted_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_boosted_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_low_mu_boosted_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_method_low_mu_boosted
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_res2b_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_res2b_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_res2b_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_res2b_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_method_high_e_res2b
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_recovery_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_recovery_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_recovery_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_recovery_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_method_high_e_recovery
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_boosted_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_boosted_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_boosted_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_e_boosted_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_method_high_e_boosted
+    type: shape
+    processes: [ Fakes ]
+    channels: [ e ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_res2b_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_res2b_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_res2b_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_res2b_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_method_high_mu_res2b
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_res2b ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_recovery_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_recovery_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_recovery_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_recovery_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_method_high_mu_recovery
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_recovery ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_boosted_Run3_2022
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022 ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_boosted_Run3_2022EE
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2022EE ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_boosted_Run3_2023
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023 ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_stat_high_mu_boosted_Run3_2023BPix
+    type: shape
+    processes: [ Fakes ]
+    eras: [ Run3_2023BPix ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
+  - name: CMS_bbww_SL_fakes_method_high_mu_boosted
+    type: shape
+    processes: [ Fakes ]
+    channels: [ mu ]
+    categories: [ SR_boosted ]
