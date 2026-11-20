@@ -13,6 +13,10 @@ norm:
   EleID_TightIDIso:
     expression: weight_lep1_EleSF_wp80iso_EleID{scale}_rel * weight_lep2_EleSF_wp80iso_EleID{scale}_rel * final_weight
     name: EleID_TightIDIso_2022_{}
+  EleReco:
+    expression: weight_lep1_EleSF_Reco_EleReco{scale}_rel * weight_lep2_EleSF_Reco_EleReco{scale}_rel * final_weight
+    name: EleReco_2022_{}
+    requires: eleReco
 
   SingleEleTrg:
     expression: "(trgSF_lep == 2 ? weight_lep2_TrgSF_singleEleWpTight_singleEle{scale}_rel : trgSF_lep == 1 ? weight_lep1_TrgSF_singleEleWpTight_singleEle{scale}_rel : 1.0) * final_weight"

@@ -27,13 +27,3 @@ uncertainties:
     processes: [ TT ]
     categories: [ TT_recovery ]
     preprocess: *ttcr_tilt
-  - name: CMS_bbww_dycr_shape_boosted
-    type: shape
-    processes: [ DY ]
-    categories: [ DY_boosted ]
-    preprocess: *dycr_tilt
-  - name: CMS_bbww_ttcr_shape_boosted
-    type: shape
-    processes: [ TT ]
-    categories: [ TT_boosted ]
-    preprocess: *ttcr_tilt
