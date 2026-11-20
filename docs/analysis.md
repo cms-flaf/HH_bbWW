@@ -121,15 +121,18 @@ What the models return and what is stored is configured per network in `multicla
 | `save_as` | what is stored: `logit` (raw), `probability`, or `recomputed_logit` |
 | `signal_node` | binary model with more than one output: the signal output (1; 0 is background) |
 
-The current models return raw logits. Both networks store `recomputed_logit`: log(p / (1 − p)) of
-the softmax probability of each output, with p clipped to [`logit_clip_eps`, 1 − `logit_clip_eps`].
-For the 2-output binary model this is the logit difference z<sub>1</sub> − z<sub>0</sub>. The raw
-signal logit z<sub>1</sub> alone has no absolute scale: softmax does not change when the same
-constant is added to both outputs. With `logit_clip_eps: 1.0e-10` every stored score is within
-±23.03, and the TwoStageDNN entries of `config/plot/histograms.yaml` use the range [−23.5, 23.5]
-(94 bins in 1D, 47 on the DNN axis of the plots against DeepHME). The range has to contain the
-bound strictly, as plots drop the overflow; changing `logit_clip_eps` means changing it too.
-Storing raw logits cannot be configured for a model that returns probabilities.
+The current models return raw logits. As configured (`config/global.yaml`), the binary network
+stores the raw logit z<sub>1</sub> of its signal node (`save_as: logit`) and the multiclass network
+the softmax probability of each class (`save_as: probability`). `recomputed_logit` would store
+log(p / (1 − p)) of the softmax probability of each output, with p clipped to
+[`logit_clip_eps`, 1 − `logit_clip_eps`] (±23.03 for `1.0e-10`); for the 2-output binary model that
+is the logit difference z<sub>1</sub> − z<sub>0</sub>. The raw signal logit z<sub>1</sub> has no
+absolute scale (softmax does not change when the same constant is added to both outputs) and no
+bound: the binary DNN entries of `config/plot/histograms.yaml` use [−23.5, 23.5] (94 bins in 1D, 47
+on the DNN axis of the plots against DeepHME), and scores outside it are in the under- and overflow,
+which plots drop. The multiclass entries use the same axis, so their probabilities fill its bins
+[0, 0.5) and [0.5, 1]. Storing raw logits cannot be configured for a model that returns
+probabilities.
 
 An event that no fold scores stops the producer. A non-finite model output only prints a warning,
 with the event numbers, and is stored as it is.
@@ -152,7 +155,9 @@ and fills them in for events that only a shift selected, after checking that eve
 
 ## Categories
 
-HH→bb̄WW is analysed in **resolved** and **boosted** categories (low- and high-p_T HH topologies).
+HH→bb̄WW is analysed in a **boosted** category (a large-radius jet, high-p_T HH topologies) and two
+**resolved** ones, `res2b` (both b-jet candidates b-tagged) and `recovery` (the leading one only);
+`inclusive` is their union (`Analysis/hh_bbww.py`, `categories` in `config/global.yaml`).
 Category and channel selection is driven by `config/global.yaml`; narrow or extend it there or via
 your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/).
 
@@ -220,7 +225,8 @@ In the SL window `SR_SL_HMESub_m<MX>`, per channel (e, μ) and category (res2b, 
 
     f = (D − O) / T − 1      D data, O the simulated backgrounds other than TT, T TT,
 
-measured outside the window, separately below and from the mass's `split` of the DNN (two parts, each
+measured without the data of the isolated window, separately below and from the mass's `split` of the
+DNN (two parts, each
 applied to the TT bins of its part). Two schemes (`scheme` per mass):
 
 - **H:** f from the isolated HME sidebands, `SR_SL_HMESB{L2,L1}_m<MX>` pooled and
@@ -237,18 +243,26 @@ edge of the binary DNN) and a `scheme`, and every physics model listing `Fakes` 
 (`test/test_sl_fakes.py` checks them, and that the scheme's regions exist in every cell). A scheme
 whose regions a cell lacks is a configuration error.
 
-**Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (the statistical error of f, per
-channel, category and era) and `FakesMethodLow/High` (|f of the other scheme − f|, per channel and
-category, correlated across eras; no shift where the other scheme's regions are missing or it is not
-determined). The nominal decides whether f is determined (at least `min_tt` weighted TT events in each
-region group and, for V, an excess in the anti-isolated sidebands): where it is not, there are no
-Fakes in that cell, with a message; a variation that leaves no
-TT where the nominal had enough stops the merge. The variations of the simulation enter through D − O
-and T; data stay nominal.
+**Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (f shifted by its statistical
+error, propagated to first order from the yields of the regions; Up and Down are
+max(max(f, 0) ± σ<sub>f</sub>, 0) × TT; per channel, category and era) and `FakesMethodLow/High`
+(max(f, 0) ± |max(f<sub>other</sub>, 0) − max(f, 0)| with the other scheme, per channel and category,
+correlated across eras; no shift where the other scheme's regions are missing or it is not
+determined). The members of the theory uncertainties (QCD scale, PDF) get no Fakes variation: FLAF
+estimates data-driven processes for the other sources only, so the sum of eras and the datacards take
+the Fakes nominal there. The nominal decides whether f is determined (at least `min_tt` weighted TT
+events in each DNN part of each region group and, for V, an excess in the anti-isolated sidebands):
+where it is not, there are no Fakes in that cell (both parts), with a message, and that era adds no
+Fakes to the cell in a sum of eras. A variation at which f is not determined stops the merge: one
+that leaves no TT in a region group where the nominal had enough, or, for V, one at which the
+anti-isolated sidebands show no excess. The variations of the simulation enter through D − O and T;
+data stay nominal.
 
-**Blinding:** data in the isolated window are never read, and the merge prints no data-derived
-number. The sub-regions are not plotted, so Fakes appear on no control plot yet, and the SL datacards
-do not include them yet.
+**Blinding:** the estimator never reads the data of the isolated window. The merged file holds them,
+as FLAF merges data in every region; the sub-regions are not plotted. The merge prints, per cell, the
+scheme used or that the cell is not estimated, and no number; in V, "not determined" with enough TT
+means that the anti-isolated sidebands show no excess in a part. Fakes appear on no control plot yet,
+and the SL datacards do not include them yet.
 
 ## Choosing which variables to histogram
 

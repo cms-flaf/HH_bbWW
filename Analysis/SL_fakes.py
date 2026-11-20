@@ -8,8 +8,9 @@ excess of data over the simulation,
 
     f = (D - O) / T - 1     (D data, O the simulated backgrounds other than TT, T TT),
 
-measured outside the window, separately in two parts of the DNN axis (below and from the mass's
-``split`` on), each applied to the TT bins of its part. Schemes (``scheme`` per mass):
+measured without the data of the isolated window, separately in two parts of the DNN axis (below
+and from the mass's ``split`` on), each applied to the TT bins of its part. Schemes (``scheme`` per
+mass):
 
 - H: f from the isolated HME sidebands, lower (L1+L2) and upper (H1+H2) pooled, interpolated
   linearly in HME to the window: f = f_lo + w (f_hi - f_lo), w = (u_win - u_lo) / (u_hi - u_lo),
@@ -22,9 +23,10 @@ A scheme whose regions are missing is a configuration error. Nuisances (declared
 ``nuisances``): FakesStat{Low,High}, max(f, 0) +- the statistical error of f in that part;
 FakesMethod{Low,High}, max(f, 0) +- |max(f_other, 0) - max(f, 0)| with the other scheme (no shift
 where its regions are missing or it is not determined). A region group with less TT than ``min_tt``
-does not determine f at the nominal: no Fakes in that cell (both parts). Data are read in the
-isolated sidebands and in SR_SL_Fakeable only, never in the isolated window; no data-derived number
-is printed.
+does not determine f at the nominal: no Fakes in that cell (both parts). A variation at which f is
+not determined (no TT where the nominal had enough or, for V, no anti-isolated excess) stops the
+merge. Data are read in the isolated sidebands and in SR_SL_Fakeable only, never in the isolated
+window; no data-derived number is printed.
 """
 
 import ctypes
@@ -205,7 +207,8 @@ class Estimate:
 
     def f_of(self, scheme, cell, ch, cat, unc, scale):
         """[(f, var) or None for each part] of a scheme in one cell. Whether TT determines f is
-        decided at the nominal (min_tt); a variation needs TT > 0 only."""
+        decided at the nominal (min_tt); a variation needs TT > 0 and, for V, f_anti > 0.
+        """
         min_tt = self.min_tt if (unc, scale) == ("Central", "Central") else 1e-300
         names = lambda regions: [n for n, _ in regions]  # noqa: E731
         lower, upper = cell.side("L"), cell.side("H")

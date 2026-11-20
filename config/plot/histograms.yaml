@@ -2511,8 +2511,8 @@ DNN_m1500_vs_HME:
   blind: True
   var_list: [ DNN_M1500_Signal, DeepHME_mass ]
 
-# Two-stage DNN, scores saved as recomputed logits bounded by +-23.03
-# (logit_clip_eps 1e-10 in config/global.yaml)
+# Two-stage DNN binary: the raw signal-node logit (config/global.yaml binary_output save_as: logit),
+# not bounded: scores outside [-23.5, 23.5] are in the flows
 TwoStageDNN_M250_binary:
   signal_params: { mass: 250 }
   x_bins: "94|-23.5:23.5"
@@ -3384,7 +3384,8 @@ binary_DNN_m2000_vs_HME:
   blind: True
   var_list: [ TwoStageDNN_M2000_binary, DeepHME_mass ]
 
-# Multiclass DNN, mass-independent
+# Multiclass DNN, mass-independent: stored as probabilities (multiclass_output save_as: probability),
+# which fill the bins [0, 0.5) and [0.5, 1] of this axis
 TwoStageDNN_Signal:
   x_bins: "94|-23.5:23.5"
   x_title: Multiclass DNN Signal logit
