@@ -23,10 +23,11 @@ A scheme whose regions are missing is a configuration error. Nuisances (declared
 ``nuisances``): FakesStat{Low,High}, max(f, 0) +- the statistical error of f in that part;
 FakesMethod{Low,High}, max(f, 0) +- |max(f_other, 0) - max(f, 0)| with the other scheme (no shift
 where its regions are missing or it is not determined). A region group with less TT than ``min_tt``
-does not determine f at the nominal: no Fakes in that cell (both parts). A variation at which f is
-not determined (no TT where the nominal had enough or, for V, no anti-isolated excess) stops the
-merge. Data are read in the isolated sidebands and in SR_SL_Fakeable only, never in the isolated
-window; no data-derived number is printed.
+does not determine f at the nominal: no Fakes in that cell (both parts). Where a variation leaves f
+undetermined in a part (no TT where the nominal had enough or, for V, no anti-isolated excess), that
+part keeps the nominal f, applied to the varied TT, with a message. Data are read in the isolated
+sidebands and in SR_SL_Fakeable only, never in the isolated window; no data-derived number is
+printed.
 """
 
 import ctypes
@@ -295,9 +296,15 @@ class Estimate:
                     else self.f_of(self.scheme, cell, ch, cat, unc, scale)
                 )
                 if any(f is None for f in fs):
-                    raise RuntimeError(
-                        f"{what}: f is determined at the nominal but not at ({unc}, {scale})"
+                    # f determined at the nominal but not at this variation (no TT, or for V
+                    # no anti-isolated excess): that part keeps the nominal f, applied to the
+                    # varied TT
+                    parts = [p for p, f in zip(PARTS, fs) if f is None]
+                    print(
+                        f"{what}: f not determined at ({unc}, {scale}) in "
+                        f"{', '.join(parts)}: the nominal f is used there"
                     )
+                    fs = [n if f is None else f for f, n in zip(fs, nominal)]
                 tt = ctx.require(self.tt, key, unc, scale)
                 out[(key, (unc, scale))] = self.fakes(tt, [f for f, _ in fs])
             if not ctx.nominal_pass:

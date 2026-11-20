@@ -270,6 +270,26 @@ class Schemes(unittest.TestCase):
             contents(out[(KEY, (UNC, "Up"))]), expected(f_up, f_up, k=1.2)
         )
 
+    def test_a_variation_without_f_keeps_the_nominal_f(self):
+        # V with an anti-isolated sideband excess of 0.1: TT x 1.2 (Up) turns it negative, so f
+        # is not determined at Up; TT x 0.8 (Down) keeps it
+        def f_of(base, family):
+            if base == "SR_SL":
+                return (0.3, 0.3)
+            return (0.5, 0.5) if family == "HMESub" else (0.1, 0.1)
+
+        config = dict(CONFIG, scheme={**CONFIG["scheme"], MASS: "V"})
+        out = run(Store(f_of), unc_source=UNC, config=config)
+        f_nom = 0.3 / 0.1 * 0.5
+        self.assertListAlmostEqual(
+            contents(out[(KEY, (UNC, "Up"))]), expected(f_nom, f_nom, k=1.2)
+        )
+        g = lambda f: (1 + f) / 0.8 - 1  # noqa: E731
+        f_down = g(0.3) / g(0.1) * g(0.5)
+        self.assertListAlmostEqual(
+            contents(out[(KEY, (UNC, "Down"))]), expected(f_down, f_down, k=0.8)
+        )
+
 
 class Guards(unittest.TestCase):
     def test_not_determined_without_enough_tt(self):

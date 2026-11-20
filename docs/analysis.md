@@ -253,10 +253,10 @@ estimates data-driven processes for the other sources only, so the sum of eras a
 the Fakes nominal there. The nominal decides whether f is determined (at least `min_tt` weighted TT
 events in each DNN part of each region group and, for V, an excess in the anti-isolated sidebands):
 where it is not, there are no Fakes in that cell (both parts), with a message, and that era adds no
-Fakes to the cell in a sum of eras. A variation at which f is not determined stops the merge: one
-that leaves no TT in a region group where the nominal had enough, or, for V, one at which the
-anti-isolated sidebands show no excess. The variations of the simulation enter through D − O and T;
-data stay nominal.
+Fakes to the cell in a sum of eras. Where a variation leaves f undetermined in a part (no TT in a
+region group where the nominal had enough or, for V, no excess in the anti-isolated sidebands), that
+part keeps the nominal f, applied to the varied TT, with a message naming the cell and the variation.
+The variations of the simulation enter through D − O and T; data stay nominal.
 
 **Blinding:** the estimator never reads the data of the isolated window. The merged file holds them,
 as FLAF merges data in every region; the sub-regions are not plotted. The merge prints, per cell, the
