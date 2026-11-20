@@ -58,6 +58,8 @@ Fakes:
     # PROVISIONAL (user, 2026-11-18): f is measured separately below and from this DNN logit, a bin
     # edge of TwoStageDNN_M<MX>_binary; the cuts of the 2026-11-10 study (other windows, 0.6-logit
     # grid) moved to the nearest 0.5 edge, until the study is redone on these sub-regions.
+    # 1200, 1300, 1500: -3.5 as at 1400 (user, 2026-11-20): the study's cuts there (-8.0, -11.5, -12.5)
+    # left the low part of the HME sidebands without TT, so f was not determined in any cell.
     split:
       250: -1.0
       260: -0.5
@@ -80,10 +82,10 @@ Fakes:
       900: -3.0
       1000: -1.0
       1100: -0.5
-      1200: -8.0
-      1300: -11.5
+      1200: -3.5
+      1300: -3.5
       1400: -3.5
-      1500: -12.5
+      1500: -3.5
     # PROVISIONAL (user, 2026-11-18): V (SR_SL_Fakeable) up to 400 GeV, where the lower sidebands
     # are missing or on the DeepHME turn-on, H (HME sidebands) above; FakesMethod = the other one.
     scheme:
