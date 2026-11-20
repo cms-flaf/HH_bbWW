@@ -53,11 +53,11 @@ Fakes:
     window: HMESub
     sidebands: HMESB
     tt_process: { Run3_Model: TT, Run3_Model_DYSplit: TT, TestModel: custom_CI_Background_TT }
-    # a region group with less TT than this (weighted events) does not determine f: no Fakes
+    # a region group with less TT than this (weighted events) does not determine f: Fakes = 0 in the cell
     min_tt: 1.0
-    # PROVISIONAL (user, 2026-11-18): f is measured separately below and from this DNN logit, a bin
-    # edge of TwoStageDNN_M<MX>_binary; the cuts of the 2026-11-10 study (other windows, 0.6-logit
-    # grid) moved to the nearest 0.5 edge, until the study is redone on these sub-regions.
+    # (user, 2026-11-18) f is measured separately below and from this DNN logit, a bin edge of
+    # TwoStageDNN_M<MX>_binary: the cuts of the 2026-11-10 study (other windows, 0.6-logit grid)
+    # moved to the nearest 0.5 edge.
     # 1200, 1300, 1500: -3.5 as at 1400 (user, 2026-11-20): the study's cuts there (-8.0, -11.5, -12.5)
     # left the low part of the HME sidebands without TT, so f was not determined in any cell.
     split:
@@ -86,7 +86,7 @@ Fakes:
       1300: -3.5
       1400: -3.5
       1500: -3.5
-    # PROVISIONAL (user, 2026-11-18): V (SR_SL_Fakeable) up to 400 GeV, where the lower sidebands
+    # (user, 2026-11-18) V (SR_SL_Fakeable) up to 400 GeV, where the lower sidebands
     # are missing or on the DeepHME turn-on, H (HME sidebands) above; FakesMethod = the other one.
     scheme:
       250: V

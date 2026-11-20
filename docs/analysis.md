@@ -156,8 +156,9 @@ and fills them in for events that only a shift selected, after checking that eve
 ## Categories
 
 HH→bb̄WW is analysed in a **boosted** category (a large-radius jet, high-p_T HH topologies) and two
-**resolved** ones, `res2b` (both b-jet candidates b-tagged) and `recovery` (the leading one only);
-`inclusive` is their union (`Analysis/hh_bbww.py`, `categories` in `config/global.yaml`).
+**resolved** ones, `res2b` (both b-jet candidates b-tagged) and `recovery` (only the candidate with the
+higher b-tag score b-tagged); `inclusive` holds every boosted and resolved event, resolved events
+without a b-tagged candidate included (`Analysis/hh_bbww.py`, `categories` in `config/global.yaml`).
 Category and channel selection is driven by `config/global.yaml`; narrow or extend it there or via
 your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/).
 
@@ -236,12 +237,15 @@ applied to the TT bins of its part). Two schemes (`scheme` per mass):
   anti-isolated regions being `SR_SL_Fakeable_HMESB*_m<MX>` and `SR_SL_Fakeable_HMESub_m<MX>`; f = 0
   where the isolated sidebands or the anti-isolated window show no excess.
 
-**Provisional (the analysts' choice):** V up to 400 GeV, where the lower sidebands are missing or sit on
-the DeepHME turn-on, H above; the `split` per mass (the cuts of an earlier study, moved to the nearest
-0.5 edge of the DNN axis). Every mass of `config/sub_regions/hme_SL_v2610.yaml` needs a `split` (a bin
+**Configuration** (the analysts' choice): V up to 400 GeV, where the lower sidebands are missing or sit
+on the DeepHME turn-on, H above; the `split` per mass (the cuts of an earlier study, moved to the
+nearest 0.5 edge of the DNN axis; −3.5 at 1200, 1300 and 1500 GeV, as at 1400 GeV, where the study's
+cuts left the low part of the sidebands without TT). Every mass of `config/sub_regions/hme_SL_v2610.yaml` needs a `split` (a bin
 edge of the binary DNN) and a `scheme`, and every physics model listing `Fakes` a `tt_process`
 (`test/test_sl_fakes.py` checks them, and that the scheme's regions exist in every cell). A scheme
-whose regions a cell lacks is a configuration error.
+whose regions a cell lacks is a configuration error, and so is a `split` that leaves one part with too
+little TT (`min_tt`) in a region group of every cell of a mass while the other part is determined in
+some cell: the merge stops rather than give no Fakes to the whole mass.
 
 **Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (f shifted by its statistical
 error, propagated to first order from the yields of the regions; Up and Down are

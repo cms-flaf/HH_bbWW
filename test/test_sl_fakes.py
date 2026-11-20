@@ -98,7 +98,7 @@ def split_bin():
 class Store:
     """The merged histograms: {(process, region, unc, scale): hist}; f per (region, part)."""
 
-    def __init__(self, f_of, tt_scale=1.0, tt_shift=None):
+    def __init__(self, f_of, tt_scale=1.0, tt_shift=None, tt_low=1.0):
         self.hists = {}
         b_split = split_bin()
         for base in ("SR_SL", "SR_SL_Fakeable"):
@@ -106,7 +106,12 @@ class Store:
                 region = name(base, family)
                 for unc, scale in (("Central", "Central"), (UNC, "Up"), (UNC, "Down")):
                     k = 1.2 if scale == "Up" else 0.8 if scale == "Down" else 1.0
-                    t = hist(lambda b: tt_scale * k * (10.0 + b % 7))
+                    t = hist(
+                        lambda b: tt_scale
+                        * k
+                        * (tt_low if b < b_split else 1.0)
+                        * (10.0 + b % 7)
+                    )
                     o = hist(lambda b: 3.0 + b % 3)
                     self.hists[(TT, region, unc, scale)] = t
                     self.hists[(W, region, unc, scale)] = o
@@ -290,8 +295,31 @@ class Schemes(unittest.TestCase):
             contents(out[(KEY, (UNC, "Down"))]), expected(f_down, f_down, k=0.8)
         )
 
+    def test_a_variation_without_f_in_one_part_keeps_the_nominal_f_there_only(self):
+        # V: the anti-isolated sideband excess is 0.1 below the split and 0.5 from it, so TT x 1.2
+        # (Up) leaves f undetermined in the low part only
+        def f_of(base, family):
+            if base == "SR_SL":
+                return (0.3, 0.3)
+            return (0.5, 0.5) if family == "HMESub" else (0.1, 0.5)
+
+        config = dict(CONFIG, scheme={**CONFIG["scheme"], MASS: "V"})
+        out = run(Store(f_of), unc_source=UNC, config=config)
+        g = lambda f: (1 + f) / 1.2 - 1  # noqa: E731
+        f_low = 0.3 / 0.1 * 0.5
+        f_high = g(0.3) / g(0.5) * g(0.5)
+        self.assertListAlmostEqual(
+            contents(out[(KEY, (UNC, "Up"))]), expected(f_low, f_high, k=1.2)
+        )
+
 
 class Guards(unittest.TestCase):
+    def test_a_split_that_starves_one_part_everywhere_is_an_error(self):
+        # TT below the split 1e-4 of its nominal in every region: the low part is short of TT in
+        # the only cell, the high part determined
+        with self.assertRaisesRegex(RuntimeError, "the split is misplaced"):
+            run(Store(lambda b, f: (0.3, 0.3), tt_low=1e-4))
+
     def test_not_determined_without_enough_tt(self):
         # TT of each part, pooled over two sidebands, below min_tt
         out = run(Store(lambda b, f: (0.3, 0.3), tt_scale=1e-4))

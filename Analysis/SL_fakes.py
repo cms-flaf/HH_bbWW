@@ -24,7 +24,8 @@ A scheme whose regions are missing is a configuration error. Nuisances (declared
 FakesMethod{Low,High}, max(f, 0) +- |max(f_other, 0) - max(f, 0)| with the other scheme (no shift
 where its regions are missing or it is not determined). A region group with less TT than ``min_tt``
 does not determine f at the nominal: Fakes = 0 in that cell (both parts, every variation and
-nuisance), with a message. Where a variation leaves f
+nuisance), with a message; a split that leaves one part with too little TT in every cell while the
+other part is determined somewhere is a configuration error (raised). Where a variation leaves f
 undetermined in a part (no TT where the nominal had enough or, for V, no anti-isolated excess), that
 part keeps the nominal f, applied to the varied TT, with a message. Data are read in the isolated
 sidebands and in SR_SL_Fakeable only, never in the isolated window; no data-derived number is
@@ -268,10 +269,54 @@ class Estimate:
                 hist.SetBinError(b, scale * tt_window.GetBinError(b))
         return hist
 
+    def tt_short(self, scheme, cell, ch, cat):
+        """[for each part: whether a region group of the scheme has less TT than min_tt] at the
+        nominal."""
+        names = lambda regions: [n for n, _ in regions]  # noqa: E731
+        lower, upper = cell.side("L"), cell.side("H")
+        if scheme == "H":
+            groups = [names(lower), names(upper)]
+        else:
+            groups = [
+                names(lower + upper),
+                names(cell.side("L", True) + cell.side("H", True)),
+                [cell.anti_window[0]],
+            ]
+        short = [False, False]
+        for group in groups:
+            for i, y in enumerate(self.yields(ch, cat, group, "Central", "Central")):
+                short[i] = short[i] or y.T < self.min_tt
+        return short
+
+    def check_split(self, cells):
+        """A split that leaves one part of the DNN with too little TT in every cell, while the other
+        part is determined somewhere, is misplaced: raise rather than give Fakes = 0 to the whole
+        mass."""
+        short, determined = [True, True], [False, False]
+        for (ch, cat), cell in sorted(cells.items()):
+            key = (ch, cell.window[0], cat)
+            if key not in self.ctx.key_dirs or not self.available(self.scheme, cell):
+                continue
+            self._iso_window = cell.window[0]
+            cell_short = self.tt_short(self.scheme, cell, ch, cat)
+            nominal = self.f_of(self.scheme, cell, ch, cat, "Central", "Central")
+            for i in range(2):
+                short[i] = short[i] and cell_short[i]
+                determined[i] = determined[i] or nominal[i] is not None
+        for i, j in ((0, 1), (1, 0)):
+            if short[i] and determined[j]:
+                raise RuntimeError(
+                    f"Fakes {self.ctx.era} M{self.mass}: the {PARTS[i]} part of the DNN "
+                    f"(split {self.split}) has less TT than min_tt in a region group of every "
+                    f"cell, while the {PARTS[j]} part is determined: the split is misplaced"
+                )
+
     def run(self, cells):
         ctx = self.ctx
         out = {}
         other = "V" if self.scheme == "H" else "H"
+        if ctx.nominal_pass:
+            self.check_split(cells)
         for (ch, cat), cell in sorted(cells.items()):
             self._iso_window = cell.window[0]
             key = (ch, cell.window[0], cat)

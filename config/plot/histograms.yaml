@@ -3385,7 +3385,7 @@ binary_DNN_m2000_vs_HME:
   var_list: [ TwoStageDNN_M2000_binary, DeepHME_mass ]
 
 # Multiclass DNN, mass-independent: stored as probabilities (multiclass_output save_as: probability),
-# which fill the bins [0, 0.5) and [0.5, 1] of this axis
+# which fill the bins [0, 0.5), [0.5, 1) and, for p = 1, [1, 1.5) of this axis
 TwoStageDNN_Signal:
   x_bins: "94|-23.5:23.5"
   x_title: Multiclass DNN Signal logit
