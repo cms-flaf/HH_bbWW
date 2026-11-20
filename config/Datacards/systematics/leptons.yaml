@@ -55,6 +55,24 @@ uncertainties:
     eras:
       - Run3_2023BPix
 
+  # Ele reconstruction (same per-era correlation as the ID SF)
+  - name: EleReco_2022
+    type: shape
+    eras:
+      - Run3_2022
+  - name: EleReco_2022EE
+    type: shape
+    eras:
+      - Run3_2022EE
+  - name: EleReco_2023
+    type: shape
+    eras:
+      - Run3_2023
+  - name: EleReco_2023BPix
+    type: shape
+    eras:
+      - Run3_2023BPix
+
   # Ele Trigger
   - name: SingleEleTrg_2022
     type: shape
