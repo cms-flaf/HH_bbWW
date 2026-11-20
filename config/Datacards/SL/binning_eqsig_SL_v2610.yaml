@@ -42,4 +42,3 @@ gates:
   min_each_neff: 2
   min_variation_neff: 2
   exempt_fraction: 0.05
-
