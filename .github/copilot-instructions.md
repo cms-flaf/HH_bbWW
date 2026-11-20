@@ -132,8 +132,8 @@ Invariants a diff must keep:
 - The SL fit has the SR windows only (user, 2026-11-20): the TT and W+jets control regions have no fake
   estimate and are not fitted; do not propose adding them back. `Fakes` is `preprocess: {gates: false}`
   in the SL cards (its parts can be empty and its Down variations zero: it must not gate the binning).
-  The `blind_ranges` of the SL binary DNNs are a user rule (the upper 10 SR bins per mass, see
-  `config/plot/histograms.yaml`).
+  The `blind_ranges` of the SL binary DNNs are a user rule (per mass, the lowest edge over the SR cells
+  of the upper bins holding half of the signal; see `config/plot/histograms.yaml`).
 
 ### Integration test
 
