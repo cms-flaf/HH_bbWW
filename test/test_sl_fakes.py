@@ -295,7 +295,17 @@ class Guards(unittest.TestCase):
     def test_not_determined_without_enough_tt(self):
         # TT of each part, pooled over two sidebands, below min_tt
         out = run(Store(lambda b, f: (0.3, 0.3), tt_scale=1e-4))
-        self.assertEqual(out, {})
+        self.assertEqual(
+            {k[1] for k in out},
+            {("Central", "Central")}
+            | {(n, s) for n in SL_fakes.NUISANCES for s in ("Up", "Down")},
+        )
+        for hist in out.values():
+            self.assertEqual(contents(hist), [0.0] * (NB + 2))
+        varied = run(Store(lambda b, f: (0.3, 0.3), tt_scale=1e-4), unc_source=UNC)
+        self.assertEqual({k[1] for k in varied}, {(UNC, "Up"), (UNC, "Down")})
+        for hist in varied.values():
+            self.assertEqual(contents(hist), [0.0] * (NB + 2))
 
     def test_a_scheme_without_its_regions_is_a_configuration_error(self):
         upper = {k: v for k, v in SIDEBANDS.items() if k.startswith("H")}

@@ -23,7 +23,8 @@ A scheme whose regions are missing is a configuration error. Nuisances (declared
 ``nuisances``): FakesStat{Low,High}, max(f, 0) +- the statistical error of f in that part;
 FakesMethod{Low,High}, max(f, 0) +- |max(f_other, 0) - max(f, 0)| with the other scheme (no shift
 where its regions are missing or it is not determined). A region group with less TT than ``min_tt``
-does not determine f at the nominal: no Fakes in that cell (both parts). Where a variation leaves f
+does not determine f at the nominal: Fakes = 0 in that cell (both parts, every variation and
+nuisance), with a message. Where a variation leaves f
 undetermined in a part (no TT where the nominal had enough or, for V, no anti-isolated excess), that
 part keeps the nominal f, applied to the varied TT, with a message. Data are read in the isolated
 sidebands and in SR_SL_Fakeable only, never in the isolated window; no data-derived number is
@@ -284,10 +285,22 @@ class Estimate:
                 )
             nominal = self.f_of(self.scheme, cell, ch, cat, "Central", "Central")
             if any(f is None for f in nominal):
+                # no estimate in this cell: zero templates (nominal, variations, nuisances), so
+                # that a sum of eras and the datacards see the process in every cell
                 if ctx.nominal_pass:
                     print(
-                        f"{what}: not estimated (scheme {self.scheme} not determined)"
+                        f"{what}: not estimated (scheme {self.scheme} not determined), "
+                        "Fakes = 0"
                     )
+                zero = [0.0, 0.0]
+                for unc, scale in ctx.variations:
+                    tt = ctx.require(self.tt, key, unc, scale)
+                    out[(key, (unc, scale))] = self.fakes(tt, zero)
+                if ctx.nominal_pass:
+                    tt = ctx.require(self.tt, key)
+                    for source in NUISANCES:
+                        for name in ("Up", "Down"):
+                            out[(key, (source, name))] = self.fakes(tt, zero)
                 continue
             for unc, scale in ctx.variations:
                 fs = (

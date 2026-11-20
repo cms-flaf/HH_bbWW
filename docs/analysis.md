@@ -252,8 +252,9 @@ determined). The members of the theory uncertainties (QCD scale, PDF) get no Fak
 estimates data-driven processes for the other sources only, so the sum of eras and the datacards take
 the Fakes nominal there. The nominal decides whether f is determined (at least `min_tt` weighted TT
 events in each DNN part of each region group and, for V, an excess in the anti-isolated sidebands):
-where it is not, there are no Fakes in that cell (both parts), with a message, and that era adds no
-Fakes to the cell in a sum of eras. Where a variation leaves f undetermined in a part (no TT in a
+where it is not, Fakes = 0 in that cell (both parts, with zero variations and nuisances, so that a
+sum of eras and the datacards find the process everywhere), with a message; that era then adds nothing
+to the cell in a sum of eras. Where a variation leaves f undetermined in a part (no TT in a
 region group where the nominal had enough or, for V, no excess in the anti-isolated sidebands), that
 part keeps the nominal f, applied to the varied TT, with a message naming the cell and the variation.
 The variations of the simulation enter through D − O and T; data stay nominal.
