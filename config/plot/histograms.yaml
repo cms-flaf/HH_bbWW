@@ -2513,14 +2513,18 @@ DNN_m1500_vs_HME:
 
 # Two-stage DNN binary: the raw signal-node logit (config/global.yaml binary_output save_as: logit),
 # not bounded: scores outside [-23.5, 23.5] are in the flows
-# Blinding of the 25 binary DNNs with SL windows (user, 2026-11-20: "blind bins up to the first 50% of the
-# signal is covered"): data hidden above a threshold per mass, from the SR binning of the SL datacards
-# (config/Datacards/SL, binning_eqsig_SL_v2610.yaml): in each spin, channel and category, the lower edge of
-# the upper bins that hold half of the signal; the lowest such edge over both spins, channels and
-# categories. The upper bins of that binning hold more than their 1/20 share of the signal (each is as
-# narrow as the 0.5-wide input bins and the background gates allow), so half of the signal is in the upper
-# 2 to 7 bins of a 20-bin cell, not 10. From the binning of the v2610_sl_v3 SR cards (2026-11-20); to be
-# derived again whenever the SL binning or its gates change. FLAF applies blind_ranges in every region.
+# Blinding of the 25 binary DNNs with SL windows, per region (user, 2026-11-20): in the signal-like HME window
+# SR_SL_HMESub_m<MX> the data are hidden above the lower edge of the upper bins that hold half of the signal
+# (lowest over spins, channels and categories, from the SR binning of the SL datacards); in every other region
+# the score of MX is plotted in (the HME side bins of SR_SL, the window and side bins of SR_SL_Fakeable, the
+# CR_SL_* windows, the base regions) a bin is hidden if its s/sqrt(b) reaches the smallest s/sqrt(b) of the
+# window's hidden bins (same spin, channel and category; b = TT; 20 bins of equal signal of the window), from
+# the lowest such bin upwards ([ ]: no bin reaches it); SR_SL, which holds the window, at most from the window's
+# threshold. The signal is that of MX only (the other masses' signals are not booked in these regions). "*":
+# the regions of other flavours (CI), with the window's threshold. Derived from the v2610_sl_v3 histograms and
+# the binning of its SR cards (2026-11-21); to be derived again whenever the SL binning or its gates change.
+# FLAF applies the windows per region (Common/PlotBlinding.py); test/test_plot_blinding_config.py checks that
+# they cover every region the scores are plotted in.
 TwoStageDNN_M250_binary:
   signal_params: { mass: 250 }
   x_bins: "94|-23.5:23.5"
@@ -2528,7 +2532,28 @@ TwoStageDNN_M250_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -6.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m250: [ -6.5, 23.5 ]
+    SR_SL_HMESBH1_m250: [ -1.5, 23.5 ]
+    SR_SL_HMESBH2_m250: [ -1.5, 23.5 ]
+    SR_SL: [ -6.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m250: [ -3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m250: [ -0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m250: [ -1.0, 23.5 ]
+    SR_SL_Fakeable: [ -3.0, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m250: [ -23.5, 23.5 ]
+    CR_SL_H: [ -0.5, 23.5 ]
+    CR_SL_H_HMESub_m250: [ -1.5, 23.5 ]
+    CR_SL_ST: [ -4.0, 23.5 ]
+    CR_SL_ST_HMESub_m250: [ -23.5, 23.5 ]
+    CR_SL_TT: [ -2.0, 23.5 ]
+    CR_SL_TT_HMESub_m250: [ -2.0, 23.5 ]
+    CR_SL_VV: [ -2.5, 23.5 ]
+    CR_SL_VV_HMESub_m250: [ -23.5, 23.5 ]
+    CR_SL_WJets: [ -23.5, 23.5 ]
+    CR_SL_WJets_HMESub_m250: [ -23.5, 23.5 ]
+    "*": [ -6.5, 23.5 ]
 
 TwoStageDNN_M260_binary:
   signal_params: { mass: 260 }
@@ -2537,7 +2562,28 @@ TwoStageDNN_M260_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -5.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m260: [ -5.5, 23.5 ]
+    SR_SL_HMESBH1_m260: [ -2.0, 23.5 ]
+    SR_SL_HMESBH2_m260: [ -1.5, 23.5 ]
+    SR_SL: [ -5.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m260: [ -3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m260: [ -1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m260: [ -1.5, 23.5 ]
+    SR_SL_Fakeable: [ -3.0, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m260: [ -23.5, 23.5 ]
+    CR_SL_H: [ -2.0, 23.5 ]
+    CR_SL_H_HMESub_m260: [ -2.0, 23.5 ]
+    CR_SL_ST: [ -23.5, 23.5 ]
+    CR_SL_ST_HMESub_m260: [ -23.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m260: [ ]
+    CR_SL_VV: [ -23.5, 23.5 ]
+    CR_SL_VV_HMESub_m260: [ -23.5, 23.5 ]
+    CR_SL_WJets: [ -23.5, 23.5 ]
+    CR_SL_WJets_HMESub_m260: [ -23.5, 23.5 ]
+    "*": [ -5.5, 23.5 ]
 
 TwoStageDNN_M270_binary:
   signal_params: { mass: 270 }
@@ -2546,7 +2592,28 @@ TwoStageDNN_M270_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -8.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m270: [ -8.0, 23.5 ]
+    SR_SL_HMESBH1_m270: [ -3.0, 23.5 ]
+    SR_SL_HMESBH2_m270: [ -2.5, 23.5 ]
+    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m270: [ -23.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m270: [ -2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m270: [ -1.0, 23.5 ]
+    SR_SL_Fakeable: [ -3.5, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m270: [ -23.5, 23.5 ]
+    CR_SL_H: [ -4.0, 23.5 ]
+    CR_SL_H_HMESub_m270: [ -3.0, 23.5 ]
+    CR_SL_ST: [ -23.5, 23.5 ]
+    CR_SL_ST_HMESub_m270: [ -23.5, 23.5 ]
+    CR_SL_TT: [ -23.5, 23.5 ]
+    CR_SL_TT_HMESub_m270: [ -23.5, 23.5 ]
+    CR_SL_VV: [ -23.5, 23.5 ]
+    CR_SL_VV_HMESub_m270: [ -23.5, 23.5 ]
+    CR_SL_WJets: [ -23.5, 23.5 ]
+    CR_SL_WJets_HMESub_m270: [ -23.5, 23.5 ]
+    "*": [ -8.0, 23.5 ]
 
 TwoStageDNN_M280_binary:
   signal_params: { mass: 280 }
@@ -2555,7 +2622,28 @@ TwoStageDNN_M280_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -5.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m280: [ -5.0, 23.5 ]
+    SR_SL_HMESBH1_m280: [ -2.5, 23.5 ]
+    SR_SL_HMESBH2_m280: [ -3.0, 23.5 ]
+    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m280: [ -4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m280: [ -1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m280: [ -2.0, 23.5 ]
+    SR_SL_Fakeable: [ -3.5, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m280: [ -23.5, 23.5 ]
+    CR_SL_H: [ -3.0, 23.5 ]
+    CR_SL_H_HMESub_m280: [ -1.5, 23.5 ]
+    CR_SL_ST: [ -23.5, 23.5 ]
+    CR_SL_ST_HMESub_m280: [ -23.5, 23.5 ]
+    CR_SL_TT: [ -23.5, 23.5 ]
+    CR_SL_TT_HMESub_m280: [ -23.5, 23.5 ]
+    CR_SL_VV: [ -23.5, 23.5 ]
+    CR_SL_VV_HMESub_m280: [ -23.5, 23.5 ]
+    CR_SL_WJets: [ -23.5, 23.5 ]
+    CR_SL_WJets_HMESub_m280: [ -23.5, 23.5 ]
+    "*": [ -5.0, 23.5 ]
 
 TwoStageDNN_M300_binary:
   signal_params: { mass: 300 }
@@ -2564,7 +2652,30 @@ TwoStageDNN_M300_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -4.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m300: [ -4.0, 23.5 ]
+    SR_SL_HMESBL1_m300: [ -3.5, 23.5 ]
+    SR_SL_HMESBH1_m300: [ -2.5, 23.5 ]
+    SR_SL_HMESBH2_m300: [ -2.5, 23.5 ]
+    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m300: [ -3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m300: [ -2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m300: [ -2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m300: [ 0.5, 23.5 ]
+    SR_SL_Fakeable: [ -3.0, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m300: [ -23.5, 23.5 ]
+    CR_SL_H: [ -4.0, 23.5 ]
+    CR_SL_H_HMESub_m300: [ -2.5, 23.5 ]
+    CR_SL_ST: [ -23.5, 23.5 ]
+    CR_SL_ST_HMESub_m300: [ -23.5, 23.5 ]
+    CR_SL_TT: [ -23.5, 23.5 ]
+    CR_SL_TT_HMESub_m300: [ -3.0, 23.5 ]
+    CR_SL_VV: [ -23.5, 23.5 ]
+    CR_SL_VV_HMESub_m300: [ -23.5, 23.5 ]
+    CR_SL_WJets: [ -23.5, 23.5 ]
+    CR_SL_WJets_HMESub_m300: [ -23.5, 23.5 ]
+    "*": [ -4.0, 23.5 ]
 
 TwoStageDNN_M320_binary:
   signal_params: { mass: 320 }
@@ -2573,7 +2684,30 @@ TwoStageDNN_M320_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -2.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m320: [ -2.0, 23.5 ]
+    SR_SL_HMESBL1_m320: [ 0.0, 23.5 ]
+    SR_SL_HMESBH1_m320: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m320: [ ]
+    SR_SL: [ -2.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m320: [ -1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m320: [ ]
+    SR_SL_Fakeable_HMESBH1_m320: [ ]
+    SR_SL_Fakeable_HMESBH2_m320: [ ]
+    SR_SL_Fakeable: [ -1.5, 23.5 ]
+    CR_SL_DY: [ -23.5, 23.5 ]
+    CR_SL_DY_HMESub_m320: [ 1.0, 23.5 ]
+    CR_SL_H: [ 1.0, 23.5 ]
+    CR_SL_H_HMESub_m320: [ 1.0, 23.5 ]
+    CR_SL_ST: [ -2.5, 23.5 ]
+    CR_SL_ST_HMESub_m320: [ -2.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m320: [ ]
+    CR_SL_VV: [ ]
+    CR_SL_VV_HMESub_m320: [ ]
+    CR_SL_WJets: [ ]
+    CR_SL_WJets_HMESub_m320: [ ]
+    "*": [ -2.0, 23.5 ]
 
 TwoStageDNN_M350_binary:
   signal_params: { mass: 350 }
@@ -2582,7 +2716,30 @@ TwoStageDNN_M350_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m350: [ -1.5, 23.5 ]
+    SR_SL_HMESBL1_m350: [ 0.5, 23.5 ]
+    SR_SL_HMESBH1_m350: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m350: [ 0.0, 23.5 ]
+    SR_SL: [ -2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m350: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m350: [ ]
+    SR_SL_Fakeable_HMESBH1_m350: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m350: [ ]
+    SR_SL_Fakeable: [ 0.0, 23.5 ]
+    CR_SL_DY: [ ]
+    CR_SL_DY_HMESub_m350: [ ]
+    CR_SL_H: [ ]
+    CR_SL_H_HMESub_m350: [ ]
+    CR_SL_ST: [ 0.0, 23.5 ]
+    CR_SL_ST_HMESub_m350: [ 0.0, 23.5 ]
+    CR_SL_TT: [ 1.0, 23.5 ]
+    CR_SL_TT_HMESub_m350: [ 1.0, 23.5 ]
+    CR_SL_VV: [ ]
+    CR_SL_VV_HMESub_m350: [ 1.0, 23.5 ]
+    CR_SL_WJets: [ -1.0, 23.5 ]
+    CR_SL_WJets_HMESub_m350: [ -1.0, 23.5 ]
+    "*": [ -1.5, 23.5 ]
 
 TwoStageDNN_M360_binary:
   signal_params: { mass: 360 }
@@ -2591,7 +2748,32 @@ TwoStageDNN_M360_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m360: [ -1.5, 23.5 ]
+    SR_SL_HMESBL2_m360: [ ]
+    SR_SL_HMESBL1_m360: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m360: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m360: [ 1.5, 23.5 ]
+    SR_SL: [ -2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m360: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m360: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m360: [ ]
+    SR_SL_Fakeable_HMESBH1_m360: [ ]
+    SR_SL_Fakeable_HMESBH2_m360: [ ]
+    SR_SL_Fakeable: [ -1.0, 23.5 ]
+    CR_SL_DY: [ ]
+    CR_SL_DY_HMESub_m360: [ ]
+    CR_SL_H: [ ]
+    CR_SL_H_HMESub_m360: [ 1.5, 23.5 ]
+    CR_SL_ST: [ ]
+    CR_SL_ST_HMESub_m360: [ ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m360: [ ]
+    CR_SL_VV: [ ]
+    CR_SL_VV_HMESub_m360: [ ]
+    CR_SL_WJets: [ ]
+    CR_SL_WJets_HMESub_m360: [ ]
+    "*": [ -1.5, 23.5 ]
 
 TwoStageDNN_M400_binary:
   signal_params: { mass: 400 }
@@ -2600,7 +2782,32 @@ TwoStageDNN_M400_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m400: [ -1.5, 23.5 ]
+    SR_SL_HMESBL2_m400: [ 2.0, 23.5 ]
+    SR_SL_HMESBL1_m400: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m400: [ 0.0, 23.5 ]
+    SR_SL_HMESBH2_m400: [ ]
+    SR_SL: [ -2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m400: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m400: [ ]
+    SR_SL_Fakeable_HMESBL1_m400: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m400: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m400: [ 1.0, 23.5 ]
+    SR_SL_Fakeable: [ -0.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m400: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m400: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 0.5, 23.5 ]
+    CR_SL_ST_HMESub_m400: [ 0.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m400: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m400: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ -0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m400: [ -0.5, 23.5 ]
+    "*": [ -1.5, 23.5 ]
 
 TwoStageDNN_M450_binary:
   signal_params: { mass: 450 }
@@ -2609,7 +2816,32 @@ TwoStageDNN_M450_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -1.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m450: [ -1.0, 23.5 ]
+    SR_SL_HMESBL2_m450: [ 2.5, 23.5 ]
+    SR_SL_HMESBL1_m450: [ 3.0, 23.5 ]
+    SR_SL_HMESBH1_m450: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m450: [ 2.5, 23.5 ]
+    SR_SL: [ -1.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m450: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m450: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m450: [ ]
+    SR_SL_Fakeable_HMESBH1_m450: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m450: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 0.0, 23.5 ]
+    CR_SL_DY: [ 0.5, 23.5 ]
+    CR_SL_DY_HMESub_m450: [ 2.0, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m450: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m450: [ 1.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m450: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m450: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m450: [ 0.5, 23.5 ]
+    "*": [ -1.0, 23.5 ]
 
 TwoStageDNN_M500_binary:
   signal_params: { mass: 500 }
@@ -2618,7 +2850,32 @@ TwoStageDNN_M500_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -0.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m500: [ -0.5, 23.5 ]
+    SR_SL_HMESBL2_m500: [ 3.0, 23.5 ]
+    SR_SL_HMESBL1_m500: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m500: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m500: [ 2.0, 23.5 ]
+    SR_SL: [ -0.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m500: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m500: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m500: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m500: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m500: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 0.5, 23.5 ]
+    CR_SL_DY: [ 1.5, 23.5 ]
+    CR_SL_DY_HMESub_m500: [ 1.5, 23.5 ]
+    CR_SL_H: [ 2.5, 23.5 ]
+    CR_SL_H_HMESub_m500: [ 2.5, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m500: [ 1.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m500: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m500: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m500: [ 0.0, 23.5 ]
+    "*": [ -0.5, 23.5 ]
 
 TwoStageDNN_M550_binary:
   signal_params: { mass: 550 }
@@ -2627,7 +2884,32 @@ TwoStageDNN_M550_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ -0.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m550: [ -0.5, 23.5 ]
+    SR_SL_HMESBL2_m550: [ 3.0, 23.5 ]
+    SR_SL_HMESBL1_m550: [ 3.0, 23.5 ]
+    SR_SL_HMESBH1_m550: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m550: [ 2.5, 23.5 ]
+    SR_SL: [ -1.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m550: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m550: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m550: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m550: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m550: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 0.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m550: [ 1.0, 23.5 ]
+    CR_SL_H: [ 2.5, 23.5 ]
+    CR_SL_H_HMESub_m550: [ 2.5, 23.5 ]
+    CR_SL_ST: [ 1.0, 23.5 ]
+    CR_SL_ST_HMESub_m550: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m550: [ ]
+    CR_SL_VV: [ 2.5, 23.5 ]
+    CR_SL_VV_HMESub_m550: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m550: [ 0.0, 23.5 ]
+    "*": [ -0.5, 23.5 ]
 
 TwoStageDNN_M600_binary:
   signal_params: { mass: 600 }
@@ -2636,7 +2918,32 @@ TwoStageDNN_M600_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m600: [ 0.0, 23.5 ]
+    SR_SL_HMESBL2_m600: [ 3.5, 23.5 ]
+    SR_SL_HMESBL1_m600: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m600: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m600: [ 3.0, 23.5 ]
+    SR_SL: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m600: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m600: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m600: [ 4.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m600: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m600: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 0.5, 23.5 ]
+    CR_SL_DY: [ 1.5, 23.5 ]
+    CR_SL_DY_HMESub_m600: [ 1.5, 23.5 ]
+    CR_SL_H: [ 2.5, 23.5 ]
+    CR_SL_H_HMESub_m600: [ 2.5, 23.5 ]
+    CR_SL_ST: [ 1.0, 23.5 ]
+    CR_SL_ST_HMESub_m600: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m600: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m600: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m600: [ 0.5, 23.5 ]
+    "*": [ 0.0, 23.5 ]
 
 TwoStageDNN_M650_binary:
   signal_params: { mass: 650 }
@@ -2645,7 +2952,32 @@ TwoStageDNN_M650_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m650: [ 0.0, 23.5 ]
+    SR_SL_HMESBL2_m650: [ 3.5, 23.5 ]
+    SR_SL_HMESBL1_m650: [ 2.5, 23.5 ]
+    SR_SL_HMESBH1_m650: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m650: [ 3.0, 23.5 ]
+    SR_SL: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m650: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m650: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m650: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m650: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m650: [ 2.5, 23.5 ]
+    SR_SL_Fakeable: [ 1.0, 23.5 ]
+    CR_SL_DY: [ 1.5, 23.5 ]
+    CR_SL_DY_HMESub_m650: [ 1.5, 23.5 ]
+    CR_SL_H: [ 3.0, 23.5 ]
+    CR_SL_H_HMESub_m650: [ 3.0, 23.5 ]
+    CR_SL_ST: [ 1.0, 23.5 ]
+    CR_SL_ST_HMESub_m650: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m650: [ ]
+    CR_SL_VV: [ 2.5, 23.5 ]
+    CR_SL_VV_HMESub_m650: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m650: [ 0.0, 23.5 ]
+    "*": [ 0.0, 23.5 ]
 
 TwoStageDNN_M700_binary:
   signal_params: { mass: 700 }
@@ -2654,7 +2986,32 @@ TwoStageDNN_M700_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m700: [ 0.0, 23.5 ]
+    SR_SL_HMESBL2_m700: [ 5.0, 23.5 ]
+    SR_SL_HMESBL1_m700: [ 2.5, 23.5 ]
+    SR_SL_HMESBH1_m700: [ 2.0, 23.5 ]
+    SR_SL_HMESBH2_m700: [ 2.5, 23.5 ]
+    SR_SL: [ 0.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m700: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m700: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m700: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m700: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m700: [ 2.5, 23.5 ]
+    SR_SL_Fakeable: [ 1.0, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m700: [ 0.0, 23.5 ]
+    CR_SL_H: [ 3.0, 23.5 ]
+    CR_SL_H_HMESub_m700: [ 3.0, 23.5 ]
+    CR_SL_ST: [ 1.0, 23.5 ]
+    CR_SL_ST_HMESub_m700: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m700: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m700: [ 1.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m700: [ 0.0, 23.5 ]
+    "*": [ 0.0, 23.5 ]
 
 TwoStageDNN_M750_binary:
   signal_params: { mass: 750 }
@@ -2663,7 +3020,32 @@ TwoStageDNN_M750_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m750: [ 0.5, 23.5 ]
+    SR_SL_HMESBL2_m750: [ 4.5, 23.5 ]
+    SR_SL_HMESBL1_m750: [ 3.0, 23.5 ]
+    SR_SL_HMESBH1_m750: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m750: [ 3.5, 23.5 ]
+    SR_SL: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m750: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m750: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m750: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m750: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m750: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 1.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m750: [ 0.5, 23.5 ]
+    CR_SL_H: [ 3.0, 23.5 ]
+    CR_SL_H_HMESub_m750: [ 3.0, 23.5 ]
+    CR_SL_ST: [ 1.5, 23.5 ]
+    CR_SL_ST_HMESub_m750: [ 1.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m750: [ 0.0, 23.5 ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m750: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m750: [ 0.0, 23.5 ]
+    "*": [ 0.5, 23.5 ]
 
 TwoStageDNN_M800_binary:
   signal_params: { mass: 800 }
@@ -2672,7 +3054,32 @@ TwoStageDNN_M800_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m800: [ 0.5, 23.5 ]
+    SR_SL_HMESBL2_m800: [ 4.5, 23.5 ]
+    SR_SL_HMESBL1_m800: [ 3.5, 23.5 ]
+    SR_SL_HMESBH1_m800: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m800: [ 3.5, 23.5 ]
+    SR_SL: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m800: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m800: [ 5.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m800: [ 4.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m800: [ 3.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m800: [ 3.0, 23.5 ]
+    SR_SL_Fakeable: [ 1.0, 23.5 ]
+    CR_SL_DY: [ 0.5, 23.5 ]
+    CR_SL_DY_HMESub_m800: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.5, 23.5 ]
+    CR_SL_H_HMESub_m800: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m800: [ 2.0, 23.5 ]
+    CR_SL_TT: [ 0.0, 23.5 ]
+    CR_SL_TT_HMESub_m800: [ 0.0, 23.5 ]
+    CR_SL_VV: [ 2.5, 23.5 ]
+    CR_SL_VV_HMESub_m800: [ 1.0, 23.5 ]
+    CR_SL_WJets: [ 2.5, 23.5 ]
+    CR_SL_WJets_HMESub_m800: [ 0.0, 23.5 ]
+    "*": [ 0.5, 23.5 ]
 
 TwoStageDNN_M850_binary:
   signal_params: { mass: 850 }
@@ -2681,7 +3088,32 @@ TwoStageDNN_M850_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 0.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m850: [ 0.5, 23.5 ]
+    SR_SL_HMESBL2_m850: [ 4.5, 23.5 ]
+    SR_SL_HMESBL1_m850: [ 3.5, 23.5 ]
+    SR_SL_HMESBH1_m850: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m850: [ 3.0, 23.5 ]
+    SR_SL: [ 0.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m850: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m850: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m850: [ 5.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m850: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m850: [ 3.0, 23.5 ]
+    SR_SL_Fakeable: [ 1.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m850: [ 0.0, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m850: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 1.5, 23.5 ]
+    CR_SL_ST_HMESub_m850: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m850: [ ]
+    CR_SL_VV: [ 2.5, 23.5 ]
+    CR_SL_VV_HMESub_m850: [ 2.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m850: [ 0.0, 23.5 ]
+    "*": [ 0.5, 23.5 ]
 
 TwoStageDNN_M900_binary:
   signal_params: { mass: 900 }
@@ -2690,7 +3122,32 @@ TwoStageDNN_M900_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m900: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m900: [ 5.0, 23.5 ]
+    SR_SL_HMESBL1_m900: [ 3.5, 23.5 ]
+    SR_SL_HMESBH1_m900: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m900: [ 4.0, 23.5 ]
+    SR_SL: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m900: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m900: [ 4.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m900: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m900: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m900: [ 2.5, 23.5 ]
+    SR_SL_Fakeable: [ 2.0, 23.5 ]
+    CR_SL_DY: [ 0.5, 23.5 ]
+    CR_SL_DY_HMESub_m900: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.5, 23.5 ]
+    CR_SL_H_HMESub_m900: [ 2.5, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m900: [ 2.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m900: [ 0.5, 23.5 ]
+    CR_SL_VV: [ 3.0, 23.5 ]
+    CR_SL_VV_HMESub_m900: [ 2.5, 23.5 ]
+    CR_SL_WJets: [ ]
+    CR_SL_WJets_HMESub_m900: [ ]
+    "*": [ 1.0, 23.5 ]
 
 TwoStageDNN_M1000_binary:
   signal_params: { mass: 1000 }
@@ -2699,7 +3156,32 @@ TwoStageDNN_M1000_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1000: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m1000: [ 5.0, 23.5 ]
+    SR_SL_HMESBL1_m1000: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m1000: [ 3.5, 23.5 ]
+    SR_SL_HMESBH2_m1000: [ 3.0, 23.5 ]
+    SR_SL: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1000: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1000: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1000: [ 5.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1000: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1000: [ 1.5, 23.5 ]
+    SR_SL_Fakeable: [ 2.0, 23.5 ]
+    CR_SL_DY: [ 0.5, 23.5 ]
+    CR_SL_DY_HMESub_m1000: [ 0.5, 23.5 ]
+    CR_SL_H: [ 3.5, 23.5 ]
+    CR_SL_H_HMESub_m1000: [ 3.5, 23.5 ]
+    CR_SL_ST: [ 1.5, 23.5 ]
+    CR_SL_ST_HMESub_m1000: [ 1.5, 23.5 ]
+    CR_SL_TT: [ 0.5, 23.5 ]
+    CR_SL_TT_HMESub_m1000: [ 0.5, 23.5 ]
+    CR_SL_VV: [ 2.5, 23.5 ]
+    CR_SL_VV_HMESub_m1000: [ 2.5, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m1000: [ 0.5, 23.5 ]
+    "*": [ 1.0, 23.5 ]
 
 TwoStageDNN_M1100_binary:
   signal_params: { mass: 1100 }
@@ -2708,7 +3190,32 @@ TwoStageDNN_M1100_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1100: [ 1.5, 23.5 ]
+    SR_SL_HMESBL2_m1100: [ 5.0, 23.5 ]
+    SR_SL_HMESBL1_m1100: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m1100: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m1100: [ 3.0, 23.5 ]
+    SR_SL: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1100: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1100: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1100: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1100: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1100: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 2.0, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m1100: [ 0.0, 23.5 ]
+    CR_SL_H: [ 3.0, 23.5 ]
+    CR_SL_H_HMESub_m1100: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 1.5, 23.5 ]
+    CR_SL_ST_HMESub_m1100: [ 1.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m1100: [ ]
+    CR_SL_VV: [ 3.0, 23.5 ]
+    CR_SL_VV_HMESub_m1100: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m1100: [ 0.5, 23.5 ]
+    "*": [ 1.5, 23.5 ]
 
 TwoStageDNN_M1200_binary:
   signal_params: { mass: 1200 }
@@ -2717,7 +3224,32 @@ TwoStageDNN_M1200_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 1.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1200: [ 1.5, 23.5 ]
+    SR_SL_HMESBL2_m1200: [ 4.0, 23.5 ]
+    SR_SL_HMESBL1_m1200: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m1200: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m1200: [ 2.0, 23.5 ]
+    SR_SL: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1200: [ 1.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1200: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1200: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1200: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1200: [ 2.0, 23.5 ]
+    SR_SL_Fakeable: [ 2.0, 23.5 ]
+    CR_SL_DY: [ 1.5, 23.5 ]
+    CR_SL_DY_HMESub_m1200: [ 0.0, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m1200: [ 2.0, 23.5 ]
+    CR_SL_ST: [ 1.5, 23.5 ]
+    CR_SL_ST_HMESub_m1200: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m1200: [ ]
+    CR_SL_VV: [ 3.0, 23.5 ]
+    CR_SL_VV_HMESub_m1200: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ ]
+    CR_SL_WJets_HMESub_m1200: [ 1.0, 23.5 ]
+    "*": [ 1.5, 23.5 ]
 
 TwoStageDNN_M1300_binary:
   signal_params: { mass: 1300 }
@@ -2726,7 +3258,32 @@ TwoStageDNN_M1300_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1300: [ 2.0, 23.5 ]
+    SR_SL_HMESBL2_m1300: [ 5.5, 23.5 ]
+    SR_SL_HMESBL1_m1300: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m1300: [ 3.0, 23.5 ]
+    SR_SL_HMESBH2_m1300: [ 3.5, 23.5 ]
+    SR_SL: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1300: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1300: [ 4.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1300: [ 5.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1300: [ 2.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1300: [ 4.5, 23.5 ]
+    SR_SL_Fakeable: [ 2.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m1300: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m1300: [ 1.5, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m1300: [ 1.5, 23.5 ]
+    CR_SL_TT: [ 1.0, 23.5 ]
+    CR_SL_TT_HMESub_m1300: [ 0.0, 23.5 ]
+    CR_SL_VV: [ 3.0, 23.5 ]
+    CR_SL_VV_HMESub_m1300: [ 3.0, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m1300: [ 1.0, 23.5 ]
+    "*": [ 2.0, 23.5 ]
 
 TwoStageDNN_M1400_binary:
   signal_params: { mass: 1400 }
@@ -2735,7 +3292,32 @@ TwoStageDNN_M1400_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.0, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1400: [ 2.0, 23.5 ]
+    SR_SL_HMESBL2_m1400: [ 4.5, 23.5 ]
+    SR_SL_HMESBL1_m1400: [ 5.0, 23.5 ]
+    SR_SL_HMESBH1_m1400: [ 3.0, 23.5 ]
+    SR_SL_HMESBH2_m1400: [ 3.0, 23.5 ]
+    SR_SL: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1400: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1400: [ 5.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1400: [ 3.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1400: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1400: [ 4.5, 23.5 ]
+    SR_SL_Fakeable: [ 2.0, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m1400: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m1400: [ 1.5, 23.5 ]
+    CR_SL_ST: [ 2.0, 23.5 ]
+    CR_SL_ST_HMESub_m1400: [ 1.5, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m1400: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m1400: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ 0.5, 23.5 ]
+    CR_SL_WJets_HMESub_m1400: [ 0.5, 23.5 ]
+    "*": [ 2.0, 23.5 ]
 
 TwoStageDNN_M1500_binary:
   signal_params: { mass: 1500 }
@@ -2744,7 +3326,32 @@ TwoStageDNN_M1500_binary:
   y_title: Events
   use_log_y: True
   divide_by_bin_width: False
-  blind_ranges: [ 2.5, 23.5 ]
+  blind_ranges:
+    SR_SL_HMESub_m1500: [ 2.5, 23.5 ]
+    SR_SL_HMESBL2_m1500: [ 6.5, 23.5 ]
+    SR_SL_HMESBL1_m1500: [ 4.5, 23.5 ]
+    SR_SL_HMESBH1_m1500: [ 2.0, 23.5 ]
+    SR_SL_HMESBH2_m1500: [ 3.0, 23.5 ]
+    SR_SL: [ 2.0, 23.5 ]
+    SR_SL_Fakeable_HMESub_m1500: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBL2_m1500: [ 4.0, 23.5 ]
+    SR_SL_Fakeable_HMESBL1_m1500: [ 5.0, 23.5 ]
+    SR_SL_Fakeable_HMESBH1_m1500: [ 1.5, 23.5 ]
+    SR_SL_Fakeable_HMESBH2_m1500: [ 1.5, 23.5 ]
+    SR_SL_Fakeable: [ 1.5, 23.5 ]
+    CR_SL_DY: [ 1.0, 23.5 ]
+    CR_SL_DY_HMESub_m1500: [ 0.5, 23.5 ]
+    CR_SL_H: [ 2.0, 23.5 ]
+    CR_SL_H_HMESub_m1500: [ 1.5, 23.5 ]
+    CR_SL_ST: [ 1.0, 23.5 ]
+    CR_SL_ST_HMESub_m1500: [ 1.0, 23.5 ]
+    CR_SL_TT: [ ]
+    CR_SL_TT_HMESub_m1500: [ ]
+    CR_SL_VV: [ 2.0, 23.5 ]
+    CR_SL_VV_HMESub_m1500: [ 2.0, 23.5 ]
+    CR_SL_WJets: [ 1.0, 23.5 ]
+    CR_SL_WJets_HMESub_m1500: [ 1.0, 23.5 ]
+    "*": [ 2.5, 23.5 ]
 
 TwoStageDNN_M1600_binary:
   signal_params: { mass: 1600 }

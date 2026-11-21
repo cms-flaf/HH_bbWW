@@ -306,13 +306,19 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
 - **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
-  threshold per mass (`blind_ranges`), from the SR binning of the SL datacards (20 bins of equal signal
-  targeted): in each spin, channel and category, the lower edge of the upper bins that hold half of the
-  signal; the lowest such edge over both spins, channels and categories. The upper bins of that binning
-  hold more than their 1/20 share of the signal (each is as narrow as the input bins and the background
-  gates allow while reaching its target), so this is fewer than 10 of 20 bins. FLAF applies
-  `blind_ranges` in every region, control regions included; the binary DNNs of other masses stay
-  blinded whole (`blind: true`).
+  threshold per mass and region (`blind_ranges` per region). In the HME window of MX of `SR_SL`
+  (`SR_SL_HMESub_m<MX>`): from the SR binning of the SL datacards (20 bins of equal signal targeted), in
+  each spin, channel and category the lower edge of the upper bins that hold half of the signal, the
+  lowest such edge over spins, channels and categories. The upper bins of that binning hold more than
+  their 1/20 share of the signal (each is as narrow as the input bins and the background gates allow
+  while reaching its target), so this is fewer than 10 of 20 bins. In every other region the score is
+  plotted in — the HME side bins of `SR_SL`, the window and side bins of `SR_SL_Fakeable`, the `CR_SL_*`
+  windows and the base regions — a bin is hidden if its s/√b (b = TT, the signal of MX, in 20 bins of
+  equal signal of the window) reaches the smallest s/√b of the window's hidden bins, from the lowest such
+  bin upwards; `SR_SL`, which holds the window, at least from the window's threshold. The regions of
+  other flavours (CI) keep the window's threshold. `test/test_plot_blinding_config.py` checks that the
+  thresholds cover every region the scores are plotted in. The binary DNNs of other masses stay blinded
+  whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their
   units.
