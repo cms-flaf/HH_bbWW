@@ -22,6 +22,8 @@ pytestmark = pytest.mark.needs_root
 ana_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if ana_path not in sys.path:
     sys.path.insert(0, ana_path)
+# FLAF's HistHelper reads ANALYSIS_PATH at import
+os.environ.setdefault("ANALYSIS_PATH", ana_path)
 
 import ROOT  # noqa: E402
 
