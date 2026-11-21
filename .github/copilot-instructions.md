@@ -133,8 +133,9 @@ Invariants a diff must keep:
   estimate and are not fitted; do not propose adding them back. `Fakes` is `preprocess: {gates: false}`
   in the SL cards (its parts can be empty and its Down variations zero: it must not gate the binning).
   The per-region `blind_ranges` of the SL binary DNNs are a user rule (2026-11-20): in the HME window of
-  the mass the upper bins holding half of the signal; elsewhere the bins whose s/√b reaches that of the
-  window's hidden bins; see `config/plot/histograms.yaml`. Every region the scores are plotted in must
+  the mass the upper bins holding half of the signal; in the HME side bins of `SR_SL` and in `SR_SL` the
+  bins whose s/√b reaches that of the window's hidden bins; `SR_SL_Fakeable` and the `CR_SL_*` never
+  blinded (2026-11-21); see `config/plot/histograms.yaml`. Every region the scores are plotted in must
   have its own key or fall to `"*"` only outside the SL flavour (`test/test_plot_blinding_config.py`).
 
 ### Integration test

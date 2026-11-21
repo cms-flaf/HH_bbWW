@@ -4,7 +4,8 @@ in: the base regions of every flavour that plots the variable and its booked sub
 Analysis/hist_booking.py), which include the datacard input regions and the CI windows. Every such region gets
 its windows through FLAF's own rule (FLAF/Common/PlotBlinding.py) without an error; every region pattern
 matches a plotted region (a misspelt pattern would leave its region to "*"); in the single-lepton window
-flavour no region falls to "*", and the HME window of each mass keeps its 50 %-of-signal threshold.
+flavour no region falls to "*", only the signal-like selection (SR_SL, its HME window and side bins) is
+blinded, and the HME window of each mass keeps its 50 %-of-signal threshold.
 Plain Python.
 """
 
@@ -107,6 +108,21 @@ class PerRegionBlinding(unittest.TestCase):
                 with self.subTest(var=var, region=region):
                     self.assertTrue(
                         any(re.fullmatch(p, region) for p in patterns), region
+                    )
+
+    def test_only_the_signal_like_selection_is_blinded(self):
+        # user, 2026-11-21: the SL window, its HME side bins and SR_SL only; SR_SL_Fakeable and CR_SL_* never
+        for var, regions in self.regions[SL_FLAVOUR].items():
+            if var not in PER_REGION:
+                continue
+            for region in regions:
+                if region == "SR_SL" or region.startswith(
+                    ("SR_SL_HMESub_", "SR_SL_HMESB")
+                ):
+                    continue
+                with self.subTest(var=var, region=region):
+                    self.assertEqual(
+                        blind_windows(var, var, PER_REGION[var], region), []
                     )
 
     def test_window_keeps_the_half_signal_threshold(self):
