@@ -203,8 +203,9 @@ the plots) gets them from there.
   (`config/sub_regions/hme_SL_v2610.yaml`, the [16, 84] % signal window per category,
   `<REG>_HMESub_m<MX>`) of `SR_SL`, the six `CR_SL_*` and the anti-isolated `SR_SL_Fakeable`, and in up
   to two sidebands of ≥ 50 GeV on each side of the window (`<REG>_HMESB{L2,L1,H1,H2}_m<MX>`) of `SR_SL`
-  and `SR_SL_Fakeable`: the inputs of the single-lepton fit and of its fake-lepton estimate, as 1D
-  histograms instead of the 2D `binary_DNN_m<MX>_vs_HME`. A side keeps the sidebands within
+  and `SR_SL_Fakeable`, as 1D histograms instead of the 2D `binary_DNN_m<MX>_vs_HME`. The single-lepton
+  fit reads the windows of `SR_SL`; the fake-lepton estimate reads the sidebands of `SR_SL` and the
+  window and sidebands of `SR_SL_Fakeable`; the `CR_SL_*` windows are booked but feed neither. A side keeps the sidebands within
   [240, 2000] GeV, 240 GeV being the DeepHME turn-on: at the lowest masses the lower side has one
   sideband or none. `DeepHME_mass` is booked in the base regions only. No DNN cut is applied in these
   sub-regions. The sidebands follow the windows of the cuts file per category: a new window file
