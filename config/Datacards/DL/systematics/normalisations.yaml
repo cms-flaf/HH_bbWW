@@ -45,11 +45,13 @@ uncertainties:
       member_values: { DY_M_10to50: 0.30 }
 
   # TT and DY normalisations: generous priors, constrained by TT_CR / DY_CR in the fit (as good as
-  # free rateParams); boosted shares res2b's (too few CR events).
+  # free rateParams). SR boosted shares res2b's; there are no boosted CRs (too few events: dropping them
+  # moved the expected limit by <= 1.3%, v2610_hmesub_v2 spin 0). res2b and recovery keep their own CRs and
+  # normalisations: one inclusive TT/DY CR with a shared normalisation costs ~7% at MX 300.
   - name: CMS_bbww_norm_TT_res2b
     type: lnN
     processes: [ TT ]
-    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted ]
     value: 0.10
   - name: CMS_bbww_norm_TT_recovery
     type: lnN
@@ -59,7 +61,7 @@ uncertainties:
   - name: CMS_bbww_norm_DY_res2b
     type: lnN
     processes: [ DY ]
-    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted, TT_boosted, DY_boosted ]
+    categories: [ SR_res2b, TT_res2b, DY_res2b, SR_boosted ]
     value: 0.20
   - name: CMS_bbww_norm_DY_recovery
     type: lnN
