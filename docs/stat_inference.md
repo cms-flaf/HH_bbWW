@@ -92,12 +92,18 @@ config/Datacards/
   SL/systematics/           the SL-only uncertainties:
     theory.yaml               DL's process theory numbers and names, for the SL backgrounds
                               (W on its own; DY split as in DL); keep the two in step
-    normalisations.yaml       TT / W+jets control-region normalisations, DY, Minor members
-  SL/sl_common.yaml         as dl_common.yaml for SL: SR and the TT / W+jets CRs in the HME
-                            windows, TwoStageDNN_M<MX>_binary inputs (Run3_Model_DYSplit)
+    normalisations.yaml       TT / W+jets normalisations per jet category, DY, Minor members
+    fakes.yaml                the Fakes nuisances (statistical per channel, category, era and part;
+                              method per channel, category and part), as named in config/processes.yaml
+  SL/sl_common.yaml         as dl_common.yaml for SL: the SR in the HME windows, no control
+                            region, the data-driven Fakes (`preprocess: gates: false`: binned but
+                            outside the binning gates, so the bins are those of the other
+                            backgrounds), TwoStageDNN_M<MX>_binary inputs (Run3_Model_DYSplit)
   SL/binning_eqsig_SL_v2610.yaml  the SL binning only
-  SL/sl_spin{0,2}.yaml      as the DL spin cards, with SL/; not in `cards:` yet (no fake
-                            background in the inputs: expected limits only)
+  SL/sl_spin{0,2}.yaml      as the DL spin cards, with SL/; not in `cards:`: they read the SL
+                            production (flavour Signal_Extraction_SL_window, with Fakes), so a
+                            run names them in a user_custom `StatInference: cards:` block with
+                            that production's --hists-version (expected limits only)
   run2_external_limits.json the Run 2 (HIG-21-005) expected limits the limit plots overlay
                             (`external_limits: [{ file: ..., key: <channel>/spin<J> }]`), on
                             sigma(pp->X->HH) in pb, the same quantity as r (the signals are
@@ -332,7 +338,8 @@ The DL cards (`DL/dl_spin0.yaml` and `DL/dl_spin2.yaml`, through their shared
 - bins the DNN score from the top down: the SR into equal-signal bins, the control
   regions into `control_region_bins` (5) bins of equal background. A bin closes only
   once every background passes the statistics and positivity gates, for the nominal and
-  every variation.
+  every variation; a background with `preprocess: {gates: false}` (the SL Fakes) is binned but
+  takes no part in them.
 
 ```yaml
 preprocess:
@@ -455,8 +462,8 @@ Hints:
 
 Declared in the datacard configuration's `impact_plots` block and drawn by
 `PlotPullsAndImpactsTask`, which writes to `<version>/ImpactPlots/<card>/<name>/<era>/<mass>/`
-on `fs_default`
-beside the limit plots:
+on `fs_StatInference` (`fs_default` unless set; see FLAF's
+[Storage](https://cms-flaf.github.io/FLAF/concepts/storage/)) beside the limit plots:
 
 ```sh
 law run PlotPullsAndImpactsTask \

@@ -42,8 +42,3 @@ gates:
   min_each_neff: 2
   min_variation_neff: 2
   exempt_fraction: 0.05
-
-# Control regions (base region names): the window in this many equal-background DNN bins.
-control_region_bins:
-  CR_SL_TT: 5
-  CR_SL_WJets: 5

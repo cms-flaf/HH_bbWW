@@ -196,6 +196,26 @@ class SingleLeptonWindows(unittest.TestCase):
                 self.assertEqual(entry.get("signal_params"), {"mass": int(m.group(1))})
 
 
+class Intervals(unittest.TestCase):
+    """Every SL record's DeepHME_mass interval is the one its cut encodes (read back from the
+    bin-index expression, an independent path); test/test_sl_fakes.py checks the cells the SL fake
+    estimate builds from them."""
+
+    def test_intervals_equal_the_cuts(self):
+        edges = HB.axis_edges(HISTS["DeepHME_mass"]["x_bins"])
+        n = 0
+        for flavour in (SL_FLAVOUR, "CI"):
+            for s in HB.sub_regions(setup_for(flavour)):
+                if s["base_region"] not in SB_REGIONS:
+                    continue
+                self.assertEqual(sorted(s["intervals"]), sorted(s["cuts"]), s["name"])
+                for key, (expr, _) in s["cuts"].items():
+                    (got,) = s["intervals"][key]["DeepHME_mass"]
+                    self.assertEqual(got, interval(expr, edges), (s["name"], key))
+                    n += 1
+        self.assertGreater(n, 0)
+
+
 class CiWindows(unittest.TestCase):
     def test_no_one_and_two_lower_sidebands(self):
         subs = HB.sub_regions(setup_for("CI"))

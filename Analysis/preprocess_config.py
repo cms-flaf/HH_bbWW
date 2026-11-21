@@ -14,6 +14,7 @@ Two inputs, with no overlap:
         drop: { <member>: [ <card category>, ... ] }   # members left out there
         dy_template: { share_by, fit, guard_sigma, pool }  # settings of the DY templates
         lowmass_dy: { process, transfer, reference }       # settings of the low-mass estimate
+        gates: false                                       # binned, but not in the binning gates
   - a `type: shape` uncertainty entry, exactly one of:
       preprocess: { member_values: { <member>: v or [ down, up ], ... } }
       preprocess: { cr_tilt: <size> }
@@ -50,7 +51,7 @@ MOVED_BINNING_KEYS = {
     "systematics entry CMS_bbww_dy_lowmass (preprocess: lowmass_dy: [down, up])",
 }
 
-PROCESS_KEYS = {"members", "drop", "dy_template", "lowmass_dy"}
+PROCESS_KEYS = {"members", "drop", "dy_template", "lowmass_dy", "gates"}
 UNCERTAINTY_KEYS = {"member_values", "cr_tilt", "dy_template", "lowmass_dy"}
 DY_TEMPLATE_KEYS = {"share_by", "fit", "guard_sigma", "pool"}
 DY_TEMPLATE_REQUIRED = {"share_by"}
@@ -158,6 +159,8 @@ class PreprocessModel:
         }
         self.card_name = {}  # background histogram name -> card process name
         self.members, self.drop = {}, {}
+        # backgrounds that take no part in the binning gates (preprocess: gates: false)
+        self.ungated = set()
         self.dy_template, self.lowmass = None, None
         self._read_processes(cfg.get("processes") or [])
         self.owner = {}  # member -> its background
@@ -216,6 +219,11 @@ class PreprocessModel:
                     f"{what}: members must be a non-empty list of distinct process names"
                 )
             self.members[name] = list(members)
+            if "gates" in pre:
+                if not isinstance(pre["gates"], bool):
+                    raise PreprocessConfigError(f"{what}: gates must be true or false")
+                if not pre["gates"]:
+                    self.ungated.add(name)
             for member, cats in (pre.get("drop") or {}).items():
                 if member not in members:
                     raise PreprocessConfigError(

@@ -60,8 +60,9 @@ impact_plots:
       # fits at r_nominal, which dhi counts as a failed fit and refuses to merge; keep the rest. The
       # task still warns, by name, about every card nuisance missing from the plot.
       keep_failures: true
-      # the bin-by-bin MC-statistics nuisances (autoMCStats) too: ~230 parameters per SL point, ~400 per DL
-      # point. AN layout (frozen 2026-11-19, as the DL and SL impact figures of the AN): 50 per page,
+      # the bin-by-bin MC-statistics nuisances (autoMCStats) too: ~300 parameters per SL point (294 at MX 600,
+      # with the Fakes), ~400 per DL point. AN layout (frozen 2026-11-19, as the DL and SL impact
+      # figures of the AN): 50 per page,
       # canvas 1580 px, label margin 590 px, row height 30 px, label size 22, the MC-stat names shortened
       # for display (impact_labels.py; the longest remaining label, 44 characters, fits). The AN figures
       # are also cropped to the drawn area, which dhi cannot do (a step after the plot).

@@ -151,12 +151,13 @@ class SLCards(unittest.TestCase):
                 "ST": ["ST"],
                 "DY": ["DY_M_10to50", "DY_M_50"],
                 "Minor": ["VV", "VVV", "H"],
+                "Fakes": ["Fakes"],
             },
         )
-        # DY: a trace in the TT CR whose heavy events break the gates there
-        self.assertEqual(m.dropped_in("TT_boosted"), {"DY_M_10to50", "DY_M_50"})
-        self.assertEqual(m.dropped_in("W_recovery"), set())
+        # the SR windows only, nothing dropped; the Fakes outside the binning gates
+        self.assertEqual(m.categories, ["SR_res2b", "SR_boosted", "SR_recovery"])
         self.assertEqual(m.dropped_in("SR_res2b"), set())
+        self.assertEqual(m.ungated, {"Fakes"})
         # the DL numbers, with the SL process names
         self.assertEqual(m.member_uncs["QCD_scale_TT"], [("TT", (-0.036, 0.025))])
         self.assertEqual(m.member_uncs["QCD_scale_DY"], [("DY_M_50", (-0.011, 0.007))])
@@ -164,7 +165,7 @@ class SLCards(unittest.TestCase):
         # no DY template, low-mass estimate or CR tilt (yet)
         self.assertEqual(m.templates, {})
         self.assertIsNone(m.lowmass)
-        self.assertEqual(m.tilts("e", "TT_res2b"), [])
+        self.assertEqual(m.tilts("e", "SR_res2b"), [])
 
     def test_binning_file_is_binning_only(self):
         with open(SL_BINNING) as f:
@@ -175,7 +176,7 @@ class SLCards(unittest.TestCase):
         bases = {d.split("_HMESub_")[0] for d in card["input_categories"].values()} - {
             "SR_SL"
         }
-        self.assertEqual(set(cfg["control_region_bins"]), bases)
+        self.assertEqual(set(cfg.get("control_region_bins") or {}), bases)
 
 
 class Strict(unittest.TestCase):
@@ -244,6 +245,15 @@ class Strict(unittest.TestCase):
             cfg = card()
             entry(cfg, "QCD_scale_ttV")["preprocess"]["member_values"]["ttV"] = bad
             self.assertRaises(PreprocessConfigError, PreprocessModel, cfg)
+
+    def test_gates_false_takes_a_background_out_of_the_gates(self):
+        cfg = card()
+        process(cfg, "TT")["preprocess"]["gates"] = False
+        self.assertEqual(PreprocessModel(cfg).ungated, {"TT"})
+        process(cfg, "TT")["preprocess"]["gates"] = True
+        self.assertEqual(PreprocessModel(cfg).ungated, set())
+        process(cfg, "TT")["preprocess"]["gates"] = "no"
+        self.assertRaisesWith("gates must be true or false", cfg)
 
     def test_unknown_process_key(self):
         cfg = card()

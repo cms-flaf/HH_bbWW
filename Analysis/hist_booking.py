@@ -624,6 +624,18 @@ def _sideband_spec(spec, edges_of, has_binning, what):
     return out, edges
 
 
+def bin_intervals(cut, has_binning):
+    """``{variable: [(low, high), ...]}`` of the bin-form parts of a (checked) cut; C++ parts have
+    none."""
+    out = {}
+    for part in cut if isinstance(cut, list) else [cut]:
+        if isinstance(part, dict):
+            for var, value in part.items():
+                if has_binning(var):
+                    out.setdefault(var, []).extend(_intervals(value, var))
+    return out
+
+
 def _split_channels(value, has_binning, channels):
     """``{channel: cut}`` of a category's value: a channel map as is, any other cut for every channel."""
     if isinstance(value, dict) and value and set(value) <= set(channels):
@@ -698,7 +710,9 @@ def load_cuts(path, ana_path, what):
 def sub_regions(setup):
     """The sub-regions of the flavour, cached on the setup: a list of
     ``{"name", "sub_region", "base_region", "point": {parameter: value},
-    "cuts": {(category, channel): (expression, columns)}, "variables": [names] or None (all)}``.
+    "cuts": {(category, channel): (expression, columns)},
+    "intervals": {(category, channel): {variable: [(low, high), ...]}} (the bin-form intervals),
+    "variables": [names] or None (all)}``.
     """
     cache = setup.__dict__.get("_bbww_sub_regions")
     if cache is not None:
@@ -822,7 +836,7 @@ def sub_regions(setup):
                             "flavour that belongs to the point"
                         )
                     point_vars.append(var)
-            point_cuts = {}
+            point_cuts, point_intervals = {}, {}
             for cat, value in points[values].items():
                 if cat not in categories:
                     raise HistBookingError(
@@ -834,13 +848,16 @@ def sub_regions(setup):
                 ).items():
                     if ch in entry_channels:
                         point_cuts[(cat, ch)] = cut
-            # {sub-region name: cuts}: the cut itself, or each sideband of its window
-            families = {name: point_cuts}
+                for ch, raw in _split_channels(value, has_binning, channels).items():
+                    if ch in entry_channels:
+                        point_intervals[(cat, ch)] = bin_intervals(raw, has_binning)
+            # {sub-region name: (cuts, intervals)}: the cut itself, or each sideband of its window
+            families = {name: (point_cuts, point_intervals)}
             if sidebands is not None:
                 spec, sb_edges = sidebands
                 labels = [f"L{i}" for i in range(spec["count"], 0, -1)]
                 labels += [f"H{i}" for i in range(1, spec["count"] + 1)]
-                per_label = {label: {} for label in labels}
+                per_label = {label: ({}, {}) for label in labels}
                 for cat, value in points[values].items():
                     for ch, raw in _split_channels(
                         value, has_binning, channels
@@ -851,15 +868,18 @@ def sub_regions(setup):
                         for label, cut in sideband_cuts(
                             raw, spec, sb_edges, cell
                         ).items():
-                            per_label[label][(cat, ch)] = cut_expression(
+                            per_label[label][0][(cat, ch)] = cut_expression(
                                 cut, ctx, f"{cell} sideband {label}"
+                            )
+                            per_label[label][1][(cat, ch)] = bin_intervals(
+                                cut, has_binning
                             )
                 families = {
                     name + label: per_label[label]
                     for label in labels
-                    if per_label[label]
+                    if per_label[label][0]
                 }
-            for family, cuts in families.items():
+            for family, (cuts, intervals) in families.items():
                 if not cuts:
                     continue  # no key in the entry's channels
                 for reg in base_regions:
@@ -880,6 +900,7 @@ def sub_regions(setup):
                             "base_region": reg,
                             "point": dict(point),
                             "cuts": dict(cuts),
+                            "intervals": {k: intervals[k] for k in cuts},
                             "variables": point_vars,
                         }
                     )

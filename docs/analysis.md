@@ -83,9 +83,11 @@ Two networks consume that grid, and they do not cover the same part of it:
   `TwoStageDNN.masses` in `config/global.yaml`: the 30 produced points from 250 GeV to 2 TeV. Its
   multiclass stage does not depend on the mass, so neither do the SL signal and control regions
   (see [below](#single-lepton-two-stage-dnn)). The SL cards (`config/Datacards/SL/`)
-  fit `SR_SL` and the TT and W+jets classes `CR_SL_TT`, `CR_SL_WJets` in the HME window of each
-  mass (`<region>_HMESub_m<MX>`), with the DL preprocess step; expected limits only, and not yet
-  in `StatInference.cards`, until the fake background is part of the inputs;
+  fit `SR_SL` alone, in the HME window of each mass (`SR_SL_HMESub_m<MX>`), with the data-driven
+  Fakes as a background ([Single-lepton fakes](#single-lepton-fakes)) and the DL preprocess step; no
+  TT or W+jets control region is fitted, as they have no fake estimate. Expected limits only; they are
+  not in `StatInference.cards` (they read the SL production, see
+  [Statistical inference](stat_inference.md));
   the earlier single-file SL card, `config/Datacards/x_hh_bbww_SL_run3.yaml`, is kept for
   reference only and still reads the per-mass regions `SR_SL_M${MX}` that no longer exist.
 
@@ -123,15 +125,18 @@ What the models return and what is stored is configured per network in `multicla
 | `save_as` | what is stored: `logit` (raw), `probability`, or `recomputed_logit` |
 | `signal_node` | binary model with more than one output: the signal output (1; 0 is background) |
 
-The current models return raw logits. Both networks store `recomputed_logit`: log(p / (1 − p)) of
-the softmax probability of each output, with p clipped to [`logit_clip_eps`, 1 − `logit_clip_eps`].
-For the 2-output binary model this is the logit difference z<sub>1</sub> − z<sub>0</sub>. The raw
-signal logit z<sub>1</sub> alone has no absolute scale: softmax does not change when the same
-constant is added to both outputs. With `logit_clip_eps: 1.0e-10` every stored score is within
-±23.03, and the TwoStageDNN entries of `config/plot/histograms.yaml` use the range [−23.5, 23.5]
-(94 bins in 1D, 47 on the DNN axis of the plots against DeepHME). The range has to contain the
-bound strictly, as plots drop the overflow; changing `logit_clip_eps` means changing it too.
-Storing raw logits cannot be configured for a model that returns probabilities.
+The current models return raw logits. As configured (`config/global.yaml`), the binary network
+stores the raw logit z<sub>1</sub> of its signal node (`save_as: logit`) and the multiclass network
+the softmax probability of each class (`save_as: probability`). `recomputed_logit` would store
+log(p / (1 − p)) of the softmax probability of each output, with p clipped to
+[`logit_clip_eps`, 1 − `logit_clip_eps`] (±23.03 for `1.0e-10`); for the 2-output binary model that
+is the logit difference z<sub>1</sub> − z<sub>0</sub>. The raw signal logit z<sub>1</sub> has no
+absolute scale (softmax does not change when the same constant is added to both outputs) and no
+bound: the binary DNN entries of `config/plot/histograms.yaml` use [−23.5, 23.5] (94 bins in 1D, 47
+on the DNN axis of the plots against DeepHME), and scores outside it are in the under- and overflow,
+which plots drop. The multiclass entries use the same axis, so their probabilities fill its bins
+[0, 0.5), [0.5, 1) and, for p = 1, [1, 1.5). Storing raw logits cannot be configured for a model that returns
+probabilities.
 
 An event that no fold scores stops the producer. A non-finite model output only prints a warning,
 with the event numbers, and is stored as it is.
@@ -154,7 +159,10 @@ and fills them in for events that only a shift selected, after checking that eve
 
 ## Categories
 
-HH→bb̄WW is analysed in **resolved** and **boosted** categories (low- and high-p_T HH topologies).
+HH→bb̄WW is analysed in a **boosted** category (a large-radius jet, high-p_T HH topologies) and two
+**resolved** ones, `res2b` (both b-jet candidates b-tagged) and `recovery` (only the candidate with the
+higher b-tag score b-tagged); `inclusive` holds every boosted and resolved event, resolved events
+without a b-tagged candidate included (`Analysis/hh_bbww.py`, `categories` in `config/global.yaml`).
 Category and channel selection is driven by `config/global.yaml`; narrow or extend it there or via
 your [`user_custom.yaml`](https://cms-flaf.github.io/FLAF/configuration/user-custom/).
 
@@ -195,8 +203,9 @@ the plots) gets them from there.
   (`config/sub_regions/hme_SL_v2610.yaml`, the [16, 84] % signal window per category,
   `<REG>_HMESub_m<MX>`) of `SR_SL`, the six `CR_SL_*` and the anti-isolated `SR_SL_Fakeable`, and in up
   to two sidebands of ≥ 50 GeV on each side of the window (`<REG>_HMESB{L2,L1,H1,H2}_m<MX>`) of `SR_SL`
-  and `SR_SL_Fakeable`: the inputs of the single-lepton fit and of its fake-lepton estimate, as 1D
-  histograms instead of the 2D `binary_DNN_m<MX>_vs_HME`. A side keeps the sidebands within
+  and `SR_SL_Fakeable`, as 1D histograms instead of the 2D `binary_DNN_m<MX>_vs_HME`. The single-lepton
+  fit reads the windows of `SR_SL`; the fake-lepton estimate reads the sidebands of `SR_SL` and the
+  window and sidebands of `SR_SL_Fakeable`; the `CR_SL_*` windows are booked but feed neither. A side keeps the sidebands within
   [240, 2000] GeV, 240 GeV being the DeepHME turn-on: at the lowest masses the lower side has one
   sideband or none. `DeepHME_mass` is booked in the base regions only. No DNN cut is applied in these
   sub-regions. The sidebands follow the windows of the cuts file per category: a new window file
@@ -204,6 +213,67 @@ the plots) gets them from there.
   own (`config/sub_regions/ci_sl_hme.yaml`, whose windows leave room for no, one and two lower
   sidebands), and books `SR_SL_Fakeable`: every base region of a flavour's sub-regions must be in its `regions:`,
   or the plots of that region find no histograms.
+
+## Single-lepton fakes
+
+Events with a non-prompt or misidentified lepton in the single-lepton signal region are estimated from
+data: the process `Fakes` ("Non-prompt leptons", `config/processes.yaml`, `Analysis/SL_fakes.py`), a
+[data-driven process](https://cms-flaf.github.io/FLAF/configuration/processes-and-models/#data-driven-processes)
+of FLAF listed among the backgrounds of `Run3_Model`, `Run3_Model_DYSplit` and `TestModel`. It has no
+datasets: `HistMergerTask` computes it after every process is merged, in the merged file of each
+`TwoStageDNN_M<MX>_binary` of `Signal_Extraction_SL_window` (the HME sub-regions of
+[Regions and sub-regions](#regions-and-sub-regions)), when data was merged and the merge is not
+restricted with `--process` or `--dataset`. Other variables, flavours and binary DNNs without SL
+windows (1600–2000 GeV) get none.
+
+In the SL window `SR_SL_HMESub_m<MX>`, per channel (e, μ) and category (res2b, recovery, boosted),
+`Fakes = max(f, 0) × TT` bin by bin, with f the excess of data over the simulation in units of TT,
+
+    f = (D − O) / T − 1      D data, O the simulated backgrounds other than TT, T TT,
+
+measured without the data of the isolated window, separately below and from the mass's `split` of the
+DNN (two parts, each
+applied to the TT bins of its part). Two schemes (`scheme` per mass):
+
+- **H:** f from the isolated HME sidebands, `SR_SL_HMESB{L2,L1}_m<MX>` pooled and
+  `SR_SL_HMESB{H1,H2}_m<MX>` pooled, interpolated linearly in HME to the window at the middle of each
+  region's HME interval;
+- **V:** f(isolated sidebands) / f(anti-isolated sidebands) × f(anti-isolated window), the
+  anti-isolated regions being `SR_SL_Fakeable_HMESB*_m<MX>` and `SR_SL_Fakeable_HMESub_m<MX>`; f = 0
+  where the isolated sidebands or the anti-isolated window show no excess.
+
+**Configuration** (the analysts' choice): V up to 400 GeV, where the lower sidebands are missing or sit
+on the DeepHME turn-on, H above; the `split` per mass (the cuts of an earlier study, moved to the
+nearest 0.5 edge of the DNN axis; −3.5 at 1200, 1300 and 1500 GeV, as at 1400 GeV, where the study's
+cuts left the low part of the sidebands without TT). Every mass of `config/sub_regions/hme_SL_v2610.yaml` needs a `split` (a bin
+edge of the binary DNN) and a `scheme`, and every physics model listing `Fakes` a `tt_process`
+(`test/test_sl_fakes.py` checks them, and that the scheme's regions exist in every cell). A scheme
+whose regions a cell lacks is a configuration error, and so is a `split` that leaves one part with too
+little TT (`min_tt`) in a region group of every cell of a mass while the other part is determined in
+some cell: the merge stops rather than give no Fakes to the whole mass.
+
+**Uncertainties**, each in its part of the DNN: `FakesStatLow/High` (f shifted by its statistical
+error, propagated to first order from the yields of the regions; Up and Down are
+max(max(f, 0) ± σ<sub>f</sub>, 0) × TT; per channel, category and era) and `FakesMethodLow/High`
+(max(f, 0) ± |max(f<sub>other</sub>, 0) − max(f, 0)| with the other scheme, per channel and category,
+correlated across eras; no shift where the other scheme's regions are missing or it is not
+determined). The members of the theory uncertainties (QCD scale, PDF) get no Fakes variation: FLAF
+estimates data-driven processes for the other sources only, so the sum of eras and the datacards take
+the Fakes nominal there. The nominal decides whether f is determined (at least `min_tt` weighted TT
+events in each DNN part of each region group and, for V, an excess in the anti-isolated sidebands):
+where it is not, Fakes = 0 in that cell (both parts, with zero variations and nuisances, so that a
+sum of eras and the datacards find the process everywhere), with a message; that era then adds nothing
+to the cell in a sum of eras. Where a variation leaves f undetermined in a part (no TT in a
+region group where the nominal had enough or, for V, no excess in the anti-isolated sidebands), that
+part keeps the nominal f, applied to the varied TT, with a message naming the cell and the variation.
+The variations of the simulation enter through D − O and T; data stay nominal.
+
+**Blinding:** the estimator never reads the data of the isolated window. The merged file holds them,
+as FLAF merges data in every region; the sub-regions are not plotted. The merge prints, per cell, the
+scheme used or that the cell is not estimated, and no number; in V, "not determined" with enough TT
+means that the anti-isolated sidebands show no excess in a part. Fakes appear on no control plot yet;
+the SL datacards include them (`config/Datacards/SL/`, with the nuisances of
+`config/Datacards/SL/systematics/fakes.yaml`).
 
 ## Choosing which variables to histogram
 
@@ -235,6 +305,14 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
 - **Control regions** (`plot_control_regions: [ TT_CR, DY_CR ]`): no signal is drawn, and the
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
+- **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
+  threshold per mass (`blind_ranges`), from the SR binning of the SL datacards (20 bins of equal signal
+  targeted): in each spin, channel and category, the lower edge of the upper bins that hold half of the
+  signal; the lowest such edge over both spins, channels and categories. The upper bins of that binning
+  hold more than their 1/20 share of the signal (each is as narrow as the input bins and the background
+  gates allow while reaching its target), so this is fewer than 10 of 20 bins. FLAF applies
+  `blind_ranges` in every region, control regions included; the binary DNNs of other masses stay
+  blinded whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their
   units.

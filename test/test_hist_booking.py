@@ -937,5 +937,73 @@ class EntryVariables(BookingTestBase):
                 )
 
 
+class Intervals(BookingTestBase):
+    """The bin-form intervals each sub-region record carries (``intervals``), which the SL fake
+    estimate reads for the HME position of its regions."""
+
+    def test_window_intervals_per_key(self):
+        subs = {
+            s["name"]: s for s in HB.sub_regions(self.setup_for(entries=[self.entry()]))
+        }
+        rec = subs["SR_HMESub_m300"]
+        self.assertEqual(sorted(rec["intervals"]), sorted(rec["cuts"]))
+        self.assertEqual(
+            rec["intervals"][("res2b", "eE")], {"DeepHME_mass": [(250.0, 350.0)]}
+        )
+        # the whole range is an interval like any other
+        self.assertEqual(
+            rec["intervals"][("boosted", "eE")], {"DeepHME_mass": [(0.0, 400.0)]}
+        )
+
+    def test_sideband_intervals_are_the_slices(self):
+        self.write_cuts(
+            HEADER + "cuts:\n  300:\n    res2b: { DeepHME_mass: [ 260, 300 ] }\n"
+        )
+        subs = {
+            s["sub_region"]: s
+            for s in HB.sub_regions(
+                self.setup_for(entries=[self.entry(name="HMESB", sidebands=SB)])
+            )
+        }
+        expected = {
+            "L2": (220, 240),
+            "L1": (240, 260),
+            "H1": (300, 320),
+            "H2": (320, 340),
+        }
+        for label, interval in expected.items():
+            rec = subs["HMESB" + label]
+            self.assertEqual(sorted(rec["intervals"]), sorted(rec["cuts"]))
+            for key in rec["intervals"]:
+                self.assertEqual(
+                    rec["intervals"][key],
+                    {"DeepHME_mass": [tuple(map(float, interval))]},
+                )
+
+    def test_channel_maps_lists_and_cpp_parts(self):
+        self.write_cuts(
+            HEADER
+            + "cuts:\n  300:\n    res2b: { eE: { DeepHME_mass: [ 260, 300 ] }, "
+            + "muMu: [ { DeepHME_mass: [ [ 250, 260 ], [ 280, 300 ] ], "
+            + "DNN_M300_Signal: [ 0.5, 1.0 ] }, 'lep1_pt > 30' ] }\n"
+        )
+        setup = self.setup_for(
+            entries=[self.entry(points=[{"mass": 300}])], fullres=("lep1_pt",)
+        )
+        (rec,) = HB.sub_regions(setup)
+        self.assertEqual(
+            rec["intervals"][("res2b", "eE")], {"DeepHME_mass": [(260.0, 300.0)]}
+        )
+        self.assertEqual(
+            rec["intervals"][("res2b", "muMu")],
+            {
+                "DeepHME_mass": [(250.0, 260.0), (280.0, 300.0)],
+                "DNN_M300_Signal": [(0.5, 1.0)],
+            },
+        )
+        cpp = self.one('    res2b: "DeepHME_mass > 250"\n')
+        self.assertEqual(list(cpp["intervals"].values()), [{}] * len(cpp["intervals"]))
+
+
 if __name__ == "__main__":
     unittest.main()

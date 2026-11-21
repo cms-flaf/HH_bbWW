@@ -14,12 +14,13 @@ include:
   # SL-only uncertainties (every file of systematics/)
   - systematics/theory.yaml
   - systematics/normalisations.yaml
+  - systematics/fakes.yaml
   - sl_common.yaml
   # the signals of this spin, with their uncertainties (shared with DL/dl_spin0.yaml)
   - ../signals/spin0.yaml
 
 # Compared with the Run 2 SL expected limit of the same spin (run2_external_limits.json, SL/: recomputed from the
-# HIG-21-005 SL cards, which include a data-driven fake background; the Run 3 SL inputs have none yet).
+# HIG-21-005 SL cards, which include a data-driven fake background, as these cards do).
 limit_plots:
   - name: spin0_sl
     bands: true
@@ -45,7 +46,7 @@ limit_plots:
   - name: spin0_categories
     datacards:
       - { name: "Combined spin-0 (radion)", glob: "*.txt" }
-      # each jet category with its control regions (dhi combines the cards of one mass)
+      # each jet category (dhi combines the cards of one mass)
       - { name: "res 2b", glob: "${ERA}/categories/*_res2b/*.txt" }
       - { name: "recovery", glob: "${ERA}/categories/*_recovery/*.txt" }
       - { name: "boosted", glob: "${ERA}/categories/*_boosted/*.txt" }

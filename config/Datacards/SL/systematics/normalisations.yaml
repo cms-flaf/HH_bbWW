@@ -1,4 +1,4 @@
-# SL normalisations: TT and W+jets from the control regions, DY, Minor members.
+# SL normalisations: TT and W+jets priors per jet category (no control region in the fit), DY, Minor members.
 uncertainties:
   # The members of Minor, as shapes of Minor moving only that member (`preprocess: member_values`,
   # as in theory.yaml). The same names and values as DL/systematics/normalisations.yaml (they are
@@ -33,37 +33,36 @@ uncertainties:
     processes: [ DY ]
     value: 0.20
 
-  # TT and W+jets normalisations: generous priors, constrained by the TT and W+jets CRs in the
-  # fit (as good as free rateParams), one per jet category (unlike DL, the SL CRs are large in
-  # boosted too: TT CR boosted ~90k, W CR boosted ~4.5k MC-weighted events over the four eras at
-  # MX 300). SL names of their own: a different selection from DL's TT / DY normalisations.
+  # TT and W+jets normalisations: generous priors, one per jet category; the fit has the SR windows
+  # only (no control region), so they are constrained by the SR alone. SL names of their own: a
+  # different selection from DL's TT / DY normalisations.
   - name: CMS_bbww_SL_norm_TT_res2b
     type: lnN
     processes: [ TT ]
-    categories: [ SR_res2b, TT_res2b, W_res2b ]
+    categories: [ SR_res2b ]
     value: 0.10
   - name: CMS_bbww_SL_norm_TT_recovery
     type: lnN
     processes: [ TT ]
-    categories: [ SR_recovery, TT_recovery, W_recovery ]
+    categories: [ SR_recovery ]
     value: 0.10
   - name: CMS_bbww_SL_norm_TT_boosted
     type: lnN
     processes: [ TT ]
-    categories: [ SR_boosted, TT_boosted, W_boosted ]
+    categories: [ SR_boosted ]
     value: 0.10
   - name: CMS_bbww_SL_norm_W_res2b
     type: lnN
     processes: [ W ]
-    categories: [ SR_res2b, TT_res2b, W_res2b ]
+    categories: [ SR_res2b ]
     value: 0.20
   - name: CMS_bbww_SL_norm_W_recovery
     type: lnN
     processes: [ W ]
-    categories: [ SR_recovery, TT_recovery, W_recovery ]
+    categories: [ SR_recovery ]
     value: 0.20
   - name: CMS_bbww_SL_norm_W_boosted
     type: lnN
     processes: [ W ]
-    categories: [ SR_boosted, TT_boosted, W_boosted ]
+    categories: [ SR_boosted ]
     value: 0.20

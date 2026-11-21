@@ -47,7 +47,8 @@ uncertainties:
       member_values: { TT: [ -0.027, 0.028 ], ST: [ -0.015, 0.015 ] }
   # H: ttH's (https://twiki.cern.ch/twiki/bin/view/LHCPhysics/LHCHWG136TeVxsec_extrap)
   # W: no value in DL either (there W is a nonprompt-lepton normalisation); here its normalisation
-  # is free-floating per category (normalisations.yaml), constrained by the W+jets CR.
+  # is a prior per jet category (normalisations.yaml), constrained by the SR windows alone (no control
+  # region in the SL fit).
   - name: PDF_alphas
     type: shape
     processes: [ TT, ST, DY, Minor ]
