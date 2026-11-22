@@ -5,7 +5,8 @@ Analysis/hist_booking.py), which include the datacard input regions and the CI w
 its windows through FLAF's own rule (FLAF/Common/PlotBlinding.py) without an error; every region pattern
 matches a plotted region (a misspelt pattern would leave its region to "*"); in the single-lepton window
 flavour no region falls to "*", only the signal-like selection (SR_SL, its HME window and side bins) is
-blinded, and the HME window of each mass keeps its 50 %-of-signal threshold.
+blinded, and the HME window of each mass keeps its 50 %-of-signal threshold. The study model of the cross-mass
+signal filling (SL_CrossMassSignals) is the only one that lifts signal_params.
 Plain Python.
 """
 
@@ -124,6 +125,19 @@ class PerRegionBlinding(unittest.TestCase):
                     self.assertEqual(
                         blind_windows(var, var, PER_REGION[var], region), []
                     )
+
+    def test_cross_mass_model_is_a_study_model(self):
+        # the model of the cross-mass signal filling fills every binary DNN for every signal, and has no
+        # background nor data; the models of the results keep the signal_params restriction
+        models = load("config/phys_models.yaml")
+        cross = models["SL_CrossMassSignals"]
+        self.assertIs(cross["apply_signal_params"], False)
+        self.assertEqual(cross.get("backgrounds") or [], [])
+        self.assertNotIn("data", cross)
+        for name, model in models.items():
+            if name != "SL_CrossMassSignals":
+                with self.subTest(model=name):
+                    self.assertTrue(model.get("apply_signal_params", True))
 
     def test_window_keeps_the_half_signal_threshold(self):
         for var, entry in PER_REGION.items():

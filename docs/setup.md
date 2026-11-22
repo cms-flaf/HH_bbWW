@@ -61,6 +61,20 @@ process it stands for, so the [stitching](https://cms-flaf.github.io/FLAF/concep
 is exercised over the whole anaTuple → merge chain; keep them in step when you change the real
 ones.
 
+`SL_CrossMassSignals` is a study model, never the model of the limits or of the plots of results: the six signal
+processes only, with `apply_signal_params: false`, so that every binary DNN `TwoStageDNN_M<MX>_binary` is filled
+for the signals of every mass (the limit models fill it for the signal of mass MX only). The booking still puts the
+score of MX in the HME sub-regions of MX only, so its histograms hold, in the window and side bins of each mass,
+every signal in that mass's score — the input of the s/√b blinding of the SL binary DNNs
+([Control plots](analysis.md#control-plots)). It is filled once, nominal only, from the existing histTuples into a
+version and histogram storage of its own: in a `user_custom` file `phys_model: SL_CrossMassSignals`,
+`compute_unc_histograms: false` (nominal only; the upstream settings stay the production's) and `fs_Hists` /
+`fs_default` of its own, then `HistMergerTask --version <new> --HistTupleProducerTask-version <production>
+--ana-version <production's> --variables <the binary DNNs>` (a new `--version`: with the production's own, the
+local law job files of the two runs would be shared). Launch it only after `HistTupleProducerTask --version
+<production> --print-status 0`, with the same `--era`, `--user-custom` and `--ana-version`, shows the histTuples
+complete in every era: anything missing would be produced into the production's version and storage.
+
 ## Next
 
 - [Running the analysis](analysis.md) — the bb̄WW-specific run notes (DeepHME, b-tag-shape cache,
