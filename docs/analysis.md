@@ -312,9 +312,12 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
   lowest such edge over spins, channels and categories. The upper bins of that binning hold more than
   their 1/20 share of the signal (each is as narrow as the input bins and the background gates allow
   while reaching its target), so this is fewer than 10 of 20 bins. In the HME side bins of `SR_SL`
-  (`SR_SL_HMESB*_m<MX>`) and in `SR_SL` itself a bin is hidden if its s/√b (b = TT, the signal of MX, in
-  20 bins of equal signal of the window) reaches the smallest s/√b of the window's hidden bins, from the
-  lowest such bin upwards; `SR_SL`, which holds the window, at least from the window's threshold.
+  (`SR_SL_HMESB*_m<MX>`) and in `SR_SL` itself a bin is hidden if the largest s/√b over the signals of the
+  25 masses (b = TT, in 20 bins of equal signal of the window of MX) reaches the smallest s/√b of the
+  window's hidden bins, from the lowest such bin upwards; `SR_SL`, which holds the window, at least from
+  the window's threshold. The side bins of a mass lie where the windows of its neighbours are, so most
+  of them are hidden whole. The signals of the other masses come from the study model
+  `SL_CrossMassSignals` ([Setup](setup.md)).
   `SR_SL_Fakeable` and the `CR_SL_*` are never blinded. The regions of other flavours (CI) keep the
   window's threshold. `test/test_plot_blinding_config.py` checks that the
   thresholds cover every region the scores are plotted in. The binary DNNs of other masses stay blinded
