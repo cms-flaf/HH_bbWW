@@ -306,20 +306,21 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
 - **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
-  threshold per mass and region (`blind_ranges` per region). In the HME window of MX of `SR_SL`
-  (`SR_SL_HMESub_m<MX>`): from the SR binning of the SL datacards (20 bins of equal signal targeted), in
-  each spin, channel and category the lower edge of the upper bins that hold half of the signal, the
-  lowest such edge over spins, channels and categories. The upper bins of that binning hold more than
-  their 1/20 share of the signal (each is as narrow as the input bins and the background gates allow
-  while reaching its target), so this is fewer than 10 of 20 bins. In the HME side bins of `SR_SL`
-  (`SR_SL_HMESB*_m<MX>`) and in `SR_SL` itself a bin is hidden if the largest s/√b over the signals of the
-  25 masses (b = TT, in 20 bins of equal signal of the window of MX) reaches the smallest s/√b of the
-  window's hidden bins, from the lowest such bin upwards; `SR_SL`, which holds the window, at least from
-  the window's threshold. The side bins of a mass lie where the windows of its neighbours are, so most
-  of them are hidden whole. The signals of the other masses come from the study model
-  `SL_CrossMassSignals` ([Setup](setup.md)).
-  `SR_SL_Fakeable` and the `CR_SL_*` are never blinded. The regions of other flavours (CI) keep the
-  window's threshold. `test/test_plot_blinding_config.py` checks that the
+  threshold per mass and region (`blind_ranges` per region). Each mass m′ has a reference per spin and
+  channel: 0.2 × its largest s/√b (b = TT) over the fit bins of the three categories of that channel in
+  its own HME window (the SR binning of the SL datacards, the score flows in the first and last bin as
+  there). In each signal-like region of the score of MX — its HME window `SR_SL_HMESub_m<MX>`, the HME
+  side bins of `SR_SL` (`SR_SL_HMESB*_m<MX>`) and `SR_SL` itself — per spin, channel and category, in
+  the fit bins of the window of MX, the data are shown from the lowest score up to the first bin where
+  s/√b of any of the 25 masses reaches that mass's reference (same spin and channel; a bin without TT
+  holding any signal reaches every reference), and hidden from that bin upwards; the lowest such edge
+  over spins, channels and categories. A region where no bin reaches a reference is not blinded.
+  `SR_SL`, which holds the window, is hidden at least from the window's threshold. Neighbouring masses
+  often set the threshold: at low mass a wide bin with thousands of TT events reaches the reference of a
+  neighbour although s/b is below 0.1 %, and the side bins of a mass lie where the windows of its
+  neighbours are. The signals of the other masses come from the study model `SL_CrossMassSignals`
+  ([Setup](setup.md)). `SR_SL_Fakeable` and the `CR_SL_*` are never blinded. The regions of other
+  flavours (CI) keep the window's threshold. `test/test_plot_blinding_config.py` checks that the
   thresholds cover every region the scores are plotted in. The binary DNNs of other masses stay blinded
   whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
