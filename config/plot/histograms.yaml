@@ -2513,21 +2513,24 @@ DNN_m1500_vs_HME:
 
 # Two-stage DNN binary: the raw signal-node logit (config/global.yaml binary_output save_as: logit),
 # not bounded: scores outside [-23.5, 23.5] are in the flows
-# Blinding of the 25 binary DNNs with SL windows, per region (user, 2026-11-20 to 2026-11-23). Reference of each
-# mass m', spin and channel: 0.2 x the largest s_m'/sqrt(b) over the fit bins (the SR binning of the SL datacards,
-# the score flows in the first and last bin as there) of the three categories of that channel in the HME window of
-# m' (b = TT). In each signal-like region of the score of MX (its HME window SR_SL_HMESub_m<MX>, the HME side bins
-# of SR_SL SR_SL_HMESB*_m<MX>, SR_SL itself), per spin, channel and category, in the fit bins of the window of MX:
-# from low to high score the data are shown up to the first bin where s_m'/sqrt(b) reaches the reference of m'
-# (same spin and channel) for any of the 25 masses m' (a bin without TT holding any signal reaches every
-# reference), and hidden from that bin's lower edge upwards ([ -23.5, 23.5 ]: the whole axis; [ ]: no bin
-# reaches a reference); the lowest edge over spins, channels and categories. SR_SL, which holds the window, at
-# least from the window's threshold. SR_SL_Fakeable and the CR_SL_* are never blinded: [ ]. "*": the regions of
-# other flavours (CI), with the window's threshold. Derived from the v2610_sl_v3 histograms, the binning of its SR cards
-# and the signals of every mass in every binary DNN (the study model SL_CrossMassSignals, v2610_sl_v3_xmass)
-# (2026-11-23); to be derived again whenever the SL binning or its gates change.
-# FLAF applies the windows per region (Common/PlotBlinding.py); test/test_plot_blinding_config.py checks that
-# they cover every region the scores are plotted in.
+# Blinding of the 25 binary DNNs with SL windows, per region, channel and category (user, 2026-11-20 to
+# 2026-11-23). Reference of each mass m', spin and channel: 0.2 x the largest s_m'/sqrt(b) over the fit bins (the
+# SR binning of the SL datacards, the score flows in the first and last bin as there) of the three categories of
+# that channel in the HME window of m' (b = TT). In each signal-like region of the score of MX (its HME window
+# SR_SL_HMESub_m<MX>, the HME side bins of SR_SL SR_SL_HMESB*_m<MX>, SR_SL itself), per spin, channel and
+# category, in the fit bins of the window of MX: from low to high score the data are shown up to the first bin
+# where s_m'/sqrt(b) reaches the reference of m' (same spin and channel) for any of the 25 masses m' (a bin
+# without TT holding any signal reaches every reference), and hidden from that bin's lower edge upwards
+# ([ -23.5, 23.5 ]: the whole axis; [ ]: no bin reaches a reference); per channel and category the lowest edge
+# over the spins. SR_SL, which holds the window, at least from the window's threshold of the same channel and
+# category. "other" of a channel (the inclusive category) and of a region (the dilepton channels): the lowest
+# threshold of the plots beside it. SR_SL_Fakeable and the CR_SL_* are never blinded: [ ]. The top-level
+# "other": the regions of other flavours (CI), with the lowest threshold of the window. Derived from the
+# v2610_sl_v3 histograms, the binning of its SR cards and the signals of every mass in every binary DNN (the
+# study model SL_CrossMassSignals, v2610_sl_v3_xmass) (2026-11-23); to be derived again whenever the SL binning
+# or its gates change.
+# FLAF resolves the windows of each plot as it does x_rebin (Common/PlotKeys.py); test/test_plot_blinding_config.py
+# checks that they cover every channel, category and region the scores are plotted in.
 TwoStageDNN_M250_binary:
   signal_params: { mass: 250 }
   x_bins: "94|-23.5:23.5"
@@ -2536,10 +2539,22 @@ TwoStageDNN_M250_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m250: [ -6.5, 23.5 ]
-    SR_SL_HMESBH1_m250: [ -23.5, 23.5 ]
-    SR_SL_HMESBH2_m250: [ -23.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m250:
+      e: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ -3.0, 23.5 ], other: [ -5.5, 23.5 ] }
+      mu: { res2b: [ -4.0, 23.5 ], recovery: [ ], boosted: [ -6.5, 23.5 ], other: [ -6.5, 23.5 ] }
+      other: [ -6.5, 23.5 ]
+    SR_SL_HMESBH1_m250:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBH2_m250:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -3.0, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -6.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m250: [ ]
     SR_SL_Fakeable_HMESBH1_m250: [ ]
     SR_SL_Fakeable_HMESBH2_m250: [ ]
@@ -2556,7 +2571,7 @@ TwoStageDNN_M250_binary:
     CR_SL_VV_HMESub_m250: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m250: [ ]
-    "*": [ -6.5, 23.5 ]
+    other: [ -6.5, 23.5 ]
 
 TwoStageDNN_M260_binary:
   signal_params: { mass: 260 }
@@ -2566,10 +2581,22 @@ TwoStageDNN_M260_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m260: [ -23.5, 23.5 ]
-    SR_SL_HMESBH1_m260: [ -23.5, 23.5 ]
-    SR_SL_HMESBH2_m260: [ -23.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m260:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -1.0, 23.5 ], boosted: [ -3.0, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -4.0, 23.5 ], recovery: [ -1.0, 23.5 ], boosted: [ -5.5, 23.5 ], other: [ -5.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBH1_m260:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -7.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -7.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBH2_m260:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -7.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -7.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -3.5, 23.5 ], boosted: [ -3.0, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -8.0, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -5.5, 23.5 ], other: [ -8.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m260: [ ]
     SR_SL_Fakeable_HMESBH1_m260: [ ]
     SR_SL_Fakeable_HMESBH2_m260: [ ]
@@ -2586,7 +2613,7 @@ TwoStageDNN_M260_binary:
     CR_SL_VV_HMESub_m260: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m260: [ ]
-    "*": [ -23.5, 23.5 ]
+    other: [ -23.5, 23.5 ]
 
 TwoStageDNN_M270_binary:
   signal_params: { mass: 270 }
@@ -2596,10 +2623,22 @@ TwoStageDNN_M270_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m270: [ -8.0, 23.5 ]
-    SR_SL_HMESBH1_m270: [ -23.5, 23.5 ]
-    SR_SL_HMESBH2_m270: [ -23.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m270:
+      e: { res2b: [ -3.5, 23.5 ], recovery: [ ], boosted: [ -3.5, 23.5 ], other: [ -3.5, 23.5 ] }
+      mu: { res2b: [ -3.5, 23.5 ], recovery: [ -1.0, 23.5 ], boosted: [ -8.0, 23.5 ], other: [ -8.0, 23.5 ] }
+      other: [ -8.0, 23.5 ]
+    SR_SL_HMESBH1_m270:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -7.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -7.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBH2_m270:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -7.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -7.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -3.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -7.0, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -8.0, 23.5 ], other: [ -8.0, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m270: [ ]
     SR_SL_Fakeable_HMESBH1_m270: [ ]
     SR_SL_Fakeable_HMESBH2_m270: [ ]
@@ -2616,7 +2655,7 @@ TwoStageDNN_M270_binary:
     CR_SL_VV_HMESub_m270: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m270: [ ]
-    "*": [ -8.0, 23.5 ]
+    other: [ -8.0, 23.5 ]
 
 TwoStageDNN_M280_binary:
   signal_params: { mass: 280 }
@@ -2626,10 +2665,22 @@ TwoStageDNN_M280_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m280: [ -5.5, 23.5 ]
-    SR_SL_HMESBH1_m280: [ -5.5, 23.5 ]
-    SR_SL_HMESBH2_m280: [ -23.5, 23.5 ]
-    SR_SL: [ -9.5, 23.5 ]
+    SR_SL_HMESub_m280:
+      e: { res2b: [ -5.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -3.0, 23.5 ], other: [ -5.5, 23.5 ] }
+      mu: { res2b: [ -3.0, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -5.0, 23.5 ], other: [ -5.0, 23.5 ] }
+      other: [ -5.5, 23.5 ]
+    SR_SL_HMESBH1_m280:
+      e: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -5.5, 23.5 ] }
+      mu: { res2b: [ -5.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -5.0, 23.5 ] }
+      other: [ -5.5, 23.5 ]
+    SR_SL_HMESBH2_m280:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -9.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -5.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -7.0, 23.5 ], recovery: [ -3.5, 23.5 ], boosted: [ -9.5, 23.5 ], other: [ -9.5, 23.5 ] }
+      mu: { res2b: [ -6.0, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -5.0, 23.5 ], other: [ -6.0, 23.5 ] }
+      other: [ -9.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m280: [ ]
     SR_SL_Fakeable_HMESBH1_m280: [ ]
     SR_SL_Fakeable_HMESBH2_m280: [ ]
@@ -2646,7 +2697,7 @@ TwoStageDNN_M280_binary:
     CR_SL_VV_HMESub_m280: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m280: [ ]
-    "*": [ -5.5, 23.5 ]
+    other: [ -5.5, 23.5 ]
 
 TwoStageDNN_M300_binary:
   signal_params: { mass: 300 }
@@ -2656,11 +2707,26 @@ TwoStageDNN_M300_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m300: [ -3.0, 23.5 ]
-    SR_SL_HMESBL1_m300: [ 0.0, 23.5 ]
-    SR_SL_HMESBH1_m300: [ -7.5, 23.5 ]
-    SR_SL_HMESBH2_m300: [ -7.5, 23.5 ]
-    SR_SL: [ -7.5, 23.5 ]
+    SR_SL_HMESub_m300:
+      e: { res2b: [ -3.0, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -2.0, 23.5 ], other: [ -3.0, 23.5 ] }
+      mu: { res2b: [ -2.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -2.5, 23.5 ] }
+      other: [ -3.0, 23.5 ]
+    SR_SL_HMESBL1_m300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 0.0, 23.5 ], other: [ 0.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ 0.5, 23.5 ] }
+      other: [ 0.0, 23.5 ]
+    SR_SL_HMESBH1_m300:
+      e: { res2b: [ -4.0, 23.5 ], recovery: [ ], boosted: [ -7.5, 23.5 ], other: [ -7.5, 23.5 ] }
+      mu: { res2b: [ -3.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -3.5, 23.5 ] }
+      other: [ -7.5, 23.5 ]
+    SR_SL_HMESBH2_m300:
+      e: { res2b: [ -4.0, 23.5 ], recovery: [ ], boosted: [ -7.5, 23.5 ], other: [ -7.5, 23.5 ] }
+      mu: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -5.5, 23.5 ] }
+      other: [ -7.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -5.0, 23.5 ], recovery: [ -2.5, 23.5 ], boosted: [ -7.5, 23.5 ], other: [ -7.5, 23.5 ] }
+      mu: { res2b: [ -5.5, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -4.0, 23.5 ], other: [ -5.5, 23.5 ] }
+      other: [ -7.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m300: [ ]
     SR_SL_Fakeable_HMESBL1_m300: [ ]
     SR_SL_Fakeable_HMESBH1_m300: [ ]
@@ -2678,7 +2744,7 @@ TwoStageDNN_M300_binary:
     CR_SL_VV_HMESub_m300: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m300: [ ]
-    "*": [ -3.0, 23.5 ]
+    other: [ -3.0, 23.5 ]
 
 TwoStageDNN_M320_binary:
   signal_params: { mass: 320 }
@@ -2688,11 +2754,26 @@ TwoStageDNN_M320_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m320: [ -2.5, 23.5 ]
-    SR_SL_HMESBL1_m320: [ -4.5, 23.5 ]
-    SR_SL_HMESBH1_m320: [ -3.0, 23.5 ]
-    SR_SL_HMESBH2_m320: [ -1.0, 23.5 ]
-    SR_SL: [ -3.5, 23.5 ]
+    SR_SL_HMESub_m320:
+      e: { res2b: [ -2.5, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -1.0, 23.5 ], other: [ -2.5, 23.5 ] }
+      mu: { res2b: [ -2.5, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -2.5, 23.5 ] }
+      other: [ -2.5, 23.5 ]
+    SR_SL_HMESBL1_m320:
+      e: { res2b: [ -4.5, 23.5 ], recovery: [ ], boosted: [ -0.5, 23.5 ], other: [ -4.5, 23.5 ] }
+      mu: { res2b: [ -4.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -4.0, 23.5 ] }
+      other: [ -4.5, 23.5 ]
+    SR_SL_HMESBH1_m320:
+      e: { res2b: [ -3.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -3.0, 23.5 ] }
+      mu: { res2b: [ -3.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -3.0, 23.5 ] }
+      other: [ -3.0, 23.5 ]
+    SR_SL_HMESBH2_m320:
+      e: { res2b: [ -1.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -1.0, 23.5 ] }
+      mu: { res2b: [ 0.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ 0.0, 23.5 ] }
+      other: [ -1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -3.5, 23.5 ], recovery: [ -2.5, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -3.5, 23.5 ] }
+      mu: { res2b: [ -3.5, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -0.5, 23.5 ], other: [ -3.5, 23.5 ] }
+      other: [ -3.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m320: [ ]
     SR_SL_Fakeable_HMESBL1_m320: [ ]
     SR_SL_Fakeable_HMESBH1_m320: [ ]
@@ -2710,7 +2791,7 @@ TwoStageDNN_M320_binary:
     CR_SL_VV_HMESub_m320: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m320: [ ]
-    "*": [ -2.5, 23.5 ]
+    other: [ -2.5, 23.5 ]
 
 TwoStageDNN_M350_binary:
   signal_params: { mass: 350 }
@@ -2720,11 +2801,26 @@ TwoStageDNN_M350_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m350: [ -3.0, 23.5 ]
-    SR_SL_HMESBL1_m350: [ -23.5, 23.5 ]
-    SR_SL_HMESBH1_m350: [ -1.5, 23.5 ]
-    SR_SL_HMESBH2_m350: [ -0.5, 23.5 ]
-    SR_SL: [ -5.0, 23.5 ]
+    SR_SL_HMESub_m350:
+      e: { res2b: [ -3.0, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -1.0, 23.5 ], other: [ -3.0, 23.5 ] }
+      mu: { res2b: [ -3.0, 23.5 ], recovery: [ -0.5, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -3.0, 23.5 ] }
+      other: [ -3.0, 23.5 ]
+    SR_SL_HMESBL1_m350:
+      e: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ -0.5, 23.5 ], other: [ -5.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBH1_m350:
+      e: { res2b: [ -1.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -1.5, 23.5 ] }
+      mu: { res2b: [ -1.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -1.5, 23.5 ] }
+      other: [ -1.5, 23.5 ]
+    SR_SL_HMESBH2_m350:
+      e: { res2b: [ -0.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -0.5, 23.5 ] }
+      mu: { res2b: [ 0.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ 0.5, 23.5 ] }
+      other: [ -0.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -5.0, 23.5 ], recovery: [ -2.5, 23.5 ], boosted: [ -1.0, 23.5 ], other: [ -5.0, 23.5 ] }
+      mu: { res2b: [ -4.5, 23.5 ], recovery: [ -2.5, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -4.5, 23.5 ] }
+      other: [ -5.0, 23.5 ]
     SR_SL_Fakeable_HMESub_m350: [ ]
     SR_SL_Fakeable_HMESBL1_m350: [ ]
     SR_SL_Fakeable_HMESBH1_m350: [ ]
@@ -2742,7 +2838,7 @@ TwoStageDNN_M350_binary:
     CR_SL_VV_HMESub_m350: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m350: [ ]
-    "*": [ -3.0, 23.5 ]
+    other: [ -3.0, 23.5 ]
 
 TwoStageDNN_M360_binary:
   signal_params: { mass: 360 }
@@ -2752,12 +2848,30 @@ TwoStageDNN_M360_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m360: [ -3.0, 23.5 ]
-    SR_SL_HMESBL2_m360: [ ]
-    SR_SL_HMESBL1_m360: [ -5.5, 23.5 ]
-    SR_SL_HMESBH1_m360: [ -1.5, 23.5 ]
-    SR_SL_HMESBH2_m360: [ -0.5, 23.5 ]
-    SR_SL: [ -5.0, 23.5 ]
+    SR_SL_HMESub_m360:
+      e: { res2b: [ -3.0, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -1.0, 23.5 ], other: [ -3.0, 23.5 ] }
+      mu: { res2b: [ -3.0, 23.5 ], recovery: [ -1.0, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -3.0, 23.5 ] }
+      other: [ -3.0, 23.5 ]
+    SR_SL_HMESBL2_m360:
+      e: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      other: [ ]
+    SR_SL_HMESBL1_m360:
+      e: { res2b: [ -5.5, 23.5 ], recovery: [ ], boosted: [ -1.0, 23.5 ], other: [ -5.5, 23.5 ] }
+      mu: { res2b: [ -5.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -5.0, 23.5 ] }
+      other: [ -5.5, 23.5 ]
+    SR_SL_HMESBH1_m360:
+      e: { res2b: [ -1.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -1.5, 23.5 ] }
+      mu: { res2b: [ -1.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ -1.0, 23.5 ] }
+      other: [ -1.5, 23.5 ]
+    SR_SL_HMESBH2_m360:
+      e: { res2b: [ -0.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -0.5, 23.5 ] }
+      mu: { res2b: [ 0.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ 0.0, 23.5 ] }
+      other: [ -0.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -5.0, 23.5 ], recovery: [ -2.5, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -5.0, 23.5 ] }
+      mu: { res2b: [ -5.0, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -5.0, 23.5 ] }
+      other: [ -5.0, 23.5 ]
     SR_SL_Fakeable_HMESub_m360: [ ]
     SR_SL_Fakeable_HMESBL2_m360: [ ]
     SR_SL_Fakeable_HMESBL1_m360: [ ]
@@ -2776,7 +2890,7 @@ TwoStageDNN_M360_binary:
     CR_SL_VV_HMESub_m360: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m360: [ ]
-    "*": [ -3.0, 23.5 ]
+    other: [ -3.0, 23.5 ]
 
 TwoStageDNN_M400_binary:
   signal_params: { mass: 400 }
@@ -2786,12 +2900,30 @@ TwoStageDNN_M400_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m400: [ -2.5, 23.5 ]
-    SR_SL_HMESBL2_m400: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m400: [ -5.0, 23.5 ]
-    SR_SL_HMESBH1_m400: [ 0.0, 23.5 ]
-    SR_SL_HMESBH2_m400: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m400:
+      e: { res2b: [ -2.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -2.5, 23.5 ] }
+      mu: { res2b: [ -2.5, 23.5 ], recovery: [ -0.5, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -2.5, 23.5 ] }
+      other: [ -2.5, 23.5 ]
+    SR_SL_HMESBL2_m400:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -5.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m400:
+      e: { res2b: [ -5.0, 23.5 ], recovery: [ ], boosted: [ 0.0, 23.5 ], other: [ -5.0, 23.5 ] }
+      mu: { res2b: [ -5.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ -5.0, 23.5 ] }
+      other: [ -5.0, 23.5 ]
+    SR_SL_HMESBH1_m400:
+      e: { res2b: [ 0.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 0.0, 23.5 ] }
+      mu: { res2b: [ 0.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 0.0, 23.5 ] }
+      other: [ 0.0, 23.5 ]
+    SR_SL_HMESBH2_m400:
+      e: { res2b: [ 1.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 1.0, 23.5 ], recovery: [ ], boosted: [ ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -7.5, 23.5 ], recovery: [ -2.0, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -1.5, 23.5 ], boosted: [ -1.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m400: [ ]
     SR_SL_Fakeable_HMESBL2_m400: [ ]
     SR_SL_Fakeable_HMESBL1_m400: [ ]
@@ -2810,7 +2942,7 @@ TwoStageDNN_M400_binary:
     CR_SL_VV_HMESub_m400: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m400: [ ]
-    "*": [ -2.5, 23.5 ]
+    other: [ -2.5, 23.5 ]
 
 TwoStageDNN_M450_binary:
   signal_params: { mass: 450 }
@@ -2820,12 +2952,30 @@ TwoStageDNN_M450_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m450: [ -2.0, 23.5 ]
-    SR_SL_HMESBL2_m450: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m450: [ -5.0, 23.5 ]
-    SR_SL_HMESBH1_m450: [ 1.5, 23.5 ]
-    SR_SL_HMESBH2_m450: [ 2.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m450:
+      e: { res2b: [ -2.0, 23.5 ], recovery: [ 0.5, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -2.0, 23.5 ] }
+      mu: { res2b: [ -2.0, 23.5 ], recovery: [ 0.5, 23.5 ], boosted: [ 0.5, 23.5 ], other: [ -2.0, 23.5 ] }
+      other: [ -2.0, 23.5 ]
+    SR_SL_HMESBL2_m450:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m450:
+      e: { res2b: [ -5.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ -5.0, 23.5 ] }
+      mu: { res2b: [ -3.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -3.5, 23.5 ] }
+      other: [ -5.0, 23.5 ]
+    SR_SL_HMESBH1_m450:
+      e: { res2b: [ 1.5, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 1.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m450:
+      e: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      mu: { res2b: [ 2.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      other: [ 2.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -4.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ 0.5, 23.5 ], boosted: [ 0.0, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m450: [ ]
     SR_SL_Fakeable_HMESBL2_m450: [ ]
     SR_SL_Fakeable_HMESBL1_m450: [ ]
@@ -2844,7 +2994,7 @@ TwoStageDNN_M450_binary:
     CR_SL_VV_HMESub_m450: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m450: [ ]
-    "*": [ -2.0, 23.5 ]
+    other: [ -2.0, 23.5 ]
 
 TwoStageDNN_M500_binary:
   signal_params: { mass: 500 }
@@ -2854,12 +3004,30 @@ TwoStageDNN_M500_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m500: [ -0.5, 23.5 ]
-    SR_SL_HMESBL2_m500: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m500: [ -4.5, 23.5 ]
-    SR_SL_HMESBH1_m500: [ 1.0, 23.5 ]
-    SR_SL_HMESBH2_m500: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m500:
+      e: { res2b: [ -0.5, 23.5 ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ -0.5, 23.5 ] }
+      mu: { res2b: [ -0.5, 23.5 ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ -0.5, 23.5 ] }
+      other: [ -0.5, 23.5 ]
+    SR_SL_HMESBL2_m500:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m500:
+      e: { res2b: [ -4.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ -4.5, 23.5 ] }
+      mu: { res2b: [ -4.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ -4.5, 23.5 ] }
+      other: [ -4.5, 23.5 ]
+    SR_SL_HMESBH1_m500:
+      e: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 2.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -6.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m500: [ ]
     SR_SL_Fakeable_HMESBL2_m500: [ ]
     SR_SL_Fakeable_HMESBL1_m500: [ ]
@@ -2878,7 +3046,7 @@ TwoStageDNN_M500_binary:
     CR_SL_VV_HMESub_m500: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m500: [ ]
-    "*": [ -0.5, 23.5 ]
+    other: [ -0.5, 23.5 ]
 
 TwoStageDNN_M550_binary:
   signal_params: { mass: 550 }
@@ -2888,12 +3056,30 @@ TwoStageDNN_M550_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m550: [ 0.5, 23.5 ]
-    SR_SL_HMESBL2_m550: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m550: [ -0.5, 23.5 ]
-    SR_SL_HMESBH1_m550: [ 0.5, 23.5 ]
-    SR_SL_HMESBH2_m550: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m550:
+      e: { res2b: [ 0.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 0.5, 23.5 ] }
+      mu: { res2b: [ 1.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 0.5, 23.5 ]
+    SR_SL_HMESBL2_m550:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m550:
+      e: { res2b: [ -0.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ -0.5, 23.5 ] }
+      mu: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      other: [ -0.5, 23.5 ]
+    SR_SL_HMESBH1_m550:
+      e: { res2b: [ 4.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      mu: { res2b: [ 4.0, 23.5 ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ 0.5, 23.5 ] }
+      other: [ 0.5, 23.5 ]
+    SR_SL_HMESBH2_m550:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m550: [ ]
     SR_SL_Fakeable_HMESBL2_m550: [ ]
     SR_SL_Fakeable_HMESBL1_m550: [ ]
@@ -2912,7 +3098,7 @@ TwoStageDNN_M550_binary:
     CR_SL_VV_HMESub_m550: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m550: [ ]
-    "*": [ 0.5, 23.5 ]
+    other: [ 0.5, 23.5 ]
 
 TwoStageDNN_M600_binary:
   signal_params: { mass: 600 }
@@ -2922,12 +3108,30 @@ TwoStageDNN_M600_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m600: [ 1.0, 23.5 ]
-    SR_SL_HMESBL2_m600: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m600: [ 1.5, 23.5 ]
-    SR_SL_HMESBH1_m600: [ 1.0, 23.5 ]
-    SR_SL_HMESBH2_m600: [ 0.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m600:
+      e: { res2b: [ 1.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      mu: { res2b: [ 2.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m600:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ 3.5, 23.5 ], boosted: [ ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m600:
+      e: { res2b: [ 2.5, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 2.5, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m600:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 4.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m600:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ 0.5, 23.5 ] }
+      other: [ 0.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m600: [ ]
     SR_SL_Fakeable_HMESBL2_m600: [ ]
     SR_SL_Fakeable_HMESBL1_m600: [ ]
@@ -2946,7 +3150,7 @@ TwoStageDNN_M600_binary:
     CR_SL_VV_HMESub_m600: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m600: [ ]
-    "*": [ 1.0, 23.5 ]
+    other: [ 1.0, 23.5 ]
 
 TwoStageDNN_M650_binary:
   signal_params: { mass: 650 }
@@ -2956,12 +3160,30 @@ TwoStageDNN_M650_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m650: [ 1.0, 23.5 ]
-    SR_SL_HMESBL2_m650: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m650: [ 1.5, 23.5 ]
-    SR_SL_HMESBH1_m650: [ 1.0, 23.5 ]
-    SR_SL_HMESBH2_m650: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m650:
+      e: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 2.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m650:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m650:
+      e: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 4.0, 23.5 ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m650:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m650:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m650: [ ]
     SR_SL_Fakeable_HMESBL2_m650: [ ]
     SR_SL_Fakeable_HMESBL1_m650: [ ]
@@ -2980,7 +3202,7 @@ TwoStageDNN_M650_binary:
     CR_SL_VV_HMESub_m650: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m650: [ ]
-    "*": [ 1.0, 23.5 ]
+    other: [ 1.0, 23.5 ]
 
 TwoStageDNN_M700_binary:
   signal_params: { mass: 700 }
@@ -2990,12 +3212,30 @@ TwoStageDNN_M700_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m700: [ 1.5, 23.5 ]
-    SR_SL_HMESBL2_m700: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m700: [ 1.5, 23.5 ]
-    SR_SL_HMESBH1_m700: [ 1.0, 23.5 ]
-    SR_SL_HMESBH2_m700: [ 1.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m700:
+      e: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 2.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBL2_m700:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m700:
+      e: { res2b: [ 3.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 2.0, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m700:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m700:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m700: [ ]
     SR_SL_Fakeable_HMESBL2_m700: [ ]
     SR_SL_Fakeable_HMESBL1_m700: [ ]
@@ -3014,7 +3254,7 @@ TwoStageDNN_M700_binary:
     CR_SL_VV_HMESub_m700: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m700: [ ]
-    "*": [ 1.5, 23.5 ]
+    other: [ 1.5, 23.5 ]
 
 TwoStageDNN_M750_binary:
   signal_params: { mass: 750 }
@@ -3024,12 +3264,30 @@ TwoStageDNN_M750_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m750: [ 1.5, 23.5 ]
-    SR_SL_HMESBL2_m750: [ -23.5, 23.5 ]
-    SR_SL_HMESBL1_m750: [ 1.5, 23.5 ]
-    SR_SL_HMESBH1_m750: [ 1.5, 23.5 ]
-    SR_SL_HMESBH2_m750: [ 0.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m750:
+      e: { res2b: [ 3.5, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ 4.5, 23.5 ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBL2_m750:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ 0.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
+    SR_SL_HMESBL1_m750:
+      e: { res2b: [ 3.5, 23.5 ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH1_m750:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBH2_m750:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 0.5, 23.5 ], other: [ 0.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 0.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m750: [ ]
     SR_SL_Fakeable_HMESBL2_m750: [ ]
     SR_SL_Fakeable_HMESBL1_m750: [ ]
@@ -3048,7 +3306,7 @@ TwoStageDNN_M750_binary:
     CR_SL_VV_HMESub_m750: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m750: [ ]
-    "*": [ 1.5, 23.5 ]
+    other: [ 1.5, 23.5 ]
 
 TwoStageDNN_M800_binary:
   signal_params: { mass: 800 }
@@ -3058,12 +3316,30 @@ TwoStageDNN_M800_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m800: [ 1.0, 23.5 ]
-    SR_SL_HMESBL2_m800: [ 1.0, 23.5 ]
-    SR_SL_HMESBL1_m800: [ 1.0, 23.5 ]
-    SR_SL_HMESBH1_m800: [ 1.0, 23.5 ]
-    SR_SL_HMESBH2_m800: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m800:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ 5.0, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m800:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL1_m800:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH1_m800:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH2_m800:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m800: [ ]
     SR_SL_Fakeable_HMESBL2_m800: [ ]
     SR_SL_Fakeable_HMESBL1_m800: [ ]
@@ -3082,7 +3358,7 @@ TwoStageDNN_M800_binary:
     CR_SL_VV_HMESub_m800: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m800: [ ]
-    "*": [ 1.0, 23.5 ]
+    other: [ 1.0, 23.5 ]
 
 TwoStageDNN_M850_binary:
   signal_params: { mass: 850 }
@@ -3092,12 +3368,30 @@ TwoStageDNN_M850_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m850: [ 1.0, 23.5 ]
-    SR_SL_HMESBL2_m850: [ 1.0, 23.5 ]
-    SR_SL_HMESBL1_m850: [ 1.0, 23.5 ]
-    SR_SL_HMESBH1_m850: [ 2.5, 23.5 ]
-    SR_SL_HMESBH2_m850: [ 1.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m850:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ 4.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m850:
+      e: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL1_m850:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH1_m850:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      other: [ 2.5, 23.5 ]
+    SR_SL_HMESBH2_m850:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m850: [ ]
     SR_SL_Fakeable_HMESBL2_m850: [ ]
     SR_SL_Fakeable_HMESBL1_m850: [ ]
@@ -3116,7 +3410,7 @@ TwoStageDNN_M850_binary:
     CR_SL_VV_HMESub_m850: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m850: [ ]
-    "*": [ 1.0, 23.5 ]
+    other: [ 1.0, 23.5 ]
 
 TwoStageDNN_M900_binary:
   signal_params: { mass: 900 }
@@ -3126,12 +3420,30 @@ TwoStageDNN_M900_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m900: [ 1.0, 23.5 ]
-    SR_SL_HMESBL2_m900: [ 1.0, 23.5 ]
-    SR_SL_HMESBL1_m900: [ 1.0, 23.5 ]
-    SR_SL_HMESBH1_m900: [ 2.0, 23.5 ]
-    SR_SL_HMESBH2_m900: [ 2.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m900:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ 4.5, 23.5 ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL2_m900:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBL1_m900:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.0, 23.5 ], other: [ 1.0, 23.5 ] }
+      other: [ 1.0, 23.5 ]
+    SR_SL_HMESBH1_m900:
+      e: { res2b: [ 6.0, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL_HMESBH2_m900:
+      e: { res2b: [ 6.0, 23.5 ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ 4.5, 23.5 ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m900: [ ]
     SR_SL_Fakeable_HMESBL2_m900: [ ]
     SR_SL_Fakeable_HMESBL1_m900: [ ]
@@ -3150,7 +3462,7 @@ TwoStageDNN_M900_binary:
     CR_SL_VV_HMESub_m900: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m900: [ ]
-    "*": [ 1.0, 23.5 ]
+    other: [ 1.0, 23.5 ]
 
 TwoStageDNN_M1000_binary:
   signal_params: { mass: 1000 }
@@ -3160,12 +3472,30 @@ TwoStageDNN_M1000_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1000: [ 2.0, 23.5 ]
-    SR_SL_HMESBL2_m1000: [ 1.5, 23.5 ]
-    SR_SL_HMESBL1_m1000: [ 2.0, 23.5 ]
-    SR_SL_HMESBH1_m1000: [ 2.0, 23.5 ]
-    SR_SL_HMESBH2_m1000: [ 2.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1000:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL_HMESBL2_m1000:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 1.5, 23.5 ], other: [ 1.5, 23.5 ] }
+      other: [ 1.5, 23.5 ]
+    SR_SL_HMESBL1_m1000:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL_HMESBH1_m1000:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL_HMESBH2_m1000:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1000: [ ]
     SR_SL_Fakeable_HMESBL2_m1000: [ ]
     SR_SL_Fakeable_HMESBL1_m1000: [ ]
@@ -3184,7 +3514,7 @@ TwoStageDNN_M1000_binary:
     CR_SL_VV_HMESub_m1000: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1000: [ ]
-    "*": [ 2.0, 23.5 ]
+    other: [ 2.0, 23.5 ]
 
 TwoStageDNN_M1100_binary:
   signal_params: { mass: 1100 }
@@ -3194,12 +3524,30 @@ TwoStageDNN_M1100_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1100: [ 2.5, 23.5 ]
-    SR_SL_HMESBL2_m1100: [ 3.0, 23.5 ]
-    SR_SL_HMESBL1_m1100: [ 3.0, 23.5 ]
-    SR_SL_HMESBH1_m1100: [ 3.0, 23.5 ]
-    SR_SL_HMESBH2_m1100: [ 3.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1100:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      other: [ 2.5, 23.5 ]
+    SR_SL_HMESBL2_m1100:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBL1_m1100:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBH1_m1100:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBH2_m1100:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1100: [ ]
     SR_SL_Fakeable_HMESBL2_m1100: [ ]
     SR_SL_Fakeable_HMESBL1_m1100: [ ]
@@ -3218,7 +3566,7 @@ TwoStageDNN_M1100_binary:
     CR_SL_VV_HMESub_m1100: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1100: [ ]
-    "*": [ 2.5, 23.5 ]
+    other: [ 2.5, 23.5 ]
 
 TwoStageDNN_M1200_binary:
   signal_params: { mass: 1200 }
@@ -3228,12 +3576,30 @@ TwoStageDNN_M1200_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1200: [ 2.0, 23.5 ]
-    SR_SL_HMESBL2_m1200: [ 3.0, 23.5 ]
-    SR_SL_HMESBL1_m1200: [ 3.0, 23.5 ]
-    SR_SL_HMESBH1_m1200: [ 4.0, 23.5 ]
-    SR_SL_HMESBH2_m1200: [ 3.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1200:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.0, 23.5 ], other: [ 2.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 2.0, 23.5 ]
+    SR_SL_HMESBL2_m1200:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBL1_m1200:
+      e: { res2b: [ 7.0, 23.5 ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBH1_m1200:
+      e: { res2b: [ 7.0, 23.5 ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 4.0, 23.5 ]
+    SR_SL_HMESBH2_m1200:
+      e: { res2b: [ 7.0, 23.5 ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ 6.5, 23.5 ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1200: [ ]
     SR_SL_Fakeable_HMESBL2_m1200: [ ]
     SR_SL_Fakeable_HMESBL1_m1200: [ ]
@@ -3252,7 +3618,7 @@ TwoStageDNN_M1200_binary:
     CR_SL_VV_HMESub_m1200: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1200: [ ]
-    "*": [ 2.0, 23.5 ]
+    other: [ 2.0, 23.5 ]
 
 TwoStageDNN_M1300_binary:
   signal_params: { mass: 1300 }
@@ -3262,12 +3628,30 @@ TwoStageDNN_M1300_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1300: [ 2.5, 23.5 ]
-    SR_SL_HMESBL2_m1300: [ 3.5, 23.5 ]
-    SR_SL_HMESBL1_m1300: [ 3.5, 23.5 ]
-    SR_SL_HMESBH1_m1300: [ 3.5, 23.5 ]
-    SR_SL_HMESBH2_m1300: [ 3.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 2.5, 23.5 ]
+    SR_SL_HMESBL2_m1300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ 7.5, 23.5 ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBL1_m1300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ 7.0, 23.5 ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBH1_m1300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ 7.0, 23.5 ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBH2_m1300:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1300: [ ]
     SR_SL_Fakeable_HMESBL2_m1300: [ ]
     SR_SL_Fakeable_HMESBL1_m1300: [ ]
@@ -3286,7 +3670,7 @@ TwoStageDNN_M1300_binary:
     CR_SL_VV_HMESub_m1300: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1300: [ ]
-    "*": [ 2.5, 23.5 ]
+    other: [ 2.5, 23.5 ]
 
 TwoStageDNN_M1400_binary:
   signal_params: { mass: 1400 }
@@ -3296,12 +3680,30 @@ TwoStageDNN_M1400_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1400: [ 3.0, 23.5 ]
-    SR_SL_HMESBL2_m1400: [ 4.0, 23.5 ]
-    SR_SL_HMESBL1_m1400: [ 4.0, 23.5 ]
-    SR_SL_HMESBH1_m1400: [ 3.0, 23.5 ]
-    SR_SL_HMESBH2_m1400: [ 4.0, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1400:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBL2_m1400:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 4.0, 23.5 ]
+    SR_SL_HMESBL1_m1400:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 4.0, 23.5 ]
+    SR_SL_HMESBH1_m1400:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.0, 23.5 ], other: [ 3.0, 23.5 ] }
+      other: [ 3.0, 23.5 ]
+    SR_SL_HMESBH2_m1400:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.5, 23.5 ], other: [ 4.5, 23.5 ] }
+      mu: { res2b: [ 7.5, 23.5 ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      other: [ 4.0, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1400: [ ]
     SR_SL_Fakeable_HMESBL2_m1400: [ ]
     SR_SL_Fakeable_HMESBL1_m1400: [ ]
@@ -3320,7 +3722,7 @@ TwoStageDNN_M1400_binary:
     CR_SL_VV_HMESub_m1400: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1400: [ ]
-    "*": [ 3.0, 23.5 ]
+    other: [ 3.0, 23.5 ]
 
 TwoStageDNN_M1500_binary:
   signal_params: { mass: 1500 }
@@ -3330,12 +3732,30 @@ TwoStageDNN_M1500_binary:
   use_log_y: True
   divide_by_bin_width: False
   blind_ranges:
-    SR_SL_HMESub_m1500: [ 2.5, 23.5 ]
-    SR_SL_HMESBL2_m1500: [ 3.5, 23.5 ]
-    SR_SL_HMESBL1_m1500: [ 3.5, 23.5 ]
-    SR_SL_HMESBH1_m1500: [ 3.5, 23.5 ]
-    SR_SL_HMESBH2_m1500: [ 7.5, 23.5 ]
-    SR_SL: [ -23.5, 23.5 ]
+    SR_SL_HMESub_m1500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 2.5, 23.5 ], other: [ 2.5, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 2.5, 23.5 ]
+    SR_SL_HMESBL2_m1500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      mu: { res2b: [ 7.5, 23.5 ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBL1_m1500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ 4.0, 23.5 ], other: [ 4.0, 23.5 ] }
+      mu: { res2b: [ ], recovery: [ 6.5, 23.5 ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBH1_m1500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      mu: { res2b: [ ], recovery: [ ], boosted: [ 3.5, 23.5 ], other: [ 3.5, 23.5 ] }
+      other: [ 3.5, 23.5 ]
+    SR_SL_HMESBH2_m1500:
+      e: { res2b: [ ], recovery: [ ], boosted: [ ], other: [ ] }
+      mu: { res2b: [ 7.5, 23.5 ], recovery: [ ], boosted: [ ], other: [ 7.5, 23.5 ] }
+      other: [ 7.5, 23.5 ]
+    SR_SL:
+      e: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      mu: { res2b: [ -23.5, 23.5 ], recovery: [ -23.5, 23.5 ], boosted: [ -23.5, 23.5 ], other: [ -23.5, 23.5 ] }
+      other: [ -23.5, 23.5 ]
     SR_SL_Fakeable_HMESub_m1500: [ ]
     SR_SL_Fakeable_HMESBL2_m1500: [ ]
     SR_SL_Fakeable_HMESBL1_m1500: [ ]
@@ -3354,7 +3774,7 @@ TwoStageDNN_M1500_binary:
     CR_SL_VV_HMESub_m1500: [ ]
     CR_SL_WJets: [ ]
     CR_SL_WJets_HMESub_m1500: [ ]
-    "*": [ 2.5, 23.5 ]
+    other: [ 2.5, 23.5 ]
 
 TwoStageDNN_M1600_binary:
   signal_params: { mass: 1600 }

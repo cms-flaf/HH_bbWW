@@ -306,23 +306,29 @@ FLAF's, described in its [HistPlotTask reference](https://cms-flaf.github.io/FLA
   data is shown even for variables blinded in the signal regions (`blind: true` in
   `config/plot/histograms.yaml`).
 - **Binary DNNs of the SL windows** (`TwoStageDNN_M<MX>_binary`, 250–1500 GeV): data hidden above a
-  threshold per mass and region (`blind_ranges` per region). Each mass m′ has a reference per spin and
+  threshold per mass, region, channel and category (`blind_ranges`, resolved per plot as FLAF resolves
+  `x_rebin`). Each mass m′ has a reference per spin and
   channel: 0.2 × its largest s/√b (b = TT) over the fit bins of the three categories of that channel in
   its own HME window (the SR binning of the SL datacards, the score flows in the first and last bin as
   there). In each signal-like region of the score of MX — its HME window `SR_SL_HMESub_m<MX>`, the HME
   side bins of `SR_SL` (`SR_SL_HMESB*_m<MX>`) and `SR_SL` itself — per spin, channel and category, in
   the fit bins of the window of MX, the data are shown from the lowest score up to the first bin where
   s/√b of any of the 25 masses reaches that mass's reference (same spin and channel; a bin without TT
-  holding any signal reaches every reference), and hidden from that bin upwards; the lowest such edge
-  over spins, channels and categories. A region where no bin reaches a reference is not blinded.
-  `SR_SL`, which holds the window, is hidden at least from the window's threshold. Neighbouring masses
+  holding any signal reaches every reference), and hidden from that bin upwards; per channel and
+  category the lower of the two spins' edges. A plot where no bin reaches a reference is not blinded.
+  `SR_SL`, which holds the window, is hidden at least from the window's threshold of the same channel and
+  category. The inclusive category takes the lowest threshold of the channel's three categories (it
+  also holds the resolved events whose leading b jet is not tagged, which none of them holds); a
+  channel without a key of its own (the dilepton channels, whose SL regions are empty) the lowest of
+  the region. Neighbouring masses
   often set the threshold: at low mass a wide bin with thousands of TT events reaches the reference of a
   neighbour although s/b is below 0.1 %, and the side bins of a mass lie where the windows of its
   neighbours are. The signals of the other masses come from the study model `SL_CrossMassSignals`
-  ([Setup](setup.md)). `SR_SL_Fakeable` and the `CR_SL_*` are never blinded. The regions of other
-  flavours (CI) keep the window's threshold. `test/test_plot_blinding_config.py` checks that the
-  thresholds cover every region the scores are plotted in. The binary DNNs of other masses stay blinded
-  whole (`blind: true`).
+  ([Setup](setup.md)). `SR_SL_Fakeable` and the `CR_SL_*` are never blinded. A region without a key of
+  its own (those of other flavours, e.g. CI) takes the lowest threshold of the window; a CI region with
+  an SL name takes that name's key. `test/test_plot_blinding_config.py` checks that
+  the thresholds cover every channel, category and region the scores are plotted in. The binary DNNs of
+  other masses stay blinded whole (`blind: true`).
 - **Labels:** "CMS Preliminary" ("CMS Simulation Preliminary" where the data are blinded); the
   luminosity of each era is the one the simulation is normalised to; axis titles carry their
   units.

@@ -132,13 +132,14 @@ Invariants a diff must keep:
 - The SL fit has the SR windows only (user, 2026-11-20): the TT and W+jets control regions have no fake
   estimate and are not fitted; do not propose adding them back. `Fakes` is `preprocess: {gates: false}`
   in the SL cards (its parts can be empty and its Down variations zero: it must not gate the binning).
-  The per-region `blind_ranges` of the SL binary DNNs are a user rule (2026-11-20 to 2026-11-23): in the
-  HME window of the mass, its HME side bins and `SR_SL`, hidden from the first fit bin where the s/√b of
-  any mass reaches 0.2 × that mass's own largest s/√b in its window (per spin and channel, b = TT);
-  `SR_SL_Fakeable` and the `CR_SL_*` never blinded (2026-11-21); see `config/plot/histograms.yaml`.
-  The threshold 0.2 and the per-channel reference are the user's choices: do not propose other values.
-  Every region the scores are plotted in must have its own key or fall to `"*"` only outside the SL
-  flavour (`test/test_plot_blinding_config.py`).
+  The `blind_ranges` of the SL binary DNNs, per region, channel and category (FLAF `Common/PlotKeys.py`,
+  as `x_rebin`), are a user rule (2026-11-20 to 2026-11-23): in the HME window of the mass, its HME side
+  bins and `SR_SL`, hidden from the first fit bin where the s/√b of any mass reaches 0.2 × that mass's
+  own largest s/√b in its window (per spin and channel, b = TT); `SR_SL_Fakeable` and the `CR_SL_*`
+  never blinded (2026-11-21); see `config/plot/histograms.yaml`. The threshold 0.2 and the per-channel
+  reference are the user's choices: do not propose other values. Every SL region the scores are plotted
+  in has its own key; each `other` hides at least what the plots beside it hide
+  (`test/test_plot_blinding_config.py`).
 
 ### Integration test
 
