@@ -342,12 +342,25 @@ class DataFrameBuilderForHistograms(DataFrameBuilderBase):
 
             self.DefineAndAppend(
                 "SR_SL",
-                "return predicted_class == 0 && Iso && event_selection && tau_veto;",
+                "return SL && predicted_class == 0 && Iso && event_selection && tau_veto;",
             )
             for class_idx, class_name in enumerate(classes[1:], start=1):
                 self.DefineAndAppend(
                     f"CR_SL_{class_name}",
-                    f"return predicted_class == {class_idx} && Iso && event_selection && tau_veto;",
+                    f"return SL && predicted_class == {class_idx} && Iso && event_selection && tau_veto;",
+                )
+
+                self.DefineAndAppend(
+                    f"CR_SL_{class_name}_Fakeable",
+                    f"""
+                        if (!(SL && predicted_class == {class_idx} && base_event_selection && tau_veto))
+                            return false;
+                        if (lep1_legType == 1)
+                            return lep1_Electron_mvaIso > -0.9 && lep1_Electron_mvaIso_WP80 != 1;
+                        if (lep1_legType == 2)
+                            return lep1_Muon_tightId == 1 && lep1_Muon_pfRelIso04_all > 0.15 && lep1_Muon_pfRelIso04_all < 0.4;
+                        return false;
+                    """,
                 )
 
             self.DefineAndAppend(

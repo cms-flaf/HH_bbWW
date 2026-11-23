@@ -100,7 +100,7 @@ import re
 
 import yaml
 
-DEFAULT_MAX_SUB_REGION_KEY_VARS = 5000
+DEFAULT_MAX_SUB_REGION_KEY_VARS = 5500
 ENTRY_KEYS = {"name", "cuts", "regions", "points"}
 OPTIONAL_ENTRY_KEYS = {"channels", "sidebands", "variables"}
 SIDEBAND_KEYS = {"variable", "count", "min_width", "gap", "low_limit", "high_limit"}

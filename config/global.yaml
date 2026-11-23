@@ -545,7 +545,7 @@ custom_subcategories: [ ]
 signal_plot_scale: bkg
 # Control regions of the HistPlotTask plots: no signal overlay, and the data shown even for a
 # variable blinded (histograms.yaml `blind`) in the other regions.
-plot_control_regions: [ TT_CR, DY_CR ]
+plot_control_regions: [ TT_CR, DY_CR, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV ]
 # The HistPlotTask plots' processes, grouped: each entry is the sum of its processes -- one
 # stack entry for backgrounds, stacked in this order from the bottom, one curve for signals.
 # color: its first process's by default. A group none of whose processes is in the physics model
@@ -1549,56 +1549,56 @@ histTuple_flavors:
       - TwoStageDNN_H
       - TwoStageDNN_VV
 
-      - name: binary_DNN_m250_vs_HME
-        vars: [ TwoStageDNN_M250_binary, DeepHME_mass ]
-      - name: binary_DNN_m260_vs_HME
-        vars: [ TwoStageDNN_M260_binary, DeepHME_mass ]
-      - name: binary_DNN_m270_vs_HME
-        vars: [ TwoStageDNN_M270_binary, DeepHME_mass ]
-      - name: binary_DNN_m280_vs_HME
-        vars: [ TwoStageDNN_M280_binary, DeepHME_mass ]
-      - name: binary_DNN_m300_vs_HME
-        vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
-      - name: binary_DNN_m320_vs_HME
-        vars: [ TwoStageDNN_M320_binary, DeepHME_mass ]
-      - name: binary_DNN_m350_vs_HME
-        vars: [ TwoStageDNN_M350_binary, DeepHME_mass ]
-      - name: binary_DNN_m360_vs_HME
-        vars: [ TwoStageDNN_M360_binary, DeepHME_mass ]
-      - name: binary_DNN_m400_vs_HME
-        vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
-      - name: binary_DNN_m450_vs_HME
-        vars: [ TwoStageDNN_M450_binary, DeepHME_mass ]
-      - name: binary_DNN_m500_vs_HME
-        vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
-      - name: binary_DNN_m550_vs_HME
-        vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
-      - name: binary_DNN_m600_vs_HME
-        vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
-      - name: binary_DNN_m650_vs_HME
-        vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
-      - name: binary_DNN_m700_vs_HME
-        vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
-      - name: binary_DNN_m750_vs_HME
-        vars: [ TwoStageDNN_M750_binary, DeepHME_mass ]
-      - name: binary_DNN_m800_vs_HME
-        vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
-      - name: binary_DNN_m850_vs_HME
-        vars: [ TwoStageDNN_M850_binary, DeepHME_mass ]
-      - name: binary_DNN_m900_vs_HME
-        vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
-      - name: binary_DNN_m1000_vs_HME
-        vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
-      - name: binary_DNN_m1100_vs_HME
-        vars: [ TwoStageDNN_M1100_binary, DeepHME_mass ]
-      - name: binary_DNN_m1200_vs_HME
-        vars: [ TwoStageDNN_M1200_binary, DeepHME_mass ]
-      - name: binary_DNN_m1300_vs_HME
-        vars: [ TwoStageDNN_M1300_binary, DeepHME_mass ]
-      - name: binary_DNN_m1400_vs_HME
-        vars: [ TwoStageDNN_M1400_binary, DeepHME_mass ]
-      - name: binary_DNN_m1500_vs_HME
-        vars: [ TwoStageDNN_M1500_binary, DeepHME_mass ]
+      # - name: binary_DNN_m250_vs_HME
+      #   vars: [ TwoStageDNN_M250_binary, DeepHME_mass ]
+      # - name: binary_DNN_m260_vs_HME
+      #   vars: [ TwoStageDNN_M260_binary, DeepHME_mass ]
+      # - name: binary_DNN_m270_vs_HME
+      #   vars: [ TwoStageDNN_M270_binary, DeepHME_mass ]
+      # - name: binary_DNN_m280_vs_HME
+      #   vars: [ TwoStageDNN_M280_binary, DeepHME_mass ]
+      # - name: binary_DNN_m300_vs_HME
+      #   vars: [ TwoStageDNN_M300_binary, DeepHME_mass ]
+      # - name: binary_DNN_m320_vs_HME
+      #   vars: [ TwoStageDNN_M320_binary, DeepHME_mass ]
+      # - name: binary_DNN_m350_vs_HME
+      #   vars: [ TwoStageDNN_M350_binary, DeepHME_mass ]
+      # - name: binary_DNN_m360_vs_HME
+      #   vars: [ TwoStageDNN_M360_binary, DeepHME_mass ]
+      # - name: binary_DNN_m400_vs_HME
+      #   vars: [ TwoStageDNN_M400_binary, DeepHME_mass ]
+      # - name: binary_DNN_m450_vs_HME
+      #   vars: [ TwoStageDNN_M450_binary, DeepHME_mass ]
+      # - name: binary_DNN_m500_vs_HME
+      #   vars: [ TwoStageDNN_M500_binary, DeepHME_mass ]
+      # - name: binary_DNN_m550_vs_HME
+      #   vars: [ TwoStageDNN_M550_binary, DeepHME_mass ]
+      # - name: binary_DNN_m600_vs_HME
+      #   vars: [ TwoStageDNN_M600_binary, DeepHME_mass ]
+      # - name: binary_DNN_m650_vs_HME
+      #   vars: [ TwoStageDNN_M650_binary, DeepHME_mass ]
+      # - name: binary_DNN_m700_vs_HME
+      #   vars: [ TwoStageDNN_M700_binary, DeepHME_mass ]
+      # - name: binary_DNN_m750_vs_HME
+      #   vars: [ TwoStageDNN_M750_binary, DeepHME_mass ]
+      # - name: binary_DNN_m800_vs_HME
+      #   vars: [ TwoStageDNN_M800_binary, DeepHME_mass ]
+      # - name: binary_DNN_m850_vs_HME
+      #   vars: [ TwoStageDNN_M850_binary, DeepHME_mass ]
+      # - name: binary_DNN_m900_vs_HME
+      #   vars: [ TwoStageDNN_M900_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1000_vs_HME
+      #   vars: [ TwoStageDNN_M1000_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1100_vs_HME
+      #   vars: [ TwoStageDNN_M1100_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1200_vs_HME
+      #   vars: [ TwoStageDNN_M1200_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1300_vs_HME
+      #   vars: [ TwoStageDNN_M1300_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1400_vs_HME
+      #   vars: [ TwoStageDNN_M1400_binary, DeepHME_mass ]
+      # - name: binary_DNN_m1500_vs_HME
+      #   vars: [ TwoStageDNN_M1500_binary, DeepHME_mass ]
       # - name: binary_DNN_m1600_vs_HME
       #   vars: [ TwoStageDNN_M1600_binary, DeepHME_mass ]
       # - name: binary_DNN_m1700_vs_HME
@@ -1669,6 +1669,128 @@ histTuple_flavors:
       - TwoStageDNN_M1400_binary
       - TwoStageDNN_M1500_binary
 
+  DeepHME_Control:
+    regions: [ TT_CR, DY_CR, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV ]
+    # DNN Outputs (Shapes)
+    fullResolution_variables: [ ]
+
+    variables:
+      - DeepHME_mass
+
+      - TwoStageDNN_Signal
+      - TwoStageDNN_TT
+      - TwoStageDNN_ST
+      - TwoStageDNN_WJets
+      - TwoStageDNN_DY
+      - TwoStageDNN_H
+      - TwoStageDNN_VV
+
+  SL_DNN_Inputs:
+    regions: [ SR_SL, CR_SL_TT, CR_SL_ST, CR_SL_WJets, CR_SL_DY, CR_SL_H, CR_SL_VV ]
+    fullResolution_variables: [ ]
+
+    variables:
+      - TwoStageDNN_Signal
+      - TwoStageDNN_TT
+      - TwoStageDNN_ST
+      - TwoStageDNN_WJets
+      - TwoStageDNN_DY
+      - TwoStageDNN_H
+      - TwoStageDNN_VV
+
+      - HT
+      - bb_CosTheta
+      - Hbb_lepWfromH_dR
+      - PuppiMET_pt
+      - WW_pt
+      - WW_ptToE
+      - bjet1_btagPNetB
+      - bjet1_eta
+      - bjet1_mass
+      - bjet1_phi
+      - bjet1_pt
+      - bjet2_btagPNetB
+      - bjet2_eta
+      - bjet2_mass
+      - bjet2_phi
+      - bjet2_pt
+      - lep1_bjets_minDr
+      - bb_deta
+      - bb_dphi
+      - bb_mass
+      - bb_pt
+      - bb_ptToE
+      - bb_dR
+      - met_bb_dphi
+      - hadT_constituentPtFrac
+      - hadT_hadW_dR
+      - hadT_mass
+      - hadT_pt
+      - hadW_mass
+      - lep1_eta
+      - lep1_pt
+      - lep1_MT
+      - lepT_constituentPtFrac
+      - lepT_mass
+      - lepT_mT
+      - lepT_pt
+
+  Fake_Estimation:
+    regions:
+      - SR_SL
+      - CR_SL_TT
+      - CR_SL_ST
+      - CR_SL_WJets
+      - CR_SL_DY
+      - CR_SL_H
+      - CR_SL_VV
+      - SR_SL_Fakeable
+      - CR_SL_TT_Fakeable
+      - CR_SL_ST_Fakeable
+      - CR_SL_WJets_Fakeable
+      - CR_SL_DY_Fakeable
+      - CR_SL_H_Fakeable
+      - CR_SL_VV_Fakeable
+    # DNN Outputs (Shapes)
+    fullResolution_variables: [ ]
+
+    variables:
+      - DeepHME_mass
+
+      - TwoStageDNN_M250_binary
+      - TwoStageDNN_M260_binary
+      - TwoStageDNN_M270_binary
+      - TwoStageDNN_M280_binary
+      - TwoStageDNN_M300_binary
+      - TwoStageDNN_M320_binary
+      - TwoStageDNN_M350_binary
+      - TwoStageDNN_M360_binary
+      - TwoStageDNN_M400_binary
+      - TwoStageDNN_M450_binary
+      - TwoStageDNN_M500_binary
+      - TwoStageDNN_M550_binary
+      - TwoStageDNN_M600_binary
+      - TwoStageDNN_M650_binary
+      - TwoStageDNN_M700_binary
+      - TwoStageDNN_M750_binary
+      - TwoStageDNN_M800_binary
+      - TwoStageDNN_M850_binary
+      - TwoStageDNN_M900_binary
+      - TwoStageDNN_M1000_binary
+      - TwoStageDNN_M1100_binary
+      - TwoStageDNN_M1200_binary
+      - TwoStageDNN_M1300_binary
+      - TwoStageDNN_M1400_binary
+      - TwoStageDNN_M1500_binary
+
+      - TwoStageDNN_Signal
+      - TwoStageDNN_TT
+      - TwoStageDNN_ST
+      - TwoStageDNN_WJets
+      - TwoStageDNN_DY
+      - TwoStageDNN_H
+      - TwoStageDNN_VV
+
 StatInference:
   # The cards to build, by name: each gets its own datacards, limits and plots, under
   # Datacards/<card>/<era>/, ResonantLimitsTask/<card>/, ... The limit and plot tasks take
@@ -1676,6 +1798,8 @@ StatInference:
   cards:
     DL_spin0: config/Datacards/DL/dl_spin0.yaml
     DL_spin2: config/Datacards/DL/dl_spin2.yaml
+    SL_spin0: config/Datacards/SL/sl_spin0.yaml
+    SL_spin2: config/Datacards/SL/sl_spin2.yaml
   # hist_bins is unset: the shapes reaching the datacard step are already at their final
   # binning, cut by the `preprocess:` step the cards declare.
   # param_values: [ 300 ]
